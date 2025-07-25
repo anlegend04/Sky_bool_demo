@@ -463,6 +463,8 @@ export default function Candidates() {
                 <Input
                   placeholder="Search candidates by name, position, skills..."
                   className="pl-10"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
             </div>
