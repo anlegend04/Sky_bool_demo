@@ -341,10 +341,69 @@ export default function EmailAutomation() {
                   </div>
 
                   <div className="flex space-x-2 pt-3 border-t border-slate-100">
-                    <Button size="sm" variant="outline" className="flex-1">
-                      <Edit className="w-4 h-4 mr-2" />
-                      Edit
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button size="sm" variant="outline" className="flex-1">
+                          <Edit className="w-4 h-4 mr-2" />
+                          Edit
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-3xl">
+                        <DialogHeader>
+                          <DialogTitle>Edit Email Template</DialogTitle>
+                          <DialogDescription>Update your email template content and settings.</DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <Label>Template Name</Label>
+                              <Input defaultValue={template.name} className="mt-1" />
+                            </div>
+                            <div>
+                              <Label>Template Type</Label>
+                              <Select defaultValue={template.type}>
+                                <SelectTrigger className="mt-1">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="auto-response">Auto Response</SelectItem>
+                                  <SelectItem value="interview">Interview Related</SelectItem>
+                                  <SelectItem value="offer">Job Offer</SelectItem>
+                                  <SelectItem value="rejection">Rejection</SelectItem>
+                                  <SelectItem value="reminder">Reminder</SelectItem>
+                                  <SelectItem value="follow-up">Follow-up</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                          <div>
+                            <Label>Subject Line</Label>
+                            <Input defaultValue={template.subject} className="mt-1" />
+                          </div>
+                          <div>
+                            <Label>Email Content</Label>
+                            <Textarea
+                              defaultValue={template.content}
+                              className="mt-1 min-h-[200px]"
+                            />
+                          </div>
+                          <div>
+                            <Label>Available Variables</Label>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                              {variables.map((variable) => (
+                                <Badge key={variable} variant="outline" className="cursor-pointer hover:bg-slate-100">
+                                  {variable}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="flex justify-end space-x-2">
+                            <Button variant="outline">Cancel</Button>
+                            <Button>Save Changes</Button>
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                     <Button size="sm" variant="outline">
                       <Copy className="w-4 h-4" />
                     </Button>
