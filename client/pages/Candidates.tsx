@@ -521,9 +521,17 @@ export default function Candidates() {
 
       {/* Candidates Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {candidates.map((candidate) => (
-          <CandidateCard key={candidate.id} candidate={candidate} />
-        ))}
+        {filteredCandidates.length > 0 ? (
+          filteredCandidates.map((candidate) => (
+            <CandidateCard key={candidate.id} candidate={candidate} />
+          ))
+        ) : (
+          <div className="col-span-full text-center py-12">
+            <User className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-slate-900 mb-2">No candidates found</h3>
+            <p className="text-slate-600">Try adjusting your search or filters to find candidates.</p>
+          </div>
+        )}
       </div>
 
       {/* Pagination */}
