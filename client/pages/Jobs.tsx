@@ -33,6 +33,10 @@ import {
 import { Link } from "react-router-dom";
 
 export default function Jobs() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [departmentFilter, setDepartmentFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+
   const jobs = [
     {
       id: 1,
