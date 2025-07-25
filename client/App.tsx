@@ -12,6 +12,7 @@ import Jobs from "./pages/Jobs";
 import JobDetail from "./pages/JobDetail";
 import JobCreate from "./pages/JobCreate";
 import Candidates from "./pages/Candidates";
+import CandidateDetail from "./pages/CandidateDetail";
 import Calendar from "./pages/Calendar";
 import EmailAutomation from "./pages/EmailAutomation";
 import Reports from "./pages/Reports";
