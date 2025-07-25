@@ -52,6 +52,10 @@ import { Link } from "react-router-dom";
 export default function Candidates() {
   const [selectedView, setSelectedView] = useState("grid");
   const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [positionFilter, setPositionFilter] = useState("all");
+  const [stageFilter, setStageFilter] = useState("all");
+  const [locationFilter, setLocationFilter] = useState("all");
 
   const candidates = [
     {
