@@ -175,6 +175,19 @@ export default function Candidates() {
     { title: "Offers Extended", value: "8", change: "+3%", color: "purple" }
   ];
 
+  // Filter candidates based on search and filters
+  const filteredCandidates = candidates.filter(candidate => {
+    const matchesSearch = candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         candidate.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         candidate.skills.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    const matchesPosition = positionFilter === "all" || candidate.position.toLowerCase().includes(positionFilter.toLowerCase());
+    const matchesStage = stageFilter === "all" || candidate.stage.toLowerCase() === stageFilter.toLowerCase();
+    const matchesLocation = locationFilter === "all" || candidate.location.toLowerCase().includes(locationFilter.toLowerCase());
+
+    return matchesSearch && matchesPosition && matchesStage && matchesLocation;
+  });
+
   const CandidateCard = ({ candidate }: { candidate: typeof candidates[0] }) => (
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="pb-3">
