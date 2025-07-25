@@ -32,14 +32,14 @@ import {
   GraduationCap,
   Share,
   Edit,
-  Download
+  Download,
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 export default function CandidateDetail() {
   const { id } = useParams();
-  
+
   const candidate = {
     id: 1,
     name: "Marissa Mayer",
@@ -61,24 +61,34 @@ export default function CandidateDetail() {
     source: "LinkedIn",
     resume: "marissa_mayer_resume.pdf",
     skills: [
-      "Analytics", "Cloud Computing", "E-commerce", "Mobile Applications", 
-      "Mobile Devices", "Online Advertising", "Product Management", 
-      "Product Marketing", "Start-ups", "Strategic Partnerships", 
-      "Usability Testing", "User Experience", "User Experience Design", "Web Analytics"
+      "Analytics",
+      "Cloud Computing",
+      "E-commerce",
+      "Mobile Applications",
+      "Mobile Devices",
+      "Online Advertising",
+      "Product Management",
+      "Product Marketing",
+      "Start-ups",
+      "Strategic Partnerships",
+      "Usability Testing",
+      "User Experience",
+      "User Experience Design",
+      "Web Analytics",
     ],
     experience: "15+ years",
     expectedSalary: "$180k - $220k",
     noticePeriod: "3 months",
     linkedIn: "https://linkedin.com/in/marissa-mayer",
     github: "https://github.com/marissa-mayer",
-    portfolio: "https://marissa-mayer.com"
+    portfolio: "https://marissa-mayer.com",
   };
 
   const quickActions = [
     { icon: Calendar, label: "Schedule Meeting", color: "blue" },
     { icon: Phone, label: "Schedule Call", color: "green" },
     { icon: Video, label: "Schedule Interview", color: "purple" },
-    { icon: FileText, label: "Create Test", color: "orange" }
+    { icon: FileText, label: "Create Test", color: "orange" },
   ];
 
   const recentHistory = [
@@ -88,8 +98,8 @@ export default function CandidateDetail() {
       user: "Paige",
       candidate: "Marissa Mayer",
       date: "2020-06-18",
-      avatar: ""
-    }
+      avatar: "",
+    },
   ];
 
   const socialNotifications = 5;
@@ -113,18 +123,29 @@ export default function CandidateDetail() {
             <div className="flex items-start space-x-6">
               <Avatar className="w-20 h-20">
                 <AvatarImage src={candidate.avatar} />
-                <AvatarFallback className="text-xl">{candidate.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                <AvatarFallback className="text-xl">
+                  {candidate.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
+                </AvatarFallback>
               </Avatar>
-              
+
               <div className="space-y-2">
                 <div className="flex items-center space-x-3">
-                  <h1 className="text-2xl font-bold text-slate-900">{candidate.name}</h1>
-                  <Badge variant="secondary" className="text-xs font-bold">T</Badge>
+                  <h1 className="text-2xl font-bold text-slate-900">
+                    {candidate.name}
+                  </h1>
+                  <Badge variant="secondary" className="text-xs font-bold">
+                    T
+                  </Badge>
                 </div>
-                
+
                 <div className="flex items-center space-x-1 text-slate-600">
                   <Building2 className="w-4 h-4" />
-                  <span>{candidate.currentPosition}, {candidate.currentCompany}</span>
+                  <span>
+                    {candidate.currentPosition}, {candidate.currentCompany}
+                  </span>
                 </div>
 
                 <div className="flex items-center space-x-6 text-sm text-slate-600">
@@ -223,7 +244,10 @@ export default function CandidateDetail() {
             <UsersIcon className="w-4 h-4" />
             <span>Social</span>
             {socialNotifications > 0 && (
-              <Badge variant="default" className="ml-1 px-1.5 py-0.5 text-xs bg-green-500">
+              <Badge
+                variant="default"
+                className="ml-1 px-1.5 py-0.5 text-xs bg-green-500"
+              >
                 {socialNotifications}
               </Badge>
             )}
@@ -232,7 +256,10 @@ export default function CandidateDetail() {
             <Briefcase className="w-4 h-4" />
             <span>Jobs</span>
           </TabsTrigger>
-          <TabsTrigger value="activities" className="flex items-center space-x-2">
+          <TabsTrigger
+            value="activities"
+            className="flex items-center space-x-2"
+          >
             <Activity className="w-4 h-4" />
             <span>Activities</span>
           </TabsTrigger>
@@ -240,7 +267,10 @@ export default function CandidateDetail() {
             <FileText className="w-4 h-4" />
             <span>Notes</span>
           </TabsTrigger>
-          <TabsTrigger value="attachments" className="flex items-center space-x-2">
+          <TabsTrigger
+            value="attachments"
+            className="flex items-center space-x-2"
+          >
             <Paperclip className="w-4 h-4" />
             <span>Attachments</span>
           </TabsTrigger>
@@ -261,51 +291,75 @@ export default function CandidateDetail() {
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <span className="text-slate-600">Candidate Name</span>
-                    <p className="font-medium text-slate-900">{candidate.name}</p>
+                    <p className="font-medium text-slate-900">
+                      {candidate.name}
+                    </p>
                   </div>
                   <div>
                     <span className="text-slate-600">Candidate Reference</span>
-                    <p className="font-medium text-slate-900">{candidate.reference}</p>
+                    <p className="font-medium text-slate-900">
+                      {candidate.reference}
+                    </p>
                   </div>
                   <div>
                     <span className="text-slate-600">Gender</span>
-                    <p className="font-medium text-slate-900">{candidate.gender}</p>
+                    <p className="font-medium text-slate-900">
+                      {candidate.gender}
+                    </p>
                   </div>
                   <div>
                     <span className="text-slate-600">Diploma</span>
-                    <p className="font-medium text-slate-900">{candidate.diploma}</p>
+                    <p className="font-medium text-slate-900">
+                      {candidate.diploma}
+                    </p>
                   </div>
                   <div>
                     <span className="text-slate-600">University</span>
-                    <p className="font-medium text-slate-900">{candidate.university}</p>
+                    <p className="font-medium text-slate-900">
+                      {candidate.university}
+                    </p>
                   </div>
                   <div>
                     <span className="text-slate-600">Current Company</span>
-                    <p className="font-medium text-slate-900">{candidate.currentCompany}</p>
+                    <p className="font-medium text-slate-900">
+                      {candidate.currentCompany}
+                    </p>
                   </div>
                   <div>
                     <span className="text-slate-600">Current Position</span>
-                    <p className="font-medium text-slate-900">{candidate.currentPosition}</p>
+                    <p className="font-medium text-slate-900">
+                      {candidate.currentPosition}
+                    </p>
                   </div>
                   <div>
                     <span className="text-slate-600">Candidate Location</span>
-                    <p className="font-medium text-slate-900">{candidate.location}</p>
+                    <p className="font-medium text-slate-900">
+                      {candidate.location}
+                    </p>
                   </div>
                   <div>
                     <span className="text-slate-600">Birthdate</span>
-                    <p className="font-medium text-slate-900">{candidate.birthdate} ({candidate.age} years old)</p>
+                    <p className="font-medium text-slate-900">
+                      {candidate.birthdate} ({candidate.age} years old)
+                    </p>
                   </div>
                   <div>
                     <span className="text-slate-600">Experience</span>
-                    <p className="font-medium text-slate-900">{candidate.experience}</p>
+                    <p className="font-medium text-slate-900">
+                      {candidate.experience}
+                    </p>
                   </div>
                   <div>
                     <span className="text-slate-600">Expected Salary</span>
-                    <p className="font-medium text-slate-900">{candidate.expectedSalary}</p>
+                    <p className="font-medium text-slate-900">
+                      {candidate.expectedSalary}
+                    </p>
                   </div>
                   <div>
                     <span className="text-slate-600">Notice Period</span>
-                    <p className="font-medium text-slate-900">{candidate.noticePeriod}</p>
+                    <p className="font-medium text-slate-900">
+                      {candidate.noticePeriod}
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -319,9 +373,9 @@ export default function CandidateDetail() {
               <CardContent>
                 <div className="flex flex-wrap gap-2">
                   {candidate.skills.map((skill, index) => (
-                    <Badge 
-                      key={index} 
-                      variant="outline" 
+                    <Badge
+                      key={index}
+                      variant="outline"
                       className="bg-green-50 text-green-800 border-green-200"
                     >
                       {skill}
@@ -345,29 +399,41 @@ export default function CandidateDetail() {
                     <FileText className="w-8 h-8 text-blue-600" />
                     <div>
                       <p className="font-medium">{candidate.resume}</p>
-                      <p className="text-sm text-slate-600">Uploaded on {candidate.appliedDate}</p>
+                      <p className="text-sm text-slate-600">
+                        Uploaded on {candidate.appliedDate}
+                      </p>
                     </div>
                   </div>
                   <div className="flex space-x-2">
-                    <Button variant="outline" size="sm">View</Button>
-                    <Button variant="outline" size="sm">Download</Button>
+                    <Button variant="outline" size="sm">
+                      View
+                    </Button>
+                    <Button variant="outline" size="sm">
+                      Download
+                    </Button>
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <h3 className="font-medium">Online Profiles</h3>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between p-3 border rounded">
                       <span>LinkedIn Profile</span>
-                      <Button variant="outline" size="sm">View</Button>
+                      <Button variant="outline" size="sm">
+                        View
+                      </Button>
                     </div>
                     <div className="flex items-center justify-between p-3 border rounded">
                       <span>GitHub Profile</span>
-                      <Button variant="outline" size="sm">View</Button>
+                      <Button variant="outline" size="sm">
+                        View
+                      </Button>
                     </div>
                     <div className="flex items-center justify-between p-3 border rounded">
                       <span>Portfolio Website</span>
-                      <Button variant="outline" size="sm">View</Button>
+                      <Button variant="outline" size="sm">
+                        View
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -382,7 +448,9 @@ export default function CandidateDetail() {
               <CardTitle>Email Communications</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-slate-600">Email conversation history will be displayed here.</p>
+              <p className="text-slate-600">
+                Email conversation history will be displayed here.
+              </p>
             </CardContent>
           </Card>
         </TabsContent>
@@ -393,7 +461,9 @@ export default function CandidateDetail() {
               <CardTitle>Social Activity</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-slate-600">Social media activity and professional network interactions.</p>
+              <p className="text-slate-600">
+                Social media activity and professional network interactions.
+              </p>
             </CardContent>
           </Card>
         </TabsContent>
@@ -404,7 +474,9 @@ export default function CandidateDetail() {
               <CardTitle>Job Applications</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-slate-600">Jobs this candidate has applied for or been considered for.</p>
+              <p className="text-slate-600">
+                Jobs this candidate has applied for or been considered for.
+              </p>
             </CardContent>
           </Card>
         </TabsContent>
@@ -415,7 +487,9 @@ export default function CandidateDetail() {
               <CardTitle>Activity Timeline</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-slate-600">Candidate activity and interaction timeline.</p>
+              <p className="text-slate-600">
+                Candidate activity and interaction timeline.
+              </p>
             </CardContent>
           </Card>
         </TabsContent>
@@ -426,7 +500,9 @@ export default function CandidateDetail() {
               <CardTitle>Internal Notes</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-slate-600">Private notes and comments about this candidate.</p>
+              <p className="text-slate-600">
+                Private notes and comments about this candidate.
+              </p>
             </CardContent>
           </Card>
         </TabsContent>
@@ -437,7 +513,9 @@ export default function CandidateDetail() {
               <CardTitle>File Attachments</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-slate-600">Additional files and documents related to this candidate.</p>
+              <p className="text-slate-600">
+                Additional files and documents related to this candidate.
+              </p>
             </CardContent>
           </Card>
         </TabsContent>
@@ -453,13 +531,22 @@ export default function CandidateDetail() {
                   <div key={entry.id} className="flex items-center space-x-4">
                     <Avatar className="w-10 h-10">
                       <AvatarImage src={entry.avatar} />
-                      <AvatarFallback>{entry.user.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                      <AvatarFallback>
+                        {entry.user
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")}
+                      </AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
                       <p className="text-sm">
-                        <span className="text-blue-600 font-medium">{entry.user}</span>
-                        {' '}{entry.action}{' '}
-                        <span className="text-blue-600 font-medium">{entry.candidate}</span>
+                        <span className="text-blue-600 font-medium">
+                          {entry.user}
+                        </span>{" "}
+                        {entry.action}{" "}
+                        <span className="text-blue-600 font-medium">
+                          {entry.candidate}
+                        </span>
                       </p>
                       <p className="text-xs text-slate-600">{entry.date}</p>
                     </div>

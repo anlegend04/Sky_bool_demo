@@ -41,7 +41,7 @@ import {
   Phone,
   User,
   Edit,
-  Trash2
+  Trash2,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -63,7 +63,7 @@ export default function Calendar() {
       position: "Senior Frontend Developer",
       location: "Conference Room A",
       meetingType: "in-person",
-      status: "confirmed"
+      status: "confirmed",
     },
     {
       id: 2,
@@ -77,7 +77,7 @@ export default function Calendar() {
       position: "Product Manager",
       location: "Phone Call",
       meetingType: "phone",
-      status: "confirmed"
+      status: "confirmed",
     },
     {
       id: 3,
@@ -91,7 +91,7 @@ export default function Calendar() {
       position: "UX Designer",
       location: "Zoom Meeting",
       meetingType: "video",
-      status: "pending"
+      status: "pending",
     },
     {
       id: 4,
@@ -103,7 +103,7 @@ export default function Calendar() {
       attendees: 8,
       location: "Conference Room B",
       meetingType: "in-person",
-      status: "confirmed"
+      status: "confirmed",
     },
     {
       id: 5,
@@ -117,29 +117,41 @@ export default function Calendar() {
       position: "Data Scientist",
       location: "HR Office",
       meetingType: "in-person",
-      status: "confirmed"
-    }
+      status: "confirmed",
+    },
   ];
 
-  const upcomingEvents = events.filter(event => new Date(event.date) >= new Date()).slice(0, 5);
+  const upcomingEvents = events
+    .filter((event) => new Date(event.date) >= new Date())
+    .slice(0, 5);
 
   const getEventTypeColor = (type: string) => {
     switch (type) {
-      case "interview": return "bg-blue-100 text-blue-800 border-blue-200";
-      case "screening": return "bg-green-100 text-green-800 border-green-200";
-      case "final": return "bg-purple-100 text-purple-800 border-purple-200";
-      case "meeting": return "bg-orange-100 text-orange-800 border-orange-200";
-      case "offer": return "bg-red-100 text-red-800 border-red-200";
-      default: return "bg-gray-100 text-gray-800 border-gray-200";
+      case "interview":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "screening":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "final":
+        return "bg-purple-100 text-purple-800 border-purple-200";
+      case "meeting":
+        return "bg-orange-100 text-orange-800 border-orange-200";
+      case "offer":
+        return "bg-red-100 text-red-800 border-red-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
   const getMeetingIcon = (type: string) => {
     switch (type) {
-      case "video": return <Video className="w-4 h-4" />;
-      case "phone": return <Phone className="w-4 h-4" />;
-      case "in-person": return <MapPin className="w-4 h-4" />;
-      default: return <CalendarIcon className="w-4 h-4" />;
+      case "video":
+        return <Video className="w-4 h-4" />;
+      case "phone":
+        return <Phone className="w-4 h-4" />;
+      case "in-person":
+        return <MapPin className="w-4 h-4" />;
+      default:
+        return <CalendarIcon className="w-4 h-4" />;
     }
   };
 
@@ -154,7 +166,9 @@ export default function Calendar() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Calendar</h1>
-          <p className="text-slate-600 mt-1">Schedule interviews, meetings, and track all your appointments.</p>
+          <p className="text-slate-600 mt-1">
+            Schedule interviews, meetings, and track all your appointments.
+          </p>
         </div>
         <div className="flex space-x-3">
           <Button variant="outline" size="sm">
@@ -171,7 +185,9 @@ export default function Calendar() {
             <DialogContent className="sm:max-w-2xl">
               <DialogHeader>
                 <DialogTitle>Schedule New Event</DialogTitle>
-                <DialogDescription>Create a new interview, meeting, or appointment.</DialogDescription>
+                <DialogDescription>
+                  Create a new interview, meeting, or appointment.
+                </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -182,8 +198,12 @@ export default function Calendar() {
                         <SelectValue placeholder="Select type" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="interview">Technical Interview</SelectItem>
-                        <SelectItem value="screening">Phone Screening</SelectItem>
+                        <SelectItem value="interview">
+                          Technical Interview
+                        </SelectItem>
+                        <SelectItem value="screening">
+                          Phone Screening
+                        </SelectItem>
                         <SelectItem value="final">Final Round</SelectItem>
                         <SelectItem value="meeting">Team Meeting</SelectItem>
                         <SelectItem value="offer">Offer Discussion</SelectItem>
@@ -206,7 +226,10 @@ export default function Calendar() {
                 </div>
                 <div>
                   <Label>Event Title</Label>
-                  <Input placeholder="e.g. Technical Interview - John Doe" className="mt-1" />
+                  <Input
+                    placeholder="e.g. Technical Interview - John Doe"
+                    className="mt-1"
+                  />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -237,16 +260,25 @@ export default function Calendar() {
                   </div>
                   <div>
                     <Label>Location/Link</Label>
-                    <Input placeholder="Conference Room A or Zoom link" className="mt-1" />
+                    <Input
+                      placeholder="Conference Room A or Zoom link"
+                      className="mt-1"
+                    />
                   </div>
                 </div>
                 <div>
                   <Label>Participants</Label>
-                  <Input placeholder="Add attendees by email" className="mt-1" />
+                  <Input
+                    placeholder="Add attendees by email"
+                    className="mt-1"
+                  />
                 </div>
                 <div>
                   <Label>Notes</Label>
-                  <Textarea placeholder="Additional notes or agenda items..." className="mt-1" />
+                  <Textarea
+                    placeholder="Additional notes or agenda items..."
+                    className="mt-1"
+                  />
                 </div>
                 <div className="flex justify-end space-x-2">
                   <Button variant="outline">Cancel</Button>
@@ -274,13 +306,25 @@ export default function Calendar() {
                   </Button>
                 </CardTitle>
                 <div className="flex space-x-2">
-                  <Button variant={view === "month" ? "default" : "outline"} size="sm" onClick={() => setView("month")}>
+                  <Button
+                    variant={view === "month" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setView("month")}
+                  >
                     Month
                   </Button>
-                  <Button variant={view === "week" ? "default" : "outline"} size="sm" onClick={() => setView("week")}>
+                  <Button
+                    variant={view === "week" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setView("week")}
+                  >
                     Week
                   </Button>
-                  <Button variant={view === "day" ? "default" : "outline"} size="sm" onClick={() => setView("day")}>
+                  <Button
+                    variant={view === "day" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setView("day")}
+                  >
                     Day
                   </Button>
                 </div>
@@ -290,31 +334,42 @@ export default function Calendar() {
               {view === "month" && (
                 <div className="grid grid-cols-7 gap-2">
                   {/* Header */}
-                  {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-                    <div key={day} className="p-2 text-center font-medium text-slate-600 text-sm">
-                      {day}
-                    </div>
-                  ))}
-                  
+                  {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
+                    (day) => (
+                      <div
+                        key={day}
+                        className="p-2 text-center font-medium text-slate-600 text-sm"
+                      >
+                        {day}
+                      </div>
+                    ),
+                  )}
+
                   {/* Calendar Days */}
                   {calendarDays.map((date, index) => {
                     const isCurrentMonth = date.getMonth() === 0; // January
-                    const isToday = date.toDateString() === new Date().toDateString();
-                    const dayEvents = events.filter(event => event.date === date.toISOString().split('T')[0]);
-                    
+                    const isToday =
+                      date.toDateString() === new Date().toDateString();
+                    const dayEvents = events.filter(
+                      (event) =>
+                        event.date === date.toISOString().split("T")[0],
+                    );
+
                     return (
-                      <div 
+                      <div
                         key={index}
                         className={`p-2 min-h-[80px] border rounded-md cursor-pointer hover:bg-slate-50 ${
                           !isCurrentMonth ? "text-slate-400 bg-slate-50" : ""
                         } ${isToday ? "bg-blue-50 border-blue-200" : "border-slate-200"}`}
                       >
-                        <div className={`text-sm font-medium ${isToday ? "text-blue-600" : ""}`}>
+                        <div
+                          className={`text-sm font-medium ${isToday ? "text-blue-600" : ""}`}
+                        >
                           {date.getDate()}
                         </div>
                         <div className="space-y-1 mt-1">
                           {dayEvents.map((event) => (
-                            <div 
+                            <div
                               key={event.id}
                               className={`text-xs p-1 rounded truncate ${getEventTypeColor(event.type)}`}
                             >
@@ -330,13 +385,17 @@ export default function Calendar() {
 
               {view === "week" && (
                 <div className="space-y-4">
-                  <div className="text-center text-slate-600">Week view would show detailed day-by-day schedule</div>
+                  <div className="text-center text-slate-600">
+                    Week view would show detailed day-by-day schedule
+                  </div>
                 </div>
               )}
 
               {view === "day" && (
                 <div className="space-y-4">
-                  <div className="text-center text-slate-600">Day view would show hourly schedule</div>
+                  <div className="text-center text-slate-600">
+                    Day view would show hourly schedule
+                  </div>
                 </div>
               )}
             </CardContent>
@@ -380,12 +439,17 @@ export default function Calendar() {
             <CardContent>
               <div className="space-y-4">
                 {upcomingEvents.map((event) => (
-                  <div key={event.id} className="flex items-start space-x-3 p-3 rounded-lg border hover:bg-slate-50">
+                  <div
+                    key={event.id}
+                    className="flex items-start space-x-3 p-3 rounded-lg border hover:bg-slate-50"
+                  >
                     <div className="flex-shrink-0 mt-1">
                       {getMeetingIcon(event.meetingType)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-slate-900 truncate">{event.title}</h4>
+                      <h4 className="font-medium text-slate-900 truncate">
+                        {event.title}
+                      </h4>
                       <div className="flex items-center text-sm text-slate-600 mt-1">
                         <Clock className="w-3 h-3 mr-1" />
                         {event.startTime} - {event.endTime}

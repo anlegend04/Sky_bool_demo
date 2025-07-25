@@ -29,7 +29,7 @@ import {
   Eye,
   Copy,
   Trash2,
-  Share
+  Share,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -49,7 +49,7 @@ export default function Jobs() {
       status: "Active",
       priority: "High",
       posted: "2 days ago",
-      salary: "$120k - $150k"
+      salary: "$120k - $150k",
     },
     {
       id: 2,
@@ -61,7 +61,7 @@ export default function Jobs() {
       status: "Active",
       priority: "Medium",
       posted: "5 days ago",
-      salary: "$110k - $140k"
+      salary: "$110k - $140k",
     },
     {
       id: 3,
@@ -73,7 +73,7 @@ export default function Jobs() {
       status: "Draft",
       priority: "Low",
       posted: "1 week ago",
-      salary: "$95k - $120k"
+      salary: "$95k - $120k",
     },
     {
       id: 4,
@@ -85,7 +85,7 @@ export default function Jobs() {
       status: "Active",
       priority: "High",
       posted: "3 days ago",
-      salary: "$130k - $160k"
+      salary: "$130k - $160k",
     },
     {
       id: 5,
@@ -97,7 +97,7 @@ export default function Jobs() {
       status: "Paused",
       priority: "Medium",
       posted: "1 week ago",
-      salary: "$60k - $80k"
+      salary: "$60k - $80k",
     },
     {
       id: 6,
@@ -109,18 +109,23 @@ export default function Jobs() {
       status: "Active",
       priority: "High",
       posted: "4 days ago",
-      salary: "$115k - $145k"
-    }
+      salary: "$115k - $145k",
+    },
   ];
 
   // Filter jobs based on search and filters
-  const filteredJobs = jobs.filter(job => {
-    const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         job.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         job.location.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredJobs = jobs.filter((job) => {
+    const matchesSearch =
+      job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      job.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      job.location.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesDepartment = departmentFilter === "all" || job.department.toLowerCase() === departmentFilter.toLowerCase();
-    const matchesStatus = statusFilter === "all" || job.status.toLowerCase() === statusFilter.toLowerCase();
+    const matchesDepartment =
+      departmentFilter === "all" ||
+      job.department.toLowerCase() === departmentFilter.toLowerCase();
+    const matchesStatus =
+      statusFilter === "all" ||
+      job.status.toLowerCase() === statusFilter.toLowerCase();
 
     return matchesSearch && matchesDepartment && matchesStatus;
   });
@@ -131,7 +136,9 @@ export default function Jobs() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Jobs</h1>
-          <p className="text-slate-600 mt-1">Manage all your job postings and track their performance.</p>
+          <p className="text-slate-600 mt-1">
+            Manage all your job postings and track their performance.
+          </p>
         </div>
         <div className="flex space-x-3">
           <Button variant="outline" size="sm">
@@ -163,7 +170,10 @@ export default function Jobs() {
               </div>
             </div>
             <div className="flex gap-3">
-              <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+              <Select
+                value={departmentFilter}
+                onValueChange={setDepartmentFilter}
+              >
                 <SelectTrigger className="w-40">
                   <SelectValue placeholder="Department" />
                 </SelectTrigger>
@@ -201,106 +211,120 @@ export default function Jobs() {
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {filteredJobs.length > 0 ? (
           filteredJobs.map((job) => (
-          <Card key={job.id} className="hover:shadow-md transition-shadow cursor-pointer">
-            <CardHeader className="pb-3">
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <Link to={`/jobs/${job.id}`}>
-                    <CardTitle className="text-lg hover:text-blue-600 transition-colors">
-                      {job.title}
-                    </CardTitle>
-                  </Link>
-                  <div className="flex items-center mt-2 text-sm text-slate-600">
-                    <span>{job.department}</span>
-                    <span className="mx-2">•</span>
-                    <span>{job.type}</span>
+            <Card
+              key={job.id}
+              className="hover:shadow-md transition-shadow cursor-pointer"
+            >
+              <CardHeader className="pb-3">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <Link to={`/jobs/${job.id}`}>
+                      <CardTitle className="text-lg hover:text-blue-600 transition-colors">
+                        {job.title}
+                      </CardTitle>
+                    </Link>
+                    <div className="flex items-center mt-2 text-sm text-slate-600">
+                      <span>{job.department}</span>
+                      <span className="mx-2">•</span>
+                      <span>{job.type}</span>
+                    </div>
                   </div>
-                </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm">
-                      <MoreHorizontal className="w-4 h-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm">
+                        <MoreHorizontal className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
                       <Link to={`/jobs/${job.id}`}>
                         <DropdownMenuItem>
                           <Eye className="w-4 h-4 mr-2" />
                           View Details
                         </DropdownMenuItem>
                       </Link>
-                    <DropdownMenuItem>
-                      <Edit className="w-4 h-4 mr-2" />
-                      Edit Job
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Copy className="w-4 h-4 mr-2" />
-                      Duplicate Job
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Share className="w-4 h-4 mr-2" />
-                      Share Job
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="text-red-600">
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      Delete Job
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center text-sm text-slate-600">
-                  <MapPin className="w-4 h-4 mr-2" />
-                  {job.location}
+                      <DropdownMenuItem>
+                        <Edit className="w-4 h-4 mr-2" />
+                        Edit Job
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Copy className="w-4 h-4 mr-2" />
+                        Duplicate Job
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Share className="w-4 h-4 mr-2" />
+                        Share Job
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="text-red-600">
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Delete Job
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
-                
-                <div className="flex items-center text-sm text-slate-600">
-                  <Users className="w-4 h-4 mr-2" />
-                  {job.applicants} applicants
-                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center text-sm text-slate-600">
+                    <MapPin className="w-4 h-4 mr-2" />
+                    {job.location}
+                  </div>
 
-                <div className="flex items-center text-sm text-slate-600">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Posted {job.posted}
-                </div>
+                  <div className="flex items-center text-sm text-slate-600">
+                    <Users className="w-4 h-4 mr-2" />
+                    {job.applicants} applicants
+                  </div>
 
-                <div className="pt-2 border-t border-slate-100">
-                  <div className="flex justify-between items-center">
-                    <div className="flex gap-2">
-                      <Badge 
-                        variant={
-                          job.status === "Active" ? "default" : 
-                          job.status === "Draft" ? "secondary" : 
-                          job.status === "Paused" ? "outline" : "destructive"
-                        }
-                      >
-                        {job.status}
-                      </Badge>
-                      <Badge 
-                        variant={
-                          job.priority === "High" ? "destructive" : 
-                          job.priority === "Medium" ? "default" : "secondary"
-                        }
-                      >
-                        {job.priority}
-                      </Badge>
+                  <div className="flex items-center text-sm text-slate-600">
+                    <Calendar className="w-4 h-4 mr-2" />
+                    Posted {job.posted}
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-100">
+                    <div className="flex justify-between items-center">
+                      <div className="flex gap-2">
+                        <Badge
+                          variant={
+                            job.status === "Active"
+                              ? "default"
+                              : job.status === "Draft"
+                                ? "secondary"
+                                : job.status === "Paused"
+                                  ? "outline"
+                                  : "destructive"
+                          }
+                        >
+                          {job.status}
+                        </Badge>
+                        <Badge
+                          variant={
+                            job.priority === "High"
+                              ? "destructive"
+                              : job.priority === "Medium"
+                                ? "default"
+                                : "secondary"
+                          }
+                        >
+                          {job.priority}
+                        </Badge>
+                      </div>
+                      <span className="text-sm font-medium text-slate-900">
+                        {job.salary}
+                      </span>
                     </div>
-                    <span className="text-sm font-medium text-slate-900">
-                      {job.salary}
-                    </span>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
           ))
         ) : (
           <div className="col-span-full text-center py-12">
             <Briefcase className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-slate-900 mb-2">No jobs found</h3>
-            <p className="text-slate-600">Try adjusting your search or filters to find jobs.</p>
+            <h3 className="text-lg font-medium text-slate-900 mb-2">
+              No jobs found
+            </h3>
+            <p className="text-slate-600">
+              Try adjusting your search or filters to find jobs.
+            </p>
           </div>
         )}
       </div>
@@ -311,7 +335,11 @@ export default function Jobs() {
           <Button variant="outline" size="sm" disabled>
             Previous
           </Button>
-          <Button variant="outline" size="sm" className="bg-blue-50 text-blue-600">
+          <Button
+            variant="outline"
+            size="sm"
+            className="bg-blue-50 text-blue-600"
+          >
             1
           </Button>
           <Button variant="outline" size="sm">

@@ -37,7 +37,7 @@ import {
   MoreHorizontal,
   Calendar,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -56,7 +56,8 @@ export default function EmailAutomation() {
       status: "active",
       usage: 156,
       openRate: 85,
-      content: "Dear {{candidate_name}},\n\nThank you for applying to the {{job_title}} position at {{company_name}}. We have received your application and will review it shortly..."
+      content:
+        "Dear {{candidate_name}},\n\nThank you for applying to the {{job_title}} position at {{company_name}}. We have received your application and will review it shortly...",
     },
     {
       id: 2,
@@ -67,7 +68,8 @@ export default function EmailAutomation() {
       status: "active",
       usage: 89,
       openRate: 92,
-      content: "Dear {{candidate_name}},\n\nWe are impressed with your application for the {{job_title}} position and would like to invite you for an interview..."
+      content:
+        "Dear {{candidate_name}},\n\nWe are impressed with your application for the {{job_title}} position and would like to invite you for an interview...",
     },
     {
       id: 3,
@@ -78,7 +80,8 @@ export default function EmailAutomation() {
       status: "active",
       usage: 234,
       openRate: 78,
-      content: "Dear {{candidate_name}},\n\nThank you for your interest in the {{job_title}} position. After careful consideration..."
+      content:
+        "Dear {{candidate_name}},\n\nThank you for your interest in the {{job_title}} position. After careful consideration...",
     },
     {
       id: 4,
@@ -89,7 +92,8 @@ export default function EmailAutomation() {
       status: "active",
       usage: 23,
       openRate: 95,
-      content: "Dear {{candidate_name}},\n\nWe are pleased to extend an offer for the {{job_title}} position at {{company_name}}..."
+      content:
+        "Dear {{candidate_name}},\n\nWe are pleased to extend an offer for the {{job_title}} position at {{company_name}}...",
     },
     {
       id: 5,
@@ -100,8 +104,9 @@ export default function EmailAutomation() {
       status: "active",
       usage: 67,
       openRate: 88,
-      content: "Dear {{candidate_name}},\n\nThis is a friendly reminder about your interview scheduled for tomorrow..."
-    }
+      content:
+        "Dear {{candidate_name}},\n\nThis is a friendly reminder about your interview scheduled for tomorrow...",
+    },
   ];
 
   const workflows = [
@@ -113,7 +118,7 @@ export default function EmailAutomation() {
       steps: 3,
       active: true,
       candidates: 45,
-      openRate: 87
+      openRate: 87,
     },
     {
       id: 2,
@@ -123,7 +128,7 @@ export default function EmailAutomation() {
       steps: 4,
       active: true,
       candidates: 23,
-      openRate: 92
+      openRate: 92,
     },
     {
       id: 3,
@@ -133,20 +138,31 @@ export default function EmailAutomation() {
       steps: 2,
       active: false,
       candidates: 0,
-      openRate: 0
-    }
+      openRate: 0,
+    },
   ];
 
   const stats = [
     { title: "Active Templates", value: "12", change: "+2", color: "blue" },
-    { title: "Emails Sent (30d)", value: "2,847", change: "+18%", color: "green" },
+    {
+      title: "Emails Sent (30d)",
+      value: "2,847",
+      change: "+18%",
+      color: "green",
+    },
     { title: "Avg. Open Rate", value: "87%", change: "+5%", color: "orange" },
-    { title: "Active Workflows", value: "6", change: "+1", color: "purple" }
+    { title: "Active Workflows", value: "6", change: "+1", color: "purple" },
   ];
 
   const variables = [
-    "{{candidate_name}}", "{{job_title}}", "{{company_name}}", "{{interviewer_name}}",
-    "{{interview_date}}", "{{interview_time}}", "{{position_department}}", "{{salary_range}}"
+    "{{candidate_name}}",
+    "{{job_title}}",
+    "{{company_name}}",
+    "{{interviewer_name}}",
+    "{{interview_date}}",
+    "{{interview_time}}",
+    "{{position_department}}",
+    "{{salary_range}}",
   ];
 
   return (
@@ -154,11 +170,19 @@ export default function EmailAutomation() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Email Automation</h1>
-          <p className="text-slate-600 mt-1">Manage email templates, workflows, and automate candidate communication.</p>
+          <h1 className="text-3xl font-bold text-slate-900">
+            Email Automation
+          </h1>
+          <p className="text-slate-600 mt-1">
+            Manage email templates, workflows, and automate candidate
+            communication.
+          </p>
         </div>
         <div className="flex space-x-3">
-          <Dialog open={isWorkflowDialogOpen} onOpenChange={setIsWorkflowDialogOpen}>
+          <Dialog
+            open={isWorkflowDialogOpen}
+            onOpenChange={setIsWorkflowDialogOpen}
+          >
             <DialogTrigger asChild>
               <Button variant="outline" size="sm">
                 <Settings className="w-4 h-4 mr-2" />
@@ -168,13 +192,18 @@ export default function EmailAutomation() {
             <DialogContent className="sm:max-w-2xl">
               <DialogHeader>
                 <DialogTitle>Create Email Workflow</DialogTitle>
-                <DialogDescription>Set up an automated email sequence for candidates.</DialogDescription>
+                <DialogDescription>
+                  Set up an automated email sequence for candidates.
+                </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label>Workflow Name</Label>
-                    <Input placeholder="e.g. Interview Follow-up" className="mt-1" />
+                    <Input
+                      placeholder="e.g. Interview Follow-up"
+                      className="mt-1"
+                    />
                   </div>
                   <div>
                     <Label>Trigger Event</Label>
@@ -183,18 +212,29 @@ export default function EmailAutomation() {
                         <SelectValue placeholder="Select trigger" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="application">Application Received</SelectItem>
-                        <SelectItem value="screening">Screening Completed</SelectItem>
-                        <SelectItem value="interview">Interview Scheduled</SelectItem>
+                        <SelectItem value="application">
+                          Application Received
+                        </SelectItem>
+                        <SelectItem value="screening">
+                          Screening Completed
+                        </SelectItem>
+                        <SelectItem value="interview">
+                          Interview Scheduled
+                        </SelectItem>
                         <SelectItem value="offer">Offer Extended</SelectItem>
-                        <SelectItem value="rejection">Application Rejected</SelectItem>
+                        <SelectItem value="rejection">
+                          Application Rejected
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
                 <div>
                   <Label>Description</Label>
-                  <Textarea placeholder="Brief description of this workflow..." className="mt-1" />
+                  <Textarea
+                    placeholder="Brief description of this workflow..."
+                    className="mt-1"
+                  />
                 </div>
                 <div className="flex justify-end space-x-2">
                   <Button variant="outline">Cancel</Button>
@@ -203,8 +243,11 @@ export default function EmailAutomation() {
               </div>
             </DialogContent>
           </Dialog>
-          
-          <Dialog open={isTemplateDialogOpen} onOpenChange={setIsTemplateDialogOpen}>
+
+          <Dialog
+            open={isTemplateDialogOpen}
+            onOpenChange={setIsTemplateDialogOpen}
+          >
             <DialogTrigger asChild>
               <Button size="sm">
                 <Plus className="w-4 h-4 mr-2" />
@@ -214,13 +257,18 @@ export default function EmailAutomation() {
             <DialogContent className="sm:max-w-3xl">
               <DialogHeader>
                 <DialogTitle>Create Email Template</DialogTitle>
-                <DialogDescription>Create a new email template for candidate communication.</DialogDescription>
+                <DialogDescription>
+                  Create a new email template for candidate communication.
+                </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label>Template Name</Label>
-                    <Input placeholder="e.g. Interview Confirmation" className="mt-1" />
+                    <Input
+                      placeholder="e.g. Interview Confirmation"
+                      className="mt-1"
+                    />
                   </div>
                   <div>
                     <Label>Template Type</Label>
@@ -229,8 +277,12 @@ export default function EmailAutomation() {
                         <SelectValue placeholder="Select type" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="auto-response">Auto Response</SelectItem>
-                        <SelectItem value="interview">Interview Related</SelectItem>
+                        <SelectItem value="auto-response">
+                          Auto Response
+                        </SelectItem>
+                        <SelectItem value="interview">
+                          Interview Related
+                        </SelectItem>
                         <SelectItem value="offer">Job Offer</SelectItem>
                         <SelectItem value="rejection">Rejection</SelectItem>
                         <SelectItem value="reminder">Reminder</SelectItem>
@@ -241,11 +293,14 @@ export default function EmailAutomation() {
                 </div>
                 <div>
                   <Label>Subject Line</Label>
-                  <Input placeholder="e.g. Interview scheduled for {{job_title}} position" className="mt-1" />
+                  <Input
+                    placeholder="e.g. Interview scheduled for {{job_title}} position"
+                    className="mt-1"
+                  />
                 </div>
                 <div>
                   <Label>Email Content</Label>
-                  <Textarea 
+                  <Textarea
                     placeholder="Dear {{candidate_name}},&#10;&#10;Your email content here...&#10;&#10;Best regards,&#10;{{company_name}} Team"
                     className="mt-1 min-h-[200px]"
                   />
@@ -254,7 +309,11 @@ export default function EmailAutomation() {
                   <Label>Available Variables</Label>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {variables.map((variable) => (
-                      <Badge key={variable} variant="outline" className="cursor-pointer hover:bg-slate-100">
+                      <Badge
+                        key={variable}
+                        variant="outline"
+                        className="cursor-pointer hover:bg-slate-100"
+                      >
                         {variable}
                       </Badge>
                     ))}
@@ -278,8 +337,12 @@ export default function EmailAutomation() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-600">{stat.title}</p>
-                  <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
-                  <p className="text-sm text-green-600">{stat.change} vs last month</p>
+                  <p className="text-2xl font-bold text-slate-900">
+                    {stat.value}
+                  </p>
+                  <p className="text-sm text-green-600">
+                    {stat.change} vs last month
+                  </p>
                 </div>
                 <div className={`p-3 rounded-full bg-${stat.color}-100`}>
                   <Mail className={`w-6 h-6 text-${stat.color}-600`} />
@@ -303,12 +366,17 @@ export default function EmailAutomation() {
           {/* Email Templates */}
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
             {emailTemplates.map((template) => (
-              <Card key={template.id} className="hover:shadow-md transition-shadow">
+              <Card
+                key={template.id}
+                className="hover:shadow-md transition-shadow"
+              >
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
                     <div>
                       <CardTitle className="text-lg">{template.name}</CardTitle>
-                      <p className="text-sm text-slate-600 mt-1">{template.subject}</p>
+                      <p className="text-sm text-slate-600 mt-1">
+                        {template.subject}
+                      </p>
                     </div>
                     <Button variant="ghost" size="sm">
                       <MoreHorizontal className="w-4 h-4" />
@@ -317,14 +385,18 @@ export default function EmailAutomation() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <Badge variant={template.status === "active" ? "default" : "secondary"}>
+                    <Badge
+                      variant={
+                        template.status === "active" ? "default" : "secondary"
+                      }
+                    >
                       {template.status}
                     </Badge>
                     <Badge variant="outline">
-                      {template.type.replace('-', ' ')}
+                      {template.type.replace("-", " ")}
                     </Badge>
                   </div>
-                  
+
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-slate-600">Usage (30d):</span>
@@ -336,7 +408,9 @@ export default function EmailAutomation() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-600">Trigger:</span>
-                      <span className="font-medium capitalize">{template.trigger.replace('_', ' ')}</span>
+                      <span className="font-medium capitalize">
+                        {template.trigger.replace("_", " ")}
+                      </span>
                     </div>
                   </div>
 
@@ -351,13 +425,18 @@ export default function EmailAutomation() {
                       <DialogContent className="sm:max-w-3xl">
                         <DialogHeader>
                           <DialogTitle>Edit Email Template</DialogTitle>
-                          <DialogDescription>Update your email template content and settings.</DialogDescription>
+                          <DialogDescription>
+                            Update your email template content and settings.
+                          </DialogDescription>
                         </DialogHeader>
                         <div className="space-y-4">
                           <div className="grid grid-cols-2 gap-4">
                             <div>
                               <Label>Template Name</Label>
-                              <Input defaultValue={template.name} className="mt-1" />
+                              <Input
+                                defaultValue={template.name}
+                                className="mt-1"
+                              />
                             </div>
                             <div>
                               <Label>Template Type</Label>
@@ -366,19 +445,34 @@ export default function EmailAutomation() {
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="auto-response">Auto Response</SelectItem>
-                                  <SelectItem value="interview">Interview Related</SelectItem>
-                                  <SelectItem value="offer">Job Offer</SelectItem>
-                                  <SelectItem value="rejection">Rejection</SelectItem>
-                                  <SelectItem value="reminder">Reminder</SelectItem>
-                                  <SelectItem value="follow-up">Follow-up</SelectItem>
+                                  <SelectItem value="auto-response">
+                                    Auto Response
+                                  </SelectItem>
+                                  <SelectItem value="interview">
+                                    Interview Related
+                                  </SelectItem>
+                                  <SelectItem value="offer">
+                                    Job Offer
+                                  </SelectItem>
+                                  <SelectItem value="rejection">
+                                    Rejection
+                                  </SelectItem>
+                                  <SelectItem value="reminder">
+                                    Reminder
+                                  </SelectItem>
+                                  <SelectItem value="follow-up">
+                                    Follow-up
+                                  </SelectItem>
                                 </SelectContent>
                               </Select>
                             </div>
                           </div>
                           <div>
                             <Label>Subject Line</Label>
-                            <Input defaultValue={template.subject} className="mt-1" />
+                            <Input
+                              defaultValue={template.subject}
+                              className="mt-1"
+                            />
                           </div>
                           <div>
                             <Label>Email Content</Label>
@@ -391,7 +485,11 @@ export default function EmailAutomation() {
                             <Label>Available Variables</Label>
                             <div className="flex flex-wrap gap-2 mt-2">
                               {variables.map((variable) => (
-                                <Badge key={variable} variant="outline" className="cursor-pointer hover:bg-slate-100">
+                                <Badge
+                                  key={variable}
+                                  variant="outline"
+                                  className="cursor-pointer hover:bg-slate-100"
+                                >
                                   {variable}
                                 </Badge>
                               ))}
@@ -425,33 +523,43 @@ export default function EmailAutomation() {
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                      <div className={`p-2 rounded-lg ${workflow.active ? 'bg-green-100' : 'bg-slate-100'}`}>
+                      <div
+                        className={`p-2 rounded-lg ${workflow.active ? "bg-green-100" : "bg-slate-100"}`}
+                      >
                         {workflow.active ? (
-                          <Play className={`w-5 h-5 ${workflow.active ? 'text-green-600' : 'text-slate-400'}`} />
+                          <Play
+                            className={`w-5 h-5 ${workflow.active ? "text-green-600" : "text-slate-400"}`}
+                          />
                         ) : (
                           <Pause className="w-5 h-5 text-slate-400" />
                         )}
                       </div>
                       <div>
-                        <h3 className="font-semibold text-slate-900">{workflow.name}</h3>
-                        <p className="text-sm text-slate-600">{workflow.description}</p>
+                        <h3 className="font-semibold text-slate-900">
+                          {workflow.name}
+                        </h3>
+                        <p className="text-sm text-slate-600">
+                          {workflow.description}
+                        </p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center space-x-6">
                       <div className="text-center">
                         <p className="text-sm text-slate-600">Steps</p>
                         <p className="font-semibold">{workflow.steps}</p>
                       </div>
                       <div className="text-center">
-                        <p className="text-sm text-slate-600">Active Candidates</p>
+                        <p className="text-sm text-slate-600">
+                          Active Candidates
+                        </p>
                         <p className="font-semibold">{workflow.candidates}</p>
                       </div>
                       <div className="text-center">
                         <p className="text-sm text-slate-600">Open Rate</p>
                         <p className="font-semibold">{workflow.openRate}%</p>
                       </div>
-                      
+
                       <div className="flex items-center space-x-2">
                         <Switch checked={workflow.active} />
                         <Button variant="ghost" size="sm">
@@ -501,14 +609,19 @@ export default function EmailAutomation() {
               <CardContent>
                 <div className="space-y-3">
                   {emailTemplates.slice(0, 4).map((template) => (
-                    <div key={template.id} className="flex justify-between items-center">
+                    <div
+                      key={template.id}
+                      className="flex justify-between items-center"
+                    >
                       <div>
-                        <p className="font-medium text-slate-900">{template.name}</p>
-                        <p className="text-sm text-slate-600">{template.usage} sent</p>
+                        <p className="font-medium text-slate-900">
+                          {template.name}
+                        </p>
+                        <p className="text-sm text-slate-600">
+                          {template.usage} sent
+                        </p>
                       </div>
-                      <Badge variant="outline">
-                        {template.openRate}% open
-                      </Badge>
+                      <Badge variant="outline">{template.openRate}% open</Badge>
                     </div>
                   ))}
                 </div>
@@ -527,23 +640,30 @@ export default function EmailAutomation() {
                 <div className="flex items-center justify-between">
                   <div>
                     <Label>Auto-send acknowledgments</Label>
-                    <p className="text-sm text-slate-600">Automatically send confirmation emails when candidates apply</p>
+                    <p className="text-sm text-slate-600">
+                      Automatically send confirmation emails when candidates
+                      apply
+                    </p>
                   </div>
                   <Switch defaultChecked />
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <div>
                     <Label>Interview reminders</Label>
-                    <p className="text-sm text-slate-600">Send reminder emails 24 hours before interviews</p>
+                    <p className="text-sm text-slate-600">
+                      Send reminder emails 24 hours before interviews
+                    </p>
                   </div>
                   <Switch defaultChecked />
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <div>
                     <Label>Status change notifications</Label>
-                    <p className="text-sm text-slate-600">Notify candidates when their application status changes</p>
+                    <p className="text-sm text-slate-600">
+                      Notify candidates when their application status changes
+                    </p>
                   </div>
                   <Switch />
                 </div>
@@ -561,7 +681,10 @@ export default function EmailAutomation() {
                 </div>
                 <div>
                   <Label>From Email</Label>
-                  <Input defaultValue="noreply@talentflow.com" className="mt-1" />
+                  <Input
+                    defaultValue="noreply@talentflow.com"
+                    className="mt-1"
+                  />
                 </div>
                 <div>
                   <Label>Reply-to Email</Label>

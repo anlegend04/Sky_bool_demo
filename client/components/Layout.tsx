@@ -13,7 +13,7 @@ import {
   Plus,
   Search,
   Bell,
-  User
+  User,
 } from "lucide-react";
 
 interface LayoutProps {
@@ -45,7 +45,9 @@ export default function Layout({ children }: LayoutProps) {
                 <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-sm">HR</span>
                 </div>
-                <span className="ml-2 text-xl font-semibold text-slate-900">TalentFlow</span>
+                <span className="ml-2 text-xl font-semibold text-slate-900">
+                  TalentFlow
+                </span>
               </div>
             </div>
 
@@ -96,7 +98,7 @@ export default function Layout({ children }: LayoutProps) {
                         "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors",
                         isActive
                           ? "bg-blue-50 text-blue-700 border-r-2 border-blue-700"
-                          : "text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+                          : "text-slate-700 hover:bg-slate-50 hover:text-slate-900",
                       )}
                     >
                       <item.icon className="mr-3 h-5 w-5" />
@@ -110,9 +112,7 @@ export default function Layout({ children }: LayoutProps) {
         </nav>
 
         {/* Main Content */}
-        <main className="flex-1 overflow-auto">
-          {children}
-        </main>
+        <main className="flex-1 overflow-auto">{children}</main>
       </div>
     </div>
   );

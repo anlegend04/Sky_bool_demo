@@ -7,7 +7,10 @@ interface PlaceholderPageProps {
   description: string;
 }
 
-export default function PlaceholderPage({ title, description }: PlaceholderPageProps) {
+export default function PlaceholderPage({
+  title,
+  description,
+}: PlaceholderPageProps) {
   return (
     <div className="p-6">
       <div className="max-w-2xl mx-auto mt-16">
@@ -21,11 +24,10 @@ export default function PlaceholderPage({ title, description }: PlaceholderPageP
           <CardContent className="text-center">
             <p className="text-slate-600 mb-6">{description}</p>
             <p className="text-sm text-slate-500 mb-6">
-              This page is ready to be built. Continue prompting to add specific functionality and content to this section.
+              This page is ready to be built. Continue prompting to add specific
+              functionality and content to this section.
             </p>
-            <Button variant="outline">
-              Request Feature Implementation
-            </Button>
+            <Button variant="outline">Request Feature Implementation</Button>
           </CardContent>
         </Card>
       </div>

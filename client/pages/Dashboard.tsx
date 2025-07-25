@@ -13,7 +13,7 @@ import {
   ArrowDownRight,
   Plus,
   Filter,
-  MoreHorizontal
+  MoreHorizontal,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -25,7 +25,7 @@ export default function Dashboard() {
       change: "+12%",
       changeType: "positive" as const,
       icon: Briefcase,
-      color: "blue"
+      color: "blue",
     },
     {
       title: "Total Candidates",
@@ -33,7 +33,7 @@ export default function Dashboard() {
       change: "+8%",
       changeType: "positive" as const,
       icon: Users,
-      color: "green"
+      color: "green",
     },
     {
       title: "Interviews This Week",
@@ -41,7 +41,7 @@ export default function Dashboard() {
       change: "-5%",
       changeType: "negative" as const,
       icon: Clock,
-      color: "orange"
+      color: "orange",
     },
     {
       title: "Avg. Time to Hire",
@@ -49,15 +49,43 @@ export default function Dashboard() {
       change: "-2 days",
       changeType: "positive" as const,
       icon: Target,
-      color: "purple"
-    }
+      color: "purple",
+    },
   ];
 
   const recentJobs = [
-    { id: 1, title: "Senior Frontend Developer", department: "Engineering", applicants: 45, status: "Active", priority: "High" },
-    { id: 2, title: "Product Manager", department: "Product", applicants: 32, status: "Active", priority: "Medium" },
-    { id: 3, title: "UX Designer", department: "Design", applicants: 28, status: "Draft", priority: "Low" },
-    { id: 4, title: "Data Scientist", department: "Analytics", applicants: 19, status: "Active", priority: "High" },
+    {
+      id: 1,
+      title: "Senior Frontend Developer",
+      department: "Engineering",
+      applicants: 45,
+      status: "Active",
+      priority: "High",
+    },
+    {
+      id: 2,
+      title: "Product Manager",
+      department: "Product",
+      applicants: 32,
+      status: "Active",
+      priority: "Medium",
+    },
+    {
+      id: 3,
+      title: "UX Designer",
+      department: "Design",
+      applicants: 28,
+      status: "Draft",
+      priority: "Low",
+    },
+    {
+      id: 4,
+      title: "Data Scientist",
+      department: "Analytics",
+      applicants: 19,
+      status: "Active",
+      priority: "High",
+    },
   ];
 
   const pipeline = [
@@ -74,7 +102,9 @@ export default function Dashboard() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
-          <p className="text-slate-600 mt-1">Welcome back! Here's what's happening with your recruitment.</p>
+          <p className="text-slate-600 mt-1">
+            Welcome back! Here's what's happening with your recruitment.
+          </p>
         </div>
         <div className="flex space-x-3">
           <Button variant="outline" size="sm">
@@ -103,19 +133,27 @@ export default function Dashboard() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-slate-900">{stat.value}</div>
+              <div className="text-2xl font-bold text-slate-900">
+                {stat.value}
+              </div>
               <div className="flex items-center mt-1">
                 {stat.changeType === "positive" ? (
                   <ArrowUpRight className="w-4 h-4 text-green-500" />
                 ) : (
                   <ArrowDownRight className="w-4 h-4 text-red-500" />
                 )}
-                <span className={`text-sm font-medium ${
-                  stat.changeType === "positive" ? "text-green-600" : "text-red-600"
-                }`}>
+                <span
+                  className={`text-sm font-medium ${
+                    stat.changeType === "positive"
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
+                >
                   {stat.change}
                 </span>
-                <span className="text-sm text-slate-500 ml-2">vs last month</span>
+                <span className="text-sm text-slate-500 ml-2">
+                  vs last month
+                </span>
               </div>
             </CardContent>
           </Card>
@@ -137,17 +175,24 @@ export default function Dashboard() {
           <CardContent>
             <div className="space-y-4">
               {pipeline.map((stage) => (
-                <div key={stage.stage} className="flex items-center justify-between">
+                <div
+                  key={stage.stage}
+                  className="flex items-center justify-between"
+                >
                   <div className="flex items-center space-x-3">
                     <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                    <span className="font-medium text-slate-700">{stage.stage}</span>
+                    <span className="font-medium text-slate-700">
+                      {stage.stage}
+                    </span>
                     <Badge variant="secondary" className="text-xs">
                       {stage.count}
                     </Badge>
                   </div>
                   <div className="flex items-center space-x-3 w-32">
                     <Progress value={stage.percentage} className="h-2" />
-                    <span className="text-sm text-slate-500 w-10">{stage.percentage}%</span>
+                    <span className="text-sm text-slate-500 w-10">
+                      {stage.percentage}%
+                    </span>
                   </div>
                 </div>
               ))}
@@ -196,18 +241,34 @@ export default function Dashboard() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-slate-200">
-                  <th className="text-left py-3 text-sm font-medium text-slate-600">Job Title</th>
-                  <th className="text-left py-3 text-sm font-medium text-slate-600">Department</th>
-                  <th className="text-left py-3 text-sm font-medium text-slate-600">Applicants</th>
-                  <th className="text-left py-3 text-sm font-medium text-slate-600">Status</th>
-                  <th className="text-left py-3 text-sm font-medium text-slate-600">Priority</th>
+                  <th className="text-left py-3 text-sm font-medium text-slate-600">
+                    Job Title
+                  </th>
+                  <th className="text-left py-3 text-sm font-medium text-slate-600">
+                    Department
+                  </th>
+                  <th className="text-left py-3 text-sm font-medium text-slate-600">
+                    Applicants
+                  </th>
+                  <th className="text-left py-3 text-sm font-medium text-slate-600">
+                    Status
+                  </th>
+                  <th className="text-left py-3 text-sm font-medium text-slate-600">
+                    Priority
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {recentJobs.map((job) => (
-                  <tr key={job.id} className="border-b border-slate-100 hover:bg-slate-50">
+                  <tr
+                    key={job.id}
+                    className="border-b border-slate-100 hover:bg-slate-50"
+                  >
                     <td className="py-3">
-                      <Link to={`/jobs/${job.id}`} className="font-medium text-slate-900 hover:text-blue-600">
+                      <Link
+                        to={`/jobs/${job.id}`}
+                        className="font-medium text-slate-900 hover:text-blue-600"
+                      >
                         {job.title}
                       </Link>
                     </td>
@@ -216,15 +277,22 @@ export default function Dashboard() {
                       <Badge variant="secondary">{job.applicants}</Badge>
                     </td>
                     <td className="py-3">
-                      <Badge variant={job.status === "Active" ? "default" : "secondary"}>
+                      <Badge
+                        variant={
+                          job.status === "Active" ? "default" : "secondary"
+                        }
+                      >
                         {job.status}
                       </Badge>
                     </td>
                     <td className="py-3">
-                      <Badge 
+                      <Badge
                         variant={
-                          job.priority === "High" ? "destructive" : 
-                          job.priority === "Medium" ? "default" : "secondary"
+                          job.priority === "High"
+                            ? "destructive"
+                            : job.priority === "Medium"
+                              ? "default"
+                              : "secondary"
                         }
                       >
                         {job.priority}

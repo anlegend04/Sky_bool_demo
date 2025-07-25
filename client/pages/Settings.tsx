@@ -33,17 +33,47 @@ import {
   Settings as SettingsIcon,
   Moon,
   Sun,
-  Monitor
+  Monitor,
 } from "lucide-react";
 
 export default function Settings() {
   const integrations = [
-    { name: "Google Calendar", status: "connected", description: "Sync interviews and meetings", icon: "📅" },
-    { name: "Slack", status: "connected", description: "Team notifications and updates", icon: "💬" },
-    { name: "Zoom", status: "connected", description: "Video interview integration", icon: "📹" },
-    { name: "LinkedIn", status: "disconnected", description: "Import candidate profiles", icon: "💼" },
-    { name: "GitHub", status: "disconnected", description: "Technical assessment integration", icon: "🔧" },
-    { name: "Microsoft Teams", status: "disconnected", description: "Alternative video meeting platform", icon: "👥" }
+    {
+      name: "Google Calendar",
+      status: "connected",
+      description: "Sync interviews and meetings",
+      icon: "📅",
+    },
+    {
+      name: "Slack",
+      status: "connected",
+      description: "Team notifications and updates",
+      icon: "💬",
+    },
+    {
+      name: "Zoom",
+      status: "connected",
+      description: "Video interview integration",
+      icon: "📹",
+    },
+    {
+      name: "LinkedIn",
+      status: "disconnected",
+      description: "Import candidate profiles",
+      icon: "💼",
+    },
+    {
+      name: "GitHub",
+      status: "disconnected",
+      description: "Technical assessment integration",
+      icon: "🔧",
+    },
+    {
+      name: "Microsoft Teams",
+      status: "disconnected",
+      description: "Alternative video meeting platform",
+      icon: "👥",
+    },
   ];
 
   return (
@@ -52,7 +82,9 @@ export default function Settings() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Settings</h1>
-          <p className="text-slate-600 mt-1">Manage your account, preferences, and system configuration.</p>
+          <p className="text-slate-600 mt-1">
+            Manage your account, preferences, and system configuration.
+          </p>
         </div>
         <div className="flex space-x-3">
           <Button variant="outline" size="sm">
@@ -93,7 +125,9 @@ export default function Settings() {
                   </Avatar>
                   <div className="space-y-2">
                     <Button size="sm">Change Photo</Button>
-                    <Button variant="outline" size="sm">Remove</Button>
+                    <Button variant="outline" size="sm">
+                      Remove
+                    </Button>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -170,7 +204,9 @@ export default function Settings() {
                       <SelectItem value="pst">Pacific Standard Time</SelectItem>
                       <SelectItem value="est">Eastern Standard Time</SelectItem>
                       <SelectItem value="cst">Central Standard Time</SelectItem>
-                      <SelectItem value="mst">Mountain Standard Time</SelectItem>
+                      <SelectItem value="mst">
+                        Mountain Standard Time
+                      </SelectItem>
                       <SelectItem value="utc">UTC</SelectItem>
                     </SelectContent>
                   </Select>
@@ -205,7 +241,9 @@ export default function Settings() {
                 <div className="flex items-center justify-between">
                   <div>
                     <Label>Auto-save drafts</Label>
-                    <p className="text-sm text-slate-600">Automatically save form drafts</p>
+                    <p className="text-sm text-slate-600">
+                      Automatically save form drafts
+                    </p>
                   </div>
                   <Switch defaultChecked />
                 </div>
@@ -225,33 +263,43 @@ export default function Settings() {
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
-                <h3 className="font-medium text-slate-900">Email Notifications</h3>
+                <h3 className="font-medium text-slate-900">
+                  Email Notifications
+                </h3>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <Label>New Applications</Label>
-                      <p className="text-sm text-slate-600">Get notified when candidates apply</p>
+                      <p className="text-sm text-slate-600">
+                        Get notified when candidates apply
+                      </p>
                     </div>
                     <Switch defaultChecked />
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
                       <Label>Interview Reminders</Label>
-                      <p className="text-sm text-slate-600">Reminders 24 hours before interviews</p>
+                      <p className="text-sm text-slate-600">
+                        Reminders 24 hours before interviews
+                      </p>
                     </div>
                     <Switch defaultChecked />
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
                       <Label>Status Updates</Label>
-                      <p className="text-sm text-slate-600">When candidate status changes</p>
+                      <p className="text-sm text-slate-600">
+                        When candidate status changes
+                      </p>
                     </div>
                     <Switch />
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
                       <Label>Weekly Reports</Label>
-                      <p className="text-sm text-slate-600">Summary of recruitment activities</p>
+                      <p className="text-sm text-slate-600">
+                        Summary of recruitment activities
+                      </p>
                     </div>
                     <Switch defaultChecked />
                   </div>
@@ -259,26 +307,34 @@ export default function Settings() {
               </div>
 
               <div className="space-y-4">
-                <h3 className="font-medium text-slate-900">Push Notifications</h3>
+                <h3 className="font-medium text-slate-900">
+                  Push Notifications
+                </h3>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <Label>Urgent Updates</Label>
-                      <p className="text-sm text-slate-600">Critical system alerts and updates</p>
+                      <p className="text-sm text-slate-600">
+                        Critical system alerts and updates
+                      </p>
                     </div>
                     <Switch defaultChecked />
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
                       <Label>Calendar Events</Label>
-                      <p className="text-sm text-slate-600">Upcoming interviews and meetings</p>
+                      <p className="text-sm text-slate-600">
+                        Upcoming interviews and meetings
+                      </p>
                     </div>
                     <Switch defaultChecked />
                   </div>
                   <div className="flex items-center justify-between">
                     <div>
                       <Label>Team Messages</Label>
-                      <p className="text-sm text-slate-600">Messages from team members</p>
+                      <p className="text-sm text-slate-600">
+                        Messages from team members
+                      </p>
                     </div>
                     <Switch />
                   </div>
@@ -286,7 +342,9 @@ export default function Settings() {
               </div>
 
               <div className="space-y-4">
-                <h3 className="font-medium text-slate-900">Notification Frequency</h3>
+                <h3 className="font-medium text-slate-900">
+                  Notification Frequency
+                </h3>
                 <div>
                   <Label>Email Digest</Label>
                   <Select defaultValue="daily">
@@ -348,14 +406,18 @@ export default function Settings() {
                 <div className="flex items-center justify-between">
                   <div>
                     <Label>Compact Mode</Label>
-                    <p className="text-sm text-slate-600">Reduce spacing for more content</p>
+                    <p className="text-sm text-slate-600">
+                      Reduce spacing for more content
+                    </p>
                   </div>
                   <Switch />
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
                     <Label>Show Sidebar</Label>
-                    <p className="text-sm text-slate-600">Always show navigation sidebar</p>
+                    <p className="text-sm text-slate-600">
+                      Always show navigation sidebar
+                    </p>
                   </div>
                   <Switch defaultChecked />
                 </div>
@@ -418,9 +480,13 @@ export default function Settings() {
                 <div className="flex items-center justify-between">
                   <div>
                     <Label>2FA Status</Label>
-                    <p className="text-sm text-slate-600">Enhance account security</p>
+                    <p className="text-sm text-slate-600">
+                      Enhance account security
+                    </p>
                   </div>
-                  <Badge variant="outline" className="text-red-600">Disabled</Badge>
+                  <Badge variant="outline" className="text-red-600">
+                    Disabled
+                  </Badge>
                 </div>
                 <Button>Enable 2FA</Button>
                 <div className="space-y-2">
@@ -429,9 +495,13 @@ export default function Settings() {
                     <div className="flex justify-between items-center p-3 border rounded">
                       <div>
                         <p className="font-medium">Current Session</p>
-                        <p className="text-sm text-slate-600">Chrome on macOS</p>
+                        <p className="text-sm text-slate-600">
+                          Chrome on macOS
+                        </p>
                       </div>
-                      <Badge variant="outline" className="text-green-600">Active</Badge>
+                      <Badge variant="outline" className="text-green-600">
+                        Active
+                      </Badge>
                     </div>
                   </div>
                 </div>
@@ -456,16 +526,35 @@ export default function Settings() {
                       <div className="flex items-center space-x-3">
                         <span className="text-2xl">{integration.icon}</span>
                         <div>
-                          <h3 className="font-medium text-slate-900">{integration.name}</h3>
-                          <p className="text-sm text-slate-600">{integration.description}</p>
+                          <h3 className="font-medium text-slate-900">
+                            {integration.name}
+                          </h3>
+                          <p className="text-sm text-slate-600">
+                            {integration.description}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <Badge variant={integration.status === "connected" ? "default" : "outline"}>
+                        <Badge
+                          variant={
+                            integration.status === "connected"
+                              ? "default"
+                              : "outline"
+                          }
+                        >
                           {integration.status}
                         </Badge>
-                        <Button size="sm" variant={integration.status === "connected" ? "outline" : "default"}>
-                          {integration.status === "connected" ? "Disconnect" : "Connect"}
+                        <Button
+                          size="sm"
+                          variant={
+                            integration.status === "connected"
+                              ? "outline"
+                              : "default"
+                          }
+                        >
+                          {integration.status === "connected"
+                            ? "Disconnect"
+                            : "Connect"}
                         </Button>
                       </div>
                     </div>
@@ -492,7 +581,10 @@ export default function Settings() {
                 </div>
                 <div>
                   <Label>Company Website</Label>
-                  <Input defaultValue="https://talentflow.com" className="mt-1" />
+                  <Input
+                    defaultValue="https://talentflow.com"
+                    className="mt-1"
+                  />
                 </div>
                 <div>
                   <Label>Company Size</Label>
@@ -504,7 +596,9 @@ export default function Settings() {
                       <SelectItem value="1-10">1-10 employees</SelectItem>
                       <SelectItem value="11-50">11-50 employees</SelectItem>
                       <SelectItem value="50-200">50-200 employees</SelectItem>
-                      <SelectItem value="200-1000">200-1000 employees</SelectItem>
+                      <SelectItem value="200-1000">
+                        200-1000 employees
+                      </SelectItem>
                       <SelectItem value="1000+">1000+ employees</SelectItem>
                     </SelectContent>
                   </Select>
@@ -540,7 +634,9 @@ export default function Settings() {
                 <div className="flex justify-between items-center">
                   <div>
                     <Label>Team Members</Label>
-                    <p className="text-sm text-slate-600">Manage user access and permissions</p>
+                    <p className="text-sm text-slate-600">
+                      Manage user access and permissions
+                    </p>
                   </div>
                   <Button size="sm">
                     <Plus className="w-4 h-4 mr-2" />

@@ -43,7 +43,7 @@ import {
   Eye,
   Edit,
   Trash2,
-  Share
+  Share,
 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -73,12 +73,12 @@ export default function Candidates() {
       resume: "sarah_johnson_resume.pdf",
       avatar: "",
       salary: "$120k - $140k",
-      source: "LinkedIn"
+      source: "LinkedIn",
     },
     {
       id: 2,
       name: "Michael Chen",
-      email: "m.chen@email.com", 
+      email: "m.chen@email.com",
       phone: "+1 (555) 0124",
       location: "New York, NY",
       position: "Product Manager",
@@ -91,7 +91,7 @@ export default function Candidates() {
       resume: "michael_chen_resume.pdf",
       avatar: "",
       salary: "$110k - $130k",
-      source: "Website"
+      source: "Website",
     },
     {
       id: 3,
@@ -102,14 +102,14 @@ export default function Candidates() {
       position: "UX Designer",
       experience: "3+ years",
       skills: ["Figma", "Sketch", "User Research", "Prototyping"],
-      status: "Active", 
+      status: "Active",
       stage: "Screening",
       rating: 4,
       appliedDate: "2024-01-10",
       resume: "emily_davis_resume.pdf",
       avatar: "",
       salary: "$85k - $105k",
-      source: "Indeed"
+      source: "Indeed",
     },
     {
       id: 4,
@@ -127,7 +127,7 @@ export default function Candidates() {
       resume: "david_kim_resume.pdf",
       avatar: "",
       salary: "$130k - $150k",
-      source: "Referral"
+      source: "Referral",
     },
     {
       id: 5,
@@ -145,7 +145,7 @@ export default function Candidates() {
       resume: "lisa_garcia_resume.pdf",
       avatar: "",
       salary: "$115k - $135k",
-      source: "LinkedIn"
+      source: "LinkedIn",
     },
     {
       id: 6,
@@ -163,39 +163,68 @@ export default function Candidates() {
       resume: "robert_taylor_resume.pdf",
       avatar: "",
       salary: "$60k - $75k",
-      source: "Website"
-    }
+      source: "Website",
+    },
   ];
 
   const stats = [
-    { title: "Total Candidates", value: "1,847", change: "+12%", color: "blue" },
+    {
+      title: "Total Candidates",
+      value: "1,847",
+      change: "+12%",
+      color: "blue",
+    },
     { title: "Active Pipeline", value: "156", change: "+8%", color: "green" },
-    { title: "Interviews Scheduled", value: "23", change: "+15%", color: "orange" },
-    { title: "Offers Extended", value: "8", change: "+3%", color: "purple" }
+    {
+      title: "Interviews Scheduled",
+      value: "23",
+      change: "+15%",
+      color: "orange",
+    },
+    { title: "Offers Extended", value: "8", change: "+3%", color: "purple" },
   ];
 
   // Filter candidates based on search and filters
-  const filteredCandidates = candidates.filter(candidate => {
-    const matchesSearch = candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         candidate.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         candidate.skills.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filteredCandidates = candidates.filter((candidate) => {
+    const matchesSearch =
+      candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      candidate.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      candidate.skills.some((skill) =>
+        skill.toLowerCase().includes(searchTerm.toLowerCase()),
+      );
 
-    const matchesPosition = positionFilter === "all" || candidate.position.toLowerCase().includes(positionFilter.toLowerCase());
-    const matchesStage = stageFilter === "all" || candidate.stage.toLowerCase() === stageFilter.toLowerCase();
-    const matchesLocation = locationFilter === "all" || candidate.location.toLowerCase().includes(locationFilter.toLowerCase());
+    const matchesPosition =
+      positionFilter === "all" ||
+      candidate.position.toLowerCase().includes(positionFilter.toLowerCase());
+    const matchesStage =
+      stageFilter === "all" ||
+      candidate.stage.toLowerCase() === stageFilter.toLowerCase();
+    const matchesLocation =
+      locationFilter === "all" ||
+      candidate.location.toLowerCase().includes(locationFilter.toLowerCase());
 
     return matchesSearch && matchesPosition && matchesStage && matchesLocation;
   });
 
-  const CandidateCard = ({ candidate }: { candidate: typeof candidates[0] }) => (
+  const CandidateCard = ({
+    candidate,
+  }: {
+    candidate: (typeof candidates)[0];
+  }) => (
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
-          <Link to={`/candidates/${candidate.id}`} className="flex items-center space-x-3 hover:bg-slate-100 p-2 rounded-md transition">
+          <Link
+            to={`/candidates/${candidate.id}`}
+            className="flex items-center space-x-3 hover:bg-slate-100 p-2 rounded-md transition"
+          >
             <Avatar className="w-12 h-12">
               <AvatarImage src={candidate.avatar} />
               <AvatarFallback>
-                {candidate.name.split(" ").map((n) => n[0]).join("")}
+                {candidate.name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")}
               </AvatarFallback>
             </Avatar>
             <div>
@@ -253,7 +282,7 @@ export default function Candidates() {
           <Briefcase className="w-4 h-4 mr-2" />
           {candidate.experience}
         </div>
-        
+
         <div className="flex flex-wrap gap-1 pt-2">
           {candidate.skills.slice(0, 3).map((skill) => (
             <Badge key={skill} variant="secondary" className="text-xs">
@@ -270,30 +299,36 @@ export default function Candidates() {
         <div className="flex items-center justify-between pt-3 border-t border-slate-100">
           <div className="flex items-center space-x-1">
             {[...Array(5)].map((_, i) => (
-              <Star 
+              <Star
                 key={i}
                 className={`w-4 h-4 ${
-                  i < candidate.rating 
-                    ? 'text-yellow-400 fill-current' 
-                    : 'text-slate-300'
+                  i < candidate.rating
+                    ? "text-yellow-400 fill-current"
+                    : "text-slate-300"
                 }`}
               />
             ))}
           </div>
           <div className="flex items-center space-x-2">
-            <Badge 
+            <Badge
               variant={
-                candidate.stage === "Offer" ? "default" :
-                candidate.stage === "Final" ? "secondary" :
-                candidate.stage === "Technical" ? "outline" :
-                candidate.stage === "Interview" ? "default" :
-                candidate.stage === "Screening" ? "secondary" : "destructive"
+                candidate.stage === "Offer"
+                  ? "default"
+                  : candidate.stage === "Final"
+                    ? "secondary"
+                    : candidate.stage === "Technical"
+                      ? "outline"
+                      : candidate.stage === "Interview"
+                        ? "default"
+                        : candidate.stage === "Screening"
+                          ? "secondary"
+                          : "destructive"
               }
               className="text-xs"
             >
               {candidate.stage}
             </Badge>
-            <Badge 
+            <Badge
               variant={candidate.status === "Active" ? "default" : "outline"}
               className="text-xs"
             >
@@ -322,7 +357,10 @@ export default function Candidates() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Candidates</h1>
-          <p className="text-slate-600 mt-1">Manage candidate profiles, applications, and track their progress through your pipeline.</p>
+          <p className="text-slate-600 mt-1">
+            Manage candidate profiles, applications, and track their progress
+            through your pipeline.
+          </p>
         </div>
         <div className="flex space-x-3">
           <Dialog open={isUploadOpen} onOpenChange={setIsUploadOpen}>
@@ -336,26 +374,33 @@ export default function Candidates() {
               <DialogHeader>
                 <DialogTitle>Import Candidates</DialogTitle>
                 <DialogDescription>
-                  Upload a CSV or JSON file to import multiple candidates at once.
+                  Upload a CSV or JSON file to import multiple candidates at
+                  once.
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center">
                   <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                  <p className="text-sm text-slate-600 mb-2">Drop your file here or click to browse</p>
-                  <Button variant="outline" size="sm">Choose File</Button>
+                  <p className="text-sm text-slate-600 mb-2">
+                    Drop your file here or click to browse
+                  </p>
+                  <Button variant="outline" size="sm">
+                    Choose File
+                  </Button>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Button variant="outline" size="sm" className="flex-1">
                     <Download className="w-4 h-4 mr-2" />
                     Download Template
                   </Button>
-                  <Button size="sm" className="flex-1">Import</Button>
+                  <Button size="sm" className="flex-1">
+                    Import
+                  </Button>
                 </div>
               </div>
             </DialogContent>
           </Dialog>
-          
+
           <Dialog>
             <DialogTrigger asChild>
               <Button size="sm">
@@ -367,7 +412,8 @@ export default function Candidates() {
               <DialogHeader>
                 <DialogTitle>Add New Candidate</DialogTitle>
                 <DialogDescription>
-                  Create a new candidate profile manually or upload their resume.
+                  Create a new candidate profile manually or upload their
+                  resume.
                 </DialogDescription>
               </DialogHeader>
               <Tabs defaultValue="manual" className="w-full">
@@ -378,36 +424,60 @@ export default function Candidates() {
                 <TabsContent value="manual" className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium text-slate-700">Full Name</label>
+                      <label className="text-sm font-medium text-slate-700">
+                        Full Name
+                      </label>
                       <Input placeholder="John Doe" className="mt-1" />
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-slate-700">Email</label>
-                      <Input type="email" placeholder="john@example.com" className="mt-1" />
+                      <label className="text-sm font-medium text-slate-700">
+                        Email
+                      </label>
+                      <Input
+                        type="email"
+                        placeholder="john@example.com"
+                        className="mt-1"
+                      />
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-slate-700">Phone</label>
+                      <label className="text-sm font-medium text-slate-700">
+                        Phone
+                      </label>
                       <Input placeholder="+1 (555) 123-4567" className="mt-1" />
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-slate-700">Location</label>
+                      <label className="text-sm font-medium text-slate-700">
+                        Location
+                      </label>
                       <Input placeholder="City, State" className="mt-1" />
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-slate-700">Position</label>
+                      <label className="text-sm font-medium text-slate-700">
+                        Position
+                      </label>
                       <Input placeholder="Software Engineer" className="mt-1" />
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-slate-700">Experience</label>
+                      <label className="text-sm font-medium text-slate-700">
+                        Experience
+                      </label>
                       <Select>
                         <SelectTrigger>
                           <SelectValue placeholder="Select experience" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="entry">Entry Level (0-2 years)</SelectItem>
-                          <SelectItem value="mid">Mid Level (3-5 years)</SelectItem>
-                          <SelectItem value="senior">Senior Level (5+ years)</SelectItem>
-                          <SelectItem value="lead">Lead/Principal (8+ years)</SelectItem>
+                          <SelectItem value="entry">
+                            Entry Level (0-2 years)
+                          </SelectItem>
+                          <SelectItem value="mid">
+                            Mid Level (3-5 years)
+                          </SelectItem>
+                          <SelectItem value="senior">
+                            Senior Level (5+ years)
+                          </SelectItem>
+                          <SelectItem value="lead">
+                            Lead/Principal (8+ years)
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -420,9 +490,12 @@ export default function Candidates() {
                 <TabsContent value="upload" className="space-y-4">
                   <div className="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center">
                     <FileText className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-                    <h4 className="text-lg font-medium text-slate-900 mb-2">Upload Resume/CV</h4>
+                    <h4 className="text-lg font-medium text-slate-900 mb-2">
+                      Upload Resume/CV
+                    </h4>
                     <p className="text-sm text-slate-600 mb-4">
-                      We'll automatically extract candidate information from the resume
+                      We'll automatically extract candidate information from the
+                      resume
                     </p>
                     <Button variant="outline">
                       <Upload className="w-4 h-4 mr-2" />
@@ -444,8 +517,12 @@ export default function Candidates() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-600">{stat.title}</p>
-                  <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
-                  <p className="text-sm text-green-600">{stat.change} vs last month</p>
+                  <p className="text-2xl font-bold text-slate-900">
+                    {stat.value}
+                  </p>
+                  <p className="text-sm text-green-600">
+                    {stat.change} vs last month
+                  </p>
                 </div>
                 <div className={`p-3 rounded-full bg-${stat.color}-100`}>
                   <User className={`w-6 h-6 text-${stat.color}-600`} />
@@ -480,7 +557,9 @@ export default function Candidates() {
                   <SelectItem value="all">All Positions</SelectItem>
                   <SelectItem value="frontend">Frontend Developer</SelectItem>
                   <SelectItem value="backend">Backend Developer</SelectItem>
-                  <SelectItem value="fullstack">Full Stack Developer</SelectItem>
+                  <SelectItem value="fullstack">
+                    Full Stack Developer
+                  </SelectItem>
                   <SelectItem value="designer">Designer</SelectItem>
                   <SelectItem value="product">Product Manager</SelectItem>
                   <SelectItem value="data">Data Scientist</SelectItem>
@@ -531,8 +610,12 @@ export default function Candidates() {
         ) : (
           <div className="col-span-full text-center py-12">
             <User className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-slate-900 mb-2">No candidates found</h3>
-            <p className="text-slate-600">Try adjusting your search or filters to find candidates.</p>
+            <h3 className="text-lg font-medium text-slate-900 mb-2">
+              No candidates found
+            </h3>
+            <p className="text-slate-600">
+              Try adjusting your search or filters to find candidates.
+            </p>
           </div>
         )}
       </div>
@@ -543,7 +626,11 @@ export default function Candidates() {
           <Button variant="outline" size="sm" disabled>
             Previous
           </Button>
-          <Button variant="outline" size="sm" className="bg-blue-50 text-blue-600">
+          <Button
+            variant="outline"
+            size="sm"
+            className="bg-blue-50 text-blue-600"
+          >
             1
           </Button>
           <Button variant="outline" size="sm">

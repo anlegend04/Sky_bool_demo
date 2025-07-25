@@ -30,7 +30,7 @@ import {
   FileText,
   Save,
   Eye,
-  Send
+  Send,
 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -50,7 +50,7 @@ export default function JobCreate() {
   };
 
   const removeSkill = (skill: string) => {
-    setSkills(skills.filter(s => s !== skill));
+    setSkills(skills.filter((s) => s !== skill));
   };
 
   const addBenefit = () => {
@@ -61,20 +61,49 @@ export default function JobCreate() {
   };
 
   const removeBenefit = (benefit: string) => {
-    setBenefits(benefits.filter(b => b !== benefit));
+    setBenefits(benefits.filter((b) => b !== benefit));
   };
 
   const predefinedSkills = [
-    "JavaScript", "TypeScript", "React", "Node.js", "Python", "Java", "AWS", 
-    "Docker", "Kubernetes", "SQL", "MongoDB", "GraphQL", "REST APIs", "Git",
-    "Agile", "Scrum", "Product Management", "UX Design", "Figma", "Adobe Creative Suite"
+    "JavaScript",
+    "TypeScript",
+    "React",
+    "Node.js",
+    "Python",
+    "Java",
+    "AWS",
+    "Docker",
+    "Kubernetes",
+    "SQL",
+    "MongoDB",
+    "GraphQL",
+    "REST APIs",
+    "Git",
+    "Agile",
+    "Scrum",
+    "Product Management",
+    "UX Design",
+    "Figma",
+    "Adobe Creative Suite",
   ];
 
   const predefinedBenefits = [
-    "Health Insurance", "Dental Insurance", "Vision Insurance", "401(k) Matching",
-    "Unlimited PTO", "Flexible Work Hours", "Remote Work", "Professional Development Budget",
-    "Gym Membership", "Wellness Programs", "Stock Options", "Commuter Benefits",
-    "Free Meals", "Coffee and Snacks", "Parental Leave", "Life Insurance"
+    "Health Insurance",
+    "Dental Insurance",
+    "Vision Insurance",
+    "401(k) Matching",
+    "Unlimited PTO",
+    "Flexible Work Hours",
+    "Remote Work",
+    "Professional Development Budget",
+    "Gym Membership",
+    "Wellness Programs",
+    "Stock Options",
+    "Commuter Benefits",
+    "Free Meals",
+    "Coffee and Snacks",
+    "Parental Leave",
+    "Life Insurance",
   ];
 
   return (
@@ -89,8 +118,12 @@ export default function JobCreate() {
             </Link>
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Create New Job</h1>
-            <p className="text-slate-600 mt-1">Fill in the details below to create a new job posting.</p>
+            <h1 className="text-3xl font-bold text-slate-900">
+              Create New Job
+            </h1>
+            <p className="text-slate-600 mt-1">
+              Fill in the details below to create a new job posting.
+            </p>
           </div>
         </div>
         <div className="flex space-x-3">
@@ -111,15 +144,21 @@ export default function JobCreate() {
               <div className="space-y-4">
                 <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center">
                   <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                  <p className="text-sm text-slate-600 mb-2">Drop your file here or click to browse</p>
-                  <Button variant="outline" size="sm">Choose File</Button>
+                  <p className="text-sm text-slate-600 mb-2">
+                    Drop your file here or click to browse
+                  </p>
+                  <Button variant="outline" size="sm">
+                    Choose File
+                  </Button>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Button variant="outline" size="sm" className="flex-1">
                     <Download className="w-4 h-4 mr-2" />
                     Download Template
                   </Button>
-                  <Button size="sm" className="flex-1">Import</Button>
+                  <Button size="sm" className="flex-1">
+                    Import
+                  </Button>
                 </div>
               </div>
             </DialogContent>
@@ -147,7 +186,7 @@ export default function JobCreate() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="title">Job Title *</Label>
-                      <Input 
+                      <Input
                         id="title"
                         placeholder="e.g. Senior Frontend Developer"
                         className="mt-1"
@@ -160,7 +199,9 @@ export default function JobCreate() {
                           <SelectValue placeholder="Select department" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="engineering">Engineering</SelectItem>
+                          <SelectItem value="engineering">
+                            Engineering
+                          </SelectItem>
                           <SelectItem value="product">Product</SelectItem>
                           <SelectItem value="design">Design</SelectItem>
                           <SelectItem value="marketing">Marketing</SelectItem>
@@ -193,17 +234,25 @@ export default function JobCreate() {
                           <SelectValue placeholder="Select level" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="entry">Entry Level (0-2 years)</SelectItem>
-                          <SelectItem value="mid">Mid Level (3-5 years)</SelectItem>
-                          <SelectItem value="senior">Senior Level (5-8 years)</SelectItem>
-                          <SelectItem value="lead">Lead/Principal (8+ years)</SelectItem>
+                          <SelectItem value="entry">
+                            Entry Level (0-2 years)
+                          </SelectItem>
+                          <SelectItem value="mid">
+                            Mid Level (3-5 years)
+                          </SelectItem>
+                          <SelectItem value="senior">
+                            Senior Level (5-8 years)
+                          </SelectItem>
+                          <SelectItem value="lead">
+                            Lead/Principal (8+ years)
+                          </SelectItem>
                           <SelectItem value="executive">Executive</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div>
                       <Label htmlFor="location">Location *</Label>
-                      <Input 
+                      <Input
                         id="location"
                         placeholder="e.g. San Francisco, CA or Remote"
                         className="mt-1"
@@ -224,26 +273,23 @@ export default function JobCreate() {
                       </Select>
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="salary-min">Salary Range</Label>
                       <div className="flex items-center space-x-2 mt-1">
-                        <Input 
+                        <Input
                           id="salary-min"
                           placeholder="Min (e.g. 80000)"
                           type="number"
                         />
                         <span className="text-slate-500">to</span>
-                        <Input 
-                          placeholder="Max (e.g. 120000)"
-                          type="number"
-                        />
+                        <Input placeholder="Max (e.g. 120000)" type="number" />
                       </div>
                     </div>
                     <div>
                       <Label htmlFor="openings">Number of Openings</Label>
-                      <Input 
+                      <Input
                         id="openings"
                         placeholder="e.g. 2"
                         type="number"
@@ -265,25 +311,27 @@ export default function JobCreate() {
                 <CardContent className="space-y-4">
                   <div>
                     <Label htmlFor="summary">Job Summary *</Label>
-                    <Textarea 
+                    <Textarea
                       id="summary"
                       placeholder="Brief overview of the role and its importance to the company..."
                       className="mt-1 min-h-[100px]"
                     />
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="description">Detailed Description *</Label>
-                    <Textarea 
+                    <Textarea
                       id="description"
                       placeholder="Detailed description of the role, responsibilities, and what the candidate will be working on..."
                       className="mt-1 min-h-[200px]"
                     />
                   </div>
-                  
+
                   <div>
-                    <Label htmlFor="responsibilities">Key Responsibilities</Label>
-                    <Textarea 
+                    <Label htmlFor="responsibilities">
+                      Key Responsibilities
+                    </Label>
+                    <Textarea
                       id="responsibilities"
                       placeholder="• Develop and maintain web applications&#10;• Collaborate with cross-functional teams&#10;• Write clean, maintainable code..."
                       className="mt-1 min-h-[150px]"
@@ -307,12 +355,20 @@ export default function JobCreate() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="high-school">High School</SelectItem>
-                        <SelectItem value="associate">Associate Degree</SelectItem>
-                        <SelectItem value="bachelor">Bachelor's Degree</SelectItem>
+                        <SelectItem value="associate">
+                          Associate Degree
+                        </SelectItem>
+                        <SelectItem value="bachelor">
+                          Bachelor's Degree
+                        </SelectItem>
                         <SelectItem value="master">Master's Degree</SelectItem>
                         <SelectItem value="phd">PhD</SelectItem>
-                        <SelectItem value="bootcamp">Bootcamp/Certification</SelectItem>
-                        <SelectItem value="none">No formal requirement</SelectItem>
+                        <SelectItem value="bootcamp">
+                          Bootcamp/Certification
+                        </SelectItem>
+                        <SelectItem value="none">
+                          No formal requirement
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -322,34 +378,43 @@ export default function JobCreate() {
                     <div className="mt-2 space-y-3">
                       <div className="flex flex-wrap gap-2">
                         {skills.map((skill) => (
-                          <Badge key={skill} variant="default" className="flex items-center gap-1">
+                          <Badge
+                            key={skill}
+                            variant="default"
+                            className="flex items-center gap-1"
+                          >
                             {skill}
-                            <X 
-                              className="w-3 h-3 cursor-pointer hover:text-red-500" 
+                            <X
+                              className="w-3 h-3 cursor-pointer hover:text-red-500"
                               onClick={() => removeSkill(skill)}
                             />
                           </Badge>
                         ))}
                       </div>
                       <div className="flex gap-2">
-                        <Input 
+                        <Input
                           placeholder="Add a skill (e.g. React, JavaScript)"
                           value={newSkill}
                           onChange={(e) => setNewSkill(e.target.value)}
-                          onKeyPress={(e) => e.key === 'Enter' && addSkill()}
+                          onKeyPress={(e) => e.key === "Enter" && addSkill()}
                         />
                         <Button type="button" onClick={addSkill} size="sm">
                           <Plus className="w-4 h-4" />
                         </Button>
                       </div>
                       <div className="flex flex-wrap gap-2">
-                        <p className="text-sm text-slate-600 w-full">Quick add:</p>
+                        <p className="text-sm text-slate-600 w-full">
+                          Quick add:
+                        </p>
                         {predefinedSkills.map((skill) => (
-                          <Badge 
-                            key={skill} 
-                            variant="outline" 
+                          <Badge
+                            key={skill}
+                            variant="outline"
                             className="cursor-pointer hover:bg-slate-100"
-                            onClick={() => !skills.includes(skill) && setSkills([...skills, skill])}
+                            onClick={() =>
+                              !skills.includes(skill) &&
+                              setSkills([...skills, skill])
+                            }
                           >
                             + {skill}
                           </Badge>
@@ -359,8 +424,10 @@ export default function JobCreate() {
                   </div>
 
                   <div>
-                    <Label htmlFor="qualifications">Additional Qualifications</Label>
-                    <Textarea 
+                    <Label htmlFor="qualifications">
+                      Additional Qualifications
+                    </Label>
+                    <Textarea
                       id="qualifications"
                       placeholder="• 5+ years of experience in React development&#10;• Experience with cloud platforms (AWS, GCP)&#10;• Strong problem-solving skills..."
                       className="mt-1 min-h-[120px]"
@@ -381,34 +448,43 @@ export default function JobCreate() {
                     <div className="mt-2 space-y-3">
                       <div className="flex flex-wrap gap-2">
                         {benefits.map((benefit) => (
-                          <Badge key={benefit} variant="default" className="flex items-center gap-1">
+                          <Badge
+                            key={benefit}
+                            variant="default"
+                            className="flex items-center gap-1"
+                          >
                             {benefit}
-                            <X 
-                              className="w-3 h-3 cursor-pointer hover:text-red-500" 
+                            <X
+                              className="w-3 h-3 cursor-pointer hover:text-red-500"
                               onClick={() => removeBenefit(benefit)}
                             />
                           </Badge>
                         ))}
                       </div>
                       <div className="flex gap-2">
-                        <Input 
+                        <Input
                           placeholder="Add a benefit (e.g. Health Insurance)"
                           value={newBenefit}
                           onChange={(e) => setNewBenefit(e.target.value)}
-                          onKeyPress={(e) => e.key === 'Enter' && addBenefit()}
+                          onKeyPress={(e) => e.key === "Enter" && addBenefit()}
                         />
                         <Button type="button" onClick={addBenefit} size="sm">
                           <Plus className="w-4 h-4" />
                         </Button>
                       </div>
                       <div className="flex flex-wrap gap-2">
-                        <p className="text-sm text-slate-600 w-full">Quick add:</p>
+                        <p className="text-sm text-slate-600 w-full">
+                          Quick add:
+                        </p>
                         {predefinedBenefits.map((benefit) => (
-                          <Badge 
-                            key={benefit} 
-                            variant="outline" 
+                          <Badge
+                            key={benefit}
+                            variant="outline"
                             className="cursor-pointer hover:bg-slate-100"
-                            onClick={() => !benefits.includes(benefit) && setBenefits([...benefits, benefit])}
+                            onClick={() =>
+                              !benefits.includes(benefit) &&
+                              setBenefits([...benefits, benefit])
+                            }
                           >
                             + {benefit}
                           </Badge>
@@ -418,8 +494,10 @@ export default function JobCreate() {
                   </div>
 
                   <div>
-                    <Label htmlFor="additional-benefits">Additional Benefits Description</Label>
-                    <Textarea 
+                    <Label htmlFor="additional-benefits">
+                      Additional Benefits Description
+                    </Label>
+                    <Textarea
                       id="additional-benefits"
                       placeholder="Describe any additional perks, company culture benefits, or unique offerings..."
                       className="mt-1 min-h-[100px]"
@@ -462,15 +540,21 @@ export default function JobCreate() {
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
                     <Checkbox id="auto-response" />
-                    <Label htmlFor="auto-response" className="text-sm">Send auto-response to applicants</Label>
+                    <Label htmlFor="auto-response" className="text-sm">
+                      Send auto-response to applicants
+                    </Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Checkbox id="screening" />
-                    <Label htmlFor="screening" className="text-sm">Require screening questions</Label>
+                    <Label htmlFor="screening" className="text-sm">
+                      Require screening questions
+                    </Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Checkbox id="cover-letter" />
-                    <Label htmlFor="cover-letter" className="text-sm">Require cover letter</Label>
+                    <Label htmlFor="cover-letter" className="text-sm">
+                      Require cover letter
+                    </Label>
                   </div>
                 </div>
               </div>
@@ -490,7 +574,10 @@ export default function JobCreate() {
                 <Eye className="w-4 h-4 mr-2" />
                 Preview Job
               </Button>
-              <Button variant="default" className="w-full bg-green-600 hover:bg-green-700">
+              <Button
+                variant="default"
+                className="w-full bg-green-600 hover:bg-green-700"
+              >
                 <Send className="w-4 h-4 mr-2" />
                 Publish Job
               </Button>

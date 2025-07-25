@@ -16,7 +16,7 @@ import {
   Star,
   Mail,
   Phone,
-  FileText
+  FileText,
 } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 
@@ -44,34 +44,35 @@ export default function JobDetail() {
     budget: "$180k",
     headcount: 2,
     jobCode: "ENG-2024-001",
-    description: "We're looking for a Senior Frontend Developer to join our growing engineering team. You'll be working on cutting-edge web applications using React, TypeScript, and modern development tools.",
+    description:
+      "We're looking for a Senior Frontend Developer to join our growing engineering team. You'll be working on cutting-edge web applications using React, TypeScript, and modern development tools.",
     requirements: [
       "5+ years of experience with React and TypeScript",
       "Strong understanding of modern JavaScript (ES6+)",
       "Experience with state management (Redux, Zustand, etc.)",
       "Proficiency with CSS-in-JS or Tailwind CSS",
-      "Experience with testing frameworks (Jest, Vitest, etc.)"
+      "Experience with testing frameworks (Jest, Vitest, etc.)",
     ],
     niceToHave: [
       "Experience with Next.js or similar frameworks",
       "Knowledge of GraphQL and Apollo Client",
       "Previous experience in a fast-paced startup environment",
-      "Open source contributions"
+      "Open source contributions",
     ],
     benefits: [
       "Competitive salary and equity package",
       "Comprehensive health, dental, and vision insurance",
       "401(k) with company matching",
       "Unlimited PTO policy",
-      "Professional development budget"
+      "Professional development budget",
     ],
     responsibilities: [
       "Develop and maintain high-quality frontend applications",
       "Collaborate with design and backend teams",
       "Participate in code reviews and technical discussions",
       "Mentor junior developers",
-      "Stay up-to-date with latest frontend technologies"
-    ]
+      "Stay up-to-date with latest frontend technologies",
+    ],
   };
 
   const kanbanColumns = [
@@ -80,45 +81,108 @@ export default function JobDetail() {
       title: "Applied",
       count: 45,
       candidates: [
-        { id: 1, name: "Sarah Johnson", email: "sarah.j@email.com", avatar: "", rating: 4, appliedDate: "2 days ago" },
-        { id: 2, name: "Michael Chen", email: "m.chen@email.com", avatar: "", rating: 5, appliedDate: "3 days ago" },
-        { id: 3, name: "Emily Davis", email: "emily.d@email.com", avatar: "", rating: 3, appliedDate: "4 days ago" },
-      ]
+        {
+          id: 1,
+          name: "Sarah Johnson",
+          email: "sarah.j@email.com",
+          avatar: "",
+          rating: 4,
+          appliedDate: "2 days ago",
+        },
+        {
+          id: 2,
+          name: "Michael Chen",
+          email: "m.chen@email.com",
+          avatar: "",
+          rating: 5,
+          appliedDate: "3 days ago",
+        },
+        {
+          id: 3,
+          name: "Emily Davis",
+          email: "emily.d@email.com",
+          avatar: "",
+          rating: 3,
+          appliedDate: "4 days ago",
+        },
+      ],
     },
     {
       id: "screening",
       title: "Phone Screening",
       count: 12,
       candidates: [
-        { id: 4, name: "James Wilson", email: "james.w@email.com", avatar: "", rating: 4, appliedDate: "1 week ago" },
-        { id: 5, name: "Lisa Garcia", email: "lisa.g@email.com", avatar: "", rating: 5, appliedDate: "1 week ago" },
-      ]
+        {
+          id: 4,
+          name: "James Wilson",
+          email: "james.w@email.com",
+          avatar: "",
+          rating: 4,
+          appliedDate: "1 week ago",
+        },
+        {
+          id: 5,
+          name: "Lisa Garcia",
+          email: "lisa.g@email.com",
+          avatar: "",
+          rating: 5,
+          appliedDate: "1 week ago",
+        },
+      ],
     },
     {
       id: "interview",
       title: "Technical Interview",
       count: 8,
       candidates: [
-        { id: 6, name: "David Kim", email: "david.k@email.com", avatar: "", rating: 5, appliedDate: "2 weeks ago" },
-        { id: 7, name: "Anna Martinez", email: "anna.m@email.com", avatar: "", rating: 4, appliedDate: "2 weeks ago" },
-      ]
+        {
+          id: 6,
+          name: "David Kim",
+          email: "david.k@email.com",
+          avatar: "",
+          rating: 5,
+          appliedDate: "2 weeks ago",
+        },
+        {
+          id: 7,
+          name: "Anna Martinez",
+          email: "anna.m@email.com",
+          avatar: "",
+          rating: 4,
+          appliedDate: "2 weeks ago",
+        },
+      ],
     },
     {
       id: "final",
       title: "Final Round",
       count: 3,
       candidates: [
-        { id: 8, name: "Robert Taylor", email: "robert.t@email.com", avatar: "", rating: 5, appliedDate: "3 weeks ago" },
-      ]
+        {
+          id: 8,
+          name: "Robert Taylor",
+          email: "robert.t@email.com",
+          avatar: "",
+          rating: 5,
+          appliedDate: "3 weeks ago",
+        },
+      ],
     },
     {
       id: "offer",
       title: "Offer Extended",
       count: 2,
       candidates: [
-        { id: 9, name: "Jessica Brown", email: "jessica.b@email.com", avatar: "", rating: 5, appliedDate: "1 month ago" },
-      ]
-    }
+        {
+          id: 9,
+          name: "Jessica Brown",
+          email: "jessica.b@email.com",
+          avatar: "",
+          rating: 5,
+          appliedDate: "1 month ago",
+        },
+      ],
+    },
   ];
 
   return (
@@ -228,44 +292,72 @@ export default function JobDetail() {
                 <div key={column.id} className="w-80 flex-shrink-0">
                   <div className="bg-slate-50 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-semibold text-slate-900">{column.title}</h3>
+                      <h3 className="font-semibold text-slate-900">
+                        {column.title}
+                      </h3>
                       <Badge variant="secondary">{column.count}</Badge>
                     </div>
                     <div className="space-y-3">
                       {column.candidates.map((candidate) => (
-                        <Card key={candidate.id} className="hover:shadow-sm transition-shadow cursor-pointer">
+                        <Card
+                          key={candidate.id}
+                          className="hover:shadow-sm transition-shadow cursor-pointer"
+                        >
                           <CardContent className="p-4">
                             <div className="flex items-start space-x-3">
                               <Avatar className="w-10 h-10">
                                 <AvatarImage src={candidate.avatar} />
-                                <AvatarFallback>{candidate.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                                <AvatarFallback>
+                                  {candidate.name
+                                    .split(" ")
+                                    .map((n) => n[0])
+                                    .join("")}
+                                </AvatarFallback>
                               </Avatar>
                               <div className="flex-1 min-w-0">
-                                <h4 className="font-medium text-slate-900 truncate">{candidate.name}</h4>
-                                <p className="text-sm text-slate-600 truncate">{candidate.email}</p>
+                                <h4 className="font-medium text-slate-900 truncate">
+                                  {candidate.name}
+                                </h4>
+                                <p className="text-sm text-slate-600 truncate">
+                                  {candidate.email}
+                                </p>
                                 <div className="flex items-center justify-between mt-2">
                                   <div className="flex items-center">
                                     {[...Array(5)].map((_, i) => (
-                                      <Star 
+                                      <Star
                                         key={i}
                                         className={`w-3 h-3 ${
-                                          i < candidate.rating 
-                                            ? 'text-yellow-400 fill-current' 
-                                            : 'text-slate-300'
+                                          i < candidate.rating
+                                            ? "text-yellow-400 fill-current"
+                                            : "text-slate-300"
                                         }`}
                                       />
                                     ))}
                                   </div>
-                                  <span className="text-xs text-slate-500">{candidate.appliedDate}</span>
+                                  <span className="text-xs text-slate-500">
+                                    {candidate.appliedDate}
+                                  </span>
                                 </div>
                                 <div className="flex space-x-2 mt-2">
-                                  <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="h-6 w-6 p-0"
+                                  >
                                     <Mail className="w-3 h-3" />
                                   </Button>
-                                  <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="h-6 w-6 p-0"
+                                  >
                                     <Phone className="w-3 h-3" />
                                   </Button>
-                                  <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="h-6 w-6 p-0"
+                                  >
                                     <FileText className="w-3 h-3" />
                                   </Button>
                                 </div>
@@ -297,7 +389,9 @@ export default function JobDetail() {
                   <CardTitle>Job Description</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-slate-700 leading-relaxed">{job.description}</p>
+                  <p className="text-slate-700 leading-relaxed">
+                    {job.description}
+                  </p>
                 </CardContent>
               </Card>
 
@@ -373,76 +467,112 @@ export default function JobDetail() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <label className="text-sm font-medium text-slate-600">Status</label>
+                    <label className="text-sm font-medium text-slate-600">
+                      Status
+                    </label>
                     <div className="mt-1">
                       <Badge variant="default">{job.status}</Badge>
                     </div>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-slate-600">Priority</label>
+                    <label className="text-sm font-medium text-slate-600">
+                      Priority
+                    </label>
                     <div className="mt-1">
                       <Badge variant="destructive">{job.priority}</Badge>
                     </div>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-slate-600">Job Code</label>
+                    <label className="text-sm font-medium text-slate-600">
+                      Job Code
+                    </label>
                     <p className="mt-1 text-slate-900">{job.jobCode}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-slate-600">Employment Type</label>
+                    <label className="text-sm font-medium text-slate-600">
+                      Employment Type
+                    </label>
                     <p className="mt-1 text-slate-900">{job.type}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-slate-600">Work Type</label>
+                    <label className="text-sm font-medium text-slate-600">
+                      Work Type
+                    </label>
                     <p className="mt-1 text-slate-900">{job.remote}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-slate-600">Salary Range</label>
+                    <label className="text-sm font-medium text-slate-600">
+                      Salary Range
+                    </label>
                     <p className="mt-1 text-slate-900">{job.salary}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-slate-600">Location</label>
+                    <label className="text-sm font-medium text-slate-600">
+                      Location
+                    </label>
                     <p className="mt-1 text-slate-900">{job.location}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-slate-600">Timezone</label>
+                    <label className="text-sm font-medium text-slate-600">
+                      Timezone
+                    </label>
                     <p className="mt-1 text-slate-900">{job.timezone}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-slate-600">Department</label>
+                    <label className="text-sm font-medium text-slate-600">
+                      Department
+                    </label>
                     <p className="mt-1 text-slate-900">{job.department}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-slate-600">Experience Required</label>
+                    <label className="text-sm font-medium text-slate-600">
+                      Experience Required
+                    </label>
                     <p className="mt-1 text-slate-900">{job.experience}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-slate-600">Education</label>
+                    <label className="text-sm font-medium text-slate-600">
+                      Education
+                    </label>
                     <p className="mt-1 text-slate-900">{job.education}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-slate-600">Start Date</label>
+                    <label className="text-sm font-medium text-slate-600">
+                      Start Date
+                    </label>
                     <p className="mt-1 text-slate-900">{job.startDate}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-slate-600">Application Deadline</label>
+                    <label className="text-sm font-medium text-slate-600">
+                      Application Deadline
+                    </label>
                     <p className="mt-1 text-slate-900">{job.deadline}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-slate-600">Hiring Manager</label>
+                    <label className="text-sm font-medium text-slate-600">
+                      Hiring Manager
+                    </label>
                     <p className="mt-1 text-slate-900">{job.hiringManager}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-slate-600">Recruiter</label>
+                    <label className="text-sm font-medium text-slate-600">
+                      Recruiter
+                    </label>
                     <p className="mt-1 text-slate-900">{job.recruiter}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-slate-600">Budget</label>
+                    <label className="text-sm font-medium text-slate-600">
+                      Budget
+                    </label>
                     <p className="mt-1 text-slate-900">{job.budget}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-slate-600">Headcount</label>
-                    <p className="mt-1 text-slate-900">{job.headcount} position(s)</p>
+                    <label className="text-sm font-medium text-slate-600">
+                      Headcount
+                    </label>
+                    <p className="mt-1 text-slate-900">
+                      {job.headcount} position(s)
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -456,7 +586,9 @@ export default function JobDetail() {
               <CardTitle>Analytics & Performance</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-slate-600">Analytics dashboard for this job posting will be displayed here.</p>
+              <p className="text-slate-600">
+                Analytics dashboard for this job posting will be displayed here.
+              </p>
             </CardContent>
           </Card>
         </TabsContent>
