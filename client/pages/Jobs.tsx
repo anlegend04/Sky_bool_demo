@@ -23,7 +23,12 @@ import {
   Users,
   MapPin,
   Calendar,
-  Upload
+  Upload,
+  Edit,
+  Eye,
+  Copy,
+  Trash2,
+  Share
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
