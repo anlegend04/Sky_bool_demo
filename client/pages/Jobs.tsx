@@ -196,9 +196,35 @@ export default function Jobs() {
                     <span>{job.type}</span>
                   </div>
                 </div>
-                <Button variant="ghost" size="sm">
-                  <MoreHorizontal className="w-4 h-4" />
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm">
+                      <MoreHorizontal className="w-4 h-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem>
+                      <Eye className="w-4 h-4 mr-2" />
+                      View Details
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Edit className="w-4 h-4 mr-2" />
+                      Edit Job
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Copy className="w-4 h-4 mr-2" />
+                      Duplicate Job
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Share className="w-4 h-4 mr-2" />
+                      Share Job
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="text-red-600">
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete Job
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </CardHeader>
             <CardContent>
