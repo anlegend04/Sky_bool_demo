@@ -469,7 +469,7 @@ export default function Candidates() {
               </div>
             </div>
             <div className="flex gap-3">
-              <Select>
+              <Select value={positionFilter} onValueChange={setPositionFilter}>
                 <SelectTrigger className="w-40">
                   <SelectValue placeholder="Position" />
                 </SelectTrigger>
@@ -483,7 +483,7 @@ export default function Candidates() {
                   <SelectItem value="data">Data Scientist</SelectItem>
                 </SelectContent>
               </Select>
-              <Select>
+              <Select value={stageFilter} onValueChange={setStageFilter}>
                 <SelectTrigger className="w-32">
                   <SelectValue placeholder="Stage" />
                 </SelectTrigger>
@@ -497,7 +497,7 @@ export default function Candidates() {
                   <SelectItem value="rejected">Rejected</SelectItem>
                 </SelectContent>
               </Select>
-              <Select>
+              <Select value={locationFilter} onValueChange={setLocationFilter}>
                 <SelectTrigger className="w-32">
                   <SelectValue placeholder="Location" />
                 </SelectTrigger>
