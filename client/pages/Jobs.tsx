@@ -198,7 +198,8 @@ export default function Jobs() {
 
       {/* Jobs Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {jobs.map((job) => (
+        {filteredJobs.length > 0 ? (
+          filteredJobs.map((job) => (
           <Card key={job.id} className="hover:shadow-md transition-shadow cursor-pointer">
             <CardHeader className="pb-3">
               <div className="flex justify-between items-start">
@@ -291,7 +292,14 @@ export default function Jobs() {
               </div>
             </CardContent>
           </Card>
-        ))}
+          ))
+        ) : (
+          <div className="col-span-full text-center py-12">
+            <Briefcase className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-slate-900 mb-2">No jobs found</h3>
+            <p className="text-slate-600">Try adjusting your search or filters to find jobs.</p>
+          </div>
+        )}
       </div>
 
       {/* Pagination */}
