@@ -223,10 +223,12 @@ export default function Jobs() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem>
-                      <Eye className="w-4 h-4 mr-2" />
-                      View Details
-                    </DropdownMenuItem>
+                      <Link to={`/jobs/${job.id}`}>
+                        <DropdownMenuItem>
+                          <Eye className="w-4 h-4 mr-2" />
+                          View Details
+                        </DropdownMenuItem>
+                      </Link>
                     <DropdownMenuItem>
                       <Edit className="w-4 h-4 mr-2" />
                       Edit Job
