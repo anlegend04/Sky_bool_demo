@@ -156,6 +156,8 @@ export default function Jobs() {
                 <Input
                   placeholder="Search jobs by title, department, or location..."
                   className="pl-10"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
             </div>
