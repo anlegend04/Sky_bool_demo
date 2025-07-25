@@ -353,8 +353,16 @@ export default function JobDetail() {
                     </div>
                   </div>
                   <div>
+                    <label className="text-sm font-medium text-slate-600">Job Code</label>
+                    <p className="mt-1 text-slate-900">{job.jobCode}</p>
+                  </div>
+                  <div>
                     <label className="text-sm font-medium text-slate-600">Employment Type</label>
                     <p className="mt-1 text-slate-900">{job.type}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-slate-600">Work Type</label>
+                    <p className="mt-1 text-slate-900">{job.remote}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium text-slate-600">Salary Range</label>
@@ -365,8 +373,44 @@ export default function JobDetail() {
                     <p className="mt-1 text-slate-900">{job.location}</p>
                   </div>
                   <div>
+                    <label className="text-sm font-medium text-slate-600">Timezone</label>
+                    <p className="mt-1 text-slate-900">{job.timezone}</p>
+                  </div>
+                  <div>
                     <label className="text-sm font-medium text-slate-600">Department</label>
                     <p className="mt-1 text-slate-900">{job.department}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-slate-600">Experience Required</label>
+                    <p className="mt-1 text-slate-900">{job.experience}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-slate-600">Education</label>
+                    <p className="mt-1 text-slate-900">{job.education}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-slate-600">Start Date</label>
+                    <p className="mt-1 text-slate-900">{job.startDate}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-slate-600">Application Deadline</label>
+                    <p className="mt-1 text-slate-900">{job.deadline}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-slate-600">Hiring Manager</label>
+                    <p className="mt-1 text-slate-900">{job.hiringManager}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-slate-600">Recruiter</label>
+                    <p className="mt-1 text-slate-900">{job.recruiter}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-slate-600">Budget</label>
+                    <p className="mt-1 text-slate-900">{job.budget}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-slate-600">Headcount</label>
+                    <p className="mt-1 text-slate-900">{job.headcount} position(s)</p>
                   </div>
                 </CardContent>
               </Card>
