@@ -33,6 +33,17 @@ export default function JobDetail() {
     priority: "High",
     posted: "2 days ago",
     salary: "$120k - $150k",
+    experience: "5+ years",
+    education: "Bachelor's degree preferred",
+    remote: "Hybrid",
+    timezone: "PST",
+    startDate: "Immediate",
+    deadline: "2024-02-15",
+    hiringManager: "Sarah Johnson",
+    recruiter: "Mike Chen",
+    budget: "$180k",
+    headcount: 2,
+    jobCode: "ENG-2024-001",
     description: "We're looking for a Senior Frontend Developer to join our growing engineering team. You'll be working on cutting-edge web applications using React, TypeScript, and modern development tools.",
     requirements: [
       "5+ years of experience with React and TypeScript",
@@ -41,12 +52,25 @@ export default function JobDetail() {
       "Proficiency with CSS-in-JS or Tailwind CSS",
       "Experience with testing frameworks (Jest, Vitest, etc.)"
     ],
+    niceToHave: [
+      "Experience with Next.js or similar frameworks",
+      "Knowledge of GraphQL and Apollo Client",
+      "Previous experience in a fast-paced startup environment",
+      "Open source contributions"
+    ],
     benefits: [
       "Competitive salary and equity package",
       "Comprehensive health, dental, and vision insurance",
       "401(k) with company matching",
       "Unlimited PTO policy",
       "Professional development budget"
+    ],
+    responsibilities: [
+      "Develop and maintain high-quality frontend applications",
+      "Collaborate with design and backend teams",
+      "Participate in code reviews and technical discussions",
+      "Mentor junior developers",
+      "Stay up-to-date with latest frontend technologies"
     ]
   };
 
