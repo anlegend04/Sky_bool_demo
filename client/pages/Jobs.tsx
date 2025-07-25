@@ -162,7 +162,7 @@ export default function Jobs() {
               </div>
             </div>
             <div className="flex gap-3">
-              <Select>
+              <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
                 <SelectTrigger className="w-40">
                   <SelectValue placeholder="Department" />
                 </SelectTrigger>
@@ -175,7 +175,7 @@ export default function Jobs() {
                   <SelectItem value="analytics">Analytics</SelectItem>
                 </SelectContent>
               </Select>
-              <Select>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-32">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
