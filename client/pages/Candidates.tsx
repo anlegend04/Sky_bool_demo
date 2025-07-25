@@ -39,7 +39,12 @@ import {
   Calendar,
   MoreHorizontal,
   User,
-  Briefcase
+  Briefcase,
+  Eye,
+  Edit,
+  Trash2,
+  Share,
+  Download
 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
