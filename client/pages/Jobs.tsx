@@ -112,6 +112,18 @@ export default function Jobs() {
     }
   ];
 
+  // Filter jobs based on search and filters
+  const filteredJobs = jobs.filter(job => {
+    const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         job.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         job.location.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesDepartment = departmentFilter === "all" || job.department.toLowerCase() === departmentFilter.toLowerCase();
+    const matchesStatus = statusFilter === "all" || job.status.toLowerCase() === statusFilter.toLowerCase();
+
+    return matchesSearch && matchesDepartment && matchesStatus;
+  });
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
