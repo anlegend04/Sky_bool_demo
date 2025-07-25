@@ -363,44 +363,6 @@ export default function Candidates() {
           </p>
         </div>
         <div className="flex space-x-3">
-          <Dialog open={isUploadOpen} onOpenChange={setIsUploadOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Upload className="w-4 h-4 mr-2" />
-                Import Data
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Import Candidates</DialogTitle>
-                <DialogDescription>
-                  Upload a CSV or JSON file to import multiple candidates at
-                  once.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center">
-                  <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                  <p className="text-sm text-slate-600 mb-2">
-                    Drop your file here or click to browse
-                  </p>
-                  <Button variant="outline" size="sm">
-                    Choose File
-                  </Button>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Button variant="outline" size="sm" className="flex-1">
-                    <Download className="w-4 h-4 mr-2" />
-                    Download Template
-                  </Button>
-                  <Button size="sm" className="flex-1">
-                    Import
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-
           <Dialog>
             <DialogTrigger asChild>
               <Button size="sm">
