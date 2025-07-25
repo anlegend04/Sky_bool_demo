@@ -191,16 +191,18 @@ export default function Candidates() {
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
-          <div className="flex items-center space-x-3">
+          <Link to={`/candidates/${candidate.id}`} className="flex items-center space-x-3 hover:bg-slate-100 p-2 rounded-md transition">
             <Avatar className="w-12 h-12">
               <AvatarImage src={candidate.avatar} />
-              <AvatarFallback>{candidate.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+              <AvatarFallback>
+                {candidate.name.split(" ").map((n) => n[0]).join("")}
+              </AvatarFallback>
             </Avatar>
             <div>
               <h3 className="font-semibold text-slate-900">{candidate.name}</h3>
               <p className="text-sm text-slate-600">{candidate.position}</p>
             </div>
-          </div>
+          </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm">
@@ -208,10 +210,12 @@ export default function Candidates() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>
-                <Eye className="w-4 h-4 mr-2" />
-                View Profile
-              </DropdownMenuItem>
+              <Link to={`/Candidate/${candidates.id}`}>
+                <DropdownMenuItem>
+                  <Eye className="w-4 h-4 mr-2" />
+                  View Details
+                </DropdownMenuItem>
+              </Link>
               <DropdownMenuItem>
                 <Edit className="w-4 h-4 mr-2" />
                 Edit Candidate
