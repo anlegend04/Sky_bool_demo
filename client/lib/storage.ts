@@ -636,6 +636,219 @@ class StorageManager {
 
     this.addCandidate(defaultCandidate);
   }
+
+  // Demo data generators for sessionStorage
+  generateDemoJobs(): Omit<JobData, 'id' | 'createdAt' | 'updatedAt'>[] {
+    return [
+      {
+        position: "Product Manager",
+        department: "Product",
+        recruiter: "Sarah Kim",
+        applications: 67,
+        target: 1,
+        hired: 0,
+        openDate: "2024-01-05",
+        deadline: "2024-02-20",
+        estimatedCost: "18000",
+        actualCost: "16200",
+        performance: 72,
+        status: "In Progress",
+        location: "New York, NY",
+        type: "Full-time",
+        description: "Seeking an experienced Product Manager to drive product strategy and roadmap execution.",
+        priority: "High",
+        emailAlias: "product-jobs@company.com",
+        expectedSkills: ["Product Strategy", "Agile", "Data Analysis", "User Research"],
+        salaryMin: "110000",
+        salaryMax: "140000",
+        domain: "Technology",
+        headcount: 1,
+        interviewers: ["pm.lead@company.com"],
+        pipelineSummary: {
+          applied: 67,
+          screening: 20,
+          interview: 15,
+          technical: 8,
+          offer: 3,
+          hired: 0,
+          rejected: 21
+        }
+      },
+      {
+        position: "UX Designer",
+        department: "Design",
+        recruiter: "Mike Wilson",
+        applications: 34,
+        target: 1,
+        hired: 1,
+        openDate: "2023-12-20",
+        deadline: "2024-01-25",
+        estimatedCost: "12000",
+        actualCost: "9500",
+        performance: 95,
+        status: "Closed",
+        location: "Remote",
+        type: "Full-time",
+        description: "Join our design team to create exceptional user experiences for our products.",
+        priority: "Medium",
+        emailAlias: "design-jobs@company.com",
+        expectedSkills: ["Figma", "Sketch", "User Research", "Prototyping"],
+        salaryMin: "85000",
+        salaryMax: "105000",
+        domain: "Technology",
+        headcount: 1,
+        interviewers: ["design.lead@company.com"],
+        pipelineSummary: {
+          applied: 34,
+          screening: 15,
+          interview: 10,
+          technical: 5,
+          offer: 2,
+          hired: 1,
+          rejected: 11
+        }
+      }
+    ];
+  }
+
+  generateDemoCandidates(): Omit<CandidateData, 'id' | 'createdAt' | 'updatedAt'>[] {
+    return [
+      {
+        name: "Michael Chen",
+        email: "m.chen@email.com",
+        phone: "+1 (555) 0124",
+        location: "New York, NY",
+        position: "Product Manager",
+        experience: "4+ years",
+        skills: ["Product Strategy", "Agile", "Data Analysis", "UX Design"],
+        status: "Active",
+        stage: "Offer",
+        rating: 4,
+        appliedDate: "2024-01-12",
+        resume: "michael_chen_resume.pdf",
+        avatar: "",
+        salary: "$110k - $130k",
+        source: "Website",
+        recruiter: "Sarah Kim",
+        department: "Product",
+        duration: 12,
+        tags: ["Product Expert", "Leadership"],
+        stageHistory: [],
+        notes: [],
+        emails: [],
+        attachments: []
+      },
+      {
+        name: "Emily Davis",
+        email: "emily.d@email.com",
+        phone: "+1 (555) 0125",
+        location: "Austin, TX",
+        position: "UX Designer",
+        experience: "3+ years",
+        skills: ["Figma", "Sketch", "User Research", "Prototyping"],
+        status: "Active",
+        stage: "Applied",
+        rating: 4,
+        appliedDate: "2024-01-10",
+        resume: "emily_davis_resume.pdf",
+        avatar: "",
+        salary: "$85k - $105k",
+        source: "Indeed",
+        recruiter: "Mike Wilson",
+        department: "Design",
+        duration: 2,
+        tags: ["Creative", "User-Focused"],
+        stageHistory: [],
+        notes: [],
+        emails: [],
+        attachments: []
+      },
+      {
+        name: "David Kim",
+        email: "david.k@email.com",
+        phone: "+1 (555) 0126",
+        location: "Seattle, WA",
+        position: "Data Scientist",
+        experience: "6+ years",
+        skills: ["Python", "Machine Learning", "SQL", "TensorFlow"],
+        status: "Active",
+        stage: "Technical",
+        rating: 5,
+        appliedDate: "2024-01-08",
+        resume: "david_kim_resume.pdf",
+        avatar: "",
+        salary: "$130k - $150k",
+        source: "Referral",
+        recruiter: "Alex Chen",
+        department: "Data",
+        duration: 8,
+        tags: ["AI Expert", "Analytics"],
+        stageHistory: [],
+        notes: [],
+        emails: [],
+        attachments: []
+      },
+      {
+        name: "Lisa Garcia",
+        email: "lisa.g@email.com",
+        phone: "+1 (555) 0127",
+        location: "Remote",
+        position: "DevOps Engineer",
+        experience: "5+ years",
+        skills: ["AWS", "Docker", "Kubernetes", "Terraform"],
+        status: "Active",
+        stage: "Hired",
+        rating: 4,
+        appliedDate: "2024-01-05",
+        resume: "lisa_garcia_resume.pdf",
+        avatar: "",
+        salary: "$115k - $135k",
+        source: "LinkedIn",
+        recruiter: "Sarah Kim",
+        department: "Engineering",
+        duration: 30,
+        tags: ["DevOps Expert", "Cloud"],
+        stageHistory: [],
+        notes: [],
+        emails: [],
+        attachments: []
+      },
+      {
+        name: "Robert Taylor",
+        email: "robert.t@email.com",
+        phone: "+1 (555) 0128",
+        location: "Boston, MA",
+        position: "Marketing Specialist",
+        experience: "2+ years",
+        skills: ["Digital Marketing", "SEO", "Content Strategy", "Analytics"],
+        status: "Inactive",
+        stage: "Rejected",
+        rating: 2,
+        appliedDate: "2024-01-03",
+        resume: "robert_taylor_resume.pdf",
+        avatar: "",
+        salary: "$60k - $75k",
+        source: "Website",
+        recruiter: "Mike Wilson",
+        department: "Marketing",
+        duration: 15,
+        tags: ["Digital Marketing"],
+        stageHistory: [],
+        notes: [],
+        emails: [],
+        attachments: []
+      }
+    ];
+  }
+
+  // Add demo data to sessionStorage when user demos add/edit
+  addDemoData(): void {
+    const demoJobs = this.generateDemoJobs();
+    const demoCandidates = this.generateDemoCandidates();
+
+    demoJobs.forEach(job => this.addJob(job));
+    demoCandidates.forEach(candidate => this.addCandidate(candidate));
+  }
 }
 
 // Export singleton instance
