@@ -421,13 +421,57 @@ class StorageManager {
     });
   }
 
+  // User preferences operations
+  getUserPreferences(): UserPreferences {
+    return this.getItem(STORAGE_KEYS.USER_PREFERENCES, {
+      selectedFilters: {
+        jobs: {
+          department: "all",
+          status: "all",
+          priority: "all",
+          recruiter: "all",
+        },
+        candidates: {
+          department: "all",
+          stage: "all",
+          recruiter: "all",
+          location: "all",
+        },
+      },
+      viewPreferences: {
+        jobsView: "list",
+        candidatesView: "list",
+      },
+      lastOpenedTabs: {
+        emailAutomation: "templates",
+        reports: "overview",
+        settings: "profile",
+      },
+      dashboardLayout: ["stats", "recent-jobs", "recent-candidates", "activities"],
+    });
+  }
+
+  updateUserPreferences(updates: Partial<UserPreferences>): void {
+    const currentPrefs = this.getUserPreferences();
+    const newPrefs = { ...currentPrefs, ...updates };
+    this.setItem(STORAGE_KEYS.USER_PREFERENCES, newPrefs);
+  }
+
   // Initialize with default data if empty
   initializeDefaultData(): void {
-    if (this.getJobs().length === 0) {
-      this.initializeDefaultJobs();
-    }
-    if (this.getCandidates().length === 0) {
-      this.initializeDefaultCandidates();
+    const demoLoaded = this.getItem(STORAGE_KEYS.DEMO_DATA_LOADED, false);
+
+    if (!demoLoaded) {
+      // Load one default item to localStorage
+      if (this.getJobs().length === 0) {
+        this.initializeDefaultJobs();
+      }
+      if (this.getCandidates().length === 0) {
+        this.initializeDefaultCandidates();
+      }
+
+      // Mark demo data as loaded
+      this.setItem(STORAGE_KEYS.DEMO_DATA_LOADED, true);
     }
   }
 
