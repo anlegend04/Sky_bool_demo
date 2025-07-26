@@ -664,10 +664,102 @@ export default function Candidates() {
                     <SelectItem value="mike wilson">Mike Wilson</SelectItem>
                   </SelectContent>
                 </Select>
-                <Button variant="outline" size="sm">
-                  <Filter className="w-4 h-4 mr-2" />
-                  More Filters
-                </Button>
+                <Dialog open={showMoreFilters} onOpenChange={setShowMoreFilters}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Filter className="w-4 h-4 mr-2" />
+                      More Filters
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Advanced Filters</DialogTitle>
+                      <DialogDescription>
+                        Apply additional filters to refine your candidate search.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium text-slate-700">Experience Level</label>
+                          <Select>
+                            <SelectTrigger className="mt-1">
+                              <SelectValue placeholder="Any experience" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="entry">Entry Level (0-2 years)</SelectItem>
+                              <SelectItem value="mid">Mid Level (3-5 years)</SelectItem>
+                              <SelectItem value="senior">Senior Level (5+ years)</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-700">Salary Range</label>
+                          <Select>
+                            <SelectTrigger className="mt-1">
+                              <SelectValue placeholder="Any salary" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="50-75">$50k - $75k</SelectItem>
+                              <SelectItem value="75-100">$75k - $100k</SelectItem>
+                              <SelectItem value="100-150">$100k - $150k</SelectItem>
+                              <SelectItem value="150+">$150k+</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-700">Rating</label>
+                          <Select>
+                            <SelectTrigger className="mt-1">
+                              <SelectValue placeholder="Any rating" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="5">5 Stars</SelectItem>
+                              <SelectItem value="4+">4+ Stars</SelectItem>
+                              <SelectItem value="3+">3+ Stars</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-700">Application Date</label>
+                          <Select>
+                            <SelectTrigger className="mt-1">
+                              <SelectValue placeholder="Any date" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="last-week">Last Week</SelectItem>
+                              <SelectItem value="last-month">Last Month</SelectItem>
+                              <SelectItem value="last-quarter">Last Quarter</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-slate-700">Skills</label>
+                        <Input
+                          placeholder="Search by specific skills..."
+                          className="mt-1"
+                        />
+                      </div>
+                      <div className="flex justify-end space-x-2">
+                        <Button variant="outline" onClick={() => setShowMoreFilters(false)}>
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setShowMoreFilters(false);
+                            toast({
+                              title: "Filters Applied",
+                              description: "Advanced filters have been applied to the candidate list.",
+                            });
+                          }}
+                        >
+                          Apply Filters
+                        </Button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
           </div>
