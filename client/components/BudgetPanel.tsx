@@ -229,7 +229,7 @@ export default function BudgetPanel({ job, onJobUpdate }: BudgetPanelProps) {
           <CardContent>
             {pieData.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
+                <PieChart margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
                   <Pie
                     data={pieData}
                     cx="50%"
@@ -239,12 +239,13 @@ export default function BudgetPanel({ job, onJobUpdate }: BudgetPanelProps) {
                     outerRadius={80}
                     fill="#8884d8"
                     dataKey="value"
+                    stroke="none"
                   >
                     {pieData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value) => [`$${value}`, 'Amount']} />
+                  <Tooltip formatter={(value) => [`$${value}`, 'Amount']} cursor={false} />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
