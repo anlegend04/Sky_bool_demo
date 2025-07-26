@@ -574,49 +574,49 @@ const [popupPosition, setPopupPosition] = useState<{ x: number; y: number } | nu
           </Card>
         </div>
       </div>
+
+      {/* Date popup overlay */}
+      {popupDate && popupPosition && (
+        <div
+          className="absolute z-50 bg-white border border-slate-300 rounded shadow-lg p-4 w-72"
+          style={{
+            top: popupPosition.y + 5,
+            left: popupPosition.x,
+          }}
+        >
+          <div className="flex justify-between items-center mb-2">
+            <h4 className="text-sm font-semibold text-slate-700">
+              Events on {popupDate.toDateString()}
+            </h4>
+            <button
+              className="text-slate-500 hover:text-slate-800 text-xs"
+              onClick={() => setPopupDate(null)}
+            >
+              ✕
+            </button>
+          </div>
+          <div className="space-y-2 max-h-60 overflow-y-auto">
+            {events.filter(e => e.date === popupDate.toISOString().split("T")[0]).length === 0 ? (
+              <p className="text-slate-400 text-sm">No events</p>
+            ) : (
+              events
+                .filter(e => e.date === popupDate.toISOString().split("T")[0])
+                .map(event => (
+                  <div
+                    key={event.id}
+                    className={`p-2 border rounded ${getEventTypeColor(event.type)} text-sm`}
+                  >
+                    <div className="font-medium">{event.title}</div>
+                    <div className="text-slate-600">
+                      {event.startTime} - {event.endTime}
+                    </div>
+                    <div className="text-slate-500 text-xs">{event.location}</div>
+                  </div>
+                ))
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
-{popupDate && popupPosition && (
-  <div
-    className="absolute z-50 bg-white border border-slate-300 rounded shadow-lg p-4 w-72"
-    style={{
-      top: popupPosition.y + 5,
-      left: popupPosition.x,
-    }}
-  >
-    <div className="flex justify-between items-center mb-2">
-      <h4 className="text-sm font-semibold text-slate-700">
-        Events on {popupDate.toDateString()}
-      </h4>
-      <button
-        className="text-slate-500 hover:text-slate-800 text-xs"
-        onClick={() => setPopupDate(null)}
-      >
-        ✕
-      </button>
-    </div>
-    <div className="space-y-2 max-h-60 overflow-y-auto">
-      {events.filter(e => e.date === popupDate.toISOString().split("T")[0]).length === 0 ? (
-        <p className="text-slate-400 text-sm">No events</p>
-      ) : (
-        events
-          .filter(e => e.date === popupDate.toISOString().split("T")[0])
-          .map(event => (
-            <div
-              key={event.id}
-              className={`p-2 border rounded ${getEventTypeColor(event.type)} text-sm`}
-            >
-              <div className="font-medium">{event.title}</div>
-              <div className="text-slate-600">
-                {event.startTime} - {event.endTime}
-              </div>
-              <div className="text-slate-500 text-xs">{event.location}</div>
-            </div>
-          ))
-      )}
-    </div>
-  </div>
-)}
-
