@@ -300,11 +300,11 @@ export default function Reports() {
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={monthlyData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" allowDuplicatedCategory={false} />
-                    <YAxis allowDecimals={false} />
-                    <Tooltip />
-                    <Legend />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis dataKey="month" allowDuplicatedCategory={false} tickLine={false} />
+                    <YAxis allowDecimals={false} tickLine={false} />
+                    <Tooltip cursor={false} />
+                    <Legend iconType="line" />
                     <Line type="monotone" dataKey="applications" stroke="#8884d8" name="Applications" />
                     <Line type="monotone" dataKey="interviews" stroke="#82ca9d" name="Interviews" />
                     <Line type="monotone" dataKey="hires" stroke="#ffc658" name="Hires" />
