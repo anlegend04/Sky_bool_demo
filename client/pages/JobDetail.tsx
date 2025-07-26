@@ -68,6 +68,8 @@ export default function JobDetail() {
   const [tempValue, setTempValue] = useState("");
   const [showAddStageDialog, setShowAddStageDialog] = useState(false);
   const [newStage, setNewStage] = useState("");
+  const [draggedCandidate, setDraggedCandidate] = useState<CandidateData | null>(null);
+  const [dragOverStage, setDragOverStage] = useState<string | null>(null);
   const { toast } = useToast();
 
   const stages = ["Applied", "Screening", "Interview", "Technical", "Offer", "Hired", "Rejected"];
