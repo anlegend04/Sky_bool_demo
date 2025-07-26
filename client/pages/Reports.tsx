@@ -428,8 +428,8 @@ export default function Reports() {
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={sourceData}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
+                    <XAxis dataKey="name" allowDuplicatedCategory={false} />
+                    <YAxis allowDecimals={false} />
                     <Tooltip />
                     <Bar dataKey="effectiveness" fill="#82ca9d" name="Effectiveness %" />
                   </BarChart>
