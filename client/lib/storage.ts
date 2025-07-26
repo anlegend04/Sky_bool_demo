@@ -476,78 +476,71 @@ class StorageManager {
   }
 
   private initializeDefaultJobs(): void {
-    const defaultJobs: Omit<JobData, 'id' | 'createdAt' | 'updatedAt'>[] = [
-      {
-        position: "Senior Frontend Developer",
-        department: "Engineering",
-        recruiter: "Alex Chen",
-        applications: 45,
-        target: 2,
+    // Only add one job to localStorage, rest will be added via sessionStorage when user demos
+    const defaultJob: Omit<JobData, 'id' | 'createdAt' | 'updatedAt'> = {
+      position: "Senior Frontend Developer",
+      department: "Engineering",
+      recruiter: "Alex Chen",
+      applications: 45,
+      target: 2,
+      hired: 1,
+      openDate: "2024-01-10",
+      deadline: "2024-02-15",
+      estimatedCost: "15000",
+      actualCost: "12500",
+      performance: 85,
+      status: "Open",
+      location: "San Francisco, CA",
+      type: "Full-time",
+      description: "We are looking for a Senior Frontend Developer to join our growing engineering team. You'll be working on cutting-edge web applications using React, TypeScript, and modern development tools.",
+      priority: "High",
+      emailAlias: "frontend-jobs@company.com",
+      expectedSkills: ["React", "TypeScript", "Node.js", "JavaScript", "CSS", "HTML"],
+      salaryMin: "120000",
+      salaryMax: "150000",
+      domain: "Technology",
+      headcount: 2,
+      interviewers: ["john.doe@company.com", "jane.smith@company.com"],
+      pipelineSummary: {
+        applied: 45,
+        screening: 12,
+        interview: 8,
+        technical: 5,
+        offer: 2,
         hired: 1,
-        openDate: "2024-01-10",
-        deadline: "2024-02-15",
-        estimatedCost: "15000",
-        actualCost: "12500",
-        performance: 85,
-        status: "Open",
-        location: "San Francisco, CA",
-        type: "Full-time",
-        description: "We are looking for a Senior Frontend Developer to join our team...",
-        priority: "High",
-        emailAlias: "frontend-jobs@company.com",
-        expectedSkills: ["React", "TypeScript", "Node.js"],
-        salaryMin: "120000",
-        salaryMax: "150000",
-        domain: "Technology",
-        headcount: 2,
-        interviewers: ["john.doe@company.com", "jane.smith@company.com"],
-        pipelineSummary: {
-          applied: 45,
-          screening: 12,
-          interview: 8,
-          technical: 5,
-          offer: 2,
-          hired: 1,
-          rejected: 17
-        }
+        rejected: 17
       },
-      {
-        position: "Product Manager",
-        department: "Product",
-        recruiter: "Sarah Kim",
-        applications: 67,
-        target: 1,
-        hired: 0,
-        openDate: "2024-01-05",
-        deadline: "2024-02-20",
-        estimatedCost: "18000",
-        actualCost: "16200",
-        performance: 72,
-        status: "In Progress",
-        location: "New York, NY",
-        type: "Full-time",
-        description: "Seeking an experienced Product Manager to drive product strategy...",
-        priority: "High",
-        emailAlias: "product-jobs@company.com",
-        expectedSkills: ["Product Strategy", "Agile", "Data Analysis"],
-        salaryMin: "110000",
-        salaryMax: "140000",
-        domain: "Technology",
-        headcount: 1,
-        interviewers: ["pm.lead@company.com"],
-        pipelineSummary: {
-          applied: 67,
-          screening: 20,
-          interview: 15,
-          technical: 8,
-          offer: 3,
-          hired: 0,
-          rejected: 21
-        }
+      budget: {
+        estimated: 15000,
+        actual: 12500,
+        expenses: [
+          {
+            id: "exp_1",
+            amount: 5000,
+            category: "Job Boards",
+            description: "LinkedIn Premium and Indeed postings",
+            expectedOutcome: "Attract 50+ qualified candidates",
+            evaluationPeriod: "30 days",
+            effectiveness: 85,
+            createdAt: "2024-01-10",
+            createdBy: "Alex Chen"
+          },
+          {
+            id: "exp_2",
+            amount: 7500,
+            category: "Recruitment Agency",
+            description: "Agency fee for candidate sourcing",
+            expectedOutcome: "5 pre-screened candidates",
+            evaluationPeriod: "45 days",
+            effectiveness: 90,
+            createdAt: "2024-01-15",
+            createdBy: "Alex Chen"
+          }
+        ]
       }
-    ];
+    };
 
-    defaultJobs.forEach(job => this.addJob(job));
+    this.addJob(defaultJob);
   }
 
   private initializeDefaultCandidates(): void {
