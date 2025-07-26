@@ -27,6 +27,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Progress } from "@/components/ui/progress";
+import { HelpTooltip, helpContent } from "@/components/ui/help-tooltip";
 import {
   ArrowLeft,
   Mail,
@@ -58,9 +59,16 @@ import {
   DollarSign,
   Calendar as CalendarIcon,
   AlertCircle,
+  Eye,
+  Forward,
+  Save,
+  Trash2,
+  Copy,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
+import { storage, CandidateData, EmailData, StageHistoryData } from "@/lib/storage";
+import { useToast } from "@/hooks/use-toast";
 
 type StageData = {
   name: string;
@@ -74,34 +82,43 @@ type StageData = {
 
 export default function CandidateDetail() {
   const { id } = useParams();
+  const [candidate, setCandidate] = useState<CandidateData | null>(null);
   const [currentStage, setCurrentStage] = useState("Interview");
   const [newNote, setNewNote] = useState("");
   const [emailContent, setEmailContent] = useState("");
+  const [emailSubject, setEmailSubject] = useState("");
+  const [selectedTemplate, setSelectedTemplate] = useState("");
   const [showStageChangeDialog, setShowStageChangeDialog] = useState(false);
+  const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [newStage, setNewStage] = useState("");
   const [stageChangeReason, setStageChangeReason] = useState("");
+  const [emailPreview, setEmailPreview] = useState("");
+  const { toast } = useToast();
 
-  const candidate = {
-    id: 1,
-    name: "Marissa Mayer",
-    email: "marissa.mayer@lumilabs.com",
-    phone: "+1 (555) 123-4567",
-    location: "San Francisco Bay Area",
-    currentCompany: "Lumi Labs",
-    currentPosition: "Co-Founder",
-    appliedPosition: "Senior Product Manager",
-    department: "Product",
-    recruiter: "Alex Chen",
-    source: "LinkedIn",
-    appliedDate: "2024-01-15",
-    expectedSalary: "$150k - $180k",
-    experience: "8+ years",
-    skills: ["Product Strategy", "Team Leadership", "Data Analysis", "UX Design"],
-    rating: 5,
-    resume: "marissa_mayer_resume.pdf",
-    avatar: "",
-    tags: ["High Priority", "Cultural Fit", "Leadership"],
-  };
+  // Load candidate from localStorage
+  useEffect(() => {
+    if (id) {
+      const candidateData = storage.getCandidate(id);
+      if (candidateData) {
+        setCandidate(candidateData);
+        setCurrentStage(candidateData.stage);
+      }
+    }
+  }, [id]);
+
+  if (!candidate) {
+    return (
+      <div className="p-6">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-slate-900">Candidate not found</h2>
+          <p className="text-slate-600 mt-2">The candidate you're looking for doesn't exist.</p>
+          <Link to="/candidates">
+            <Button className="mt-4">Back to Candidates</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const stages: StageData[] = [
     {
@@ -182,24 +199,138 @@ export default function CandidateDetail() {
     },
   ];
 
-  const emailHistory = [
+  const emailHistory: EmailData[] = [
     {
-      id: 1,
+      id: "email_1",
       subject: "Interview Invitation - Senior Product Manager",
+      content: "Hi Marissa, Thank you for your interest in the Senior Product Manager position. We would like to invite you for an interview...",
       from: "alex.chen@company.com",
-      to: "marissa.mayer@lumilabs.com",
+      to: candidate.email,
       timestamp: "2024-01-17 9:00 AM",
-      content: "Hi Marissa, Thank you for your interest in the Senior Product Manager position...",
+      status: "sent",
     },
     {
-      id: 2,
+      id: "email_2",
       subject: "Application Received - Senior Product Manager",
+      content: "Thank you for applying to our Senior Product Manager position. We have received your application and will review it shortly...",
       from: "noreply@company.com",
-      to: "marissa.mayer@lumilabs.com",
+      to: candidate.email,
       timestamp: "2024-01-15 2:30 PM",
-      content: "Thank you for applying to our Senior Product Manager position...",
+      status: "sent",
     },
   ];
+
+  const emailTemplates = storage.getEmailTemplates();
+
+  const handleStageChange = () => {
+    if (!candidate) return;
+
+    const updatedCandidate = storage.updateCandidate(candidate.id, {
+      stage: newStage,
+      stageChangeReason,
+    });
+
+    if (updatedCandidate) {
+      setCandidate(updatedCandidate);
+      setCurrentStage(newStage);
+      setShowStageChangeDialog(false);
+      setStageChangeReason("");
+      
+      toast({
+        title: "Stage Updated",
+        description: `${candidate.name} has been moved to ${newStage} stage.`,
+      });
+
+      // Auto-suggest sending email on stage change
+      suggestEmailOnStageChange(newStage);
+    }
+  };
+
+  const suggestEmailOnStageChange = (stage: string) => {
+    let template = "";
+    let subject = "";
+
+    switch (stage) {
+      case "Interview":
+        template = "interview_invitation";
+        subject = `Interview Invitation - ${candidate.position}`;
+        break;
+      case "Offer":
+        template = "offer_letter";
+        subject = `Job Offer - ${candidate.position}`;
+        break;
+      case "Rejected":
+        template = "rejection_notice";
+        subject = `Thank you for your application - ${candidate.position}`;
+        break;
+    }
+
+    if (template) {
+      setSelectedTemplate(template);
+      setEmailSubject(subject);
+      setEmailContent(emailTemplates[template] || "");
+      setShowEmailDialog(true);
+      
+      toast({
+        title: "Email Suggested",
+        description: `Would you like to send a ${stage.toLowerCase()} email to ${candidate.name}?`,
+      });
+    }
+  };
+
+  const handleSendEmail = () => {
+    const emailData: Omit<EmailData, 'id'> = {
+      subject: emailSubject,
+      content: emailContent,
+      from: "recruiter@company.com",
+      to: candidate.email,
+      timestamp: new Date().toISOString(),
+      status: "sent",
+      template: selectedTemplate || undefined,
+    };
+
+    // In a real app, you'd send the email and store it
+    toast({
+      title: "Email Sent",
+      description: `Email sent to ${candidate.name} successfully.`,
+    });
+
+    setShowEmailDialog(false);
+    setEmailContent("");
+    setEmailSubject("");
+    setSelectedTemplate("");
+  };
+
+  const handleSaveDraft = () => {
+    const emailData: Omit<EmailData, 'id'> = {
+      subject: emailSubject,
+      content: emailContent,
+      from: "recruiter@company.com",
+      to: candidate.email,
+      timestamp: new Date().toISOString(),
+      status: "draft",
+      template: selectedTemplate || undefined,
+    };
+
+    toast({
+      title: "Draft Saved",
+      description: "Email draft has been saved successfully.",
+    });
+  };
+
+  const handleTemplateSelect = (templateKey: string) => {
+    setSelectedTemplate(templateKey);
+    const template = emailTemplates[templateKey] || "";
+    
+    // Replace template variables
+    const processedTemplate = template
+      .replace(/{{name}}/g, candidate.name)
+      .replace(/{{position}}/g, candidate.position)
+      .replace(/{{company}}/g, "TalentFlow");
+    
+    setEmailContent(processedTemplate);
+    setEmailPreview(processedTemplate);
+  };
 
   const StatusTracker = () => {
     const currentStageIndex = stages.findIndex(stage => stage.name === currentStage);
@@ -208,7 +339,10 @@ export default function CandidateDetail() {
       <Card className="mb-6">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <span>Application Progress</span>
+            <div className="flex items-center gap-2">
+              Application Progress
+              <HelpTooltip content={helpContent.effortTime} />
+            </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm">
@@ -255,7 +389,8 @@ export default function CandidateDetail() {
                 </div>
                 <div className="text-xs font-medium mt-2 text-center">{stage.name}</div>
                 {stage.duration > 0 && (
-                  <div className="text-xs text-slate-500 mt-1">
+                  <div className="text-xs text-slate-500 mt-1 flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
                     {stage.duration} day{stage.duration !== 1 ? "s" : ""}
                   </div>
                 )}
@@ -312,7 +447,7 @@ export default function CandidateDetail() {
               </Avatar>
               <div>
                 <h2 className="text-xl font-bold text-slate-900">{candidate.name}</h2>
-                <p className="text-slate-600">{candidate.currentPosition} at {candidate.currentCompany}</p>
+                <p className="text-slate-600">{candidate.position}</p>
                 <div className="flex items-center space-x-1 mt-1">
                   {[...Array(5)].map((_, i) => (
                     <Star
@@ -366,7 +501,7 @@ export default function CandidateDetail() {
             </div>
             <div className="flex items-center space-x-3">
               <Briefcase className="w-4 h-4 text-slate-500" />
-              <span className="text-sm">{candidate.appliedPosition}</span>
+              <span className="text-sm">{candidate.position}</span>
             </div>
             <div className="flex items-center space-x-3">
               <Building2 className="w-4 h-4 text-slate-500" />
@@ -378,7 +513,7 @@ export default function CandidateDetail() {
             </div>
             <div className="flex items-center space-x-3">
               <DollarSign className="w-4 h-4 text-slate-500" />
-              <span className="text-sm">{candidate.expectedSalary}</span>
+              <span className="text-sm">{candidate.salary}</span>
             </div>
           </div>
 
@@ -401,6 +536,29 @@ export default function CandidateDetail() {
                   {tag}
                 </Badge>
               ))}
+            </div>
+          </div>
+
+          {/* Resume Preview */}
+          <div className="pt-4 border-t">
+            <h4 className="font-medium text-slate-900 mb-2 flex items-center gap-2">
+              Resume Preview
+              <HelpTooltip content="Click to view the full resume document" />
+            </h4>
+            <div className="border border-slate-200 rounded-lg p-4 bg-slate-50">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <FileText className="w-8 h-8 text-slate-500" />
+                  <div>
+                    <p className="font-medium text-sm">{candidate.resume}</p>
+                    <p className="text-xs text-slate-500">PDF Document</p>
+                  </div>
+                </div>
+                <Button variant="outline" size="sm">
+                  <Eye className="w-4 h-4 mr-2" />
+                  View
+                </Button>
+              </div>
             </div>
           </div>
         </CardContent>
@@ -427,6 +585,14 @@ export default function CandidateDetail() {
           <Button className="w-full justify-start" variant="outline">
             <FileText className="w-4 h-4 mr-2" />
             Send Assessment
+          </Button>
+          <Button 
+            className="w-full justify-start" 
+            variant="outline"
+            onClick={() => setShowEmailDialog(true)}
+          >
+            <Mail className="w-4 h-4 mr-2" />
+            Send Email
           </Button>
         </CardContent>
       </Card>
@@ -476,7 +642,10 @@ export default function CandidateDetail() {
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
                         <h4 className="font-medium text-slate-900">{stage.name}</h4>
-                        <span className="text-xs text-slate-500">{stage.duration} days</span>
+                        <span className="text-xs text-slate-500 flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {stage.duration} days
+                        </span>
                       </div>
                       <p className="text-sm text-slate-600 mt-1">
                         {stage.startDate} {stage.endDate && `- ${stage.endDate}`}
@@ -543,42 +712,63 @@ export default function CandidateDetail() {
 
   const RightPanel = () => (
     <div className="space-y-6">
-      {/* Send Message */}
+      {/* Send Email Section */}
       <Card>
         <CardHeader>
-          <CardTitle>Send Message</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            Send Email
+            <HelpTooltip content={helpContent.template} />
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-3">
-            <Input placeholder="Subject line..." />
-            <Textarea
-              placeholder="Compose your message..."
-              value={emailContent}
-              onChange={(e) => setEmailContent(e.target.value)}
-              rows={4}
-            />
-            <div className="flex items-center justify-between">
-              <Button variant="outline" size="sm">
-                <Paperclip className="w-4 h-4 mr-2" />
-                Attach File
-              </Button>
-              <Button size="sm">
-                <Send className="w-4 h-4 mr-2" />
-                Send Email
-              </Button>
-            </div>
-          </div>
+          <Button 
+            className="w-full justify-start" 
+            onClick={() => setShowEmailDialog(true)}
+          >
+            <Mail className="w-4 h-4 mr-2" />
+            Compose Email
+          </Button>
           
           <div className="pt-4 border-t">
-            <h4 className="font-medium text-slate-900 mb-2">Email Templates</h4>
+            <h4 className="font-medium text-slate-900 mb-2 flex items-center gap-2">
+              Quick Templates
+              <HelpTooltip content={helpContent.template} />
+            </h4>
             <div className="space-y-2">
-              <Button variant="outline" size="sm" className="w-full justify-start">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full justify-start"
+                onClick={() => {
+                  handleTemplateSelect("interview_invitation");
+                  setEmailSubject(`Interview Invitation - ${candidate.position}`);
+                  setShowEmailDialog(true);
+                }}
+              >
                 Interview Invitation
               </Button>
-              <Button variant="outline" size="sm" className="w-full justify-start">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full justify-start"
+                onClick={() => {
+                  handleTemplateSelect("offer_letter");
+                  setEmailSubject(`Job Offer - ${candidate.position}`);
+                  setShowEmailDialog(true);
+                }}
+              >
                 Offer Letter
               </Button>
-              <Button variant="outline" size="sm" className="w-full justify-start">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full justify-start"
+                onClick={() => {
+                  handleTemplateSelect("rejection_notice");
+                  setEmailSubject(`Thank you for your application - ${candidate.position}`);
+                  setShowEmailDialog(true);
+                }}
+              >
                 Rejection Notice
               </Button>
             </div>
@@ -594,16 +784,41 @@ export default function CandidateDetail() {
         <CardContent>
           <div className="space-y-4">
             {emailHistory.map((email) => (
-              <div key={email.id} className="p-3 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer">
+              <div key={email.id} className="p-3 border border-slate-200 rounded-lg hover:bg-slate-50">
                 <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-medium text-sm text-slate-900 truncate">{email.subject}</h4>
-                  <span className="text-xs text-slate-500">{email.timestamp}</span>
+                  <h4 className="font-medium text-sm text-slate-900 truncate flex items-center gap-2">
+                    {email.subject}
+                    <Badge variant={email.status === "sent" ? "default" : "secondary"} className="text-xs">
+                      {email.status}
+                    </Badge>
+                  </h4>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm">
+                        <MoreHorizontal className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem>
+                        <Eye className="w-4 h-4 mr-2" />
+                        View Full
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Forward className="w-4 h-4 mr-2" />
+                        Forward
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Copy className="w-4 h-4 mr-2" />
+                        Resend
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
                 <p className="text-xs text-slate-600 mb-1">
                   From: {email.from}
                 </p>
                 <p className="text-xs text-slate-600 mb-2">
-                  To: {email.to}
+                  {email.timestamp}
                 </p>
                 <p className="text-xs text-slate-600 truncate">
                   {email.content}
@@ -663,11 +878,16 @@ export default function CandidateDetail() {
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <Badge variant="outline">{candidate.source}</Badge>
+            <Badge variant="outline" className="flex items-center gap-1">
+              <span className="text-slate-600">{candidate.source}</span>
+              <HelpTooltip content={helpContent.source} />
+            </Badge>
             <Badge
               variant={currentStage === "Hired" ? "default" : currentStage === "Rejected" ? "destructive" : "secondary"}
+              className="flex items-center gap-1"
             >
               {currentStage}
+              <HelpTooltip content={helpContent.stage} />
             </Badge>
           </div>
         </div>
@@ -720,17 +940,122 @@ export default function CandidateDetail() {
               >
                 Cancel
               </Button>
-              <Button
-                onClick={() => {
-                  setCurrentStage(newStage);
-                  setShowStageChangeDialog(false);
-                  setStageChangeReason("");
-                }}
-              >
+              <Button onClick={handleStageChange}>
                 Update Stage
               </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Email Compose Dialog */}
+      <Dialog open={showEmailDialog} onOpenChange={setShowEmailDialog}>
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              Compose Email
+              <HelpTooltip content={helpContent.template} />
+            </DialogTitle>
+            <DialogDescription>
+              Send an email to {candidate.name} ({candidate.email})
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Tabs defaultValue="compose" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="compose">Compose</TabsTrigger>
+              <TabsTrigger value="preview">Preview</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="compose" className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                  Email Template
+                  <HelpTooltip content={helpContent.template} />
+                </label>
+                <Select value={selectedTemplate} onValueChange={handleTemplateSelect}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Select a template or compose manually" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Manual Compose</SelectItem>
+                    <SelectItem value="interview_invitation">Interview Invitation</SelectItem>
+                    <SelectItem value="offer_letter">Offer Letter</SelectItem>
+                    <SelectItem value="rejection_notice">Rejection Notice</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium text-slate-700">Subject Line</label>
+                <Input
+                  value={emailSubject}
+                  onChange={(e) => setEmailSubject(e.target.value)}
+                  placeholder="Enter email subject..."
+                  className="mt-1"
+                />
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium text-slate-700">Email Content</label>
+                <Textarea
+                  value={emailContent}
+                  onChange={(e) => setEmailContent(e.target.value)}
+                  placeholder="Compose your email..."
+                  rows={12}
+                  className="mt-1"
+                />
+              </div>
+              
+              <div className="flex items-center justify-between pt-4">
+                <Button variant="outline" size="sm">
+                  <Paperclip className="w-4 h-4 mr-2" />
+                  Attach File
+                </Button>
+                <div className="flex items-center space-x-2">
+                  <Button variant="outline" onClick={handleSaveDraft}>
+                    <Save className="w-4 h-4 mr-2" />
+                    Save Draft
+                  </Button>
+                  <Button onClick={handleSendEmail}>
+                    <Send className="w-4 h-4 mr-2" />
+                    Send Email
+                  </Button>
+                </div>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="preview" className="space-y-4">
+              <div className="border border-slate-200 rounded-lg p-4 bg-slate-50">
+                <div className="space-y-3 mb-4 pb-4 border-b border-slate-200">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-medium">To:</span>
+                    <span>{candidate.email}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="font-medium">Subject:</span>
+                    <span>{emailSubject || "No subject"}</span>
+                  </div>
+                </div>
+                <div className="prose prose-sm max-w-none">
+                  <div className="whitespace-pre-wrap text-sm text-slate-700">
+                    {emailContent || "No content"}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex justify-end space-x-2">
+                <Button variant="outline" onClick={handleSaveDraft}>
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Draft
+                </Button>
+                <Button onClick={handleSendEmail}>
+                  <Send className="w-4 h-4 mr-2" />
+                  Send Email
+                </Button>
+              </div>
+            </TabsContent>
+          </Tabs>
         </DialogContent>
       </Dialog>
     </div>
