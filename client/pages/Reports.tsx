@@ -398,7 +398,7 @@ export default function Reports() {
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
+                  <PieChart margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
                     <Pie
                       data={sourceData}
                       cx="50%"
@@ -408,12 +408,13 @@ export default function Reports() {
                       outerRadius={80}
                       fill="#8884d8"
                       dataKey="value"
+                      stroke="none"
                     >
                       {sourceData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip cursor={false} />
                   </PieChart>
                 </ResponsiveContainer>
               </CardContent>
