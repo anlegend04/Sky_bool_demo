@@ -35,6 +35,20 @@ const navigation = [
 
 export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Update notification count every 5 seconds
+  useEffect(() => {
+    const updateNotificationCount = () => {
+      const count = storage.getUnreadNotificationCount();
+      setUnreadCount(count);
+    };
+
+    updateNotificationCount();
+    const interval = setInterval(updateNotificationCount, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-50">
