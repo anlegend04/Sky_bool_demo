@@ -283,8 +283,8 @@ export default function Reports() {
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={funnelData} layout="horizontal">
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis type="number" />
-                    <YAxis dataKey="name" type="category" width={80} />
+                    <XAxis type="number" allowDecimals={false} />
+                    <YAxis dataKey="name" type="category" width={80} allowDuplicatedCategory={false} />
                     <Tooltip />
                     <Bar dataKey="value" fill="#8884d8" />
                   </BarChart>
