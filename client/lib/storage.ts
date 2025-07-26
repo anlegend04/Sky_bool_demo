@@ -170,7 +170,36 @@ const STORAGE_KEYS = {
   RESUME_UPLOADS: 'recruitment_resume_uploads',
   SETTINGS: 'recruitment_settings',
   EMAIL_TEMPLATES: 'recruitment_email_templates',
+  USER_PREFERENCES: 'recruitment_user_preferences',
+  DEMO_DATA_LOADED: 'recruitment_demo_loaded',
 } as const;
+
+export interface UserPreferences {
+  selectedFilters: {
+    jobs: {
+      department: string;
+      status: string;
+      priority: string;
+      recruiter: string;
+    };
+    candidates: {
+      department: string;
+      stage: string;
+      recruiter: string;
+      location: string;
+    };
+  };
+  viewPreferences: {
+    jobsView: "list" | "grid";
+    candidatesView: "list" | "grid";
+  };
+  lastOpenedTabs: {
+    emailAutomation: string;
+    reports: string;
+    settings: string;
+  };
+  dashboardLayout: string[];
+}
 
 // Generic storage operations
 class StorageManager {
