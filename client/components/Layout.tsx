@@ -117,10 +117,28 @@ export default function Layout({ children }: LayoutProps) {
 
             {/* Actions */}
             <div className="flex items-center space-x-4">
-              <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
-                <Plus className="w-4 h-4 mr-2" />
-                Quick Add
-              </Button>
+              {/* Quick Add Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Quick Add
+                    <ChevronDown className="w-4 h-4 ml-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={handleQuickAddJob}>
+                    <Briefcase className="w-4 h-4 mr-2" />
+                    Add Job
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleQuickAddCandidate}>
+                    <Users className="w-4 h-4 mr-2" />
+                    Add Candidate
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Notifications */}
               <Link to="/notifications">
                 <Button variant="ghost" size="sm" className="relative">
                   <Bell className="w-5 h-5" />
@@ -131,9 +149,52 @@ export default function Layout({ children }: LayoutProps) {
                   )}
                 </Button>
               </Link>
-              <Button variant="ghost" size="sm">
-                <User className="w-5 h-5" />
-              </Button>
+
+              {/* User Avatar Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="relative">
+                    <Avatar className="w-6 h-6">
+                      <AvatarImage src="" />
+                      <AvatarFallback>JD</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <div className="flex items-center gap-2 p-2">
+                    <Avatar className="w-8 h-8">
+                      <AvatarImage src="" />
+                      <AvatarFallback>JD</AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium">John Doe</p>
+                      <p className="text-xs text-slate-500">john.doe@company.com</p>
+                    </div>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                    <UserCircle className="w-4 h-4 mr-2" />
+                    Profile
+                  </DropdownMenuItem>
+                  <Link to="/settings">
+                    <DropdownMenuItem>
+                      <Settings className="w-4 h-4 mr-2" />
+                      Settings
+                    </DropdownMenuItem>
+                  </Link>
+                  <Link to="/notifications">
+                    <DropdownMenuItem>
+                      <Bell className="w-4 h-4 mr-2" />
+                      Notifications
+                    </DropdownMenuItem>
+                  </Link>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="text-red-600">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
