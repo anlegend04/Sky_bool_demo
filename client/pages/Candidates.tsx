@@ -159,10 +159,30 @@ export default function Candidates() {
   const stages = ["Applied", "Screening", "Interview", "Technical", "Offer", "Hired", "Rejected"];
 
   const stats = [
-    { title: "Total Candidates", value: "1,847", change: "+12%", color: "blue" },
-    { title: "Active Pipeline", value: "156", change: "+8%", color: "green" },
-    { title: "Interviews Scheduled", value: "23", change: "+15%", color: "orange" },
-    { title: "Offers Extended", value: "8", change: "+3%", color: "purple" },
+    {
+      title: "Total Candidates",
+      value: candidates.length.toString(),
+      change: "+12%",
+      color: "blue"
+    },
+    {
+      title: "Active Pipeline",
+      value: candidates.filter(c => c.status === "Active").length.toString(),
+      change: "+8%",
+      color: "green"
+    },
+    {
+      title: "Interviews Scheduled",
+      value: candidates.filter(c => c.stage === "Interview").length.toString(),
+      change: "+15%",
+      color: "orange"
+    },
+    {
+      title: "Offers Extended",
+      value: candidates.filter(c => c.stage === "Offer").length.toString(),
+      change: "+3%",
+      color: "purple"
+    },
   ];
 
   // Filter candidates based on search and filters
