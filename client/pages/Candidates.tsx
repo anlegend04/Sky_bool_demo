@@ -427,14 +427,17 @@ export default function Candidates() {
           (candidate) => candidate.stage === stage
         );
         return (
-          <div key={stage} className="space-y-3">
-            <div className="flex items-center justify-between">
+          <div
+            key={stage}
+            className="border border-slate-300 bg-slate-50 rounded-lg shadow-sm"
+          >
+            <div className="flex items-center justify-between p-3 border-b border-slate-200 bg-slate-100 rounded-t-lg">
               <h3 className="font-semibold text-sm text-slate-900">{stage}</h3>
               <Badge variant="outline" className="text-xs">
                 {stageCandidates.length}
               </Badge>
             </div>
-            <div className="space-y-3 min-h-[200px] bg-slate-50 rounded-lg p-3">
+            <div className="space-y-3 p-3 min-h-[250px]">
               {stageCandidates.map((candidate) => (
                 <CandidateCard key={candidate.id} candidate={candidate} />
               ))}
@@ -448,6 +451,7 @@ export default function Candidates() {
         );
       })}
     </div>
+
   );
 
   return (
