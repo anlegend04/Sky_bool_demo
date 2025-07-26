@@ -104,7 +104,7 @@ export default function JobDetail() {
 
   const handleInlineEdit = (field: string, value: any) => {
     if (!job) return;
-    
+
     const updatedJob = storage.updateJob(job.id, { [field]: value });
     if (updatedJob) {
       setJob(updatedJob);
@@ -114,6 +114,76 @@ export default function JobDetail() {
         description: `${field} has been updated successfully.`,
       });
     }
+  };
+
+  // Drag and drop handlers
+  const handleDragStart = (candidate: CandidateData) => {
+    setDraggedCandidate(candidate);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedCandidate(null);
+    setDragOverStage(null);
+  };
+
+  const handleDragOver = (e: React.DragEvent, stage: string) => {
+    e.preventDefault();
+    setDragOverStage(stage);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverStage(null);
+  };
+
+  const handleDrop = (e: React.DragEvent, newStage: string) => {
+    e.preventDefault();
+
+    if (draggedCandidate && draggedCandidate.stage !== newStage) {
+      // Simulate API update with loading state
+      const candidateId = draggedCandidate.id;
+      const oldStage = draggedCandidate.stage;
+
+      // Update candidate stage in storage
+      const updatedCandidate = storage.updateCandidate(candidateId, {
+        stage: newStage,
+        duration: 0, // Reset duration for new stage
+      });
+
+      if (updatedCandidate) {
+        // Update local candidates state
+        setCandidates(prev =>
+          prev.map(c => c.id === candidateId ? updatedCandidate : c)
+        );
+
+        // Show success toast with API simulation
+        toast({
+          title: "Stage Updated",
+          description: `${draggedCandidate.name} moved from ${oldStage} to ${newStage}`,
+        });
+
+        // Update job pipeline summary
+        if (job) {
+          const updatedPipeline = { ...job.pipelineSummary };
+          if (oldStage.toLowerCase() in updatedPipeline) {
+            updatedPipeline[oldStage.toLowerCase() as keyof typeof updatedPipeline]--;
+          }
+          if (newStage.toLowerCase() in updatedPipeline) {
+            updatedPipeline[newStage.toLowerCase() as keyof typeof updatedPipeline]++;
+          }
+
+          const updatedJob = storage.updateJob(job.id, {
+            pipelineSummary: updatedPipeline
+          });
+
+          if (updatedJob) {
+            setJob(updatedJob);
+          }
+        }
+      }
+    }
+
+    setDraggedCandidate(null);
+    setDragOverStage(null);
   };
 
   const getStageColor = (stage: string) => {
