@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import {
   Select,
   SelectContent,
@@ -49,6 +50,9 @@ export default function Calendar() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isEventDialogOpen, setIsEventDialogOpen] = useState(false);
   const [view, setView] = useState("month"); // month, week, day
+  const [popupDate, setPopupDate] = useState<Date | null>(null);
+const [popupPosition, setPopupPosition] = useState<{ x: number; y: number } | null>(null);
+
 
   const events = [
     {
@@ -358,8 +362,12 @@ export default function Calendar() {
                     return (
                       <div
                         key={index}
-                        onClick={() => setSelectedDate(date)} // thêm dòng này
-                        className={`p-2 min-h-[80px] border rounded-md cursor-pointer hover:bg-slate-50 ${
+                        onClick={(e) => {
+                          setSelectedDate(date);
+                          setPopupDate(date);
+                          const rect = (e.target as HTMLElement).getBoundingClientRect();
+                          setPopupPosition({ x: rect.left, y: rect.bottom });
+                        }}                        className={`p-2 min-h-[80px] border rounded-md cursor-pointer hover:bg-slate-50 ${
                           !isCurrentMonth ? "text-slate-400 bg-slate-50" : ""
                         } ${isToday ? "bg-blue-50 border-blue-200" : "border-slate-200"}`}
                       >
