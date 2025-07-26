@@ -172,7 +172,6 @@ export default function JobDetail() {
 
         // Show success toast with API simulation
         toast({
-          PipelineListView 
           title: "Stage Updated",
           description: `${draggedCandidate.name} moved from ${oldStage} to ${newStage}`,
         });
