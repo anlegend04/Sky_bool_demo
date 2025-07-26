@@ -345,13 +345,13 @@ export default function Reports() {
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
-                  <RadarChart data={jobPerformanceData}>
-                    <PolarGrid />
-                    <PolarAngleAxis dataKey="subject" />
-                    <PolarRadiusAxis />
-                    <Radar name="Job A" dataKey="A" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
-                    <Radar name="Job B" dataKey="B" stroke="#82ca9d" fill="#82ca9d" fillOpacity={0.6} />
-                    <Legend />
+                  <RadarChart data={jobPerformanceData} margin={{ top: 20, right: 80, bottom: 20, left: 80 }}>
+                    <PolarGrid stroke="#f0f0f0" />
+                    <PolarAngleAxis dataKey="subject" tick={{ fontSize: 12 }} />
+                    <PolarRadiusAxis angle={90} domain={[0, 150]} tick={{ fontSize: 10 }} />
+                    <Radar name="Job A" dataKey="A" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} strokeWidth={2} />
+                    <Radar name="Job B" dataKey="B" stroke="#82ca9d" fill="#82ca9d" fillOpacity={0.6} strokeWidth={2} />
+                    <Legend iconType="rect" />
                   </RadarChart>
                 </ResponsiveContainer>
               </CardContent>
