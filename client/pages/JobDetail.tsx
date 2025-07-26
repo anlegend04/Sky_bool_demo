@@ -647,6 +647,9 @@ export default function JobDetail() {
           </CardContent>
         </Card>
 
+        {/* Budget Panel */}
+        <BudgetPanel job={job} onJobUpdate={setJob} />
+
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
