@@ -358,6 +358,7 @@ export default function Calendar() {
                     return (
                       <div
                         key={index}
+                        onClick={() => setSelectedDate(date)} // thêm dòng này
                         className={`p-2 min-h-[80px] border rounded-md cursor-pointer hover:bg-slate-50 ${
                           !isCurrentMonth ? "text-slate-400 bg-slate-50" : ""
                         } ${isToday ? "bg-blue-50 border-blue-200" : "border-slate-200"}`}
@@ -385,19 +386,60 @@ export default function Calendar() {
 
               {view === "week" && (
                 <div className="space-y-4">
-                  <div className="text-center text-slate-600">
-                    Week view would show detailed day-by-day schedule
-                  </div>
+                  {[...Array(7)].map((_, i) => {
+                    const currentDate = new Date(selectedDate);
+                    currentDate.setDate(selectedDate.getDate() - selectedDate.getDay() + i);
+                    const dateStr = currentDate.toISOString().split("T")[0];
+                    const dailyEvents = events.filter((e) => e.date === dateStr);
+
+                    return (
+                      <div key={i}>
+                        <h3 className="text-slate-800 font-medium">
+                          {currentDate.toLocaleDateString("en-US", {
+                            weekday: "long",
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </h3>
+                        {dailyEvents.length > 0 ? (
+                          <ul className="ml-4 list-disc text-sm text-slate-700">
+                            {dailyEvents.map((event) => (
+                              <li key={event.id}>
+                                {event.startTime} - {event.title}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="ml-4 text-slate-400 text-sm">No events</p>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
 
+
               {view === "day" && (
                 <div className="space-y-4">
-                  <div className="text-center text-slate-600">
-                    Day view would show hourly schedule
-                  </div>
+                  <h2 className="text-lg font-semibold text-slate-700">
+                    {selectedDate.toDateString()}
+                  </h2>
+                  {events
+                    .filter((event) => event.date === selectedDate.toISOString().split("T")[0])
+                    .map((event) => (
+                      <div
+                        key={event.id}
+                        className={`p-2 rounded border ${getEventTypeColor(event.type)}`}
+                      >
+                        <div className="font-medium">{event.title}</div>
+                        <div className="text-sm text-slate-600">
+                          {event.startTime} - {event.endTime} @ {event.location}
+                        </div>
+                      </div>
+                    ))}
                 </div>
               )}
+
             </CardContent>
           </Card>
         </div>
