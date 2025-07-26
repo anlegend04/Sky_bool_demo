@@ -172,6 +172,7 @@ export default function JobDetail() {
 
         // Show success toast with API simulation
         toast({
+          PipelineListView 
           title: "Stage Updated",
           description: `${draggedCandidate.name} moved from ${oldStage} to ${newStage}`,
         });
@@ -356,35 +357,107 @@ export default function JobDetail() {
   const PipelineListView = () => (
     <Card>
       <CardContent className="p-6">
-        <div className="space-y-4">
-          {stages.map((stage) => {
-            const stageCandidates = candidates.filter(c => c.stage === stage);
-            return (
-              <div key={stage} className={`rounded-lg border p-4 ${getStageColor(stage)}`}>
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-semibold text-slate-900">{stage}</h3>
-                  <Badge variant="outline">
-                    {stageCandidates.length} candidates
-                  </Badge>
-                </div>
-                {stageCandidates.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {stageCandidates.map((candidate) => (
-                      <CandidateCard key={candidate.id} candidate={candidate} />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center text-slate-400 py-4">
-                    No candidates in this stage
-                  </div>
-                )}
-              </div>
-            );
-          })}
+        <div className="overflow-x-auto">
+          <table className="min-w-full table-auto text-sm text-left">
+            <thead>
+              <tr className="text-slate-600 border-b">
+                <th className="px-4 py-2">Candidate</th>
+                <th className="px-4 py-2">Email</th>
+                <th className="px-4 py-2">Location</th>
+                <th className="px-4 py-2">Stage</th>
+                <th className="px-4 py-2">Days in Stage</th>
+                <th className="px-4 py-2">Rating</th>
+                <th className="px-4 py-2">Source</th>
+                <th className="px-4 py-2">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {candidates.length > 0 ? (
+                candidates.map((candidate) => (
+                  <tr
+                    key={candidate.id}
+                    className="border-b hover:bg-slate-50 transition"
+                  >
+                    <td className="px-4 py-2 flex items-center gap-2">
+                      <Avatar className="w-8 h-8">
+                        <AvatarImage src={candidate.avatar} />
+                        <AvatarFallback>
+                          {candidate.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
+                        </AvatarFallback>
+                      </Avatar>
+                      <Link
+                        to={`/candidates/${candidate.id}`}
+                        className="font-medium text-slate-900 hover:text-blue-600"
+                      >
+                        {candidate.name}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-2">{candidate.email}</td>
+                    <td className="px-4 py-2">{candidate.location}</td>
+                    <td className="px-4 py-2">{candidate.stage}</td>
+                    <td className="px-4 py-2">{candidate.duration} days</td>
+                    <td className="px-4 py-2">
+                      <div className="flex space-x-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`w-3 h-3 ${i < candidate.rating
+                                ? "text-yellow-400 fill-current"
+                                : "text-slate-300"
+                              }`}
+                          />
+                        ))}
+                      </div>
+                    </td>
+                    <td className="px-4 py-2">
+                      <Badge variant="outline" className="text-xs">
+                        {candidate.source}
+                      </Badge>
+                    </td>
+                    <td className="px-4 py-2">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreHorizontal className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <Link to={`/candidates/${candidate.id}`}>
+                            <DropdownMenuItem>
+                              <User className="w-4 h-4 mr-2" />
+                              View Profile
+                            </DropdownMenuItem>
+                          </Link>
+                          <DropdownMenuItem>
+                            <Mail className="w-4 h-4 mr-2" />
+                            Send Email
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Calendar className="w-4 h-4 mr-2" />
+                            Schedule Interview
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={8} className="text-center text-slate-400 py-6">
+                    No candidates available
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </CardContent>
     </Card>
   );
+
 
   const EditableField = ({ field, value, type = "text" }: { field: string; value: any; type?: string }) => {
     if (editingField === field) {
