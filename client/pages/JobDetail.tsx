@@ -209,7 +209,14 @@ export default function JobDetail() {
   };
 
   const CandidateCard = ({ candidate }: { candidate: CandidateData }) => (
-    <Card className={`hover:shadow-md transition-shadow border-l-4 ${getCandidateStatusColor(candidate)}`}>
+    <Card
+      className={`hover:shadow-md transition-shadow border-l-4 cursor-move ${getCandidateStatusColor(candidate)} ${
+        draggedCandidate?.id === candidate.id ? 'opacity-50 scale-95' : ''
+      }`}
+      draggable
+      onDragStart={() => handleDragStart(candidate)}
+      onDragEnd={handleDragEnd}
+    >
       <CardContent className="p-4">
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center space-x-3">
