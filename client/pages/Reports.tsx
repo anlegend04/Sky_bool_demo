@@ -282,10 +282,10 @@ export default function Reports() {
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={funnelData} layout="horizontal">
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis type="number" allowDecimals={false} />
-                    <YAxis dataKey="name" type="category" width={80} allowDuplicatedCategory={false} />
-                    <Tooltip />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis type="number" allowDecimals={false} tickLine={false} />
+                    <YAxis dataKey="name" type="category" width={80} allowDuplicatedCategory={false} tickLine={false} />
+                    <Tooltip cursor={false} />
                     <Bar dataKey="value" fill="#8884d8" />
                   </BarChart>
                 </ResponsiveContainer>
