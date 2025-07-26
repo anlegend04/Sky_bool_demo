@@ -544,35 +544,97 @@ class StorageManager {
   }
 
   private initializeDefaultCandidates(): void {
-    const defaultCandidates: Omit<CandidateData, 'id' | 'createdAt' | 'updatedAt'>[] = [
-      {
-        name: "Sarah Johnson",
-        email: "sarah.j@email.com",
-        phone: "+1 (555) 0123",
-        location: "San Francisco, CA",
-        position: "Senior Frontend Developer",
-        experience: "5+ years",
-        skills: ["React", "TypeScript", "Node.js", "GraphQL"],
-        status: "Active",
-        stage: "Interview",
-        rating: 5,
-        appliedDate: "2024-01-15",
-        resume: "sarah_johnson_resume.pdf",
-        avatar: "",
-        salary: "$120k - $140k",
-        source: "LinkedIn",
-        recruiter: "Alex Chen",
-        department: "Engineering",
-        duration: 5,
-        tags: ["High Priority", "Cultural Fit"],
-        stageHistory: [],
-        notes: [],
-        emails: [],
-        attachments: []
-      }
-    ];
+    // Only add one candidate to localStorage, rest will be added via sessionStorage when user demos
+    const defaultCandidate: Omit<CandidateData, 'id' | 'createdAt' | 'updatedAt'> = {
+      name: "Sarah Johnson",
+      email: "sarah.j@email.com",
+      phone: "+1 (555) 0123",
+      location: "San Francisco, CA",
+      position: "Senior Frontend Developer",
+      experience: "5+ years",
+      skills: ["React", "TypeScript", "Node.js", "GraphQL", "JavaScript", "CSS"],
+      status: "Active",
+      stage: "Interview",
+      rating: 5,
+      appliedDate: "2024-01-15",
+      resume: "sarah_johnson_resume.pdf",
+      avatar: "",
+      salary: "$120k - $140k",
+      source: "LinkedIn",
+      recruiter: "Alex Chen",
+      department: "Engineering",
+      duration: 5,
+      tags: ["High Priority", "Cultural Fit", "Technical Expert"],
+      stageHistory: [
+        {
+          id: "stage_1",
+          stage: "Applied",
+          startDate: "2024-01-15",
+          endDate: "2024-01-16",
+          duration: 1,
+          reason: "Application submitted",
+          notes: "Strong technical background",
+          userId: "user_1",
+          userName: "Alex Chen"
+        },
+        {
+          id: "stage_2",
+          stage: "Screening",
+          startDate: "2024-01-16",
+          endDate: "2024-01-19",
+          duration: 3,
+          reason: "Passed initial screening",
+          notes: "Excellent communication skills",
+          userId: "user_1",
+          userName: "Alex Chen"
+        },
+        {
+          id: "stage_3",
+          stage: "Interview",
+          startDate: "2024-01-19",
+          duration: 5,
+          reason: "Scheduled for technical interview",
+          notes: "Panel interview scheduled for Jan 25th",
+          userId: "user_1",
+          userName: "Alex Chen"
+        }
+      ],
+      notes: [
+        {
+          id: "note_1",
+          content: "Excellent React skills demonstrated in portfolio",
+          userId: "user_1",
+          userName: "Alex Chen",
+          timestamp: "2024-01-16T10:30:00Z",
+          type: "note"
+        }
+      ],
+      emails: [
+        {
+          id: "email_1",
+          subject: "Interview Invitation - Senior Frontend Developer",
+          content: "Hi Sarah, Thank you for your interest in our Senior Frontend Developer position...",
+          from: "alex.chen@company.com",
+          to: "sarah.j@email.com",
+          timestamp: "2024-01-17T09:00:00Z",
+          status: "sent",
+          template: "interview_invitation"
+        }
+      ],
+      attachments: [
+        {
+          id: "att_1",
+          name: "sarah_johnson_resume.pdf",
+          type: "application/pdf",
+          size: 245760,
+          url: "/uploads/sarah_johnson_resume.pdf",
+          uploadedAt: "2024-01-15T14:30:00Z",
+          uploadedBy: "Sarah Johnson"
+        }
+      ]
+    };
 
-    defaultCandidates.forEach(candidate => this.addCandidate(candidate));
+    this.addCandidate(defaultCandidate);
   }
 }
 
