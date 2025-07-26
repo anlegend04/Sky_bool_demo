@@ -301,22 +301,35 @@ export default function JobDetail() {
     <div className="grid grid-cols-1 lg:grid-cols-7 gap-4">
       {stages.map((stage) => {
         const stageCandidates = candidates.filter(c => c.stage === stage);
+        const isDropTarget = dragOverStage === stage;
+
         return (
-          <div key={stage} className={`rounded-lg border p-4 ${getStageColor(stage)}`}>
+          <div
+            key={stage}
+            className={`rounded-lg border p-4 transition-all ${getStageColor(stage)} ${
+              isDropTarget ? 'ring-2 ring-blue-500 ring-opacity-50 bg-blue-50' : ''
+            }`}
+            onDragOver={(e) => handleDragOver(e, stage)}
+            onDragLeave={handleDragLeave}
+            onDrop={(e) => handleDrop(e, stage)}
+          >
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-sm text-slate-900">{stage}</h3>
               <Badge variant="outline" className="text-xs">
                 {stageCandidates.length}
               </Badge>
             </div>
-            <div className="space-y-3 min-h-[200px]">
+            <div className="space-y-3 min-h-[200px] relative">
               {stageCandidates.map((candidate) => (
                 <CandidateCard key={candidate.id} candidate={candidate} />
               ))}
               {stageCandidates.length === 0 && (
                 <div className="text-center text-slate-400 text-xs py-8">
-                  No candidates
+                  {isDropTarget ? "Drop candidate here" : "No candidates"}
                 </div>
+              )}
+              {isDropTarget && (
+                <div className="absolute inset-0 border-2 border-dashed border-blue-400 rounded-lg pointer-events-none opacity-50" />
               )}
             </div>
           </div>
