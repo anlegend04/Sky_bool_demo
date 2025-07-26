@@ -2,6 +2,8 @@ import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { storage } from "@/lib/storage";
+import { useState, useEffect } from "react";
 import {
   Users,
   Briefcase,
@@ -27,6 +29,7 @@ const navigation = [
   { name: "Calendar", href: "/calendar", icon: Calendar },
   { name: "Email Automation", href: "/email", icon: Mail },
   { name: "Reports", href: "/reports", icon: BarChart3 },
+  { name: "Notifications", href: "/notifications", icon: Bell },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
