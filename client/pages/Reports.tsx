@@ -325,11 +325,11 @@ export default function Reports() {
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={recruiterData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" allowDuplicatedCategory={false} />
-                    <YAxis allowDecimals={false} />
-                    <Tooltip />
-                    <Legend />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis dataKey="name" allowDuplicatedCategory={false} tickLine={false} />
+                    <YAxis allowDecimals={false} tickLine={false} />
+                    <Tooltip cursor={false} />
+                    <Legend iconType="rect" />
                     <Bar dataKey="applications" fill="#8884d8" name="Applications" />
                     <Bar dataKey="interviews" fill="#82ca9d" name="Interviews" />
                     <Bar dataKey="hires" fill="#ffc658" name="Hires" />
