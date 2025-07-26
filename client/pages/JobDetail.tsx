@@ -58,6 +58,7 @@ import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { storage, JobData, CandidateData } from "@/lib/storage";
 import { useToast } from "@/hooks/use-toast";
+import BudgetPanel from "@/components/BudgetPanel";
 
 export default function JobDetail() {
   const { id } = useParams();
