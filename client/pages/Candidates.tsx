@@ -5,6 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -24,12 +32,13 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Plus,
   Search,
   Filter,
-  Upload,
   Download,
   Star,
   Mail,
@@ -44,19 +53,63 @@ import {
   Edit,
   Trash2,
   Share,
+  Grid3X3,
+  List,
+  Settings,
+  Clock,
+  DollarSign,
+  Building,
 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
+type CandidateData = {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  location: string;
+  position: string;
+  experience: string;
+  skills: string[];
+  status: string;
+  stage: string;
+  rating: number;
+  appliedDate: string;
+  resume: string;
+  avatar: string;
+  salary: string;
+  source: string;
+  recruiter: string;
+  department: string;
+  duration: number; // days in current stage
+};
+
 export default function Candidates() {
-  const [selectedView, setSelectedView] = useState("grid");
-  const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const [searchTerm, setSearchTerm] = useState("");
   const [positionFilter, setPositionFilter] = useState("all");
   const [stageFilter, setStageFilter] = useState("all");
   const [locationFilter, setLocationFilter] = useState("all");
+  const [departmentFilter, setDepartmentFilter] = useState("all");
+  const [recruiterFilter, setRecruiterFilter] = useState("all");
 
-  const candidates = [
+  // Customizable field visibility for list view
+  const [visibleFields, setVisibleFields] = useState({
+    name: true,
+    appliedDate: true,
+    email: true,
+    phone: true,
+    position: true,
+    recruiter: true,
+    stage: true,
+    source: true,
+    salary: false,
+    location: false,
+    department: false,
+  });
+
+  const candidates: CandidateData[] = [
     {
       id: 1,
       name: "Sarah Johnson",
@@ -74,6 +127,9 @@ export default function Candidates() {
       avatar: "",
       salary: "$120k - $140k",
       source: "LinkedIn",
+      recruiter: "Alex Chen",
+      department: "Engineering",
+      duration: 5,
     },
     {
       id: 2,
@@ -92,6 +148,9 @@ export default function Candidates() {
       avatar: "",
       salary: "$110k - $130k",
       source: "Website",
+      recruiter: "Sarah Kim",
+      department: "Product",
+      duration: 12,
     },
     {
       id: 3,
@@ -103,13 +162,16 @@ export default function Candidates() {
       experience: "3+ years",
       skills: ["Figma", "Sketch", "User Research", "Prototyping"],
       status: "Active",
-      stage: "Screening",
+      stage: "Applied",
       rating: 4,
       appliedDate: "2024-01-10",
       resume: "emily_davis_resume.pdf",
       avatar: "",
       salary: "$85k - $105k",
       source: "Indeed",
+      recruiter: "Mike Wilson",
+      department: "Design",
+      duration: 2,
     },
     {
       id: 4,
@@ -128,6 +190,9 @@ export default function Candidates() {
       avatar: "",
       salary: "$130k - $150k",
       source: "Referral",
+      recruiter: "Alex Chen",
+      department: "Data",
+      duration: 8,
     },
     {
       id: 5,
@@ -139,13 +204,16 @@ export default function Candidates() {
       experience: "5+ years",
       skills: ["AWS", "Docker", "Kubernetes", "Terraform"],
       status: "Active",
-      stage: "Final",
+      stage: "Hired",
       rating: 4,
       appliedDate: "2024-01-05",
       resume: "lisa_garcia_resume.pdf",
       avatar: "",
       salary: "$115k - $135k",
       source: "LinkedIn",
+      recruiter: "Sarah Kim",
+      department: "Engineering",
+      duration: 30,
     },
     {
       id: 6,
@@ -164,23 +232,18 @@ export default function Candidates() {
       avatar: "",
       salary: "$60k - $75k",
       source: "Website",
+      recruiter: "Mike Wilson",
+      department: "Marketing",
+      duration: 15,
     },
   ];
 
+  const stages = ["Applied", "Screening", "Interview", "Technical", "Offer", "Hired", "Rejected"];
+
   const stats = [
-    {
-      title: "Total Candidates",
-      value: "1,847",
-      change: "+12%",
-      color: "blue",
-    },
+    { title: "Total Candidates", value: "1,847", change: "+12%", color: "blue" },
     { title: "Active Pipeline", value: "156", change: "+8%", color: "green" },
-    {
-      title: "Interviews Scheduled",
-      value: "23",
-      change: "+15%",
-      color: "orange",
-    },
+    { title: "Interviews Scheduled", value: "23", change: "+15%", color: "orange" },
     { title: "Offers Extended", value: "8", change: "+3%", color: "purple" },
   ];
 
@@ -202,23 +265,26 @@ export default function Candidates() {
     const matchesLocation =
       locationFilter === "all" ||
       candidate.location.toLowerCase().includes(locationFilter.toLowerCase());
+    const matchesDepartment =
+      departmentFilter === "all" ||
+      candidate.department.toLowerCase() === departmentFilter.toLowerCase();
+    const matchesRecruiter =
+      recruiterFilter === "all" ||
+      candidate.recruiter.toLowerCase().includes(recruiterFilter.toLowerCase());
 
-    return matchesSearch && matchesPosition && matchesStage && matchesLocation;
+    return matchesSearch && matchesPosition && matchesStage && matchesLocation && 
+           matchesDepartment && matchesRecruiter;
   });
 
-  const CandidateCard = ({
-    candidate,
-  }: {
-    candidate: (typeof candidates)[0];
-  }) => (
-    <Card className="hover:shadow-md transition-shadow">
+  const CandidateCard = ({ candidate }: { candidate: CandidateData }) => (
+    <Card className="hover:shadow-md transition-shadow cursor-pointer">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <Link
             to={`/candidates/${candidate.id}`}
             className="flex items-center space-x-3 hover:bg-slate-100 p-2 rounded-md transition"
           >
-            <Avatar className="w-12 h-12">
+            <Avatar className="w-10 h-10">
               <AvatarImage src={candidate.avatar} />
               <AvatarFallback>
                 {candidate.name
@@ -228,8 +294,8 @@ export default function Candidates() {
               </AvatarFallback>
             </Avatar>
             <div>
-              <h3 className="font-semibold text-slate-900">{candidate.name}</h3>
-              <p className="text-sm text-slate-600">{candidate.position}</p>
+              <h3 className="font-semibold text-sm text-slate-900">{candidate.name}</h3>
+              <p className="text-xs text-slate-600">{candidate.position}</p>
             </div>
           </Link>
           <DropdownMenu>
@@ -239,7 +305,7 @@ export default function Candidates() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <Link to={`/Candidate/${candidates.id}`}>
+              <Link to={`/candidates/${candidate.id}`}>
                 <DropdownMenuItem>
                   <Eye className="w-4 h-4 mr-2" />
                   View Details
@@ -265,43 +331,21 @@ export default function Candidates() {
           </DropdownMenu>
         </div>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="flex items-center text-sm text-slate-600">
-          <Mail className="w-4 h-4 mr-2" />
-          {candidate.email}
+      <CardContent className="space-y-2">
+        <div className="flex items-center text-xs text-slate-600">
+          <Building className="w-3 h-3 mr-1" />
+          {candidate.department}
         </div>
-        <div className="flex items-center text-sm text-slate-600">
-          <Phone className="w-4 h-4 mr-2" />
-          {candidate.phone}
+        <div className="flex items-center text-xs text-slate-600">
+          <Clock className="w-3 h-3 mr-1" />
+          {candidate.duration} days in stage
         </div>
-        <div className="flex items-center text-sm text-slate-600">
-          <MapPin className="w-4 h-4 mr-2" />
-          {candidate.location}
-        </div>
-        <div className="flex items-center text-sm text-slate-600">
-          <Briefcase className="w-4 h-4 mr-2" />
-          {candidate.experience}
-        </div>
-
-        <div className="flex flex-wrap gap-1 pt-2">
-          {candidate.skills.slice(0, 3).map((skill) => (
-            <Badge key={skill} variant="secondary" className="text-xs">
-              {skill}
-            </Badge>
-          ))}
-          {candidate.skills.length > 3 && (
-            <Badge variant="outline" className="text-xs">
-              +{candidate.skills.length - 3} more
-            </Badge>
-          )}
-        </div>
-
-        <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+        <div className="flex items-center justify-between pt-2 border-t border-slate-100">
           <div className="flex items-center space-x-1">
             {[...Array(5)].map((_, i) => (
               <Star
                 key={i}
-                className={`w-4 h-4 ${
+                className={`w-3 h-3 ${
                   i < candidate.rating
                     ? "text-yellow-400 fill-current"
                     : "text-slate-300"
@@ -309,46 +353,163 @@ export default function Candidates() {
               />
             ))}
           </div>
-          <div className="flex items-center space-x-2">
-            <Badge
-              variant={
-                candidate.stage === "Offer"
-                  ? "default"
-                  : candidate.stage === "Final"
-                    ? "secondary"
-                    : candidate.stage === "Technical"
-                      ? "outline"
-                      : candidate.stage === "Interview"
-                        ? "default"
-                        : candidate.stage === "Screening"
-                          ? "secondary"
-                          : "destructive"
-              }
-              className="text-xs"
-            >
-              {candidate.stage}
-            </Badge>
-            <Badge
-              variant={candidate.status === "Active" ? "default" : "outline"}
-              className="text-xs"
-            >
-              {candidate.status}
-            </Badge>
-          </div>
-        </div>
-
-        <div className="flex space-x-2 pt-2">
-          <Button size="sm" variant="outline" className="flex-1">
-            <Mail className="w-4 h-4 mr-2" />
-            Message
-          </Button>
-          <Button size="sm" variant="outline" className="flex-1">
-            <FileText className="w-4 h-4 mr-2" />
-            Resume
-          </Button>
+          <Badge variant="outline" className="text-xs">
+            {candidate.recruiter}
+          </Badge>
         </div>
       </CardContent>
     </Card>
+  );
+
+  const ListView = () => (
+    <Card>
+      <CardContent className="p-0">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              {visibleFields.name && <TableHead>Candidate Name</TableHead>}
+              {visibleFields.appliedDate && <TableHead>Applied On</TableHead>}
+              {visibleFields.email && <TableHead>Email</TableHead>}
+              {visibleFields.phone && <TableHead>Phone</TableHead>}
+              {visibleFields.position && <TableHead>Job Position</TableHead>}
+              {visibleFields.recruiter && <TableHead>Recruiter</TableHead>}
+              {visibleFields.stage && <TableHead>Current Stage</TableHead>}
+              {visibleFields.source && <TableHead>Source</TableHead>}
+              {visibleFields.salary && <TableHead>Salary</TableHead>}
+              {visibleFields.location && <TableHead>Location</TableHead>}
+              {visibleFields.department && <TableHead>Department</TableHead>}
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredCandidates.map((candidate) => (
+              <TableRow key={candidate.id} className="hover:bg-slate-50">
+                {visibleFields.name && (
+                  <TableCell>
+                    <Link
+                      to={`/candidates/${candidate.id}`}
+                      className="flex items-center space-x-3 hover:text-blue-600"
+                    >
+                      <Avatar className="w-8 h-8">
+                        <AvatarImage src={candidate.avatar} />
+                        <AvatarFallback className="text-xs">
+                          {candidate.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="font-medium">{candidate.name}</div>
+                        <div className="flex items-center space-x-1 mt-1">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`w-3 h-3 ${
+                                i < candidate.rating
+                                  ? "text-yellow-400 fill-current"
+                                  : "text-slate-300"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </Link>
+                  </TableCell>
+                )}
+                {visibleFields.appliedDate && <TableCell>{candidate.appliedDate}</TableCell>}
+                {visibleFields.email && <TableCell>{candidate.email}</TableCell>}
+                {visibleFields.phone && <TableCell>{candidate.phone}</TableCell>}
+                {visibleFields.position && <TableCell>{candidate.position}</TableCell>}
+                {visibleFields.recruiter && <TableCell>{candidate.recruiter}</TableCell>}
+                {visibleFields.stage && (
+                  <TableCell>
+                    <Badge
+                      variant={
+                        candidate.stage === "Offer"
+                          ? "default"
+                          : candidate.stage === "Hired"
+                            ? "default"
+                            : candidate.stage === "Technical"
+                              ? "secondary"
+                              : candidate.stage === "Interview"
+                                ? "outline"
+                                : candidate.stage === "Screening"
+                                  ? "secondary"
+                                  : candidate.stage === "Applied"
+                                    ? "outline"
+                                    : "destructive"
+                      }
+                    >
+                      {candidate.stage}
+                    </Badge>
+                  </TableCell>
+                )}
+                {visibleFields.source && <TableCell>{candidate.source}</TableCell>}
+                {visibleFields.salary && <TableCell>{candidate.salary}</TableCell>}
+                {visibleFields.location && <TableCell>{candidate.location}</TableCell>}
+                {visibleFields.department && <TableCell>{candidate.department}</TableCell>}
+                <TableCell>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm">
+                        <MoreHorizontal className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <Link to={`/candidates/${candidate.id}`}>
+                        <DropdownMenuItem>
+                          <Eye className="w-4 h-4 mr-2" />
+                          View Details
+                        </DropdownMenuItem>
+                      </Link>
+                      <DropdownMenuItem>
+                        <Edit className="w-4 h-4 mr-2" />
+                        Edit Candidate
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Download className="w-4 h-4 mr-2" />
+                        Download CV
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  );
+
+  const GridView = () => (
+    <div className="grid grid-cols-1 lg:grid-cols-7 gap-4">
+      {stages.map((stage) => {
+        const stageCandidates = filteredCandidates.filter(
+          (candidate) => candidate.stage === stage
+        );
+        return (
+          <div key={stage} className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-sm text-slate-900">{stage}</h3>
+              <Badge variant="outline" className="text-xs">
+                {stageCandidates.length}
+              </Badge>
+            </div>
+            <div className="space-y-3 min-h-[200px] bg-slate-50 rounded-lg p-3">
+              {stageCandidates.map((candidate) => (
+                <CandidateCard key={candidate.id} candidate={candidate} />
+              ))}
+              {stageCandidates.length === 0 && (
+                <div className="text-center text-slate-400 text-xs py-8">
+                  No candidates
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 
   return (
@@ -358,8 +519,7 @@ export default function Candidates() {
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Candidates</h1>
           <p className="text-slate-600 mt-1">
-            Manage candidate profiles, applications, and track their progress
-            through your pipeline.
+            Manage candidate profiles, applications, and track their progress through your pipeline.
           </p>
         </div>
         <div className="flex space-x-3">
@@ -374,8 +534,7 @@ export default function Candidates() {
               <DialogHeader>
                 <DialogTitle>Add New Candidate</DialogTitle>
                 <DialogDescription>
-                  Create a new candidate profile manually or upload their
-                  resume.
+                  Create a new candidate profile manually or upload their resume.
                 </DialogDescription>
               </DialogHeader>
               <Tabs defaultValue="manual" className="w-full">
@@ -386,60 +545,37 @@ export default function Candidates() {
                 <TabsContent value="manual" className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium text-slate-700">
-                        Full Name
-                      </label>
+                      <label className="text-sm font-medium text-slate-700">Full Name</label>
                       <Input placeholder="John Doe" className="mt-1" />
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-slate-700">
-                        Email
-                      </label>
-                      <Input
-                        type="email"
-                        placeholder="john@example.com"
-                        className="mt-1"
-                      />
+                      <label className="text-sm font-medium text-slate-700">Email</label>
+                      <Input type="email" placeholder="john@example.com" className="mt-1" />
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-slate-700">
-                        Phone
-                      </label>
+                      <label className="text-sm font-medium text-slate-700">Phone</label>
                       <Input placeholder="+1 (555) 123-4567" className="mt-1" />
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-slate-700">
-                        Location
-                      </label>
+                      <label className="text-sm font-medium text-slate-700">Location</label>
                       <Input placeholder="City, State" className="mt-1" />
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-slate-700">
-                        Position
-                      </label>
+                      <label className="text-sm font-medium text-slate-700">Position</label>
                       <Input placeholder="Software Engineer" className="mt-1" />
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-slate-700">
-                        Experience
-                      </label>
+                      <label className="text-sm font-medium text-slate-700">Department</label>
                       <Select>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select experience" />
+                          <SelectValue placeholder="Select department" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="entry">
-                            Entry Level (0-2 years)
-                          </SelectItem>
-                          <SelectItem value="mid">
-                            Mid Level (3-5 years)
-                          </SelectItem>
-                          <SelectItem value="senior">
-                            Senior Level (5+ years)
-                          </SelectItem>
-                          <SelectItem value="lead">
-                            Lead/Principal (8+ years)
-                          </SelectItem>
+                          <SelectItem value="engineering">Engineering</SelectItem>
+                          <SelectItem value="product">Product</SelectItem>
+                          <SelectItem value="design">Design</SelectItem>
+                          <SelectItem value="marketing">Marketing</SelectItem>
+                          <SelectItem value="data">Data</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -452,15 +588,12 @@ export default function Candidates() {
                 <TabsContent value="upload" className="space-y-4">
                   <div className="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center">
                     <FileText className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-                    <h4 className="text-lg font-medium text-slate-900 mb-2">
-                      Upload Resume/CV
-                    </h4>
+                    <h4 className="text-lg font-medium text-slate-900 mb-2">Upload Resume/CV</h4>
                     <p className="text-sm text-slate-600 mb-4">
-                      We'll automatically extract candidate information from the
-                      resume
+                      We'll automatically extract candidate information from the resume
                     </p>
                     <Button variant="outline">
-                      <Upload className="w-4 h-4 mr-2" />
+                      <FileText className="w-4 h-4 mr-2" />
                       Choose File
                     </Button>
                   </div>
@@ -479,12 +612,8 @@ export default function Candidates() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-600">{stat.title}</p>
-                  <p className="text-2xl font-bold text-slate-900">
-                    {stat.value}
-                  </p>
-                  <p className="text-sm text-green-600">
-                    {stat.change} vs last month
-                  </p>
+                  <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
+                  <p className="text-sm text-green-600">{stat.change} vs last month</p>
                 </div>
                 <div className={`p-3 rounded-full bg-${stat.color}-100`}>
                   <User className={`w-6 h-6 text-${stat.color}-600`} />
@@ -495,92 +624,120 @@ export default function Candidates() {
         ))}
       </div>
 
-      {/* Filters */}
+      {/* View Toggle and Filters */}
       <Card>
         <CardContent className="pt-6">
-          <div className="flex flex-col lg:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-                <Input
-                  placeholder="Search candidates by name, position, skills..."
-                  className="pl-10"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
+          <div className="flex flex-col lg:flex-row gap-4 justify-between">
+            <div className="flex items-center space-x-4">
+              {/* View Mode Toggle */}
+              <div className="flex items-center space-x-2 border rounded-lg p-1">
+                <Button
+                  variant={viewMode === "list" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("list")}
+                >
+                  <List className="w-4 h-4 mr-2" />
+                  List
+                </Button>
+                <Button
+                  variant={viewMode === "grid" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("grid")}
+                >
+                  <Grid3X3 className="w-4 h-4 mr-2" />
+                  Grid
+                </Button>
               </div>
+
+              {/* Field Visibility Settings (only for list view) */}
+              {viewMode === "list" && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Settings className="w-4 h-4 mr-2" />
+                      Fields
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56">
+                    {Object.entries(visibleFields).map(([field, visible]) => (
+                      <DropdownMenuCheckboxItem
+                        key={field}
+                        checked={visible}
+                        onCheckedChange={(checked) =>
+                          setVisibleFields((prev) => ({ ...prev, [field]: checked }))
+                        }
+                      >
+                        {field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1')}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
-            <div className="flex gap-3">
-              <Select value={positionFilter} onValueChange={setPositionFilter}>
-                <SelectTrigger className="w-40">
-                  <SelectValue placeholder="Position" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Positions</SelectItem>
-                  <SelectItem value="frontend">Frontend Developer</SelectItem>
-                  <SelectItem value="backend">Backend Developer</SelectItem>
-                  <SelectItem value="fullstack">
-                    Full Stack Developer
-                  </SelectItem>
-                  <SelectItem value="designer">Designer</SelectItem>
-                  <SelectItem value="product">Product Manager</SelectItem>
-                  <SelectItem value="data">Data Scientist</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={stageFilter} onValueChange={setStageFilter}>
-                <SelectTrigger className="w-32">
-                  <SelectValue placeholder="Stage" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Stages</SelectItem>
-                  <SelectItem value="screening">Screening</SelectItem>
-                  <SelectItem value="interview">Interview</SelectItem>
-                  <SelectItem value="technical">Technical</SelectItem>
-                  <SelectItem value="final">Final</SelectItem>
-                  <SelectItem value="offer">Offer</SelectItem>
-                  <SelectItem value="rejected">Rejected</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={locationFilter} onValueChange={setLocationFilter}>
-                <SelectTrigger className="w-32">
-                  <SelectValue placeholder="Location" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Locations</SelectItem>
-                  <SelectItem value="remote">Remote</SelectItem>
-                  <SelectItem value="sf">San Francisco</SelectItem>
-                  <SelectItem value="ny">New York</SelectItem>
-                  <SelectItem value="austin">Austin</SelectItem>
-                  <SelectItem value="seattle">Seattle</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button variant="outline" size="sm">
-                <Filter className="w-4 h-4 mr-2" />
-                More Filters
-              </Button>
+
+            {/* Search and Filters */}
+            <div className="flex flex-col lg:flex-row gap-4">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+                  <Input
+                    placeholder="Search candidates by name, position, skills..."
+                    className="pl-10"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="flex gap-3">
+                <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue placeholder="Department" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Departments</SelectItem>
+                    <SelectItem value="engineering">Engineering</SelectItem>
+                    <SelectItem value="product">Product</SelectItem>
+                    <SelectItem value="design">Design</SelectItem>
+                    <SelectItem value="marketing">Marketing</SelectItem>
+                    <SelectItem value="data">Data</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={stageFilter} onValueChange={setStageFilter}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue placeholder="Stage" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Stages</SelectItem>
+                    {stages.map((stage) => (
+                      <SelectItem key={stage} value={stage.toLowerCase()}>
+                        {stage}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={recruiterFilter} onValueChange={setRecruiterFilter}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue placeholder="Recruiter" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Recruiters</SelectItem>
+                    <SelectItem value="alex chen">Alex Chen</SelectItem>
+                    <SelectItem value="sarah kim">Sarah Kim</SelectItem>
+                    <SelectItem value="mike wilson">Mike Wilson</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button variant="outline" size="sm">
+                  <Filter className="w-4 h-4 mr-2" />
+                  More Filters
+                </Button>
+              </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Candidates Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {filteredCandidates.length > 0 ? (
-          filteredCandidates.map((candidate) => (
-            <CandidateCard key={candidate.id} candidate={candidate} />
-          ))
-        ) : (
-          <div className="col-span-full text-center py-12">
-            <User className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-slate-900 mb-2">
-              No candidates found
-            </h3>
-            <p className="text-slate-600">
-              Try adjusting your search or filters to find candidates.
-            </p>
-          </div>
-        )}
-      </div>
+      {/* Content based on view mode */}
+      {viewMode === "list" ? <ListView /> : <GridView />}
 
       {/* Pagination */}
       <div className="flex justify-center">
@@ -588,22 +745,12 @@ export default function Candidates() {
           <Button variant="outline" size="sm" disabled>
             Previous
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="bg-blue-50 text-blue-600"
-          >
+          <Button variant="outline" size="sm" className="bg-blue-50 text-blue-600">
             1
           </Button>
-          <Button variant="outline" size="sm">
-            2
-          </Button>
-          <Button variant="outline" size="sm">
-            3
-          </Button>
-          <Button variant="outline" size="sm">
-            Next
-          </Button>
+          <Button variant="outline" size="sm">2</Button>
+          <Button variant="outline" size="sm">3</Button>
+          <Button variant="outline" size="sm">Next</Button>
         </div>
       </div>
     </div>
