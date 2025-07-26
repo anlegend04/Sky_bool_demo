@@ -88,6 +88,7 @@ type CandidateData = {
 };
 
 export default function Candidates() {
+  const [candidates, setCandidates] = useState<any[]>([]);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const [searchTerm, setSearchTerm] = useState("");
   const [positionFilter, setPositionFilter] = useState("all");
@@ -95,6 +96,48 @@ export default function Candidates() {
   const [locationFilter, setLocationFilter] = useState("all");
   const [departmentFilter, setDepartmentFilter] = useState("all");
   const [recruiterFilter, setRecruiterFilter] = useState("all");
+  const [showMoreFilters, setShowMoreFilters] = useState(false);
+  const { toast } = useToast();
+
+  // Load candidates and user preferences
+  useEffect(() => {
+    let storedCandidates = storage.getCandidates();
+
+    // Add demo data if we don't have enough candidates
+    if (storedCandidates.length < 5) {
+      storage.addDemoData();
+      storedCandidates = storage.getCandidates();
+    }
+
+    setCandidates(storedCandidates);
+
+    // Load user preferences
+    const prefs = storage.getUserPreferences();
+    setDepartmentFilter(prefs.selectedFilters.candidates.department);
+    setStageFilter(prefs.selectedFilters.candidates.stage);
+    setLocationFilter(prefs.selectedFilters.candidates.location);
+    setRecruiterFilter(prefs.selectedFilters.candidates.recruiter);
+    setViewMode(prefs.viewPreferences.candidatesView);
+  }, []);
+
+  // Save user preferences when filters change
+  useEffect(() => {
+    storage.updateUserPreferences({
+      selectedFilters: {
+        ...storage.getUserPreferences().selectedFilters,
+        candidates: {
+          department: departmentFilter,
+          stage: stageFilter,
+          recruiter: recruiterFilter,
+          location: locationFilter,
+        }
+      },
+      viewPreferences: {
+        ...storage.getUserPreferences().viewPreferences,
+        candidatesView: viewMode,
+      }
+    });
+  }, [departmentFilter, stageFilter, recruiterFilter, locationFilter, viewMode]);
 
   // Customizable field visibility for list view
   const [visibleFields, setVisibleFields] = useState({
