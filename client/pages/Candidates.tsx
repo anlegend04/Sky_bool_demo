@@ -60,8 +60,10 @@ import {
   DollarSign,
   Building,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { storage } from "@/lib/storage";
+import { useToast } from "@/hooks/use-toast";
 
 type CandidateData = {
   id: number;
