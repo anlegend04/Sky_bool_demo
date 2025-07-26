@@ -2,8 +2,17 @@ import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { storage } from "@/lib/storage";
 import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
 import {
   Users,
   Briefcase,
@@ -16,6 +25,9 @@ import {
   Search,
   Bell,
   User,
+  UserCircle,
+  LogOut,
+  ChevronDown,
 } from "lucide-react";
 
 interface LayoutProps {
