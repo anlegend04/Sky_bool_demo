@@ -263,11 +263,11 @@ export default function BudgetPanel({ job, onJobUpdate }: BudgetPanelProps) {
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={monthlyData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" allowDuplicatedCategory={false} />
-                <YAxis allowDecimals={false} />
-                <Tooltip formatter={(value) => [`$${value}`, '']} />
-                <Legend />
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="month" allowDuplicatedCategory={false} tickLine={false} />
+                <YAxis allowDecimals={false} tickLine={false} />
+                <Tooltip formatter={(value) => [`$${value}`, '']} cursor={false} />
+                <Legend iconType="line" />
                 <Line
                   type="monotone"
                   dataKey="planned"
