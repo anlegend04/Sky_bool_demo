@@ -1,14 +1,33 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  MapPin,
-  Calendar,
-  DollarSign,
-  Users,
-  Clock,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Progress } from "@/components/ui/progress";
+import { HelpTooltip, helpContent } from "@/components/ui/help-tooltip";
+import {
   ArrowLeft,
   Share,
   Edit,
@@ -17,582 +36,603 @@ import {
   Mail,
   Phone,
   FileText,
+  MapPin,
+  Calendar,
+  DollarSign,
+  Users,
+  Clock,
+  Building,
+  Target,
+  TrendingUp,
+  Plus,
+  Grid3X3,
+  List,
+  AlertCircle,
+  CheckCircle,
+  Pause,
+  User,
+  Activity,
+  Settings,
 } from "lucide-react";
+import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
+import { storage, JobData, CandidateData } from "@/lib/storage";
+import { useToast } from "@/hooks/use-toast";
 
 export default function JobDetail() {
   const { id } = useParams();
+  const [job, setJob] = useState<JobData | null>(null);
+  const [candidates, setCandidates] = useState<CandidateData[]>([]);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [editingField, setEditingField] = useState<string | null>(null);
+  const [tempValue, setTempValue] = useState("");
+  const [showAddStageDialog, setShowAddStageDialog] = useState(false);
+  const [newStage, setNewStage] = useState("");
+  const { toast } = useToast();
 
-  const job = {
-    id: 1,
-    title: "Senior Frontend Developer",
-    department: "Engineering",
-    location: "San Francisco, CA",
-    type: "Full-time",
-    status: "Active",
-    priority: "High",
-    posted: "2 days ago",
-    salary: "$120k - $150k",
-    experience: "5+ years",
-    education: "Bachelor's degree preferred",
-    remote: "Hybrid",
-    timezone: "PST",
-    startDate: "Immediate",
-    deadline: "2024-02-15",
-    hiringManager: "Sarah Johnson",
-    recruiter: "Mike Chen",
-    budget: "$180k",
-    headcount: 2,
-    jobCode: "ENG-2024-001",
-    description:
-      "We're looking for a Senior Frontend Developer to join our growing engineering team. You'll be working on cutting-edge web applications using React, TypeScript, and modern development tools.",
-    requirements: [
-      "5+ years of experience with React and TypeScript",
-      "Strong understanding of modern JavaScript (ES6+)",
-      "Experience with state management (Redux, Zustand, etc.)",
-      "Proficiency with CSS-in-JS or Tailwind CSS",
-      "Experience with testing frameworks (Jest, Vitest, etc.)",
-    ],
-    niceToHave: [
-      "Experience with Next.js or similar frameworks",
-      "Knowledge of GraphQL and Apollo Client",
-      "Previous experience in a fast-paced startup environment",
-      "Open source contributions",
-    ],
-    benefits: [
-      "Competitive salary and equity package",
-      "Comprehensive health, dental, and vision insurance",
-      "401(k) with company matching",
-      "Unlimited PTO policy",
-      "Professional development budget",
-    ],
-    responsibilities: [
-      "Develop and maintain high-quality frontend applications",
-      "Collaborate with design and backend teams",
-      "Participate in code reviews and technical discussions",
-      "Mentor junior developers",
-      "Stay up-to-date with latest frontend technologies",
-    ],
+  const stages = ["Applied", "Screening", "Interview", "Technical", "Offer", "Hired", "Rejected"];
+
+  // Load job and candidates from localStorage
+  useEffect(() => {
+    if (id) {
+      const jobData = storage.getJob(id);
+      if (jobData) {
+        setJob(jobData);
+        // Get candidates for this job
+        const allCandidates = storage.getCandidates();
+        const jobCandidates = allCandidates.filter(c => c.jobId === id || c.position === jobData.position);
+        setCandidates(jobCandidates);
+      }
+    }
+  }, [id]);
+
+  if (!job) {
+    return (
+      <div className="p-6">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-slate-900">Job not found</h2>
+          <p className="text-slate-600 mt-2">The job you're looking for doesn't exist.</p>
+          <Link to="/jobs">
+            <Button className="mt-4">Back to Jobs</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const handleInlineEdit = (field: string, value: any) => {
+    if (!job) return;
+    
+    const updatedJob = storage.updateJob(job.id, { [field]: value });
+    if (updatedJob) {
+      setJob(updatedJob);
+      setEditingField(null);
+      toast({
+        title: "Updated",
+        description: `${field} has been updated successfully.`,
+      });
+    }
   };
 
-  const kanbanColumns = [
-    {
-      id: "applied",
-      title: "Applied",
-      count: 45,
-      candidates: [
-        {
-          id: 1,
-          name: "Sarah Johnson",
-          email: "sarah.j@email.com",
-          avatar: "",
-          rating: 4,
-          appliedDate: "2 days ago",
-        },
-        {
-          id: 2,
-          name: "Michael Chen",
-          email: "m.chen@email.com",
-          avatar: "",
-          rating: 5,
-          appliedDate: "3 days ago",
-        },
-        {
-          id: 3,
-          name: "Emily Davis",
-          email: "emily.d@email.com",
-          avatar: "",
-          rating: 3,
-          appliedDate: "4 days ago",
-        },
-      ],
-    },
-    {
-      id: "screening",
-      title: "Phone Screening",
-      count: 12,
-      candidates: [
-        {
-          id: 4,
-          name: "James Wilson",
-          email: "james.w@email.com",
-          avatar: "",
-          rating: 4,
-          appliedDate: "1 week ago",
-        },
-        {
-          id: 5,
-          name: "Lisa Garcia",
-          email: "lisa.g@email.com",
-          avatar: "",
-          rating: 5,
-          appliedDate: "1 week ago",
-        },
-      ],
-    },
-    {
-      id: "interview",
-      title: "Technical Interview",
-      count: 8,
-      candidates: [
-        {
-          id: 6,
-          name: "David Kim",
-          email: "david.k@email.com",
-          avatar: "",
-          rating: 5,
-          appliedDate: "2 weeks ago",
-        },
-        {
-          id: 7,
-          name: "Anna Martinez",
-          email: "anna.m@email.com",
-          avatar: "",
-          rating: 4,
-          appliedDate: "2 weeks ago",
-        },
-      ],
-    },
-    {
-      id: "final",
-      title: "Final Round",
-      count: 3,
-      candidates: [
-        {
-          id: 8,
-          name: "Robert Taylor",
-          email: "robert.t@email.com",
-          avatar: "",
-          rating: 5,
-          appliedDate: "3 weeks ago",
-        },
-      ],
-    },
-    {
-      id: "offer",
-      title: "Offer Extended",
-      count: 2,
-      candidates: [
-        {
-          id: 9,
-          name: "Jessica Brown",
-          email: "jessica.b@email.com",
-          avatar: "",
-          rating: 5,
-          appliedDate: "1 month ago",
-        },
-      ],
-    },
-  ];
+  const getStageColor = (stage: string) => {
+    switch (stage) {
+      case "Applied": return "bg-blue-50 border-blue-200";
+      case "Screening": return "bg-yellow-50 border-yellow-200";
+      case "Interview": return "bg-purple-50 border-purple-200";
+      case "Technical": return "bg-orange-50 border-orange-200";
+      case "Offer": return "bg-green-50 border-green-200";
+      case "Hired": return "bg-emerald-50 border-emerald-200";
+      case "Rejected": return "bg-red-50 border-red-200";
+      default: return "bg-slate-50 border-slate-200";
+    }
+  };
+
+  const getCandidateStatusColor = (candidate: CandidateData) => {
+    // Green = progressing, Red = blocked, Gray = in review
+    if (candidate.stage === "Hired") return "border-l-green-500";
+    if (candidate.stage === "Rejected") return "border-l-red-500";
+    if (["Interview", "Technical", "Offer"].includes(candidate.stage)) return "border-l-green-500";
+    if (candidate.duration > 7) return "border-l-red-500"; // Blocked if more than 7 days
+    return "border-l-gray-500"; // In review
+  };
+
+  const CandidateCard = ({ candidate }: { candidate: CandidateData }) => (
+    <Card className={`hover:shadow-md transition-shadow border-l-4 ${getCandidateStatusColor(candidate)}`}>
+      <CardContent className="p-4">
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex items-center space-x-3">
+            <Avatar className="w-10 h-10">
+              <AvatarImage src={candidate.avatar} />
+              <AvatarFallback>
+                {candidate.name.split(" ").map(n => n[0]).join("")}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <Link
+                to={`/candidates/${candidate.id}`}
+                className="font-medium text-slate-900 hover:text-blue-600"
+              >
+                {candidate.name}
+              </Link>
+              <p className="text-xs text-slate-600">{candidate.experience}</p>
+            </div>
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm">
+                <MoreHorizontal className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <Link to={`/candidates/${candidate.id}`}>
+                <DropdownMenuItem>
+                  <User className="w-4 h-4 mr-2" />
+                  View Profile
+                </DropdownMenuItem>
+              </Link>
+              <DropdownMenuItem>
+                <Mail className="w-4 h-4 mr-2" />
+                Send Email
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Calendar className="w-4 h-4 mr-2" />
+                Schedule Interview
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        
+        <div className="space-y-2 text-xs text-slate-600">
+          <div className="flex items-center gap-2">
+            <Mail className="w-3 h-3" />
+            {candidate.email}
+          </div>
+          <div className="flex items-center gap-2">
+            <MapPin className="w-3 h-3" />
+            {candidate.location}
+          </div>
+          <div className="flex items-center gap-2">
+            <Clock className="w-3 h-3" />
+            {candidate.duration} days in stage
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
+          <div className="flex items-center space-x-1">
+            {[...Array(5)].map((_, i) => (
+              <Star
+                key={i}
+                className={`w-3 h-3 ${
+                  i < candidate.rating
+                    ? "text-yellow-400 fill-current"
+                    : "text-slate-300"
+                }`}
+              />
+            ))}
+          </div>
+          <Badge variant="outline" className="text-xs">
+            {candidate.source}
+          </Badge>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  const PipelineGridView = () => (
+    <div className="grid grid-cols-1 lg:grid-cols-7 gap-4">
+      {stages.map((stage) => {
+        const stageCandidates = candidates.filter(c => c.stage === stage);
+        return (
+          <div key={stage} className={`rounded-lg border p-4 ${getStageColor(stage)}`}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-sm text-slate-900">{stage}</h3>
+              <Badge variant="outline" className="text-xs">
+                {stageCandidates.length}
+              </Badge>
+            </div>
+            <div className="space-y-3 min-h-[200px]">
+              {stageCandidates.map((candidate) => (
+                <CandidateCard key={candidate.id} candidate={candidate} />
+              ))}
+              {stageCandidates.length === 0 && (
+                <div className="text-center text-slate-400 text-xs py-8">
+                  No candidates
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  const PipelineListView = () => (
+    <Card>
+      <CardContent className="p-6">
+        <div className="space-y-4">
+          {stages.map((stage) => {
+            const stageCandidates = candidates.filter(c => c.stage === stage);
+            return (
+              <div key={stage} className={`rounded-lg border p-4 ${getStageColor(stage)}`}>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-semibold text-slate-900">{stage}</h3>
+                  <Badge variant="outline">
+                    {stageCandidates.length} candidates
+                  </Badge>
+                </div>
+                {stageCandidates.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {stageCandidates.map((candidate) => (
+                      <CandidateCard key={candidate.id} candidate={candidate} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center text-slate-400 py-4">
+                    No candidates in this stage
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  const EditableField = ({ field, value, type = "text" }: { field: string; value: any; type?: string }) => {
+    if (editingField === field) {
+      return (
+        <div className="flex items-center gap-2">
+          <Input
+            value={tempValue}
+            onChange={(e) => setTempValue(e.target.value)}
+            className="h-8"
+            type={type}
+            autoFocus
+          />
+          <Button
+            size="sm"
+            onClick={() => handleInlineEdit(field, tempValue)}
+          >
+            Save
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setEditingField(null)}
+          >
+            Cancel
+          </Button>
+        </div>
+      );
+    }
+
+    return (
+      <span
+        className="cursor-pointer hover:bg-slate-100 px-2 py-1 rounded"
+        onClick={() => {
+          setEditingField(field);
+          setTempValue(value?.toString() || "");
+        }}
+      >
+        {value || "Click to edit"}
+      </span>
+    );
+  };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="sm" asChild>
+      <div className="bg-white border-b border-slate-200 p-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
             <Link to="/jobs">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Jobs
+              <Button variant="ghost" size="sm">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Jobs
+              </Button>
             </Link>
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900">{job.title}</h1>
-            <div className="flex items-center space-x-4 mt-2 text-slate-600">
-              <span>{job.department}</span>
-              <span>•</span>
-              <span className="flex items-center">
-                <MapPin className="w-4 h-4 mr-1" />
-                {job.location}
-              </span>
-              <span>•</span>
-              <span className="flex items-center">
-                <Calendar className="w-4 h-4 mr-1" />
-                Posted {job.posted}
-              </span>
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900">{job.position}</h1>
+              <p className="text-slate-600">{job.department} • {job.location}</p>
             </div>
           </div>
-        </div>
-        <div className="flex space-x-3">
-          <Button variant="outline" size="sm">
-            <Share className="w-4 h-4 mr-2" />
-            Share
-          </Button>
-          <Button variant="outline" size="sm">
-            <Edit className="w-4 h-4 mr-2" />
-            Edit
-          </Button>
-          <Button variant="ghost" size="sm">
-            <MoreHorizontal className="w-4 h-4" />
-          </Button>
+          <div className="flex items-center space-x-2">
+            <Badge
+              variant={job.priority === "High" ? "destructive" : job.priority === "Medium" ? "secondary" : "outline"}
+            >
+              {job.priority} Priority
+            </Badge>
+            <Badge
+              variant={job.status === "Open" ? "default" : job.status === "Closed" ? "outline" : "secondary"}
+            >
+              {job.status}
+            </Badge>
+          </div>
         </div>
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-600">Total Applications</p>
-                <p className="text-2xl font-bold">70</p>
-              </div>
-              <Users className="w-8 h-8 text-blue-500" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-600">In Process</p>
-                <p className="text-2xl font-bold">25</p>
-              </div>
-              <Clock className="w-8 h-8 text-orange-500" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-600">Avg. Rating</p>
-                <p className="text-2xl font-bold">4.2</p>
-              </div>
-              <Star className="w-8 h-8 text-yellow-500" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-600">Salary Range</p>
-                <p className="text-2xl font-bold">{job.salary}</p>
-              </div>
-              <DollarSign className="w-8 h-8 text-green-500" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Main Content */}
-      <Tabs defaultValue="candidates" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="candidates">Candidates Pipeline</TabsTrigger>
-          <TabsTrigger value="details">Job Details</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="candidates" className="space-y-6">
-          {/* Kanban Board */}
-          <div className="overflow-x-auto">
-            <div className="flex space-x-6 min-w-max pb-4">
-              {kanbanColumns.map((column) => (
-                <div key={column.id} className="w-80 flex-shrink-0">
-                  <div className="bg-slate-50 rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-semibold text-slate-900">
-                        {column.title}
-                      </h3>
-                      <Badge variant="secondary">{column.count}</Badge>
-                    </div>
-                    <div className="space-y-3">
-                      {column.candidates.map((candidate) => (
-                        <Card
-                          key={candidate.id}
-                          className="hover:shadow-sm transition-shadow cursor-pointer"
-                        >
-                          <CardContent className="p-4">
-                            <div className="flex items-start space-x-3">
-                              <Avatar className="w-10 h-10">
-                                <AvatarImage src={candidate.avatar} />
-                                <AvatarFallback>
-                                  {candidate.name
-                                    .split(" ")
-                                    .map((n) => n[0])
-                                    .join("")}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div className="flex-1 min-w-0">
-                                <h4 className="font-medium text-slate-900 truncate">
-                                  {candidate.name}
-                                </h4>
-                                <p className="text-sm text-slate-600 truncate">
-                                  {candidate.email}
-                                </p>
-                                <div className="flex items-center justify-between mt-2">
-                                  <div className="flex items-center">
-                                    {[...Array(5)].map((_, i) => (
-                                      <Star
-                                        key={i}
-                                        className={`w-3 h-3 ${
-                                          i < candidate.rating
-                                            ? "text-yellow-400 fill-current"
-                                            : "text-slate-300"
-                                        }`}
-                                      />
-                                    ))}
-                                  </div>
-                                  <span className="text-xs text-slate-500">
-                                    {candidate.appliedDate}
-                                  </span>
-                                </div>
-                                <div className="flex space-x-2 mt-2">
-                                  <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    className="h-6 w-6 p-0"
-                                  >
-                                    <Mail className="w-3 h-3" />
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    className="h-6 w-6 p-0"
-                                  >
-                                    <Phone className="w-3 h-3" />
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    className="h-6 w-6 p-0"
-                                  >
-                                    <FileText className="w-3 h-3" />
-                                  </Button>
-                                </div>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                      {column.candidates.length < column.count && (
-                        <div className="text-center py-4">
-                          <Button variant="ghost" size="sm">
-                            View {column.count - column.candidates.length} more
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="details" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Job Description</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-slate-700 leading-relaxed">
-                    {job.description}
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Key Responsibilities</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {job.responsibilities.map((resp, index) => (
-                      <li key={index} className="flex items-start">
-                        <span className="w-2 h-2 bg-purple-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                        <span className="text-slate-700">{resp}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Required Qualifications</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {job.requirements.map((req, index) => (
-                      <li key={index} className="flex items-start">
-                        <span className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                        <span className="text-slate-700">{req}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Nice to Have</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {job.niceToHave.map((nice, index) => (
-                      <li key={index} className="flex items-start">
-                        <span className="w-2 h-2 bg-amber-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                        <span className="text-slate-700">{nice}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Benefits</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {job.benefits.map((benefit, index) => (
-                      <li key={index} className="flex items-start">
-                        <span className="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                        <span className="text-slate-700">{benefit}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            </div>
-
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Job Information</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-slate-600">
-                      Status
-                    </label>
-                    <div className="mt-1">
-                      <Badge variant="default">{job.status}</Badge>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-slate-600">
-                      Priority
-                    </label>
-                    <div className="mt-1">
-                      <Badge variant="destructive">{job.priority}</Badge>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-slate-600">
-                      Job Code
-                    </label>
-                    <p className="mt-1 text-slate-900">{job.jobCode}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-slate-600">
-                      Employment Type
-                    </label>
-                    <p className="mt-1 text-slate-900">{job.type}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-slate-600">
-                      Work Type
-                    </label>
-                    <p className="mt-1 text-slate-900">{job.remote}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-slate-600">
-                      Salary Range
-                    </label>
-                    <p className="mt-1 text-slate-900">{job.salary}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-slate-600">
-                      Location
-                    </label>
-                    <p className="mt-1 text-slate-900">{job.location}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-slate-600">
-                      Timezone
-                    </label>
-                    <p className="mt-1 text-slate-900">{job.timezone}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-slate-600">
-                      Department
-                    </label>
-                    <p className="mt-1 text-slate-900">{job.department}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-slate-600">
-                      Experience Required
-                    </label>
-                    <p className="mt-1 text-slate-900">{job.experience}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-slate-600">
-                      Education
-                    </label>
-                    <p className="mt-1 text-slate-900">{job.education}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-slate-600">
-                      Start Date
-                    </label>
-                    <p className="mt-1 text-slate-900">{job.startDate}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-slate-600">
-                      Application Deadline
-                    </label>
-                    <p className="mt-1 text-slate-900">{job.deadline}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-slate-600">
-                      Hiring Manager
-                    </label>
-                    <p className="mt-1 text-slate-900">{job.hiringManager}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-slate-600">
-                      Recruiter
-                    </label>
-                    <p className="mt-1 text-slate-900">{job.recruiter}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-slate-600">
-                      Budget
-                    </label>
-                    <p className="mt-1 text-slate-900">{job.budget}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-slate-600">
-                      Headcount
-                    </label>
-                    <p className="mt-1 text-slate-900">
-                      {job.headcount} position(s)
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="analytics">
+      <div className="p-6 space-y-6">
+        {/* Job Details Panel */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Job Summary */}
           <Card>
             <CardHeader>
-              <CardTitle>Analytics & Performance</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                Job Summary
+                <Button variant="ghost" size="sm">
+                  <Edit className="w-4 h-4" />
+                </Button>
+              </CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-slate-600">
-                Analytics dashboard for this job posting will be displayed here.
-              </p>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-slate-700">Description</label>
+                <p className="text-sm text-slate-600 mt-1">{job.description}</p>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-slate-700">Type</label>
+                  <p className="text-sm text-slate-600">{job.type}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-700">Domain</label>
+                  <p className="text-sm text-slate-600">{job.domain}</p>
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-slate-700">Skills Required</label>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {job.expectedSkills.map((skill) => (
+                    <Badge key={skill} variant="secondary" className="text-xs">
+                      {skill}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+
+          {/* Team & Budget */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Team & Budget</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                    Recruiter
+                  </label>
+                  <EditableField field="recruiter" value={job.recruiter} />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-700">Interviewers</label>
+                  <p className="text-sm text-slate-600">{job.interviewers.join(", ")}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                    Headcount
+                    <HelpTooltip content={helpContent.headcount} />
+                  </label>
+                  <EditableField field="headcount" value={job.headcount} type="number" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-700">Hired</label>
+                  <p className="text-sm text-slate-600">{job.hired}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                    Est. Budget
+                    <HelpTooltip content={helpContent.estimatedBudget} />
+                  </label>
+                  <EditableField field="estimatedCost" value={`$${job.estimatedCost}`} />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                    Actual Cost
+                    <HelpTooltip content={helpContent.actualBudget} />
+                  </label>
+                  <EditableField field="actualCost" value={`$${job.actualCost}`} />
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-slate-700">Salary Range</label>
+                <p className="text-sm text-slate-600">${job.salaryMin} - ${job.salaryMax}</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Performance & Timeline */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                Performance & Timeline
+                <HelpTooltip content={helpContent.performanceIndicator} />
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <div className="flex justify-between text-sm mb-2">
+                  <span>Performance Score</span>
+                  <span className="font-medium">{job.performance}%</span>
+                </div>
+                <Progress value={job.performance} className="h-2" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-slate-700">Open Date</label>
+                  <p className="text-sm text-slate-600">{job.openDate}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-700">Deadline</label>
+                  <p className="text-sm text-slate-600">{job.deadline}</p>
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-slate-700">Duration Since Created</label>
+                <p className="text-sm text-slate-600">
+                  {Math.floor((new Date().getTime() - new Date(job.createdAt).getTime()) / (1000 * 60 * 60 * 24))} days
+                </p>
+              </div>
+              <div className="pt-2 border-t">
+                <h4 className="text-sm font-medium text-slate-700 mb-2">Recent Activity</h4>
+                <div className="space-y-2 text-xs text-slate-600">
+                  <div className="flex items-center gap-2">
+                    <Activity className="w-3 h-3" />
+                    Job updated {Math.floor((new Date().getTime() - new Date(job.updatedAt).getTime()) / (1000 * 60 * 60))} hours ago
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <User className="w-3 h-3" />
+                    {job.applications} applications received
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Candidate Pipeline */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  Candidate Pipeline
+                  <HelpTooltip content={helpContent.pipelineSummary} />
+                </CardTitle>
+                <p className="text-sm text-slate-600 mt-1">
+                  Manage candidates grouped by recruitment stages
+                </p>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 border rounded-lg p-1">
+                  <Button
+                    variant={viewMode === "grid" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setViewMode("grid")}
+                  >
+                    <Grid3X3 className="w-4 h-4 mr-2" />
+                    Kanban
+                  </Button>
+                  <Button
+                    variant={viewMode === "list" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setViewMode("list")}
+                  >
+                    <List className="w-4 h-4 mr-2" />
+                    List
+                  </Button>
+                </div>
+                <Button size="sm" onClick={() => setShowAddStageDialog(true)}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Stage
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {viewMode === "grid" ? <PipelineGridView /> : <PipelineListView />}
+          </CardContent>
+        </Card>
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-slate-600">Total Applications</p>
+                  <p className="text-2xl font-bold text-slate-900">{job.applications}</p>
+                </div>
+                <Users className="w-8 h-8 text-blue-600" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-slate-600">In Interview</p>
+                  <p className="text-2xl font-bold text-slate-900">
+                    {candidates.filter(c => ["Interview", "Technical"].includes(c.stage)).length}
+                  </p>
+                </div>
+                <Calendar className="w-8 h-8 text-green-600" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-slate-600">Hired / Target</p>
+                  <p className="text-2xl font-bold text-slate-900">{job.hired} / {job.target}</p>
+                </div>
+                <Target className="w-8 h-8 text-purple-600" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-slate-600">Budget Used</p>
+                  <p className="text-2xl font-bold text-slate-900">
+                    {Math.round((parseInt(job.actualCost) / parseInt(job.estimatedCost)) * 100)}%
+                  </p>
+                </div>
+                <DollarSign className="w-8 h-8 text-orange-600" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Add Custom Stage Dialog */}
+      <Dialog open={showAddStageDialog} onOpenChange={setShowAddStageDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Custom Stage</DialogTitle>
+            <DialogDescription>
+              Add a new stage to the recruitment pipeline for this job.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-slate-700">Stage Name</label>
+              <Input
+                placeholder="e.g., Portfolio Review, Final Interview"
+                value={newStage}
+                onChange={(e) => setNewStage(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={() => setShowAddStageDialog(false)}>
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  // In a real app, you'd add this to the stages array
+                  toast({
+                    title: "Stage Added",
+                    description: `"${newStage}" has been added to the pipeline.`,
+                  });
+                  setShowAddStageDialog(false);
+                  setNewStage("");
+                }}
+              >
+                Add Stage
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
