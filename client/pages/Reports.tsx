@@ -326,8 +326,8 @@ export default function Reports() {
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={recruiterData}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
+                    <XAxis dataKey="name" allowDuplicatedCategory={false} />
+                    <YAxis allowDecimals={false} />
                     <Tooltip />
                     <Legend />
                     <Bar dataKey="applications" fill="#8884d8" name="Applications" />
