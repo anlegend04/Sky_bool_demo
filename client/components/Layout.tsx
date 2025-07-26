@@ -48,6 +48,7 @@ const navigation = [
 export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
   const [unreadCount, setUnreadCount] = useState(0);
+  const { toast } = useToast();
 
   // Update notification count every 5 seconds
   useEffect(() => {
@@ -61,6 +62,28 @@ export default function Layout({ children }: LayoutProps) {
 
     return () => clearInterval(interval);
   }, []);
+
+  const handleQuickAddJob = () => {
+    // Add demo data if needed and redirect
+    storage.addDemoData();
+    toast({
+      title: "Demo Data Added",
+      description: "Sample jobs and candidates have been added for demonstration.",
+    });
+    // In a real app, this would open the Add Job dialog or navigate to create page
+    window.location.href = "/jobs";
+  };
+
+  const handleQuickAddCandidate = () => {
+    // Add demo data if needed and redirect
+    storage.addDemoData();
+    toast({
+      title: "Demo Data Added",
+      description: "Sample jobs and candidates have been added for demonstration.",
+    });
+    // In a real app, this would open the Add Candidate dialog
+    window.location.href = "/candidates";
+  };
 
   return (
     <div className="min-h-screen bg-slate-50">
