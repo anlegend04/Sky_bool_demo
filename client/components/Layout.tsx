@@ -145,7 +145,7 @@ export default function Layout({ children }: LayoutProps) {
               {/* Quick Add Dropdown - Hidden on mobile */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700 hidden sm:flex btn-mobile">
+                  <Button size="sm" className="bg-primary hover:bg-primary/90 hidden sm:flex btn-mobile text-primary-foreground">
                     <Plus className="w-4 h-4 mr-2" />
                     <span className="hidden lg:inline text-wrap-safe">Quick Add</span>
                     <ChevronDown className="w-4 h-4 ml-1" />
