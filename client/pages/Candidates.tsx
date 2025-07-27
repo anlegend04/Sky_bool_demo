@@ -101,24 +101,7 @@ export default function Candidates() {
 
   // Candidates loaded from hardcoded data
 
-  // Save user preferences when filters change
-  useEffect(() => {
-    storage.updateUserPreferences({
-      selectedFilters: {
-        ...storage.getUserPreferences().selectedFilters,
-        candidates: {
-          department: departmentFilter,
-          stage: stageFilter,
-          recruiter: recruiterFilter,
-          location: locationFilter,
-        }
-      },
-      viewPreferences: {
-        ...storage.getUserPreferences().viewPreferences,
-        candidatesView: viewMode,
-      }
-    });
-  }, [departmentFilter, stageFilter, recruiterFilter, locationFilter, viewMode]);
+  // In a real app, this would save user preferences
 
   // Customizable field visibility for list view
   const [visibleFields, setVisibleFields] = useState({
