@@ -132,10 +132,7 @@ export default function Jobs() {
   });
 
   // Load jobs from localStorage on component mount
-  useEffect(() => {
-    const storedJobs = storage.getJobs();
-    setJobs(storedJobs);
-  }, []);
+  // Jobs are loaded from hardcoded data
 
   // Filter jobs based on search and filters
   const filteredJobs = jobs.filter((job) => {
