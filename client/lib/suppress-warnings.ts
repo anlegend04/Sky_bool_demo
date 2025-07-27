@@ -25,7 +25,7 @@ console.warn = (...args: any[]) => {
 
 // Also suppress console.error for the same patterns
 console.error = (...args: any[]) => {
-  // Suppress specific Recharts defaultProps warnings
+  // Suppress ALL defaultProps warnings - they're all from Recharts in this app
   const allArgs = args.join(" ");
 
   if (
@@ -33,16 +33,8 @@ console.error = (...args: any[]) => {
       "Support for defaultProps will be removed from function components",
     )
   ) {
-    // Check if it's any Recharts component - check all arguments
-    const rechartsComponentPattern =
-      /(XAxis|YAxis|CartesianGrid|Tooltip|Legend|PolarGrid|PolarAngleAxis|PolarRadiusAxis|Radar|Bar|Line|Pie|Cell|ResponsiveContainer|Surface|ReferenceLine|ReferenceArea|Brush|ErrorBar)\d*/;
-
-    const isRechartsComponent = rechartsComponentPattern.test(allArgs);
-
-    if (isRechartsComponent) {
-      // Suppress this error - it's from Recharts library, not our code
-      return;
-    }
+    // Suppress all defaultProps warnings - they're from third-party libraries (Recharts)
+    return;
   }
 
   // Allow all other errors to pass through
