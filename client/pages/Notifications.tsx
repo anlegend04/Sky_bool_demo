@@ -38,7 +38,7 @@ import { HARDCODED_NOTIFICATIONS, NotificationData } from "@/data/hardcoded-data
 import { useToast } from "@/hooks/use-toast";
 
 export default function Notifications() {
-  const [notifications, setNotifications] = useState<NotificationData[]>([]);
+  const [notifications] = useState<NotificationData[]>(HARDCODED_NOTIFICATIONS);
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
