@@ -75,29 +75,15 @@ export default function JobDetail() {
 
   const stages = ["Applied", "Screening", "Interview", "Technical", "Offer", "Hired", "Rejected"];
 
-  // Load job and candidates from localStorage
+  // Load job and candidates from hardcoded data
   useEffect(() => {
     if (id) {
-      const jobData = storage.getJob(id);
+      const jobData = getJob(id);
       if (jobData) {
         setJob(jobData);
 
-        // Get all candidates
-        let allCandidates = storage.getCandidates();
-
-        // If we don't have enough candidates, add demo data
-        if (allCandidates.length < 5) {
-          storage.addDemoData();
-          allCandidates = storage.getCandidates();
-        }
-
-        // Get candidates for this job (match by position or jobId)
-        const jobCandidates = allCandidates.filter(c =>
-          c.jobId === id ||
-          c.position === jobData.position ||
-          c.department === jobData.department
-        );
-
+        // Get candidates for this job
+        const jobCandidates = getJobCandidates(id);
         setCandidates(jobCandidates);
       }
     }
