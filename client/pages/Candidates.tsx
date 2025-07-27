@@ -99,26 +99,7 @@ export default function Candidates() {
   const [showMoreFilters, setShowMoreFilters] = useState(false);
   const { toast } = useToast();
 
-  // Load candidates and user preferences
-  useEffect(() => {
-    let storedCandidates = storage.getCandidates();
-
-    // Add demo data if we don't have enough candidates
-    if (storedCandidates.length < 5) {
-      storage.addDemoData();
-      storedCandidates = storage.getCandidates();
-    }
-
-    setCandidates(storedCandidates);
-
-    // Load user preferences
-    const prefs = storage.getUserPreferences();
-    setDepartmentFilter(prefs.selectedFilters.candidates.department);
-    setStageFilter(prefs.selectedFilters.candidates.stage);
-    setLocationFilter(prefs.selectedFilters.candidates.location);
-    setRecruiterFilter(prefs.selectedFilters.candidates.recruiter);
-    setViewMode(prefs.viewPreferences.candidatesView);
-  }, []);
+  // Candidates loaded from hardcoded data
 
   // Save user preferences when filters change
   useEffect(() => {
