@@ -136,7 +136,7 @@ export default function BudgetPanel({ job, onJobUpdate }: BudgetPanelProps) {
       expenses: [...(job.budget?.expenses || []), expense],
     };
 
-    const updatedJob = storage.updateJob(job.id, { budget: updatedBudget });
+    // In a real app, this would update the job budget
     
     if (updatedJob) {
       onJobUpdate(updatedJob);
