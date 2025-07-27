@@ -77,7 +77,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { storage, JobData } from "@/lib/storage";
+import { HARDCODED_JOBS, JobData } from "@/data/hardcoded-data";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Jobs() {
