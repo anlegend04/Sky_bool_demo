@@ -65,27 +65,7 @@ import { Link } from "react-router-dom";
 import { HARDCODED_CANDIDATES, CandidateData } from "@/data/hardcoded-data";
 import { useToast } from "@/hooks/use-toast";
 
-type CandidateData = {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  location: string;
-  position: string;
-  experience: string;
-  skills: string[];
-  status: string;
-  stage: string;
-  rating: number;
-  appliedDate: string;
-  resume: string;
-  avatar: string;
-  salary: string;
-  source: string;
-  recruiter: string;
-  department: string;
-  duration: number; // days in current stage
-};
+// Using the imported CandidateData type from hardcoded-data
 
 export default function Candidates() {
   const [candidates] = useState<CandidateData[]>(HARDCODED_CANDIDATES);
@@ -195,12 +175,12 @@ export default function Candidates() {
   const CandidateCard = ({ candidate }: { candidate: CandidateData }) => (
     <Card className="hover:shadow-md transition-shadow cursor-pointer">
       <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between min-w-0">
           <Link
             to={`/candidates/${candidate.id}`}
-            className="flex items-center space-x-3 hover:bg-slate-100 p-2 rounded-md transition"
+            className="flex items-center space-x-3 hover:bg-slate-100 p-2 rounded-md transition min-w-0 flex-1"
           >
-            <Avatar className="w-10 h-10">
+            <Avatar className="w-10 h-10 flex-shrink-0">
               <AvatarImage src={candidate.avatar} />
               <AvatarFallback>
                 {candidate.name
@@ -209,16 +189,16 @@ export default function Candidates() {
                   .join("")}
               </AvatarFallback>
             </Avatar>
-            <div>
-              <h3 className="font-semibold text-sm text-slate-900">
+            <div className="min-w-0 flex-1">
+              <h3 className="font-semibold text-sm text-slate-900 truncate">
                 {candidate.name}
               </h3>
-              <p className="text-xs text-slate-600">{candidate.position}</p>
+              <p className="text-xs text-slate-600 truncate">{candidate.position}</p>
             </div>
           </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="flex-shrink-0">
                 <MoreHorizontal className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -250,13 +230,13 @@ export default function Candidates() {
         </div>
       </CardHeader>
       <CardContent className="space-y-2">
-        <div className="flex items-center text-xs text-slate-600">
-          <Building className="w-3 h-3 mr-1" />
-          {candidate.department}
+        <div className="flex items-center text-xs text-slate-600 min-w-0">
+          <Building className="w-3 h-3 mr-1 flex-shrink-0" />
+          <span className="truncate">{candidate.department}</span>
         </div>
-        <div className="flex items-center text-xs text-slate-600">
-          <Clock className="w-3 h-3 mr-1" />
-          {candidate.duration} days in stage
+        <div className="flex items-center text-xs text-slate-600 min-w-0">
+          <Clock className="w-3 h-3 mr-1 flex-shrink-0" />
+          <span className="truncate">{candidate.duration} days in stage</span>
         </div>
         <div className="flex items-center justify-between pt-2 border-t border-slate-100">
           <div className="flex items-center space-x-1">
@@ -271,7 +251,7 @@ export default function Candidates() {
               />
             ))}
           </div>
-          <Badge variant="outline" className="text-xs">
+          <Badge variant="outline" className="text-xs truncate max-w-20">
             {candidate.recruiter}
           </Badge>
         </div>
@@ -282,144 +262,147 @@ export default function Candidates() {
   const ListView = () => (
     <Card>
       <CardContent className="p-0">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              {visibleFields.name && <TableHead>Candidate Name</TableHead>}
-              {visibleFields.appliedDate && <TableHead>Applied On</TableHead>}
-              {visibleFields.email && <TableHead>Email</TableHead>}
-              {visibleFields.phone && <TableHead>Phone</TableHead>}
-              {visibleFields.position && <TableHead>Job Position</TableHead>}
-              {visibleFields.recruiter && <TableHead>Recruiter</TableHead>}
-              {visibleFields.stage && <TableHead>Current Stage</TableHead>}
-              {visibleFields.source && <TableHead>Source</TableHead>}
-              {visibleFields.salary && <TableHead>Salary</TableHead>}
-              {visibleFields.location && <TableHead>Location</TableHead>}
-              {visibleFields.department && <TableHead>Department</TableHead>}
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredCandidates.map((candidate) => (
-              <TableRow key={candidate.id} className="hover:bg-slate-50">
-                {visibleFields.name && (
-                  <TableCell>
-                    <Link
-                      to={`/candidates/${candidate.id}`}
-                      className="flex items-center space-x-3 hover:text-blue-600"
-                    >
-                      <Avatar className="w-8 h-8">
-                        <AvatarImage src={candidate.avatar} />
-                        <AvatarFallback className="text-xs">
-                          {candidate.name
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <div className="font-medium">{candidate.name}</div>
-                        <div className="flex items-center space-x-1 mt-1">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`w-3 h-3 ${
-                                i < candidate.rating
-                                  ? "text-yellow-400 fill-current"
-                                  : "text-slate-300"
-                              }`}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    </Link>
-                  </TableCell>
-                )}
-                {visibleFields.appliedDate && (
-                  <TableCell>{candidate.appliedDate}</TableCell>
-                )}
-                {visibleFields.email && (
-                  <TableCell>{candidate.email}</TableCell>
-                )}
-                {visibleFields.phone && (
-                  <TableCell>{candidate.phone}</TableCell>
-                )}
-                {visibleFields.position && (
-                  <TableCell>{candidate.position}</TableCell>
-                )}
-                {visibleFields.recruiter && (
-                  <TableCell>{candidate.recruiter}</TableCell>
-                )}
-                {visibleFields.stage && (
-                  <TableCell>
-                    <Badge
-                      variant={
-                        candidate.stage === "Offer"
-                          ? "default"
-                          : candidate.stage === "Hired"
-                            ? "default"
-                            : candidate.stage === "Technical"
-                              ? "secondary"
-                              : candidate.stage === "Interview"
-                                ? "outline"
-                                : candidate.stage === "Screening"
-                                  ? "secondary"
-                                  : candidate.stage === "Applied"
-                                    ? "outline"
-                                    : "destructive"
-                      }
-                    >
-                      {candidate.stage}
-                    </Badge>
-                  </TableCell>
-                )}
-                {visibleFields.source && (
-                  <TableCell>{candidate.source}</TableCell>
-                )}
-                {visibleFields.salary && (
-                  <TableCell>{candidate.salary}</TableCell>
-                )}
-                {visibleFields.location && (
-                  <TableCell>{candidate.location}</TableCell>
-                )}
-                {visibleFields.department && (
-                  <TableCell>{candidate.department}</TableCell>
-                )}
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm">
-                        <MoreHorizontal className="w-4 h-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <Link to={`/candidates/${candidate.id}`}>
-                        <DropdownMenuItem>
-                          <Eye className="w-4 h-4 mr-2" />
-                          View Details
-                        </DropdownMenuItem>
-                      </Link>
-                      <DropdownMenuItem>
-                        <Edit className="w-4 h-4 mr-2" />
-                        Edit Candidate
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Download className="w-4 h-4 mr-2" />
-                        Download CV
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {visibleFields.name && <TableHead>Candidate Name</TableHead>}
+                {visibleFields.appliedDate && <TableHead>Applied On</TableHead>}
+                {visibleFields.email && <TableHead>Email</TableHead>}
+                {visibleFields.phone && <TableHead>Phone</TableHead>}
+                {visibleFields.position && <TableHead>Job Position</TableHead>}
+                {visibleFields.recruiter && <TableHead>Recruiter</TableHead>}
+                {visibleFields.stage && <TableHead>Current Stage</TableHead>}
+                {visibleFields.source && <TableHead>Source</TableHead>}
+                {visibleFields.salary && <TableHead>Salary</TableHead>}
+                {visibleFields.location && <TableHead>Location</TableHead>}
+                {visibleFields.department && <TableHead>Department</TableHead>}
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {filteredCandidates.map((candidate) => (
+                <TableRow key={candidate.id} className="hover:bg-slate-50">
+                  {visibleFields.name && (
+                    <TableCell>
+                      <Link
+                        to={`/candidates/${candidate.id}`}
+                        className="flex items-center space-x-3 hover:text-blue-600 min-w-0"
+                      >
+                        <Avatar className="w-8 h-8 flex-shrink-0">
+                          <AvatarImage src={candidate.avatar} />
+                          <AvatarFallback className="text-xs">
+                            {candidate.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0 flex-1">
+                          <div className="font-medium truncate">{candidate.name}</div>
+                          <div className="flex items-center space-x-1 mt-1">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`w-3 h-3 ${
+                                  i < candidate.rating
+                                    ? "text-yellow-400 fill-current"
+                                    : "text-slate-300"
+                                }`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      </Link>
+                    </TableCell>
+                  )}
+                  {visibleFields.appliedDate && (
+                    <TableCell className="truncate max-w-32">{candidate.appliedDate}</TableCell>
+                  )}
+                  {visibleFields.email && (
+                    <TableCell className="truncate max-w-48">{candidate.email}</TableCell>
+                  )}
+                  {visibleFields.phone && (
+                    <TableCell className="truncate max-w-32">{candidate.phone}</TableCell>
+                  )}
+                  {visibleFields.position && (
+                    <TableCell className="truncate max-w-40">{candidate.position}</TableCell>
+                  )}
+                  {visibleFields.recruiter && (
+                    <TableCell className="truncate max-w-32">{candidate.recruiter}</TableCell>
+                  )}
+                  {visibleFields.stage && (
+                    <TableCell>
+                      <Badge
+                        variant={
+                          candidate.stage === "Offer"
+                            ? "default"
+                            : candidate.stage === "Hired"
+                              ? "default"
+                              : candidate.stage === "Technical"
+                                ? "secondary"
+                                : candidate.stage === "Interview"
+                                  ? "outline"
+                                  : candidate.stage === "Screening"
+                                    ? "secondary"
+                                    : candidate.stage === "Applied"
+                                      ? "outline"
+                                      : "destructive"
+                        }
+                        className="truncate max-w-24"
+                      >
+                        {candidate.stage}
+                      </Badge>
+                    </TableCell>
+                  )}
+                  {visibleFields.source && (
+                    <TableCell className="truncate max-w-32">{candidate.source}</TableCell>
+                  )}
+                  {visibleFields.salary && (
+                    <TableCell className="truncate max-w-32">{candidate.salary}</TableCell>
+                  )}
+                  {visibleFields.location && (
+                    <TableCell className="truncate max-w-40">{candidate.location}</TableCell>
+                  )}
+                  {visibleFields.department && (
+                    <TableCell className="truncate max-w-40">{candidate.department}</TableCell>
+                  )}
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="flex-shrink-0">
+                          <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <Link to={`/candidates/${candidate.id}`}>
+                          <DropdownMenuItem>
+                            <Eye className="w-4 h-4 mr-2" />
+                            View Details
+                          </DropdownMenuItem>
+                        </Link>
+                        <DropdownMenuItem>
+                          <Edit className="w-4 h-4 mr-2" />
+                          Edit Candidate
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Download className="w-4 h-4 mr-2" />
+                          Download CV
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );
 
   const GridView = () => (
-    <div className="grid grid-cols-1 lg:grid-cols-7 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
       {stages.map((stage) => {
         const stageCandidates = filteredCandidates.filter(
           (candidate) => candidate.stage === stage,
@@ -452,17 +435,17 @@ export default function Candidates() {
   );
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Candidates</h1>
-          <p className="text-slate-600 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Candidates</h1>
+          <p className="text-slate-600 mt-1 text-sm sm:text-base">
             Manage candidate profiles, applications, and track their progress
             through your pipeline.
           </p>
         </div>
-        <div className="flex space-x-3">
+        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
           <Dialog>
             <DialogTrigger asChild>
               <Button size="sm">

@@ -389,18 +389,20 @@ export default function CandidateDetail() {
 
   const StatusTracker = () => {
     const currentStageIndex = stages.findIndex(stage => stage.name === currentStage);
+    const completedStages = stages.filter(s => s.completed).length;
+    const totalStages = stages.length;
     
     return (
-      <Card className="mb-6">
+      <Card className="mb-4 sm:mb-6">
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
+          <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
             <div className="flex items-center gap-2">
-              Application Progress
+              <span className="text-lg sm:text-xl">Application Progress</span>
               <HelpTooltip content={helpContent.effortTime} />
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="w-full sm:w-auto">
                   Update Stage
                 </Button>
               </DropdownMenuTrigger>
@@ -422,11 +424,36 @@ export default function CandidateDetail() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between mb-4">
+          {/* Progress Bar */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-slate-700">Overall Progress</span>
+              <span className="text-sm text-slate-500">{completedStages} of {totalStages} stages</span>
+            </div>
+            <Progress value={(completedStages / totalStages) * 100} className="h-2" />
+          </div>
+
+          {/* Current Stage Highlight */}
+          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center">
+                <Circle className="w-5 h-5 fill-current text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="font-medium text-blue-900 truncate">Current: {currentStage}</h4>
+                <p className="text-sm text-blue-700 truncate">
+                  {stages.find(s => s.name === currentStage)?.notes || "Stage in progress"}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Stages Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             {stages.map((stage, index) => (
-              <div key={stage.name} className="flex flex-col items-center relative">
+              <div key={stage.name} className="text-center">
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${
+                  className={`w-8 h-8 rounded-full flex items-center justify-center border-2 mx-auto mb-2 ${
                     stage.completed
                       ? "bg-green-500 border-green-500 text-white"
                       : index === currentStageIndex
@@ -435,51 +462,49 @@ export default function CandidateDetail() {
                   }`}
                 >
                   {stage.completed ? (
-                    <CheckCircle className="w-5 h-5" />
+                    <CheckCircle className="w-4 h-4" />
                   ) : index === currentStageIndex ? (
-                    <Circle className="w-5 h-5 fill-current" />
+                    <Circle className="w-4 h-4 fill-current" />
                   ) : (
-                    <Circle className="w-5 h-5" />
+                    <Circle className="w-4 h-4" />
                   )}
                 </div>
-                <div className="text-xs font-medium mt-2 text-center">{stage.name}</div>
+                <div className="text-xs font-medium text-slate-700 truncate px-1">{stage.name}</div>
                 {stage.duration > 0 && (
-                  <div className="text-xs text-slate-500 mt-1 flex items-center gap-1">
+                  <div className="text-xs text-slate-500 flex items-center justify-center gap-1 mt-1">
                     <Clock className="w-3 h-3" />
-                    {stage.duration} day{stage.duration !== 1 ? "s" : ""}
+                    <span className="truncate">{stage.duration}d</span>
                   </div>
-                )}
-                {index < stages.length - 1 && (
-                  <div
-                    className={`absolute top-5 left-10 w-full h-0.5 ${
-                      stage.completed ? "bg-green-500" : "bg-slate-300"
-                    }`}
-                    style={{ width: "calc(100% + 20px)" }}
-                  />
                 )}
               </div>
             ))}
           </div>
           
           {/* Stage Details */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-            <div className="flex items-center space-x-2">
-              <Clock className="w-4 h-4 text-slate-500" />
-              <span className="text-sm text-slate-600">
-                Total Time: {stages.reduce((acc, stage) => acc + stage.duration, 0)} days
-              </span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mt-6">
+            <div className="flex items-center space-x-2 p-3 bg-slate-50 rounded-lg">
+              <Clock className="w-4 h-4 text-slate-500 flex-shrink-0" />
+              <div className="min-w-0 flex-1">
+                <span className="text-sm text-slate-600 truncate block">
+                  Total Time: {stages.reduce((acc, stage) => acc + stage.duration, 0)} days
+                </span>
+              </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <Target className="w-4 h-4 text-slate-500" />
-              <span className="text-sm text-slate-600">
-                Current: {currentStage} ({stages.find(s => s.name === currentStage)?.duration || 0} days)
-              </span>
+            <div className="flex items-center space-x-2 p-3 bg-slate-50 rounded-lg">
+              <Target className="w-4 h-4 text-slate-500 flex-shrink-0" />
+              <div className="min-w-0 flex-1">
+                <span className="text-sm text-slate-600 truncate block">
+                  Current: {currentStage} ({stages.find(s => s.name === currentStage)?.duration || 0} days)
+                </span>
+              </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <CheckCircle className="w-4 h-4 text-green-500" />
-              <span className="text-sm text-slate-600">
-                {stages.filter(s => s.completed).length} of {stages.length} completed
-              </span>
+            <div className="flex items-center space-x-2 p-3 bg-slate-50 rounded-lg sm:col-span-2 lg:col-span-1">
+              <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+              <div className="min-w-0 flex-1">
+                <span className="text-sm text-slate-600 truncate block">
+                  {completedStages} of {totalStages} completed
+                </span>
+              </div>
             </div>
           </div>
         </CardContent>
@@ -488,22 +513,22 @@ export default function CandidateDetail() {
   };
 
   const LeftPanel = () => (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Candidate Info */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Avatar className="w-16 h-16">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+            <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
+              <Avatar className="w-16 h-16 mx-auto sm:mx-0">
                 <AvatarImage src={candidate.avatar} />
                 <AvatarFallback className="text-lg">
                   {candidate.name.split(" ").map(n => n[0]).join("")}
                 </AvatarFallback>
               </Avatar>
-              <div>
-                <h2 className="text-xl font-bold text-slate-900">{candidate.name}</h2>
-                <p className="text-slate-600">{candidate.position}</p>
-                <div className="flex items-center space-x-1 mt-1">
+              <div className="text-center sm:text-left min-w-0 flex-1">
+                <h2 className="text-lg sm:text-xl font-bold text-slate-900 truncate">{candidate.name}</h2>
+                <p className="text-sm sm:text-base text-slate-600 truncate">{candidate.position}</p>
+                <div className="flex items-center justify-center sm:justify-start space-x-1 mt-1">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
@@ -519,8 +544,9 @@ export default function CandidateDetail() {
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  <MoreHorizontal className="w-4 h-4" />
+                <Button variant="ghost" size="sm" className="w-full sm:w-auto">
+                  <MoreHorizontal className="w-4 h-4 mr-2" />
+                  Actions
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -541,38 +567,38 @@ export default function CandidateDetail() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 gap-3">
-            <div className="flex items-center space-x-3">
-              <Mail className="w-4 h-4 text-slate-500" />
-              <span className="text-sm">{candidate.email}</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="flex items-center space-x-3 min-w-0">
+              <Mail className="w-4 h-4 text-slate-500 flex-shrink-0" />
+              <span className="text-sm truncate">{candidate.email}</span>
             </div>
-            <div className="flex items-center space-x-3">
-              <Phone className="w-4 h-4 text-slate-500" />
-              <span className="text-sm">{candidate.phone}</span>
+            <div className="flex items-center space-x-3 min-w-0">
+              <Phone className="w-4 h-4 text-slate-500 flex-shrink-0" />
+              <span className="text-sm truncate">{candidate.phone}</span>
             </div>
-            <div className="flex items-center space-x-3">
-              <MapPin className="w-4 h-4 text-slate-500" />
-              <span className="text-sm">{candidate.location}</span>
+            <div className="flex items-center space-x-3 min-w-0 sm:col-span-2">
+              <MapPin className="w-4 h-4 text-slate-500 flex-shrink-0" />
+              <span className="text-sm truncate">{candidate.location}</span>
             </div>
-            <div className="flex items-center space-x-3">
-              <Briefcase className="w-4 h-4 text-slate-500" />
-              <span className="text-sm">{candidate.position}</span>
+            <div className="flex items-center space-x-3 min-w-0">
+              <Briefcase className="w-4 h-4 text-slate-500 flex-shrink-0" />
+              <span className="text-sm truncate">{candidate.position}</span>
             </div>
-            <div className="flex items-center space-x-3">
-              <Building2 className="w-4 h-4 text-slate-500" />
-              <span className="text-sm">{candidate.department}</span>
+            <div className="flex items-center space-x-3 min-w-0">
+              <Building2 className="w-4 h-4 text-slate-500 flex-shrink-0" />
+              <span className="text-sm truncate">{candidate.department}</span>
             </div>
-            <div className="flex items-center space-x-3">
-              <User className="w-4 h-4 text-slate-500" />
-              <span className="text-sm">Recruiter: {candidate.recruiter}</span>
+            <div className="flex items-center space-x-3 min-w-0">
+              <User className="w-4 h-4 text-slate-500 flex-shrink-0" />
+              <span className="text-sm truncate">Recruiter: {candidate.recruiter}</span>
             </div>
-            <div className="flex items-center space-x-3">
-              <DollarSign className="w-4 h-4 text-slate-500" />
-              <span className="text-sm">{candidate.salary}</span>
+            <div className="flex items-center space-x-3 min-w-0">
+              <DollarSign className="w-4 h-4 text-slate-500 flex-shrink-0" />
+              <span className="text-sm truncate">{candidate.salary}</span>
             </div>
-            <div className="flex items-center space-x-3">
-              <GraduationCap className="w-4 h-4 text-slate-500" />
-              <span className="text-sm">Experience: {candidate.experience}</span>
+            <div className="flex items-center space-x-3 min-w-0">
+              <GraduationCap className="w-4 h-4 text-slate-500 flex-shrink-0" />
+              <span className="text-sm truncate">Experience: {candidate.experience}</span>
             </div>
           </div>
 
@@ -580,7 +606,7 @@ export default function CandidateDetail() {
             <h4 className="font-medium text-slate-900 mb-2">Skills</h4>
             <div className="flex flex-wrap gap-2">
               {candidate.skills.map((skill) => (
-                <Badge key={skill} variant="secondary">
+                <Badge key={skill} variant="secondary" className="truncate max-w-full">
                   {skill}
                 </Badge>
               ))}
@@ -591,7 +617,7 @@ export default function CandidateDetail() {
             <h4 className="font-medium text-slate-900 mb-2">Tags</h4>
             <div className="flex flex-wrap gap-2">
               {candidate.tags.map((tag) => (
-                <Badge key={tag} variant="outline">
+                <Badge key={tag} variant="outline" className="truncate max-w-full">
                   {tag}
                 </Badge>
               ))}
@@ -605,15 +631,15 @@ export default function CandidateDetail() {
               <HelpTooltip content="Click to view the full resume document" />
             </h4>
             <div className="border border-slate-200 rounded-lg p-4 bg-slate-50">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <FileText className="w-8 h-8 text-slate-500" />
-                  <div>
-                    <p className="font-medium text-sm">{candidate.resume}</p>
-                    <p className="text-xs text-slate-500">PDF Document</p>
+              <div className="flex items-center justify-between min-w-0">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <FileText className="w-8 h-8 text-slate-500 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-sm truncate">{candidate.resume}</p>
+                    <p className="text-xs text-slate-500 truncate">PDF Document</p>
                   </div>
                 </div>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="flex-shrink-0">
                   <Eye className="w-4 h-4 mr-2" />
                   View
                 </Button>
@@ -626,32 +652,34 @@ export default function CandidateDetail() {
       {/* Quick Actions */}
       <Card>
         <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
+          <CardTitle className="text-lg sm:text-xl">Quick Actions</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <Button className="w-full justify-start" variant="outline">
-            <Video className="w-4 h-4 mr-2" />
-            Schedule Video Interview
-          </Button>
-          <Button className="w-full justify-start" variant="outline">
-            <Phone className="w-4 h-4 mr-2" />
-            Schedule Phone Call
-          </Button>
-          <Button className="w-full justify-start" variant="outline">
-            <CalendarIcon className="w-4 h-4 mr-2" />
-            Schedule In-Person Meeting
-          </Button>
-          <Button className="w-full justify-start" variant="outline">
-            <FileText className="w-4 h-4 mr-2" />
-            Send Assessment
-          </Button>
+        <CardContent className="space-y-2 sm:space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+            <Button className="w-full justify-start text-sm" variant="outline">
+              <Video className="w-4 h-4 mr-2 flex-shrink-0" />
+              <span className="truncate">Schedule Video Interview</span>
+            </Button>
+            <Button className="w-full justify-start text-sm" variant="outline">
+              <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
+              <span className="truncate">Schedule Phone Call</span>
+            </Button>
+            <Button className="w-full justify-start text-sm" variant="outline">
+              <CalendarIcon className="w-4 h-4 mr-2 flex-shrink-0" />
+              <span className="truncate">Schedule In-Person Meeting</span>
+            </Button>
+            <Button className="w-full justify-start text-sm" variant="outline">
+              <FileText className="w-4 h-4 mr-2 flex-shrink-0" />
+              <span className="truncate">Send Assessment</span>
+            </Button>
+          </div>
           <Button 
-            className="w-full justify-start" 
+            className="w-full justify-start text-sm" 
             variant="outline"
             onClick={() => setShowEmailDialog(true)}
           >
-            <Mail className="w-4 h-4 mr-2" />
-            Send Email
+            <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
+            <span className="truncate">Send Email</span>
           </Button>
         </CardContent>
       </Card>
@@ -659,14 +687,14 @@ export default function CandidateDetail() {
   );
 
   const CenterPanel = () => (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <StatusTracker />
 
       {/* Notes and Activities */}
       <Tabs defaultValue="notes" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="notes">Notes & Timeline</TabsTrigger>
-          <TabsTrigger value="activities">Activity Log</TabsTrigger>
+          <TabsTrigger value="notes" className="text-sm sm:text-base">Notes & Timeline</TabsTrigger>
+          <TabsTrigger value="activities" className="text-sm sm:text-base">Activity Log</TabsTrigger>
         </TabsList>
         
         <TabsContent value="notes" className="space-y-4">
@@ -771,26 +799,26 @@ export default function CandidateDetail() {
   );
 
   const RightPanel = () => (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Send Email Section */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
             Send Email
             <HelpTooltip content={helpContent.template} />
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-3 sm:space-y-4">
           <Button 
-            className="w-full justify-start" 
+            className="w-full justify-start text-sm" 
             onClick={() => setShowEmailDialog(true)}
           >
-            <Mail className="w-4 h-4 mr-2" />
-            Compose Email
+            <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
+            <span className="truncate">Compose Email</span>
           </Button>
           
-          <div className="pt-4 border-t">
-            <h4 className="font-medium text-slate-900 mb-2 flex items-center gap-2">
+          <div className="pt-3 sm:pt-4 border-t">
+            <h4 className="font-medium text-slate-900 mb-2 flex items-center gap-2 text-sm sm:text-base">
               Quick Templates
               <HelpTooltip content={helpContent.template} />
             </h4>
@@ -798,38 +826,38 @@ export default function CandidateDetail() {
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="w-full justify-start"
+                className="w-full justify-start text-sm"
                 onClick={() => {
                   handleTemplateSelect("interview_invitation");
                   setEmailSubject(`Interview Invitation - ${candidate.position}`);
                   setShowEmailDialog(true);
                 }}
               >
-                Interview Invitation
+                <span className="truncate">Interview Invitation</span>
               </Button>
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="w-full justify-start"
+                className="w-full justify-start text-sm"
                 onClick={() => {
                   handleTemplateSelect("offer_letter");
                   setEmailSubject(`Job Offer - ${candidate.position}`);
                   setShowEmailDialog(true);
                 }}
               >
-                Offer Letter
+                <span className="truncate">Offer Letter</span>
               </Button>
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="w-full justify-start"
+                className="w-full justify-start text-sm"
                 onClick={() => {
                   handleTemplateSelect("rejection_notice");
                   setEmailSubject(`Thank you for your application - ${candidate.position}`);
                   setShowEmailDialog(true);
                 }}
               >
-                Rejection Notice
+                <span className="truncate">Rejection Notice</span>
               </Button>
             </div>
           </div>
@@ -839,22 +867,22 @@ export default function CandidateDetail() {
       {/* Email History */}
       <Card>
         <CardHeader>
-          <CardTitle>Email History</CardTitle>
+          <CardTitle className="text-lg sm:text-xl">Email History</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {emailHistory.map((email) => (
               <div key={email.id} className="p-3 border border-slate-200 rounded-lg hover:bg-slate-50">
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-medium text-sm text-slate-900 truncate flex items-center gap-2">
-                    {email.subject}
-                    <Badge variant={email.status === "sent" ? "default" : "secondary"} className="text-xs">
+                <div className="flex items-center justify-between mb-2 min-w-0">
+                  <h4 className="font-medium text-sm text-slate-900 truncate flex items-center gap-2 min-w-0 flex-1">
+                    <span className="truncate">{email.subject}</span>
+                    <Badge variant={email.status === "sent" ? "default" : "secondary"} className="text-xs flex-shrink-0">
                       {email.status}
                     </Badge>
                   </h4>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm">
+                      <Button variant="ghost" size="sm" className="flex-shrink-0">
                         <MoreHorizontal className="w-4 h-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -874,13 +902,13 @@ export default function CandidateDetail() {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
-                <p className="text-xs text-slate-600 mb-1">
+                <p className="text-xs text-slate-600 mb-1 truncate">
                   From: {email.from}
                 </p>
                 <p className="text-xs text-slate-600 mb-2">
                   {email.timestamp}
                 </p>
-                <p className="text-xs text-slate-600 truncate">
+                <p className="text-xs text-slate-600 line-clamp-2">
                   {email.content}
                 </p>
               </div>
@@ -892,34 +920,34 @@ export default function CandidateDetail() {
       {/* Attachments */}
       <Card>
         <CardHeader>
-          <CardTitle>Attachments</CardTitle>
+          <CardTitle className="text-lg sm:text-xl">Attachments</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             <div className="flex items-center justify-between p-3 border border-slate-200 rounded-lg">
-              <div className="flex items-center space-x-3">
-                <FileText className="w-4 h-4 text-slate-500" />
-                <span className="text-sm font-medium">Resume.pdf</span>
+              <div className="flex items-center space-x-3 min-w-0 flex-1">
+                <FileText className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                <span className="text-sm font-medium truncate">Resume.pdf</span>
               </div>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="flex-shrink-0">
                 <Download className="w-4 h-4" />
               </Button>
             </div>
             <div className="flex items-center justify-between p-3 border border-slate-200 rounded-lg">
-              <div className="flex items-center space-x-3">
-                <FileText className="w-4 h-4 text-slate-500" />
-                <span className="text-sm font-medium">Cover_Letter.pdf</span>
+              <div className="flex items-center space-x-3 min-w-0 flex-1">
+                <FileText className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                <span className="text-sm font-medium truncate">Cover_Letter.pdf</span>
               </div>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="flex-shrink-0">
                 <Download className="w-4 h-4" />
               </Button>
             </div>
             <div className="flex items-center justify-between p-3 border border-slate-200 rounded-lg">
-              <div className="flex items-center space-x-3">
-                <FileText className="w-4 h-4 text-slate-500" />
-                <span className="text-sm font-medium">Portfolio.pdf</span>
+              <div className="flex items-center space-x-3 min-w-0 flex-1">
+                <FileText className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                <span className="text-sm font-medium truncate">Portfolio.pdf</span>
               </div>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="flex-shrink-0">
                 <Download className="w-4 h-4" />
               </Button>
             </div>
@@ -932,28 +960,28 @@ export default function CandidateDetail() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <div className="bg-white border-b border-slate-200 p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+      <div className="bg-white border-b border-slate-200 p-3 sm:p-4 lg:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+          <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
             <Link to="/candidates">
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="w-full sm:w-auto">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Candidates
               </Button>
             </Link>
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">Candidate Profile</h1>
-              <p className="text-slate-600">Manage candidate information and track progress</p>
+              <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Candidate Profile</h1>
+              <p className="text-sm sm:text-base text-slate-600">Manage candidate information and track progress</p>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <Badge variant="outline" className="flex items-center gap-1">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
+            <Badge variant="outline" className="flex items-center gap-1 w-full sm:w-auto justify-center sm:justify-start">
               <span className="text-slate-600">{candidate.source}</span>
               <HelpTooltip content={helpContent.source} />
             </Badge>
             <Badge
               variant={currentStage === "Hired" ? "default" : currentStage === "Rejected" ? "destructive" : "secondary"}
-              className="flex items-center gap-1"
+              className="flex items-center gap-1 w-full sm:w-auto justify-center sm:justify-start"
             >
               {currentStage}
               <HelpTooltip content={helpContent.stage} />
@@ -962,19 +990,19 @@ export default function CandidateDetail() {
         </div>
       </div>
 
-      {/* Three-Panel Layout */}
-      <div className="p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Panel */}
+      {/* Responsive Layout */}
+      <div className="p-3 sm:p-4 lg:p-6 space-y-6 lg:space-y-0 lg:grid lg:grid-cols-12 lg:gap-6">
+        {/* Left Panel - Full width on mobile, 3 columns on desktop */}
         <div className="lg:col-span-3">
           <LeftPanel />
         </div>
 
-        {/* Center Panel */}
+        {/* Center Panel - Full width on mobile, 6 columns on desktop */}
         <div className="lg:col-span-6">
           <CenterPanel />
         </div>
 
-        {/* Right Panel */}
+        {/* Right Panel - Full width on mobile, 3 columns on desktop */}
         <div className="lg:col-span-3">
           <RightPanel />
         </div>
@@ -1019,13 +1047,13 @@ export default function CandidateDetail() {
 
       {/* Email Compose Dialog */}
       <Dialog open={showEmailDialog} onOpenChange={setShowEmailDialog}>
-        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+            <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
               Compose Email
               <HelpTooltip content={helpContent.template} />
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-sm sm:text-base">
               Send an email to {candidate.name} ({candidate.email})
             </DialogDescription>
           </DialogHeader>

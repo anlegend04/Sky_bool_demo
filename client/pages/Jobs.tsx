@@ -99,7 +99,7 @@ export default function Jobs() {
     department: "",
     location: "",
     position: "",
-    type: "Full-time" as const,
+    type: "Full-time" as "Full-time" | "Part-time" | "Contract",
     expectedSkills: [] as string[],
     salaryMin: "",
     salaryMax: "",
@@ -108,7 +108,7 @@ export default function Jobs() {
     recruiter: "",
     interviewers: [] as string[],
     description: "",
-    priority: "Medium" as const,
+    priority: "Medium" as "High" | "Medium" | "Low",
     deadline: "",
     estimatedCost: "",
   });
@@ -240,7 +240,7 @@ export default function Jobs() {
 
       toast({
         title: "Job Created",
-        description: `"${createdJob.position}" has been successfully created.`,
+        description: `"${newJob.position}" has been successfully created.`,
       });
     } catch (error) {
       toast({
@@ -258,7 +258,7 @@ export default function Jobs() {
       department: job.department,
       location: job.location,
       position: job.position,
-      type: job.type,
+      type: job.type as "Full-time" | "Part-time" | "Contract",
       expectedSkills: job.expectedSkills,
       salaryMin: job.salaryMin,
       salaryMax: job.salaryMax,
@@ -267,7 +267,7 @@ export default function Jobs() {
       recruiter: job.recruiter,
       interviewers: job.interviewers,
       description: job.description,
-      priority: job.priority,
+      priority: job.priority as "High" | "Medium" | "Low",
       deadline: job.deadline,
       estimatedCost: job.estimatedCost,
     });
@@ -368,73 +368,75 @@ export default function Jobs() {
   };
 
   const JobCard = ({ job }: { job: JobData }) => (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
+    <Card className="hover:shadow-md transition-shadow card-responsive">
+      <CardHeader className="pb-3 card-mobile">
+        <div className="flex items-start justify-between min-w-0">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-2 min-w-0">
               <Link
                 to={`/jobs/${job.id}`}
-                className="font-semibold text-slate-900 hover:text-blue-600 transition-colors"
+                className="font-semibold text-slate-900 hover:text-blue-600 transition-colors text-wrap-safe min-w-0 flex-1 truncate"
               >
                 {job.position}
               </Link>
-              {getPriorityBadge(job.priority)}
+              <div className="flex-shrink-0">
+                {getPriorityBadge(job.priority)}
+              </div>
             </div>
-            <p className="text-sm text-slate-600 mb-2">{job.department}</p>
-            <div className="flex items-center gap-4 text-xs text-slate-500">
-              <span className="flex items-center gap-1">
-                <MapPin className="w-3 h-3" />
-                {job.location}
+            <p className="text-responsive-sm text-slate-600 mb-2 text-wrap-safe truncate">{job.department}</p>
+            <div className="flex items-center gap-4 text-responsive-sm text-slate-500 min-w-0">
+              <span className="flex items-center gap-1 text-wrap-safe min-w-0 flex-1">
+                <MapPin className="icon-mobile flex-shrink-0" />
+                <span className="truncate">{job.location}</span>
               </span>
-              <span className="flex items-center gap-1">
-                <Calendar className="w-3 h-3" />
-                {job.deadline}
+              <span className="flex items-center gap-1 text-wrap-safe min-w-0 flex-1">
+                <Calendar className="icon-mobile flex-shrink-0" />
+                <span className="truncate">{job.deadline}</span>
               </span>
             </div>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="icon-mobile flex-shrink-0">
                 <MoreHorizontal className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className="dropdown-mobile">
               <Link to={`/jobs/${job.id}`}>
-                <DropdownMenuItem>
-                  <Eye className="w-4 h-4 mr-2" />
+                <DropdownMenuItem className="text-wrap-safe">
+                  <Eye className="icon-mobile mr-2" />
                   View Details
                 </DropdownMenuItem>
               </Link>
-              <DropdownMenuItem onClick={() => handleEditJob(job)}>
-                <Edit className="w-4 h-4 mr-2" />
+              <DropdownMenuItem onClick={() => handleEditJob(job)} className="text-wrap-safe">
+                <Edit className="icon-mobile mr-2" />
                 Edit Job
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setShareJobId(job.id)}>
-                <Share className="w-4 h-4 mr-2" />
+              <DropdownMenuItem onClick={() => setShareJobId(job.id)} className="text-wrap-safe">
+                <Share className="icon-mobile mr-2" />
                 Share
               </DropdownMenuItem>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <DropdownMenuItem
-                    className="text-red-600"
+                    className="text-red-600 text-wrap-safe"
                     onSelect={(e) => e.preventDefault()}
                   >
-                    <Trash2 className="w-4 h-4 mr-2" />
+                    <Trash2 className="icon-mobile mr-2" />
                     Delete
                   </DropdownMenuItem>
                 </AlertDialogTrigger>
-                <AlertDialogContent>
+                <AlertDialogContent className="modal-mobile">
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Delete Job</AlertDialogTitle>
-                    <AlertDialogDescription>
+                    <AlertDialogTitle className="text-wrap-safe">Delete Job</AlertDialogTitle>
+                    <AlertDialogDescription className="text-wrap-safe">
                       Are you sure you want to delete "{job.position}"? This
                       action cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => handleDeleteJob(job.id)}>
+                    <AlertDialogCancel className="btn-mobile">Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => handleDeleteJob(job.id)} className="btn-mobile">
                       Delete
                     </AlertDialogAction>
                   </AlertDialogFooter>
@@ -444,45 +446,47 @@ export default function Jobs() {
           </DropdownMenu>
         </div>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-3 card-mobile">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-slate-600">Applications</span>
-          <Badge variant="outline">{job.applications}</Badge>
+          <span className="text-responsive-sm text-slate-600 text-wrap-safe">Applications</span>
+          <Badge variant="outline" className="badge-mobile">{job.applications}</Badge>
         </div>
 
         <div className="space-y-2">
-          <div className="flex justify-between text-xs">
-            <span>Pipeline Summary</span>
-            <span>
+          <div className="flex justify-between text-responsive-sm">
+            <span className="text-wrap-safe">Pipeline Summary</span>
+            <span className="text-wrap-safe">
               {job.pipelineSummary.hired}/{job.target} hired
             </span>
           </div>
-          <div className="grid grid-cols-3 gap-1 text-xs">
+          <div className="grid grid-cols-3 gap-1 text-responsive-sm">
             <div className="text-center p-1 bg-blue-50 rounded">
-              <div className="font-medium">{job.pipelineSummary.applied}</div>
-              <div className="text-slate-600">Applied</div>
+              <div className="font-medium text-wrap-safe">{job.pipelineSummary.applied}</div>
+              <div className="text-slate-600 text-wrap-safe">Applied</div>
             </div>
             <div className="text-center p-1 bg-yellow-50 rounded">
-              <div className="font-medium">{job.pipelineSummary.interview}</div>
-              <div className="text-slate-600">Interview</div>
+              <div className="font-medium text-wrap-safe">{job.pipelineSummary.interview}</div>
+              <div className="text-slate-600 text-wrap-safe">Interview</div>
             </div>
             <div className="text-center p-1 bg-green-50 rounded">
-              <div className="font-medium">{job.pipelineSummary.hired}</div>
-              <div className="text-slate-600">Hired</div>
+              <div className="font-medium text-wrap-safe">{job.pipelineSummary.hired}</div>
+              <div className="text-slate-600 text-wrap-safe">Hired</div>
             </div>
           </div>
         </div>
 
         <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-          <div className="flex items-center gap-2">
-            {getStatusBadge(job.status)}
-            <span className="text-xs text-slate-500">by {job.recruiter}</span>
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <div className="flex-shrink-0">
+              {getStatusBadge(job.status)}
+            </div>
+            <span className="text-responsive-sm text-slate-500 text-wrap-safe truncate">by {job.recruiter}</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-shrink-0">
             <TrendingUp
-              className={`w-4 h-4 ${getPerformanceColor(job.performance)}`}
+              className={`icon-mobile ${getPerformanceColor(job.performance)}`}
             />
-            <span className={`text-xs ${getPerformanceColor(job.performance)}`}>
+            <span className={`text-responsive-sm ${getPerformanceColor(job.performance)} text-wrap-safe`}>
               {job.performance}%
             </span>
           </div>
@@ -494,199 +498,202 @@ export default function Jobs() {
   const ListView = () => (
     <Card>
       <CardContent className="p-0">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              {visibleFields.position && <TableHead>Job Position</TableHead>}
-              {visibleFields.department && <TableHead>Department</TableHead>}
-              {visibleFields.recruiter && <TableHead>Recruiter</TableHead>}
-              {visibleFields.priority && <TableHead>Priority</TableHead>}
-              {visibleFields.applications && (
-                <TableHead>Applications</TableHead>
-              )}
-              {visibleFields.target && <TableHead>Target</TableHead>}
-              {visibleFields.hired && <TableHead>Hired</TableHead>}
-              {visibleFields.process && <TableHead>Process</TableHead>}
-              {visibleFields.pipelineSummary && (
-                <TableHead>Pipeline Summary</TableHead>
-              )}
-              {visibleFields.openDate && <TableHead>Open Date</TableHead>}
-              {visibleFields.deadline && <TableHead>Deadline</TableHead>}
-              {visibleFields.estimatedCost && <TableHead>Est. Cost</TableHead>}
-              {visibleFields.actualCost && <TableHead>Actual Cost</TableHead>}
-              {visibleFields.performance && <TableHead>Performance</TableHead>}
-              <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredJobs.map((job) => (
-              <TableRow key={job.id} className="hover:bg-slate-50">
-                {visibleFields.position && (
-                  <TableCell>
-                    <Link
-                      to={`/jobs/${job.id}`}
-                      className="font-medium hover:text-blue-600"
-                    >
-                      {job.position}
-                    </Link>
-                  </TableCell>
-                )}
-                {visibleFields.department && (
-                  <TableCell>{job.department}</TableCell>
-                )}
-                {visibleFields.recruiter && (
-                  <TableCell>{job.recruiter}</TableCell>
-                )}
-                {visibleFields.priority && (
-                  <TableCell>{getPriorityBadge(job.priority)}</TableCell>
-                )}
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {visibleFields.position && <TableHead>Job Position</TableHead>}
+                {visibleFields.department && <TableHead>Department</TableHead>}
+                {visibleFields.recruiter && <TableHead>Recruiter</TableHead>}
+                {visibleFields.priority && <TableHead>Priority</TableHead>}
                 {visibleFields.applications && (
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      <Users className="w-4 h-4 text-slate-500" />
-                      <span>{job.applications}</span>
-                    </div>
-                  </TableCell>
+                  <TableHead>Applications</TableHead>
                 )}
-                {visibleFields.target && (
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      <Target className="w-4 h-4 text-slate-500" />
-                      <span>{job.target}</span>
-                    </div>
-                  </TableCell>
-                )}
-                {visibleFields.hired && (
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                      <span>{job.hired}</span>
-                    </div>
-                  </TableCell>
-                )}
-                {visibleFields.process && (
-                  <TableCell>
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-xs">
-                        <span>
-                          {job.hired}/{job.target}
-                        </span>
-                        <span>
-                          {Math.round((job.hired / job.target) * 100)}%
-                        </span>
-                      </div>
-                      <Progress
-                        value={(job.hired / job.target) * 100}
-                        className="h-2"
-                      />
-                    </div>
-                  </TableCell>
-                )}
+                {visibleFields.target && <TableHead>Target</TableHead>}
+                {visibleFields.hired && <TableHead>Hired</TableHead>}
+                {visibleFields.process && <TableHead>Process</TableHead>}
                 {visibleFields.pipelineSummary && (
-                  <TableCell>
-                    <div className="text-xs space-y-1">
-                      <div>{job.pipelineSummary.applied} Applied</div>
-                      <div>{job.pipelineSummary.interview} Interviewing</div>
-                      <div className="font-medium text-green-600">
-                        {job.pipelineSummary.hired} Hired
-                      </div>
-                    </div>
-                  </TableCell>
+                  <TableHead>Pipeline Summary</TableHead>
                 )}
-                {visibleFields.openDate && (
-                  <TableCell>{job.openDate}</TableCell>
-                )}
-                {visibleFields.deadline && (
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      <Calendar className="w-4 h-4 text-slate-500" />
-                      <span>{job.deadline}</span>
-                    </div>
-                  </TableCell>
-                )}
-                {visibleFields.estimatedCost && (
-                  <TableCell>${job.estimatedCost}</TableCell>
-                )}
-                {visibleFields.actualCost && (
-                  <TableCell>${job.actualCost}</TableCell>
-                )}
-                {visibleFields.performance && (
-                  <TableCell>
-                    <div className="flex items-center space-x-2">
-                      <TrendingUp
-                        className={`w-4 h-4 ${getPerformanceColor(job.performance)}`}
-                      />
-                      <span className={getPerformanceColor(job.performance)}>
-                        {job.performance}%
-                      </span>
-                    </div>
-                  </TableCell>
-                )}
-                <TableCell>{getStatusBadge(job.status)}</TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm">
-                        <MoreHorizontal className="w-4 h-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <Link to={`/jobs/${job.id}`}>
-                        <DropdownMenuItem>
-                          <Eye className="w-4 h-4 mr-2" />
-                          View Details
-                        </DropdownMenuItem>
-                      </Link>
-                      <DropdownMenuItem onClick={() => handleEditJob(job)}>
-                        <Edit className="w-4 h-4 mr-2" />
-                        Edit Job
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setShareJobId(job.id)}>
-                        <Share className="w-4 h-4 mr-2" />
-                        Share
-                      </DropdownMenuItem>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <DropdownMenuItem
-                            className="text-red-600"
-                            onSelect={(e) => e.preventDefault()}
-                          >
-                            <Trash2 className="w-4 h-4 mr-2" />
-                            Delete
-                          </DropdownMenuItem>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete Job</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to delete "{job.position}"?
-                              This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDeleteJob(job.id)}
-                            >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
+                {visibleFields.openDate && <TableHead>Open Date</TableHead>}
+                {visibleFields.deadline && <TableHead>Deadline</TableHead>}
+                {visibleFields.estimatedCost && <TableHead>Est. Cost</TableHead>}
+                {visibleFields.actualCost && <TableHead>Actual Cost</TableHead>}
+                {visibleFields.performance && <TableHead>Performance</TableHead>}
+                <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {filteredJobs.map((job) => (
+                <TableRow key={job.id} className="hover:bg-slate-50">
+                  {visibleFields.position && (
+                    <TableCell>
+                      <Link
+                        to={`/jobs/${job.id}`}
+                        className="font-medium hover:text-blue-600 truncate max-w-48 block"
+                      >
+                        {job.position}
+                      </Link>
+                    </TableCell>
+                  )}
+                  {visibleFields.department && (
+                    <TableCell className="truncate max-w-32">{job.department}</TableCell>
+                  )}
+                  {visibleFields.recruiter && (
+                    <TableCell className="truncate max-w-32">{job.recruiter}</TableCell>
+                  )}
+                  {visibleFields.priority && (
+                    <TableCell>
+                      <div className="flex-shrink-0">
+                        {getPriorityBadge(job.priority)}
+                      </div>
+                    </TableCell>
+                  )}
+                  {visibleFields.applications && (
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        <Users className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                        <span>{job.applications}</span>
+                      </div>
+                    </TableCell>
+                  )}
+                  {visibleFields.target && (
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        <Target className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                        <span>{job.target}</span>
+                      </div>
+                    </TableCell>
+                  )}
+                  {visibleFields.hired && (
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                        <span>{job.hired}</span>
+                      </div>
+                    </TableCell>
+                  )}
+                  {visibleFields.process && (
+                    <TableCell>
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-xs">
+                          <span>
+                            {job.hired}/{job.target}
+                          </span>
+                          <span>
+                            {Math.round((job.hired / job.target) * 100)}%
+                          </span>
+                        </div>
+                        <Progress
+                          value={(job.hired / job.target) * 100}
+                          className="h-2"
+                        />
+                      </div>
+                    </TableCell>
+                  )}
+                  {visibleFields.pipelineSummary && (
+                    <TableCell>
+                      <div className="text-xs space-y-1">
+                        <div>{job.pipelineSummary.applied} Applied</div>
+                        <div>{job.pipelineSummary.interview} Interviewing</div>
+                        <div className="font-medium text-green-600">
+                          {job.pipelineSummary.hired} Hired
+                        </div>
+                      </div>
+                    </TableCell>
+                  )}
+                  {visibleFields.openDate && (
+                    <TableCell className="truncate max-w-32">{job.openDate}</TableCell>
+                  )}
+                  {visibleFields.deadline && (
+                    <TableCell className="truncate max-w-32">{job.deadline}</TableCell>
+                  )}
+                  {visibleFields.estimatedCost && (
+                    <TableCell className="truncate max-w-32">{job.estimatedCost}</TableCell>
+                  )}
+                  {visibleFields.actualCost && (
+                    <TableCell className="truncate max-w-32">{job.actualCost}</TableCell>
+                  )}
+                  {visibleFields.performance && (
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        <TrendingUp
+                          className={`w-4 h-4 ${getPerformanceColor(job.performance)} flex-shrink-0`}
+                        />
+                        <span className={getPerformanceColor(job.performance)}>
+                          {job.performance}%
+                        </span>
+                      </div>
+                    </TableCell>
+                  )}
+                  <TableCell>
+                    <div className="flex-shrink-0">
+                      {getStatusBadge(job.status)}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="flex-shrink-0">
+                          <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <Link to={`/jobs/${job.id}`}>
+                          <DropdownMenuItem>
+                            <Eye className="w-4 h-4 mr-2" />
+                            View Details
+                          </DropdownMenuItem>
+                        </Link>
+                        <DropdownMenuItem onClick={() => handleEditJob(job)}>
+                          <Edit className="w-4 h-4 mr-2" />
+                          Edit Job
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setShareJobId(job.id)}>
+                          <Share className="w-4 h-4 mr-2" />
+                          Share
+                        </DropdownMenuItem>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <DropdownMenuItem
+                              className="text-red-600"
+                              onSelect={(e) => e.preventDefault()}
+                            >
+                              <Trash2 className="w-4 h-4 mr-2" />
+                              Delete
+                            </DropdownMenuItem>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete Job</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to delete "{job.position}"? This
+                                action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleDeleteJob(job.id)}>
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );
 
   const GridView = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+    <div className="grid-responsive">
       {filteredJobs.map((job) => (
         <JobCard key={job.id} job={job} />
       ))}
@@ -703,10 +710,10 @@ export default function Jobs() {
         }
       }}
     >
-      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="modal-mobile max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{editingJob ? "Edit Job" : "Add New Job"}</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-wrap-safe">{editingJob ? "Edit Job" : "Add New Job"}</DialogTitle>
+          <DialogDescription className="text-wrap-safe">
             {editingJob
               ? "Update the job details below."
               : "Create a new job posting with all the necessary details."}
@@ -715,15 +722,15 @@ export default function Jobs() {
 
         <Tabs defaultValue="basic" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="basic">Basic Info</TabsTrigger>
-            <TabsTrigger value="details">Job Details</TabsTrigger>
-            <TabsTrigger value="team">Team & Budget</TabsTrigger>
+            <TabsTrigger value="basic" className="text-wrap-safe">Basic Info</TabsTrigger>
+            <TabsTrigger value="details" className="text-wrap-safe">Job Details</TabsTrigger>
+            <TabsTrigger value="team" className="text-wrap-safe">Team & Budget</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="basic" className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+          <TabsContent value="basic" className="form-responsive">
+            <div className="form-grid-responsive">
               <div>
-                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                <label className="text-responsive-sm font-medium text-slate-700 flex items-center gap-2 text-wrap-safe">
                   Email Alias
                   <HelpTooltip content={helpContent.emailAlias} />
                 </label>
@@ -733,11 +740,11 @@ export default function Jobs() {
                   onChange={(e) =>
                     setNewJob({ ...newJob, emailAlias: e.target.value })
                   }
-                  className="mt-1"
+                  className="mt-1 text-wrap-safe"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700">
+                <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
                   Department
                 </label>
                 <Select
@@ -749,18 +756,18 @@ export default function Jobs() {
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Select department" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Engineering">Engineering</SelectItem>
-                    <SelectItem value="Product">Product</SelectItem>
-                    <SelectItem value="Design">Design</SelectItem>
-                    <SelectItem value="Marketing">Marketing</SelectItem>
-                    <SelectItem value="Data">Data</SelectItem>
-                    <SelectItem value="Sales">Sales</SelectItem>
+                  <SelectContent className="dropdown-mobile">
+                    <SelectItem value="Engineering" className="text-wrap-safe">Engineering</SelectItem>
+                    <SelectItem value="Product" className="text-wrap-safe">Product</SelectItem>
+                    <SelectItem value="Design" className="text-wrap-safe">Design</SelectItem>
+                    <SelectItem value="Marketing" className="text-wrap-safe">Marketing</SelectItem>
+                    <SelectItem value="Data" className="text-wrap-safe">Data</SelectItem>
+                    <SelectItem value="Sales" className="text-wrap-safe">Sales</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700">
+                <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
                   Job Location
                 </label>
                 <Input
@@ -769,11 +776,11 @@ export default function Jobs() {
                   onChange={(e) =>
                     setNewJob({ ...newJob, location: e.target.value })
                   }
-                  className="mt-1"
+                  className="mt-1 text-wrap-safe"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700">
+                <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
                   Job Position
                 </label>
                 <Input
@@ -782,11 +789,11 @@ export default function Jobs() {
                   onChange={(e) =>
                     setNewJob({ ...newJob, position: e.target.value })
                   }
-                  className="mt-1"
+                  className="mt-1 text-wrap-safe"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                <label className="text-responsive-sm font-medium text-slate-700 flex items-center gap-2 text-wrap-safe">
                   Employment Type
                   <HelpTooltip content={helpContent.employmentType} />
                 </label>
@@ -799,15 +806,15 @@ export default function Jobs() {
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Select employment type" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Full-time">Full-time</SelectItem>
-                    <SelectItem value="Part-time">Part-time</SelectItem>
-                    <SelectItem value="Contract">Contract</SelectItem>
+                  <SelectContent className="dropdown-mobile">
+                    <SelectItem value="Full-time" className="text-wrap-safe">Full-time</SelectItem>
+                    <SelectItem value="Part-time" className="text-wrap-safe">Part-time</SelectItem>
+                    <SelectItem value="Contract" className="text-wrap-safe">Contract</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                <label className="text-responsive-sm font-medium text-slate-700 flex items-center gap-2 text-wrap-safe">
                   Domain/Industry
                   <HelpTooltip content={helpContent.domain} />
                 </label>
@@ -817,11 +824,11 @@ export default function Jobs() {
                   onChange={(e) =>
                     setNewJob({ ...newJob, domain: e.target.value })
                   }
-                  className="mt-1"
+                  className="mt-1 text-wrap-safe"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                <label className="text-responsive-sm font-medium text-slate-700 flex items-center gap-2 text-wrap-safe">
                   Priority
                   <HelpTooltip content={helpContent.priority} />
                 </label>
@@ -834,15 +841,15 @@ export default function Jobs() {
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Select priority" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="High">High</SelectItem>
-                    <SelectItem value="Medium">Medium</SelectItem>
-                    <SelectItem value="Low">Low</SelectItem>
+                  <SelectContent className="dropdown-mobile">
+                    <SelectItem value="High" className="text-wrap-safe">High</SelectItem>
+                    <SelectItem value="Medium" className="text-wrap-safe">Medium</SelectItem>
+                    <SelectItem value="Low" className="text-wrap-safe">Low</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700">
+                <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
                   Deadline
                 </label>
                 <Input
@@ -857,10 +864,10 @@ export default function Jobs() {
             </div>
           </TabsContent>
 
-          <TabsContent value="details" className="space-y-4">
+          <TabsContent value="details" className="form-responsive">
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-slate-700">
+                <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
                   Expected Skills
                 </label>
                 <Input
@@ -874,12 +881,12 @@ export default function Jobs() {
                         .filter(Boolean),
                     })
                   }
-                  className="mt-1"
+                  className="mt-1 text-wrap-safe"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="form-grid-responsive">
                 <div>
-                  <label className="text-sm font-medium text-slate-700">
+                  <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
                     Salary Min
                   </label>
                   <Input
@@ -893,7 +900,7 @@ export default function Jobs() {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-slate-700">
+                  <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
                     Salary Max
                   </label>
                   <Input
@@ -908,7 +915,7 @@ export default function Jobs() {
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700">
+                <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
                   Job Description
                 </label>
                 <Textarea
@@ -917,17 +924,17 @@ export default function Jobs() {
                   onChange={(e) =>
                     setNewJob({ ...newJob, description: e.target.value })
                   }
-                  className="mt-1"
+                  className="mt-1 text-wrap-safe"
                   rows={6}
                 />
               </div>
             </div>
           </TabsContent>
 
-          <TabsContent value="team" className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+          <TabsContent value="team" className="form-responsive">
+            <div className="form-grid-responsive">
               <div>
-                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                <label className="text-responsive-sm font-medium text-slate-700 flex items-center gap-2 text-wrap-safe">
                   Headcount
                   <HelpTooltip content={helpContent.headcount} />
                 </label>
@@ -945,7 +952,7 @@ export default function Jobs() {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700">
+                <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
                   Recruiter
                 </label>
                 <Select
@@ -957,25 +964,25 @@ export default function Jobs() {
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Select recruiter" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Alex Chen">Alex Chen</SelectItem>
-                    <SelectItem value="Sarah Kim">Sarah Kim</SelectItem>
-                    <SelectItem value="Mike Wilson">Mike Wilson</SelectItem>
+                  <SelectContent className="dropdown-mobile">
+                    <SelectItem value="Alex Chen" className="text-wrap-safe">Alex Chen</SelectItem>
+                    <SelectItem value="Sarah Kim" className="text-wrap-safe">Sarah Kim</SelectItem>
+                    <SelectItem value="Mike Wilson" className="text-wrap-safe">Mike Wilson</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-700">
+              <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
                 Interviewers
               </label>
               <Input
                 placeholder="Select team members who will conduct interviews"
-                className="mt-1"
+                className="mt-1 text-wrap-safe"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
+              <label className="text-responsive-sm font-medium text-slate-700 flex items-center gap-2 text-wrap-safe">
                 Estimated Budget
                 <HelpTooltip content={helpContent.estimatedBudget} />
               </label>
@@ -989,14 +996,15 @@ export default function Jobs() {
                 className="mt-1"
               />
             </div>
-            <div className="flex justify-end space-x-2 pt-4">
+            <div className="flex justify-end space-x-2 pt-4 btn-group-mobile">
               <Button
                 variant="outline"
                 onClick={() => setShowAddJobDialog(false)}
+                className="btn-mobile"
               >
                 Cancel
               </Button>
-              <Button onClick={editingJob ? handleUpdateJob : handleAddJob}>
+              <Button onClick={editingJob ? handleUpdateJob : handleAddJob} className="btn-mobile">
                 {editingJob ? "Update Job" : "Create Job"}
               </Button>
             </div>
@@ -1007,45 +1015,45 @@ export default function Jobs() {
   );
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="padding-responsive space-mobile">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Job Management</h1>
-          <p className="text-slate-600 mt-1">
+      <div className="flex-responsive justify-responsive items-responsive space-y-4 sm:space-y-0">
+        <div className="min-w-0 flex-1">
+          <h1 className="heading-responsive text-wrap-safe">Job Management</h1>
+          <p className="text-responsive-base text-slate-600 mt-1 text-wrap-safe">
             Manage job postings, track applications, and monitor hiring
             performance.
           </p>
         </div>
-        <div className="flex space-x-3">
-          <Button variant="outline" size="sm">
-            <FileText className="w-4 h-4 mr-2" />
+        <div className="btn-group-mobile">
+          <Button variant="outline" size="sm" className="btn-mobile">
+            <FileText className="icon-mobile mr-2" />
             Export Report
           </Button>
-          <Button size="sm" onClick={() => setShowAddJobDialog(true)}>
-            <Plus className="w-4 h-4 mr-2" />
+          <Button size="sm" onClick={() => setShowAddJobDialog(true)} className="btn-mobile">
+            <Plus className="icon-mobile mr-2" />
             Add New Job
           </Button>
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="stats-mobile">
         {stats.map((stat) => (
           <Card key={stat.title}>
-            <CardContent className="pt-6">
+            <CardContent className="pt-6 card-mobile">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-slate-600">{stat.title}</p>
-                  <p className="text-2xl font-bold text-slate-900">
+                <div className="min-w-0 flex-1">
+                  <p className="text-responsive-sm text-slate-600 text-wrap-safe">{stat.title}</p>
+                  <p className="text-responsive-xl font-bold text-slate-900 text-wrap-safe">
                     {stat.value}
                   </p>
-                  <p className="text-sm text-green-600">
+                  <p className="text-responsive-sm text-green-600 text-wrap-safe">
                     {stat.change} vs last month
                   </p>
                 </div>
-                <div className={`p-3 rounded-full bg-${stat.color}-100`}>
-                  <Briefcase className={`w-6 h-6 text-${stat.color}-600`} />
+                <div className={`p-3 rounded-full bg-${stat.color}-100 flex-shrink-0`}>
+                  <Briefcase className={`icon-mobile text-${stat.color}-600`} />
                 </div>
               </div>
             </CardContent>
@@ -1055,8 +1063,8 @@ export default function Jobs() {
 
       {/* Filters and Controls */}
       <Card>
-        <CardContent className="pt-6">
-          <div className="flex flex-col lg:flex-row gap-4 justify-between">
+        <CardContent className="pt-6 card-mobile">
+          <div className="flex-responsive gap-4 justify-responsive">
             <div className="flex items-center space-x-4">
               {/* View Mode Toggle */}
               <div className="flex items-center space-x-2 border rounded-lg p-1">
@@ -1064,16 +1072,18 @@ export default function Jobs() {
                   variant={viewMode === "list" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setViewMode("list")}
+                  className="btn-mobile"
                 >
-                  <List className="w-4 h-4 mr-2" />
+                  <List className="icon-mobile mr-2" />
                   List
                 </Button>
                 <Button
                   variant={viewMode === "grid" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setViewMode("grid")}
+                  className="btn-mobile"
                 >
-                  <Grid3X3 className="w-4 h-4 mr-2" />
+                  <Grid3X3 className="icon-mobile mr-2" />
                   Grid
                 </Button>
               </div>
@@ -1082,12 +1092,12 @@ export default function Jobs() {
               {viewMode === "list" && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <Settings className="w-4 h-4 mr-2" />
+                    <Button variant="outline" size="sm" className="btn-mobile">
+                      <Settings className="icon-mobile mr-2" />
                       Columns
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56">
+                  <DropdownMenuContent className="w-56 dropdown-mobile">
                     {Object.entries(visibleFields).map(([field, visible]) => (
                       <DropdownMenuCheckboxItem
                         key={field}
@@ -1098,6 +1108,7 @@ export default function Jobs() {
                             [field]: checked,
                           }))
                         }
+                        className="text-wrap-safe"
                       >
                         {field.charAt(0).toUpperCase() +
                           field.slice(1).replace(/([A-Z])/g, " $1")}
@@ -1109,63 +1120,63 @@ export default function Jobs() {
             </div>
 
             {/* Search and Filters */}
-            <div className="flex flex-col lg:flex-row gap-4">
+            <div className="filters-mobile">
               <div className="flex-1">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
                   <Input
                     placeholder="Search jobs by position, department, recruiter..."
-                    className="pl-10"
+                    className="pl-10 search-mobile text-wrap-safe"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
               </div>
-              <div className="flex gap-3">
+              <div className="filters-mobile">
                 <Select
                   value={departmentFilter}
                   onValueChange={setDepartmentFilter}
                 >
-                  <SelectTrigger className="w-32">
+                  <SelectTrigger className="w-32 btn-mobile">
                     <SelectValue placeholder="Department" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Departments</SelectItem>
-                    <SelectItem value="engineering">Engineering</SelectItem>
-                    <SelectItem value="product">Product</SelectItem>
-                    <SelectItem value="design">Design</SelectItem>
-                    <SelectItem value="marketing">Marketing</SelectItem>
-                    <SelectItem value="data">Data</SelectItem>
+                  <SelectContent className="dropdown-mobile">
+                    <SelectItem value="all" className="text-wrap-safe">All Departments</SelectItem>
+                    <SelectItem value="engineering" className="text-wrap-safe">Engineering</SelectItem>
+                    <SelectItem value="product" className="text-wrap-safe">Product</SelectItem>
+                    <SelectItem value="design" className="text-wrap-safe">Design</SelectItem>
+                    <SelectItem value="marketing" className="text-wrap-safe">Marketing</SelectItem>
+                    <SelectItem value="data" className="text-wrap-safe">Data</SelectItem>
                   </SelectContent>
                 </Select>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-32">
+                  <SelectTrigger className="w-32 btn-mobile">
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Status</SelectItem>
-                    <SelectItem value="open">Open</SelectItem>
-                    <SelectItem value="closed">Closed</SelectItem>
-                    <SelectItem value="in progress">In Progress</SelectItem>
-                    <SelectItem value="paused">Paused</SelectItem>
+                  <SelectContent className="dropdown-mobile">
+                    <SelectItem value="all" className="text-wrap-safe">All Status</SelectItem>
+                    <SelectItem value="open" className="text-wrap-safe">Open</SelectItem>
+                    <SelectItem value="closed" className="text-wrap-safe">Closed</SelectItem>
+                    <SelectItem value="in progress" className="text-wrap-safe">In Progress</SelectItem>
+                    <SelectItem value="paused" className="text-wrap-safe">Paused</SelectItem>
                   </SelectContent>
                 </Select>
                 <Select
                   value={priorityFilter}
                   onValueChange={setPriorityFilter}
                 >
-                  <SelectTrigger className="w-32">
+                  <SelectTrigger className="w-32 btn-mobile">
                     <SelectValue placeholder="Priority" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Priority</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="low">Low</SelectItem>
+                  <SelectContent className="dropdown-mobile">
+                    <SelectItem value="all" className="text-wrap-safe">All Priority</SelectItem>
+                    <SelectItem value="high" className="text-wrap-safe">High</SelectItem>
+                    <SelectItem value="medium" className="text-wrap-safe">Medium</SelectItem>
+                    <SelectItem value="low" className="text-wrap-safe">Low</SelectItem>
                   </SelectContent>
                 </Select>
-                <Button variant="outline" size="sm">
-                  <Filter className="w-4 h-4 mr-2" />
+                <Button variant="outline" size="sm" className="btn-mobile">
+                  <Filter className="icon-mobile mr-2" />
                   More Filters
                 </Button>
               </div>
@@ -1180,23 +1191,23 @@ export default function Jobs() {
       {/* Pagination */}
       <div className="flex justify-center">
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" disabled>
+          <Button variant="outline" size="sm" disabled className="btn-mobile">
             Previous
           </Button>
           <Button
             variant="outline"
             size="sm"
-            className="bg-blue-50 text-blue-600"
+            className="bg-blue-50 text-blue-600 btn-mobile"
           >
             1
           </Button>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" className="btn-mobile">
             2
           </Button>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" className="btn-mobile">
             3
           </Button>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" className="btn-mobile">
             Next
           </Button>
         </div>
@@ -1206,10 +1217,10 @@ export default function Jobs() {
 
       {/* Share Job Dialog */}
       <Dialog open={!!shareJobId} onOpenChange={() => setShareJobId(null)}>
-        <DialogContent>
+        <DialogContent className="modal-mobile">
           <DialogHeader>
-            <DialogTitle>Share Job</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-wrap-safe">Share Job</DialogTitle>
+            <DialogDescription className="text-wrap-safe">
               Generate a shareable link for this job posting.
             </DialogDescription>
           </DialogHeader>
@@ -1222,18 +1233,19 @@ export default function Jobs() {
                     : ""
                 }
                 readOnly
-                className="flex-1"
+                className="flex-1 text-wrap-safe"
               />
               <Button
                 size="sm"
                 onClick={() => shareJobId && handleShareJob(shareJobId)}
+                className="btn-mobile"
               >
-                <Copy className="w-4 h-4 mr-2" />
+                <Copy className="icon-mobile mr-2" />
                 Copy
               </Button>
             </div>
             <div className="flex justify-end">
-              <Button variant="outline" onClick={() => setShareJobId(null)}>
+              <Button variant="outline" onClick={() => setShareJobId(null)} className="btn-mobile">
                 Close
               </Button>
             </div>

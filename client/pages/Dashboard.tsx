@@ -97,23 +97,23 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="padding-responsive space-mobile">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
-          <p className="text-slate-600 mt-1">
+      <div className="flex-responsive justify-responsive items-responsive space-y-4 sm:space-y-0">
+        <div className="min-w-0 flex-1">
+          <h1 className="heading-responsive text-wrap-safe">Dashboard</h1>
+          <p className="text-responsive-base text-slate-600 mt-1 text-wrap-safe">
             Welcome back! Here's what's happening with your recruitment.
           </p>
         </div>
-        <div className="flex space-x-3">
-          <Button variant="outline" size="sm">
-            <Filter className="w-4 h-4 mr-2" />
+        <div className="btn-group-mobile">
+          <Button variant="outline" size="sm" className="btn-mobile">
+            <Filter className="icon-mobile mr-2" />
             Filter
           </Button>
-          <Button size="sm" asChild>
+          <Button size="sm" asChild className="btn-mobile">
             <Link to="/jobs/create">
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="icon-mobile mr-2" />
               New Job
             </Link>
           </Button>
@@ -121,37 +121,37 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="stats-mobile">
         {stats.map((stat) => (
-          <Card key={stat.title} className="relative overflow-hidden">
+          <Card key={stat.title} className="relative overflow-hidden card-responsive">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">
+              <CardTitle className="text-responsive-sm font-medium text-slate-600 text-wrap-safe">
                 {stat.title}
               </CardTitle>
-              <div className={`p-2 rounded-lg bg-${stat.color}-100`}>
-                <stat.icon className={`w-4 h-4 text-${stat.color}-600`} />
+              <div className={`p-2 rounded-lg bg-${stat.color}-100 flex-shrink-0`}>
+                <stat.icon className={`icon-mobile text-${stat.color}-600`} />
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-slate-900">
+            <CardContent className="card-mobile">
+              <div className="text-responsive-xl font-bold text-slate-900 text-wrap-safe">
                 {stat.value}
               </div>
               <div className="flex items-center mt-1">
                 {stat.changeType === "positive" ? (
-                  <ArrowUpRight className="w-4 h-4 text-green-500" />
+                  <ArrowUpRight className="icon-mobile text-green-500" />
                 ) : (
-                  <ArrowDownRight className="w-4 h-4 text-red-500" />
+                  <ArrowDownRight className="icon-mobile text-red-500" />
                 )}
                 <span
-                  className={`text-sm font-medium ${
+                  className={`text-responsive-sm font-medium ${
                     stat.changeType === "positive"
                       ? "text-green-600"
                       : "text-red-600"
-                  }`}
+                  } text-wrap-safe`}
                 >
                   {stat.change}
                 </span>
-                <span className="text-sm text-slate-500 ml-2">
+                <span className="text-responsive-sm text-slate-500 ml-2 hidden sm:inline text-wrap-safe">
                   vs last month
                 </span>
               </div>
@@ -161,36 +161,36 @@ export default function Dashboard() {
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Recruitment Pipeline */}
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
-              Recruitment Pipeline
-              <Button variant="ghost" size="sm">
+              <span className="text-responsive-lg text-wrap-safe">Recruitment Pipeline</span>
+              <Button variant="ghost" size="sm" className="icon-mobile">
                 <MoreHorizontal className="w-4 h-4" />
               </Button>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
+          <CardContent className="card-mobile">
+            <div className="space-mobile">
               {pipeline.map((stage) => (
                 <div
                   key={stage.stage}
                   className="flex items-center justify-between"
                 >
-                  <div className="flex items-center space-x-3">
-                    <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                    <span className="font-medium text-slate-700">
+                  <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+                    <div className="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0"></div>
+                    <span className="font-medium text-slate-700 text-responsive-base truncate-mobile text-wrap-safe">
                       {stage.stage}
                     </span>
-                    <Badge variant="secondary" className="text-xs">
+                    <Badge variant="secondary" className="text-xs flex-shrink-0 badge-mobile">
                       {stage.count}
                     </Badge>
                   </div>
-                  <div className="flex items-center space-x-3 w-32">
-                    <Progress value={stage.percentage} className="h-2" />
-                    <span className="text-sm text-slate-500 w-10">
+                  <div className="flex items-center space-x-2 sm:space-x-3 w-24 sm:w-32 flex-shrink-0">
+                    <Progress value={stage.percentage} className="progress-mobile flex-1" />
+                    <span className="text-responsive-sm text-slate-500 w-8 sm:w-10 text-right text-wrap-safe">
                       {stage.percentage}%
                     </span>
                   </div>
@@ -203,24 +203,24 @@ export default function Dashboard() {
         {/* Quick Stats */}
         <Card>
           <CardHeader>
-            <CardTitle>Quick Stats</CardTitle>
+            <CardTitle className="text-responsive-lg text-wrap-safe">Quick Stats</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-mobile">
             <div className="flex justify-between items-center">
-              <span className="text-slate-600">Cost per Hire</span>
-              <span className="font-semibold">$3,200</span>
+              <span className="text-slate-600 text-responsive-base text-wrap-safe">Cost per Hire</span>
+              <span className="font-semibold text-responsive-base text-wrap-safe">$3,200</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-slate-600">Hiring Success Rate</span>
-              <span className="font-semibold text-green-600">85%</span>
+              <span className="text-slate-600 text-responsive-base text-wrap-safe">Hiring Success Rate</span>
+              <span className="font-semibold text-green-600 text-responsive-base text-wrap-safe">85%</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-slate-600">Source Effectiveness</span>
-              <span className="font-semibold">LinkedIn: 45%</span>
+              <span className="text-slate-600 text-responsive-base text-wrap-safe">Source Effectiveness</span>
+              <span className="font-semibold text-responsive-base text-wrap-safe">LinkedIn: 45%</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-slate-600">Pending Interviews</span>
-              <span className="font-semibold text-orange-600">12</span>
+              <span className="text-slate-600 text-responsive-base text-wrap-safe">Pending Interviews</span>
+              <span className="font-semibold text-orange-600 text-responsive-base text-wrap-safe">12</span>
             </div>
           </CardContent>
         </Card>
@@ -230,30 +230,76 @@ export default function Dashboard() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            Recent Job Postings
-            <Button variant="ghost" size="sm" asChild>
+            <span className="text-responsive-lg text-wrap-safe">Recent Job Postings</span>
+            <Button variant="ghost" size="sm" asChild className="btn-mobile">
               <Link to="/jobs">View All</Link>
             </Button>
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
+        <CardContent className="card-mobile">
+          {/* Mobile Card View */}
+          <div className="table-mobile-card space-mobile">
+            {recentJobs.map((job) => (
+              <div
+                key={job.id}
+                className="border border-slate-200 rounded-lg p-4 space-y-3 card-responsive"
+              >
+                <div className="flex justify-between items-start min-w-0">
+                  <Link
+                    to={`/jobs/${job.id}`}
+                    className="font-medium text-slate-900 hover:text-blue-600 text-responsive-base text-wrap-safe min-w-0 flex-1 truncate"
+                  >
+                    {job.title}
+                  </Link>
+                  <Badge
+                    variant={
+                      job.status === "Active" ? "default" : "secondary"
+                    }
+                    className="badge-mobile flex-shrink-0"
+                  >
+                    {job.status}
+                  </Badge>
+                </div>
+                <div className="flex justify-between items-center text-responsive-sm text-slate-600 min-w-0">
+                  <span className="text-wrap-safe truncate flex-1">{job.department}</span>
+                  <span className="text-wrap-safe flex-shrink-0 ml-2">{job.applicants} applicants</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <Badge
+                    variant={
+                      job.priority === "High"
+                        ? "destructive"
+                        : job.priority === "Medium"
+                          ? "default"
+                          : "secondary"
+                    }
+                    className="badge-mobile"
+                  >
+                    {job.priority}
+                  </Badge>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table View */}
+          <div className="table-desktop overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-slate-200">
-                  <th className="text-left py-3 text-sm font-medium text-slate-600">
+                  <th className="text-left py-3 text-responsive-sm font-medium text-slate-600 text-wrap-safe">
                     Job Title
                   </th>
-                  <th className="text-left py-3 text-sm font-medium text-slate-600">
+                  <th className="text-left py-3 text-responsive-sm font-medium text-slate-600 text-wrap-safe">
                     Department
                   </th>
-                  <th className="text-left py-3 text-sm font-medium text-slate-600">
+                  <th className="text-left py-3 text-responsive-sm font-medium text-slate-600 text-wrap-safe">
                     Applicants
                   </th>
-                  <th className="text-left py-3 text-sm font-medium text-slate-600">
+                  <th className="text-left py-3 text-responsive-sm font-medium text-slate-600 text-wrap-safe">
                     Status
                   </th>
-                  <th className="text-left py-3 text-sm font-medium text-slate-600">
+                  <th className="text-left py-3 text-responsive-sm font-medium text-slate-600 text-wrap-safe">
                     Priority
                   </th>
                 </tr>
@@ -267,20 +313,21 @@ export default function Dashboard() {
                     <td className="py-3">
                       <Link
                         to={`/jobs/${job.id}`}
-                        className="font-medium text-slate-900 hover:text-blue-600"
+                        className="font-medium text-slate-900 hover:text-blue-600 text-wrap-safe truncate max-w-48 block"
                       >
                         {job.title}
                       </Link>
                     </td>
-                    <td className="py-3 text-slate-600">{job.department}</td>
+                    <td className="py-3 text-slate-600 text-wrap-safe truncate max-w-32">{job.department}</td>
                     <td className="py-3">
-                      <Badge variant="secondary">{job.applicants}</Badge>
+                      <Badge variant="secondary" className="badge-mobile">{job.applicants}</Badge>
                     </td>
                     <td className="py-3">
                       <Badge
                         variant={
                           job.status === "Active" ? "default" : "secondary"
                         }
+                        className="badge-mobile"
                       >
                         {job.status}
                       </Badge>
@@ -294,6 +341,7 @@ export default function Dashboard() {
                               ? "default"
                               : "secondary"
                         }
+                        className="badge-mobile"
                       >
                         {job.priority}
                       </Badge>

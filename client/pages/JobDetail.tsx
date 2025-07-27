@@ -159,9 +159,9 @@ export default function JobDetail() {
       const oldStage = draggedCandidate.stage;
 
       // Update candidate stage in storage
-      const updatedCandidate = {
+      const updatedCandidate: CandidateData = {
         ...draggedCandidate,
-        stage: newStage,
+        stage: newStage as CandidateData['stage'],
         duration: 0, // Reset duration for new stage
       };
 
@@ -241,31 +241,31 @@ export default function JobDetail() {
       onDragStart={() => handleDragStart(candidate)}
       onDragEnd={handleDragEnd}
     >
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center space-x-3">
-            <Avatar className="w-10 h-10">
+      <CardContent className="p-3 sm:p-4">
+        <div className="flex items-start justify-between mb-3 min-w-0">
+          <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+            <Avatar className="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
               <AvatarImage src={candidate.avatar} />
-              <AvatarFallback>
+              <AvatarFallback className="text-xs sm:text-sm">
                 {candidate.name
                   .split(" ")
                   .map((n) => n[0])
                   .join("")}
               </AvatarFallback>
             </Avatar>
-            <div>
+            <div className="min-w-0 flex-1">
               <Link
                 to={`/candidates/${candidate.id}`}
-                className="font-medium text-slate-900 hover:text-blue-600"
+                className="font-medium text-slate-900 hover:text-blue-600 text-sm sm:text-base truncate block"
               >
                 {candidate.name}
               </Link>
-              <p className="text-xs text-slate-600">{candidate.experience}</p>
+              <p className="text-xs text-slate-600 truncate">{candidate.experience}</p>
             </div>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="flex-shrink-0">
                 <MoreHorizontal className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -289,17 +289,17 @@ export default function JobDetail() {
         </div>
 
         <div className="space-y-2 text-xs text-slate-600">
-          <div className="flex items-center gap-2">
-            <Mail className="w-3 h-3" />
-            {candidate.email}
+          <div className="flex items-center gap-2 min-w-0">
+            <Mail className="w-3 h-3 flex-shrink-0" />
+            <span className="truncate">{candidate.email}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <MapPin className="w-3 h-3" />
-            {candidate.location}
+          <div className="flex items-center gap-2 min-w-0">
+            <MapPin className="w-3 h-3 flex-shrink-0" />
+            <span className="truncate">{candidate.location}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Clock className="w-3 h-3" />
-            {candidate.duration} days in stage
+          <div className="flex items-center gap-2 min-w-0">
+            <Clock className="w-3 h-3 flex-shrink-0" />
+            <span className="text-xs truncate">{candidate.duration} days in stage</span>
           </div>
         </div>
 
@@ -316,7 +316,7 @@ export default function JobDetail() {
               />
             ))}
           </div>
-          <Badge variant="outline" className="text-xs">
+          <Badge variant="outline" className="text-xs flex-shrink-0 truncate max-w-20">
             {candidate.source}
           </Badge>
         </div>
@@ -325,7 +325,7 @@ export default function JobDetail() {
   );
 
   const PipelineGridView = () => (
-    <div className="grid grid-cols-1 lg:grid-cols-7 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 overflow-x-auto">
       {stages.map((stage) => {
         const stageCandidates = candidates.filter((c) => c.stage === stage);
         const isDropTarget = dragOverStage === stage;
@@ -333,7 +333,7 @@ export default function JobDetail() {
         return (
           <div
             key={stage}
-            className={`rounded-lg border p-4 transition-all ${getStageColor(stage)} ${
+            className={`rounded-lg border p-4 transition-all ${getStageColor(stage)} min-w-[200px] ${
               isDropTarget
                 ? "ring-2 ring-blue-500 ring-opacity-50 bg-blue-50"
                 : ""
@@ -342,9 +342,9 @@ export default function JobDetail() {
             onDragLeave={handleDragLeave}
             onDrop={(e) => handleDrop(e, stage)}
           >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-sm text-slate-900">{stage}</h3>
-              <Badge variant="outline" className="text-xs">
+            <div className="flex items-center justify-between mb-4 min-w-0">
+              <h3 className="font-semibold text-sm text-slate-900 truncate flex-1">{stage}</h3>
+              <Badge variant="outline" className="text-xs flex-shrink-0 ml-2">
                 {stageCandidates.length}
               </Badge>
             </div>
@@ -521,25 +521,25 @@ export default function JobDetail() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <div className="bg-white border-b border-slate-200 p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+      <div className="bg-white border-b border-slate-200 p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+          <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
             <Link to="/jobs">
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="w-full sm:w-auto">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Jobs
               </Button>
             </Link>
-            <div>
-              <h1 className="text-2xl font-bold text-slate-900">
+            <div className="text-center sm:text-left">
+              <h1 className="text-xl sm:text-2xl font-bold text-slate-900">
                 {job.position}
               </h1>
-              <p className="text-slate-600">
+              <p className="text-sm sm:text-base text-slate-600">
                 {job.department} • {job.location}
               </p>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2">
             <Badge
               variant={
                 job.priority === "High"
@@ -548,6 +548,7 @@ export default function JobDetail() {
                     ? "secondary"
                     : "outline"
               }
+              className="w-full sm:w-auto justify-center sm:justify-start"
             >
               {job.priority} Priority
             </Badge>
@@ -559,6 +560,7 @@ export default function JobDetail() {
                     ? "outline"
                     : "secondary"
               }
+              className="w-full sm:w-auto justify-center sm:justify-start"
             >
               {job.status}
             </Badge>
@@ -566,9 +568,9 @@ export default function JobDetail() {
         </div>
       </div>
 
-      <div className="p-6 space-y-6">
+      <div className="p-4 sm:p-6 space-y-6">
         {/* Job Details Panel */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Job Summary */}
           <Card>
             <CardHeader>
@@ -804,17 +806,17 @@ export default function JobDetail() {
         <BudgetPanel job={job} onJobUpdate={setJob} />
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-600">Total Applications</p>
-                  <p className="text-2xl font-bold text-slate-900">
+                  <p className="text-xl sm:text-2xl font-bold text-slate-900">
                     {job.applications}
                   </p>
                 </div>
-                <Users className="w-8 h-8 text-blue-600" />
+                <Users className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
               </div>
             </CardContent>
           </Card>
@@ -823,7 +825,7 @@ export default function JobDetail() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-600">In Interview</p>
-                  <p className="text-2xl font-bold text-slate-900">
+                  <p className="text-xl sm:text-2xl font-bold text-slate-900">
                     {
                       candidates.filter((c) =>
                         ["Interview", "Technical"].includes(c.stage),
@@ -831,7 +833,7 @@ export default function JobDetail() {
                     }
                   </p>
                 </div>
-                <Calendar className="w-8 h-8 text-green-600" />
+                <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
               </div>
             </CardContent>
           </Card>
@@ -840,11 +842,11 @@ export default function JobDetail() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-600">Hired / Target</p>
-                  <p className="text-2xl font-bold text-slate-900">
+                  <p className="text-xl sm:text-2xl font-bold text-slate-900">
                     {job.hired} / {job.target}
                   </p>
                 </div>
-                <Target className="w-8 h-8 text-purple-600" />
+                <Target className="w-6 h-6 sm:w-8 sm:h-8 text-purple-600" />
               </div>
             </CardContent>
           </Card>
@@ -853,7 +855,7 @@ export default function JobDetail() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-600">Budget Used</p>
-                  <p className="text-2xl font-bold text-slate-900">
+                  <p className="text-xl sm:text-2xl font-bold text-slate-900">
                     {Math.round(
                       (parseInt(job.actualCost) / parseInt(job.estimatedCost)) *
                         100,
@@ -861,7 +863,7 @@ export default function JobDetail() {
                     %
                   </p>
                 </div>
-                <DollarSign className="w-8 h-8 text-orange-600" />
+                <DollarSign className="w-6 h-6 sm:w-8 sm:h-8 text-orange-600" />
               </div>
             </CardContent>
           </Card>
