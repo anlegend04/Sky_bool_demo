@@ -61,15 +61,9 @@ export default function Reports() {
   const [candidates, setCandidates] = useState([]);
 
   useEffect(() => {
-    // Load data and add demo data if needed
-    let jobsData = storage.getJobs();
-    let candidatesData = storage.getCandidates();
-    
-    if (jobsData.length < 3) {
-      storage.addDemoData();
-      jobsData = storage.getJobs();
-      candidatesData = storage.getCandidates();
-    }
+    // Load hardcoded data
+    let jobsData = HARDCODED_JOBS;
+    let candidatesData = HARDCODED_CANDIDATES;
     
     setJobs(jobsData);
     setCandidates(candidatesData);
