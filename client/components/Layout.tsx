@@ -290,8 +290,8 @@ export default function Layout({ children }: LayoutProps) {
                       className={cn(
                         "nav-item-mobile text-wrap-safe",
                         isActive
-                          ? "bg-blue-50 text-blue-700 border-r-2 border-blue-700"
-                          : "text-slate-700 hover:bg-slate-50 hover:text-slate-900",
+                          ? "bg-primary/10 text-primary border-r-2 border-primary"
+                          : "text-slate-700 hover:bg-accent hover:text-accent-foreground",
                       )}
                     >
                       <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
