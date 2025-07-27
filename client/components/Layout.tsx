@@ -241,7 +241,7 @@ export default function Layout({ children }: LayoutProps) {
         </div>
       </header>
 
-      <div className="flex">
+      <div className="flex h-[calc(100vh-4rem)]">
         {/* Sidebar - Mobile Overlay */}
         {sidebarOpen && (
           <div
