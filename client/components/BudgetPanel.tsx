@@ -49,7 +49,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useState } from "react";
-import { storage, JobData, ExpenseData } from "@/lib/storage";
+import { JobData, ExpenseData } from "@/data/hardcoded-data";
 import { useToast } from "@/hooks/use-toast";
 
 interface BudgetPanelProps {
