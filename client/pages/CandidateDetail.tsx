@@ -69,6 +69,7 @@ import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { storage, CandidateData, EmailData, StageHistoryData } from "@/lib/storage";
 import { useToast } from "@/hooks/use-toast";
+import { HARDCODED_CANDIDATES, EMAIL_TEMPLATES } from "@/data/hardcoded-data";
 
 type StageData = {
   name: string;
@@ -95,13 +96,32 @@ export default function CandidateDetail() {
   const [emailPreview, setEmailPreview] = useState("");
   const { toast } = useToast();
 
-  // Load candidate from localStorage
+  // Load candidate from hardcoded data or localStorage
   useEffect(() => {
     if (id) {
-      const candidateData = storage.getCandidate(id);
-      if (candidateData) {
-        setCandidate(candidateData);
-        setCurrentStage(candidateData.stage);
+      // First try to get from hardcoded data
+      const hardcodedCandidate = HARDCODED_CANDIDATES.find(c => c.id === id);
+      
+      if (hardcodedCandidate) {
+        // Convert hardcoded data to storage format
+        const convertedCandidate: CandidateData = {
+          ...hardcodedCandidate,
+          status: hardcodedCandidate.status as string,
+          emails: hardcodedCandidate.emails.map(email => ({
+            ...email,
+            status: email.status === "pending" ? "sent" : email.status as "sent" | "draft" | "failed"
+          }))
+        };
+        
+        setCandidate(convertedCandidate);
+        setCurrentStage(convertedCandidate.stage);
+      } else {
+        // Try localStorage
+        const storageCandidate = storage.getCandidate(id);
+        if (storageCandidate) {
+          setCandidate(storageCandidate);
+          setCurrentStage(storageCandidate.stage);
+        }
       }
     }
   }, [id]);
@@ -120,6 +140,7 @@ export default function CandidateDetail() {
     );
   }
 
+  // Enhanced demo stages data
   const stages: StageData[] = [
     {
       name: "Applied",
@@ -127,7 +148,7 @@ export default function CandidateDetail() {
       duration: 1,
       startDate: "2024-01-15",
       endDate: "2024-01-16",
-      notes: "Application received via LinkedIn. Strong profile match.",
+      notes: "Application received via LinkedIn. Strong profile match with required skills.",
     },
     {
       name: "Screening",
@@ -135,35 +156,39 @@ export default function CandidateDetail() {
       duration: 3,
       startDate: "2024-01-16",
       endDate: "2024-01-19",
-      notes: "Initial screening call completed. Excellent communication skills.",
+      notes: "Initial screening call completed. Excellent communication skills and cultural fit.",
     },
     {
       name: "Interview",
       completed: false,
       duration: 5,
       startDate: "2024-01-19",
-      notes: "Scheduled for panel interview on Jan 25th.",
+      notes: "Scheduled for panel interview on Jan 25th. Technical assessment completed successfully.",
     },
     {
       name: "Technical",
       completed: false,
       duration: 0,
       startDate: "",
+      notes: "Technical round pending - coding challenge and system design discussion.",
     },
     {
       name: "Offer",
       completed: false,
       duration: 0,
       startDate: "",
+      notes: "Final offer stage - salary negotiation and benefits discussion.",
     },
     {
       name: "Hired",
       completed: false,
       duration: 0,
       startDate: "",
+      notes: "Onboarding and start date coordination.",
     },
   ];
 
+  // Enhanced demo activities data
   const activities = [
     {
       id: 1,
@@ -171,23 +196,24 @@ export default function CandidateDetail() {
       action: "Moved to Interview stage",
       user: "Alex Chen",
       timestamp: "2024-01-19 10:30 AM",
-      reason: "Passed initial screening successfully",
+      reason: "Passed initial screening successfully with strong technical background",
+      content: "Candidate demonstrated excellent problem-solving skills during screening call.",
     },
     {
       id: 2,
       type: "note",
-      action: "Added note",
+      action: "Added detailed note",
       user: "Sarah Kim",
       timestamp: "2024-01-18 2:15 PM",
-      content: "Great cultural fit, strong technical background",
+      content: "Great cultural fit, strong technical background. Portfolio shows impressive React projects. Recommended for technical interview.",
     },
     {
       id: 3,
       type: "email",
-      action: "Sent email",
+      action: "Sent interview invitation",
       user: "Alex Chen",
       timestamp: "2024-01-17 9:00 AM",
-      content: "Interview invitation sent",
+      content: "Interview invitation sent with calendar link and preparation materials.",
     },
     {
       id: 4,
@@ -196,38 +222,67 @@ export default function CandidateDetail() {
       user: "Alex Chen",
       timestamp: "2024-01-16 3:30 PM",
       duration: "45 minutes",
+      content: "Discussed technical background, career goals, and company culture. Very positive impression.",
+    },
+    {
+      id: 5,
+      type: "interview",
+      action: "Technical assessment scheduled",
+      user: "Sarah Kim",
+      timestamp: "2024-01-20 11:00 AM",
+      content: "Scheduled technical round with senior developers for Jan 25th, 2:00 PM.",
+    },
+    {
+      id: 6,
+      type: "note",
+      action: "Resume review completed",
+      user: "Mike Wilson",
+      timestamp: "2024-01-15 4:45 PM",
+      content: "Resume shows strong React/TypeScript experience. Previous work at top tech companies is impressive.",
     },
   ];
 
+  // Enhanced demo email history
   const emailHistory: EmailData[] = [
     {
       id: "email_1",
       subject: "Interview Invitation - Senior Product Manager",
-      content: "Hi Marissa, Thank you for your interest in the Senior Product Manager position. We would like to invite you for an interview...",
+      content: "Hi Marissa, Thank you for your interest in the Senior Product Manager position. We would like to invite you for an interview on January 25th at 2:00 PM. Please find the calendar invitation attached. We'll be discussing your background, technical skills, and how you approach product challenges. Looking forward to meeting you!",
       from: "alex.chen@company.com",
       to: candidate.email,
       timestamp: "2024-01-17 9:00 AM",
       status: "sent",
+      template: "interview_invitation",
     },
     {
       id: "email_2",
       subject: "Application Received - Senior Product Manager",
-      content: "Thank you for applying to our Senior Product Manager position. We have received your application and will review it shortly...",
+      content: "Thank you for applying to our Senior Product Manager position. We have received your application and will review it shortly. You can expect to hear from us within 3-5 business days. In the meantime, feel free to explore our company culture and values on our website.",
       from: "noreply@company.com",
       to: candidate.email,
       timestamp: "2024-01-15 2:30 PM",
       status: "sent",
+      template: "application_received",
+    },
+    {
+      id: "email_3",
+      subject: "Technical Assessment Details",
+      content: "Hi Marissa, Following our successful initial interview, we'd like to proceed with the technical assessment. This will include a coding challenge and system design discussion. Please find the assessment materials attached. You have 48 hours to complete this. Good luck!",
+      from: "sarah.kim@company.com",
+      to: candidate.email,
+      timestamp: "2024-01-20 3:15 PM",
+      status: "sent",
+      template: "technical_assessment",
     },
   ];
 
-  const emailTemplates = storage.getEmailTemplates();
+  const emailTemplates = EMAIL_TEMPLATES;
 
   const handleStageChange = () => {
     if (!candidate) return;
 
     const updatedCandidate = storage.updateCandidate(candidate.id, {
       stage: newStage,
-      stageChangeReason,
     });
 
     if (updatedCandidate) {
@@ -515,6 +570,10 @@ export default function CandidateDetail() {
               <DollarSign className="w-4 h-4 text-slate-500" />
               <span className="text-sm">{candidate.salary}</span>
             </div>
+            <div className="flex items-center space-x-3">
+              <GraduationCap className="w-4 h-4 text-slate-500" />
+              <span className="text-sm">Experience: {candidate.experience}</span>
+            </div>
           </div>
 
           <div className="pt-4 border-t">
@@ -677,6 +736,7 @@ export default function CandidateDetail() {
                       {activity.type === "note" && <FileText className="w-4 h-4 text-green-600" />}
                       {activity.type === "email" && <Mail className="w-4 h-4 text-purple-600" />}
                       {activity.type === "call" && <Phone className="w-4 h-4 text-orange-600" />}
+                      {activity.type === "interview" && <Video className="w-4 h-4 text-indigo-600" />}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
@@ -849,6 +909,15 @@ export default function CandidateDetail() {
               <div className="flex items-center space-x-3">
                 <FileText className="w-4 h-4 text-slate-500" />
                 <span className="text-sm font-medium">Cover_Letter.pdf</span>
+              </div>
+              <Button variant="ghost" size="sm">
+                <Download className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="flex items-center justify-between p-3 border border-slate-200 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <FileText className="w-4 h-4 text-slate-500" />
+                <span className="text-sm font-medium">Portfolio.pdf</span>
               </div>
               <Button variant="ghost" size="sm">
                 <Download className="w-4 h-4" />
