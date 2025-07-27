@@ -28,6 +28,7 @@ import {
   UserCircle,
   LogOut,
   ChevronDown,
+  CheckSquare,
 } from "lucide-react";
 
 interface LayoutProps {
