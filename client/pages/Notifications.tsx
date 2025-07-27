@@ -99,8 +99,7 @@ export default function Notifications() {
   ];
 
   const handleMarkAsRead = (notificationId: string) => {
-    storage.markNotificationAsRead(notificationId);
-    setNotifications(storage.getNotifications());
+    // In a real app, this would mark notification as read
     toast({
       title: "Marked as read",
       description: "Notification has been marked as read.",
@@ -108,12 +107,7 @@ export default function Notifications() {
   };
 
   const handleMarkAllAsRead = () => {
-    notifications.forEach(notification => {
-      if (!notification.read) {
-        storage.markNotificationAsRead(notification.id);
-      }
-    });
-    setNotifications(storage.getNotifications());
+    // In a real app, this would mark all notifications as read
     toast({
       title: "All notifications marked as read",
       description: "All notifications have been marked as read.",
