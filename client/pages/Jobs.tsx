@@ -189,8 +189,7 @@ export default function Jobs() {
         },
       };
 
-      const createdJob = storage.addJob(jobData);
-      setJobs(storage.getJobs());
+      // In a real app, this would create the job
       setShowAddJobDialog(false);
       
       // Reset form
