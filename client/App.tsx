@@ -52,11 +52,11 @@ const App = () => (
 
 // Prevent multiple createRoot calls in development
 const rootElement = document.getElementById("root")!;
-if (!rootElement._reactRootContainer) {
+
+// Check if we've already initialized the root
+const isAlreadyRendered = rootElement.hasChildNodes();
+
+if (!isAlreadyRendered) {
   const root = createRoot(rootElement);
   root.render(<App />);
-  rootElement._reactRootContainer = root;
-} else {
-  // Re-render on existing root if it already exists
-  rootElement._reactRootContainer.render(<App />);
 }
