@@ -13,27 +13,10 @@ console.warn = (...args: any[]) => {
     typeof message === 'string' &&
     message.includes('Support for defaultProps will be removed from function components')
   ) {
-    // Check if it's any Recharts component
-    const isRechartsComponent =
-      message.includes('XAxis') ||
-      message.includes('YAxis') ||
-      message.includes('CartesianGrid') ||
-      message.includes('Tooltip') ||
-      message.includes('Legend') ||
-      message.includes('PolarGrid') ||
-      message.includes('PolarAngleAxis') ||
-      message.includes('PolarRadiusAxis') ||
-      message.includes('Radar') ||
-      message.includes('Bar') ||
-      message.includes('Line') ||
-      message.includes('Pie') ||
-      message.includes('Cell') ||
-      message.includes('ResponsiveContainer') ||
-      message.includes('Surface') ||
-      message.includes('ReferenceLine') ||
-      message.includes('ReferenceArea') ||
-      message.includes('Brush') ||
-      message.includes('ErrorBar');
+    // Check if it's any Recharts component (including numbered variations like XAxis2, YAxis2)
+    const rechartsComponentPattern = /(XAxis|YAxis|CartesianGrid|Tooltip|Legend|PolarGrid|PolarAngleAxis|PolarRadiusAxis|Radar|Bar|Line|Pie|Cell|ResponsiveContainer|Surface|ReferenceLine|ReferenceArea|Brush|ErrorBar)\d*/;
+
+    const isRechartsComponent = rechartsComponentPattern.test(message);
 
     if (isRechartsComponent) {
       // Suppress this warning - it's from Recharts library, not our code
