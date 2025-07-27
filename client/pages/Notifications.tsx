@@ -34,7 +34,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { storage, NotificationData } from "@/lib/storage";
+import { HARDCODED_NOTIFICATIONS, NotificationData } from "@/data/hardcoded-data";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Notifications() {
