@@ -50,38 +50,31 @@ export default function Layout({ children }: LayoutProps) {
   const [unreadCount, setUnreadCount] = useState(0);
   const { toast } = useToast();
 
-  // Update notification count every 5 seconds
+  // Update notification count
   useEffect(() => {
     const updateNotificationCount = () => {
-      const count = storage.getUnreadNotificationCount();
+      const count = getUnreadNotificationCount();
       setUnreadCount(count);
     };
 
     updateNotificationCount();
-    const interval = setInterval(updateNotificationCount, 5000);
-
-    return () => clearInterval(interval);
   }, []);
 
   const handleQuickAddJob = () => {
-    // Add demo data if needed and redirect
-    storage.addDemoData();
+    // In a real app, this would open the Add Job dialog
     toast({
-      title: "Demo Data Added",
-      description: "Sample jobs and candidates have been added for demonstration.",
+      title: "Quick Add",
+      description: "Add Job dialog would open here.",
     });
-    // In a real app, this would open the Add Job dialog or navigate to create page
     window.location.href = "/jobs";
   };
 
   const handleQuickAddCandidate = () => {
-    // Add demo data if needed and redirect
-    storage.addDemoData();
-    toast({
-      title: "Demo Data Added",
-      description: "Sample jobs and candidates have been added for demonstration.",
-    });
     // In a real app, this would open the Add Candidate dialog
+    toast({
+      title: "Quick Add",
+      description: "Add Candidate dialog would open here.",
+    });
     window.location.href = "/candidates";
   };
 
