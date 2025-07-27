@@ -88,7 +88,7 @@ type CandidateData = {
 };
 
 export default function Candidates() {
-  const [candidates, setCandidates] = useState<any[]>([]);
+  const [candidates] = useState<CandidateData[]>(HARDCODED_CANDIDATES);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const [searchTerm, setSearchTerm] = useState("");
   const [positionFilter, setPositionFilter] = useState("all");
