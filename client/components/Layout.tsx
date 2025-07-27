@@ -161,7 +161,9 @@ export default function Layout({ children }: LayoutProps) {
                     </Avatar>
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium">John Doe</p>
-                      <p className="text-xs text-slate-500">john.doe@company.com</p>
+                      <p className="text-xs text-slate-500">
+                        john.doe@company.com
+                      </p>
                     </div>
                   </div>
                   <DropdownMenuSeparator />

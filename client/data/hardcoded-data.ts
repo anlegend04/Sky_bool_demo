@@ -53,7 +53,14 @@ export interface CandidateData {
   experience: string;
   skills: string[];
   status: "Active" | "Inactive" | "Blacklisted";
-  stage: "Applied" | "Screening" | "Interview" | "Technical" | "Offer" | "Hired" | "Rejected";
+  stage:
+    | "Applied"
+    | "Screening"
+    | "Interview"
+    | "Technical"
+    | "Offer"
+    | "Hired"
+    | "Rejected";
   rating: number;
   appliedDate: string;
   resume: string;
@@ -154,10 +161,18 @@ export const HARDCODED_JOBS: JobData[] = [
     status: "Open",
     location: "San Francisco, CA",
     type: "Full-time",
-    description: "We are looking for a Senior Frontend Developer to join our growing engineering team. You'll be working on cutting-edge web applications using React, TypeScript, and modern development tools.",
+    description:
+      "We are looking for a Senior Frontend Developer to join our growing engineering team. You'll be working on cutting-edge web applications using React, TypeScript, and modern development tools.",
     priority: "High",
     emailAlias: "frontend-jobs@company.com",
-    expectedSkills: ["React", "TypeScript", "Node.js", "JavaScript", "CSS", "HTML"],
+    expectedSkills: [
+      "React",
+      "TypeScript",
+      "Node.js",
+      "JavaScript",
+      "CSS",
+      "HTML",
+    ],
     salaryMin: "120000",
     salaryMax: "150000",
     domain: "Technology",
@@ -170,7 +185,7 @@ export const HARDCODED_JOBS: JobData[] = [
       technical: 5,
       offer: 2,
       hired: 1,
-      rejected: 17
+      rejected: 17,
     },
     budget: {
       estimated: 15000,
@@ -185,7 +200,7 @@ export const HARDCODED_JOBS: JobData[] = [
           evaluationPeriod: "30 days",
           effectiveness: 85,
           createdAt: "2024-01-10",
-          createdBy: "Alex Chen"
+          createdBy: "Alex Chen",
         },
         {
           id: "exp_2",
@@ -196,12 +211,12 @@ export const HARDCODED_JOBS: JobData[] = [
           evaluationPeriod: "45 days",
           effectiveness: 90,
           createdAt: "2024-01-15",
-          createdBy: "Alex Chen"
-        }
-      ]
+          createdBy: "Alex Chen",
+        },
+      ],
     },
     createdAt: "2024-01-10T09:00:00Z",
-    updatedAt: "2024-01-15T14:30:00Z"
+    updatedAt: "2024-01-15T14:30:00Z",
   },
   {
     id: "job_2",
@@ -219,10 +234,16 @@ export const HARDCODED_JOBS: JobData[] = [
     status: "In Progress",
     location: "New York, NY",
     type: "Full-time",
-    description: "Seeking an experienced Product Manager to drive product strategy and roadmap execution.",
+    description:
+      "Seeking an experienced Product Manager to drive product strategy and roadmap execution.",
     priority: "High",
     emailAlias: "product-jobs@company.com",
-    expectedSkills: ["Product Strategy", "Agile", "Data Analysis", "User Research"],
+    expectedSkills: [
+      "Product Strategy",
+      "Agile",
+      "Data Analysis",
+      "User Research",
+    ],
     salaryMin: "110000",
     salaryMax: "140000",
     domain: "Technology",
@@ -235,10 +256,10 @@ export const HARDCODED_JOBS: JobData[] = [
       technical: 8,
       offer: 3,
       hired: 0,
-      rejected: 21
+      rejected: 21,
     },
     createdAt: "2024-01-05T10:00:00Z",
-    updatedAt: "2024-01-16T11:20:00Z"
+    updatedAt: "2024-01-16T11:20:00Z",
   },
   {
     id: "job_3",
@@ -256,7 +277,8 @@ export const HARDCODED_JOBS: JobData[] = [
     status: "Closed",
     location: "Remote",
     type: "Full-time",
-    description: "Join our design team to create exceptional user experiences for our products.",
+    description:
+      "Join our design team to create exceptional user experiences for our products.",
     priority: "Medium",
     emailAlias: "design-jobs@company.com",
     expectedSkills: ["Figma", "Sketch", "User Research", "Prototyping"],
@@ -272,11 +294,11 @@ export const HARDCODED_JOBS: JobData[] = [
       technical: 8,
       offer: 3,
       hired: 1,
-      rejected: 10
+      rejected: 10,
     },
     createdAt: "2023-12-20T14:00:00Z",
-    updatedAt: "2024-01-25T16:45:00Z"
-  }
+    updatedAt: "2024-01-25T16:45:00Z",
+  },
 ];
 
 export const HARDCODED_CANDIDATES: CandidateData[] = [
@@ -311,7 +333,7 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         reason: "Application submitted",
         notes: "Strong technical background",
         userId: "user_1",
-        userName: "Alex Chen"
+        userName: "Alex Chen",
       },
       {
         id: "stage_2",
@@ -322,7 +344,7 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         reason: "Passed initial screening",
         notes: "Excellent communication skills",
         userId: "user_1",
-        userName: "Alex Chen"
+        userName: "Alex Chen",
       },
       {
         id: "stage_3",
@@ -332,8 +354,8 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         reason: "Scheduled for technical interview",
         notes: "Panel interview scheduled for Jan 25th",
         userId: "user_1",
-        userName: "Alex Chen"
-      }
+        userName: "Alex Chen",
+      },
     ],
     notes: [
       {
@@ -342,20 +364,21 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         userId: "user_1",
         userName: "Alex Chen",
         timestamp: "2024-01-16T10:30:00Z",
-        type: "note"
-      }
+        type: "note",
+      },
     ],
     emails: [
       {
         id: "email_1",
         subject: "Interview Invitation - Senior Frontend Developer",
-        content: "Hi Sarah, Thank you for your interest in our Senior Frontend Developer position...",
+        content:
+          "Hi Sarah, Thank you for your interest in our Senior Frontend Developer position...",
         from: "alex.chen@company.com",
         to: "sarah.j@email.com",
         timestamp: "2024-01-17T09:00:00Z",
         status: "sent",
-        template: "interview_invitation"
-      }
+        template: "interview_invitation",
+      },
     ],
     attachments: [
       {
@@ -365,11 +388,11 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         size: 245760,
         url: "/uploads/sarah_johnson_resume.pdf",
         uploadedAt: "2024-01-15T14:30:00Z",
-        uploadedBy: "Sarah Johnson"
-      }
+        uploadedBy: "Sarah Johnson",
+      },
     ],
     createdAt: "2024-01-15T09:00:00Z",
-    updatedAt: "2024-01-19T11:15:00Z"
+    updatedAt: "2024-01-19T11:15:00Z",
   },
   {
     id: "candidate_2",
@@ -379,7 +402,13 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
     location: "New York, NY",
     position: "Product Manager",
     experience: "7+ years",
-    skills: ["Product Strategy", "Agile", "Data Analysis", "User Research", "Roadmapping"],
+    skills: [
+      "Product Strategy",
+      "Agile",
+      "Data Analysis",
+      "User Research",
+      "Roadmapping",
+    ],
     status: "Active",
     stage: "Technical",
     rating: 4,
@@ -402,7 +431,7 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         reason: "Application received",
         notes: "Strong PM background",
         userId: "user_2",
-        userName: "Sarah Kim"
+        userName: "Sarah Kim",
       },
       {
         id: "stage_2",
@@ -413,7 +442,7 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         reason: "Phone screening completed",
         notes: "Great strategic thinking",
         userId: "user_2",
-        userName: "Sarah Kim"
+        userName: "Sarah Kim",
       },
       {
         id: "stage_3",
@@ -424,7 +453,7 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         reason: "Panel interview passed",
         notes: "Impressive case study presentation",
         userId: "user_2",
-        userName: "Sarah Kim"
+        userName: "Sarah Kim",
       },
       {
         id: "stage_4",
@@ -434,8 +463,8 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         reason: "Technical assessment in progress",
         notes: "Product case study due Jan 28th",
         userId: "user_2",
-        userName: "Sarah Kim"
-      }
+        userName: "Sarah Kim",
+      },
     ],
     notes: [
       {
@@ -444,20 +473,21 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         userId: "user_2",
         userName: "Sarah Kim",
         timestamp: "2024-01-17T15:20:00Z",
-        type: "note"
-      }
+        type: "note",
+      },
     ],
     emails: [
       {
         id: "email_1",
         subject: "Technical Assessment - Product Manager Role",
-        content: "Hi Michael, Following our successful interview, we'd like to proceed with the technical assessment...",
+        content:
+          "Hi Michael, Following our successful interview, we'd like to proceed with the technical assessment...",
         from: "sarah.kim@company.com",
         to: "michael.chen@email.com",
         timestamp: "2024-01-20T14:30:00Z",
         status: "sent",
-        template: "technical_assessment"
-      }
+        template: "technical_assessment",
+      },
     ],
     attachments: [
       {
@@ -467,11 +497,11 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         size: 312450,
         url: "/uploads/michael_chen_resume.pdf",
         uploadedAt: "2024-01-12T16:45:00Z",
-        uploadedBy: "Michael Chen"
-      }
+        uploadedBy: "Michael Chen",
+      },
     ],
     createdAt: "2024-01-12T10:30:00Z",
-    updatedAt: "2024-01-20T14:30:00Z"
+    updatedAt: "2024-01-20T14:30:00Z",
   },
   {
     id: "candidate_3",
@@ -481,7 +511,13 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
     location: "Remote",
     position: "UX Designer",
     experience: "4+ years",
-    skills: ["Figma", "Sketch", "User Research", "Prototyping", "Design Systems"],
+    skills: [
+      "Figma",
+      "Sketch",
+      "User Research",
+      "Prototyping",
+      "Design Systems",
+    ],
     status: "Active",
     stage: "Hired",
     rating: 5,
@@ -504,7 +540,7 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         reason: "Application submitted via website",
         notes: "Impressive portfolio",
         userId: "user_3",
-        userName: "Mike Wilson"
+        userName: "Mike Wilson",
       },
       {
         id: "stage_2",
@@ -515,7 +551,7 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         reason: "Portfolio review and initial call",
         notes: "Strong design background",
         userId: "user_3",
-        userName: "Mike Wilson"
+        userName: "Mike Wilson",
       },
       {
         id: "stage_3",
@@ -526,7 +562,7 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         reason: "Design challenge completed successfully",
         notes: "Excellent design thinking process",
         userId: "user_3",
-        userName: "Mike Wilson"
+        userName: "Mike Wilson",
       },
       {
         id: "stage_4",
@@ -537,7 +573,7 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         reason: "Offer extended and accepted",
         notes: "Negotiated remote work arrangement",
         userId: "user_3",
-        userName: "Mike Wilson"
+        userName: "Mike Wilson",
       },
       {
         id: "stage_5",
@@ -547,38 +583,41 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         reason: "Onboarding completed",
         notes: "Start date: February 1st, 2024",
         userId: "user_3",
-        userName: "Mike Wilson"
-      }
+        userName: "Mike Wilson",
+      },
     ],
     notes: [
       {
         id: "note_1",
-        content: "Outstanding portfolio showcasing user-centered design approach",
+        content:
+          "Outstanding portfolio showcasing user-centered design approach",
         userId: "user_3",
         userName: "Mike Wilson",
         timestamp: "2024-01-09T11:00:00Z",
-        type: "note"
+        type: "note",
       },
       {
         id: "note_2",
-        content: "Successfully completed design challenge with innovative solutions",
+        content:
+          "Successfully completed design challenge with innovative solutions",
         userId: "user_3",
         userName: "Mike Wilson",
         timestamp: "2024-01-15T16:30:00Z",
-        type: "note"
-      }
+        type: "note",
+      },
     ],
     emails: [
       {
         id: "email_1",
         subject: "Offer Letter - UX Designer Position",
-        content: "Dear Emily, We are pleased to offer you the position of UX Designer...",
+        content:
+          "Dear Emily, We are pleased to offer you the position of UX Designer...",
         from: "mike.wilson@company.com",
         to: "emily.davis@email.com",
         timestamp: "2024-01-15T10:00:00Z",
         status: "sent",
-        template: "offer_letter"
-      }
+        template: "offer_letter",
+      },
     ],
     attachments: [
       {
@@ -588,12 +627,12 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         size: 198765,
         url: "/uploads/emily_davis_resume.pdf",
         uploadedAt: "2024-01-08T13:20:00Z",
-        uploadedBy: "Emily Davis"
-      }
+        uploadedBy: "Emily Davis",
+      },
     ],
     createdAt: "2024-01-08T09:15:00Z",
-    updatedAt: "2024-01-18T17:00:00Z"
-  }
+    updatedAt: "2024-01-18T17:00:00Z",
+  },
 ];
 
 export const HARDCODED_NOTIFICATIONS: NotificationData[] = [
@@ -605,7 +644,7 @@ export const HARDCODED_NOTIFICATIONS: NotificationData[] = [
     read: false,
     timestamp: "2024-01-20T10:30:00Z",
     actionUrl: "/candidates/candidate_1",
-    actionText: "View Candidate"
+    actionText: "View Candidate",
   },
   {
     id: "notif_2",
@@ -615,7 +654,7 @@ export const HARDCODED_NOTIFICATIONS: NotificationData[] = [
     read: true,
     timestamp: "2024-01-19T14:15:00Z",
     actionUrl: "/calendar",
-    actionText: "View Calendar"
+    actionText: "View Calendar",
   },
   {
     id: "notif_3",
@@ -625,35 +664,39 @@ export const HARDCODED_NOTIFICATIONS: NotificationData[] = [
     read: false,
     timestamp: "2024-01-18T09:00:00Z",
     actionUrl: "/jobs/job_3",
-    actionText: "View Job"
-  }
+    actionText: "View Job",
+  },
 ];
 
 export const EMAIL_TEMPLATES = {
-  interview_invitation: "Dear {{name}},\n\nWe would like to invite you for an interview for the {{position}} position...",
-  offer_letter: "Dear {{name}},\n\nWe are pleased to offer you the position of {{position}}...",
-  rejection_notice: "Dear {{name}},\n\nThank you for your interest in the {{position}} position...",
-  technical_assessment: "Dear {{name}},\n\nFollowing our successful interview, we'd like to proceed with the technical assessment..."
+  interview_invitation:
+    "Dear {{name}},\n\nWe would like to invite you for an interview for the {{position}} position...",
+  offer_letter:
+    "Dear {{name}},\n\nWe are pleased to offer you the position of {{position}}...",
+  rejection_notice:
+    "Dear {{name}},\n\nThank you for your interest in the {{position}} position...",
+  technical_assessment:
+    "Dear {{name}},\n\nFollowing our successful interview, we'd like to proceed with the technical assessment...",
 };
 
 // Helper functions
 export const getJob = (id: string): JobData | undefined => {
-  return HARDCODED_JOBS.find(job => job.id === id);
+  return HARDCODED_JOBS.find((job) => job.id === id);
 };
 
 export const getCandidate = (id: string): CandidateData | undefined => {
-  return HARDCODED_CANDIDATES.find(candidate => candidate.id === id);
+  return HARDCODED_CANDIDATES.find((candidate) => candidate.id === id);
 };
 
 export const getJobCandidates = (jobId: string): CandidateData[] => {
   const job = getJob(jobId);
   if (!job) return [];
-  
-  return HARDCODED_CANDIDATES.filter(candidate => 
-    candidate.position === job.position
+
+  return HARDCODED_CANDIDATES.filter(
+    (candidate) => candidate.position === job.position,
   );
 };
 
 export const getUnreadNotificationCount = (): number => {
-  return HARDCODED_NOTIFICATIONS.filter(notif => !notif.read).length;
+  return HARDCODED_NOTIFICATIONS.filter((notif) => !notif.read).length;
 };

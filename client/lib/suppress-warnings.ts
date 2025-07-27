@@ -12,12 +12,15 @@ console.warn = (...args: any[]) => {
   const secondArg = args[1];
 
   if (
-    typeof message === 'string' &&
-    message.includes('Support for defaultProps will be removed from function components')
+    typeof message === "string" &&
+    message.includes(
+      "Support for defaultProps will be removed from function components",
+    )
   ) {
     // Check if it's any Recharts component - the component name might be in the second argument
-    const allText = [message, secondArg].join(' ');
-    const rechartsComponentPattern = /(XAxis|YAxis|CartesianGrid|Tooltip|Legend|PolarGrid|PolarAngleAxis|PolarRadiusAxis|Radar|Bar|Line|Pie|Cell|ResponsiveContainer|Surface|ReferenceLine|ReferenceArea|Brush|ErrorBar)\d*/;
+    const allText = [message, secondArg].join(" ");
+    const rechartsComponentPattern =
+      /(XAxis|YAxis|CartesianGrid|Tooltip|Legend|PolarGrid|PolarAngleAxis|PolarRadiusAxis|Radar|Bar|Line|Pie|Cell|ResponsiveContainer|Surface|ReferenceLine|ReferenceArea|Brush|ErrorBar)\d*/;
 
     const isRechartsComponent = rechartsComponentPattern.test(allText);
 
@@ -37,12 +40,15 @@ console.error = (...args: any[]) => {
   const secondArg = args[1];
 
   if (
-    typeof message === 'string' &&
-    message.includes('Support for defaultProps will be removed from function components')
+    typeof message === "string" &&
+    message.includes(
+      "Support for defaultProps will be removed from function components",
+    )
   ) {
     // Check if it's any Recharts component - the component name might be in the second argument
-    const allText = [message, secondArg].join(' ');
-    const rechartsComponentPattern = /(XAxis|YAxis|CartesianGrid|Tooltip|Legend|PolarGrid|PolarAngleAxis|PolarRadiusAxis|Radar|Bar|Line|Pie|Cell|ResponsiveContainer|Surface|ReferenceLine|ReferenceArea|Brush|ErrorBar)\d*/;
+    const allText = [message, secondArg].join(" ");
+    const rechartsComponentPattern =
+      /(XAxis|YAxis|CartesianGrid|Tooltip|Legend|PolarGrid|PolarAngleAxis|PolarRadiusAxis|Radar|Bar|Line|Pie|Cell|ResponsiveContainer|Surface|ReferenceLine|ReferenceArea|Brush|ErrorBar)\d*/;
 
     const isRechartsComponent = rechartsComponentPattern.test(allText);
 

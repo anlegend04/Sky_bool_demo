@@ -157,14 +157,40 @@ export default function Jobs() {
       recruiterFilter === "all" ||
       job.recruiter.toLowerCase().includes(recruiterFilter.toLowerCase());
 
-    return matchesSearch && matchesDepartment && matchesStatus && matchesPriority && matchesRecruiter;
+    return (
+      matchesSearch &&
+      matchesDepartment &&
+      matchesStatus &&
+      matchesPriority &&
+      matchesRecruiter
+    );
   });
 
   const stats = [
-    { title: "Active Jobs", value: jobs.filter(j => j.status === "Open").length.toString(), change: "+3", color: "blue" },
-    { title: "Total Applications", value: jobs.reduce((acc, job) => acc + job.applications, 0).toString(), change: "+45", color: "green" },
-    { title: "Positions Filled", value: jobs.reduce((acc, job) => acc + job.hired, 0).toString(), change: "+2", color: "purple" },
-    { title: "Avg. Time to Fill", value: "28 days", change: "-5", color: "orange" },
+    {
+      title: "Active Jobs",
+      value: jobs.filter((j) => j.status === "Open").length.toString(),
+      change: "+3",
+      color: "blue",
+    },
+    {
+      title: "Total Applications",
+      value: jobs.reduce((acc, job) => acc + job.applications, 0).toString(),
+      change: "+45",
+      color: "green",
+    },
+    {
+      title: "Positions Filled",
+      value: jobs.reduce((acc, job) => acc + job.hired, 0).toString(),
+      change: "+2",
+      color: "purple",
+    },
+    {
+      title: "Avg. Time to Fill",
+      value: "28 days",
+      change: "-5",
+      color: "orange",
+    },
   ];
 
   const handleAddJob = () => {
@@ -174,7 +200,7 @@ export default function Jobs() {
         applications: 0,
         target: newJob.headcount,
         hired: 0,
-        openDate: new Date().toISOString().split('T')[0],
+        openDate: new Date().toISOString().split("T")[0],
         actualCost: "0",
         performance: 0,
         status: "Open" as const,
@@ -191,7 +217,7 @@ export default function Jobs() {
 
       // In a real app, this would create the job
       setShowAddJobDialog(false);
-      
+
       // Reset form
       setNewJob({
         emailAlias: "",
@@ -319,11 +345,23 @@ export default function Jobs() {
   const getPriorityBadge = (priority: JobData["priority"]) => {
     switch (priority) {
       case "High":
-        return <Badge variant="destructive" className="text-xs">High</Badge>;
+        return (
+          <Badge variant="destructive" className="text-xs">
+            High
+          </Badge>
+        );
       case "Medium":
-        return <Badge variant="secondary" className="text-xs">Medium</Badge>;
+        return (
+          <Badge variant="secondary" className="text-xs">
+            Medium
+          </Badge>
+        );
       case "Low":
-        return <Badge variant="outline" className="text-xs">Low</Badge>;
+        return (
+          <Badge variant="outline" className="text-xs">
+            Low
+          </Badge>
+        );
       default:
         return <Badge className="text-xs">{priority}</Badge>;
     }
@@ -378,7 +416,10 @@ export default function Jobs() {
               </DropdownMenuItem>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <DropdownMenuItem className="text-red-600" onSelect={(e) => e.preventDefault()}>
+                  <DropdownMenuItem
+                    className="text-red-600"
+                    onSelect={(e) => e.preventDefault()}
+                  >
                     <Trash2 className="w-4 h-4 mr-2" />
                     Delete
                   </DropdownMenuItem>
@@ -387,7 +428,8 @@ export default function Jobs() {
                   <AlertDialogHeader>
                     <AlertDialogTitle>Delete Job</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Are you sure you want to delete "{job.position}"? This action cannot be undone.
+                      Are you sure you want to delete "{job.position}"? This
+                      action cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
@@ -407,11 +449,13 @@ export default function Jobs() {
           <span className="text-sm text-slate-600">Applications</span>
           <Badge variant="outline">{job.applications}</Badge>
         </div>
-        
+
         <div className="space-y-2">
           <div className="flex justify-between text-xs">
             <span>Pipeline Summary</span>
-            <span>{job.pipelineSummary.hired}/{job.target} hired</span>
+            <span>
+              {job.pipelineSummary.hired}/{job.target} hired
+            </span>
           </div>
           <div className="grid grid-cols-3 gap-1 text-xs">
             <div className="text-center p-1 bg-blue-50 rounded">
@@ -435,7 +479,9 @@ export default function Jobs() {
             <span className="text-xs text-slate-500">by {job.recruiter}</span>
           </div>
           <div className="flex items-center gap-2">
-            <TrendingUp className={`w-4 h-4 ${getPerformanceColor(job.performance)}`} />
+            <TrendingUp
+              className={`w-4 h-4 ${getPerformanceColor(job.performance)}`}
+            />
             <span className={`text-xs ${getPerformanceColor(job.performance)}`}>
               {job.performance}%
             </span>
@@ -455,11 +501,15 @@ export default function Jobs() {
               {visibleFields.department && <TableHead>Department</TableHead>}
               {visibleFields.recruiter && <TableHead>Recruiter</TableHead>}
               {visibleFields.priority && <TableHead>Priority</TableHead>}
-              {visibleFields.applications && <TableHead>Applications</TableHead>}
+              {visibleFields.applications && (
+                <TableHead>Applications</TableHead>
+              )}
               {visibleFields.target && <TableHead>Target</TableHead>}
               {visibleFields.hired && <TableHead>Hired</TableHead>}
               {visibleFields.process && <TableHead>Process</TableHead>}
-              {visibleFields.pipelineSummary && <TableHead>Pipeline Summary</TableHead>}
+              {visibleFields.pipelineSummary && (
+                <TableHead>Pipeline Summary</TableHead>
+              )}
               {visibleFields.openDate && <TableHead>Open Date</TableHead>}
               {visibleFields.deadline && <TableHead>Deadline</TableHead>}
               {visibleFields.estimatedCost && <TableHead>Est. Cost</TableHead>}
@@ -482,9 +532,15 @@ export default function Jobs() {
                     </Link>
                   </TableCell>
                 )}
-                {visibleFields.department && <TableCell>{job.department}</TableCell>}
-                {visibleFields.recruiter && <TableCell>{job.recruiter}</TableCell>}
-                {visibleFields.priority && <TableCell>{getPriorityBadge(job.priority)}</TableCell>}
+                {visibleFields.department && (
+                  <TableCell>{job.department}</TableCell>
+                )}
+                {visibleFields.recruiter && (
+                  <TableCell>{job.recruiter}</TableCell>
+                )}
+                {visibleFields.priority && (
+                  <TableCell>{getPriorityBadge(job.priority)}</TableCell>
+                )}
                 {visibleFields.applications && (
                   <TableCell>
                     <div className="flex items-center space-x-2">
@@ -513,8 +569,12 @@ export default function Jobs() {
                   <TableCell>
                     <div className="space-y-1">
                       <div className="flex justify-between text-xs">
-                        <span>{job.hired}/{job.target}</span>
-                        <span>{Math.round((job.hired / job.target) * 100)}%</span>
+                        <span>
+                          {job.hired}/{job.target}
+                        </span>
+                        <span>
+                          {Math.round((job.hired / job.target) * 100)}%
+                        </span>
                       </div>
                       <Progress
                         value={(job.hired / job.target) * 100}
@@ -528,11 +588,15 @@ export default function Jobs() {
                     <div className="text-xs space-y-1">
                       <div>{job.pipelineSummary.applied} Applied</div>
                       <div>{job.pipelineSummary.interview} Interviewing</div>
-                      <div className="font-medium text-green-600">{job.pipelineSummary.hired} Hired</div>
+                      <div className="font-medium text-green-600">
+                        {job.pipelineSummary.hired} Hired
+                      </div>
                     </div>
                   </TableCell>
                 )}
-                {visibleFields.openDate && <TableCell>{job.openDate}</TableCell>}
+                {visibleFields.openDate && (
+                  <TableCell>{job.openDate}</TableCell>
+                )}
                 {visibleFields.deadline && (
                   <TableCell>
                     <div className="flex items-center space-x-2">
@@ -541,12 +605,18 @@ export default function Jobs() {
                     </div>
                   </TableCell>
                 )}
-                {visibleFields.estimatedCost && <TableCell>${job.estimatedCost}</TableCell>}
-                {visibleFields.actualCost && <TableCell>${job.actualCost}</TableCell>}
+                {visibleFields.estimatedCost && (
+                  <TableCell>${job.estimatedCost}</TableCell>
+                )}
+                {visibleFields.actualCost && (
+                  <TableCell>${job.actualCost}</TableCell>
+                )}
                 {visibleFields.performance && (
                   <TableCell>
                     <div className="flex items-center space-x-2">
-                      <TrendingUp className={`w-4 h-4 ${getPerformanceColor(job.performance)}`} />
+                      <TrendingUp
+                        className={`w-4 h-4 ${getPerformanceColor(job.performance)}`}
+                      />
                       <span className={getPerformanceColor(job.performance)}>
                         {job.performance}%
                       </span>
@@ -578,7 +648,10 @@ export default function Jobs() {
                       </DropdownMenuItem>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <DropdownMenuItem className="text-red-600" onSelect={(e) => e.preventDefault()}>
+                          <DropdownMenuItem
+                            className="text-red-600"
+                            onSelect={(e) => e.preventDefault()}
+                          >
                             <Trash2 className="w-4 h-4 mr-2" />
                             Delete
                           </DropdownMenuItem>
@@ -587,12 +660,15 @@ export default function Jobs() {
                           <AlertDialogHeader>
                             <AlertDialogTitle>Delete Job</AlertDialogTitle>
                             <AlertDialogDescription>
-                              Are you sure you want to delete "{job.position}"? This action cannot be undone.
+                              Are you sure you want to delete "{job.position}"?
+                              This action cannot be undone.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDeleteJob(job.id)}>
+                            <AlertDialogAction
+                              onClick={() => handleDeleteJob(job.id)}
+                            >
                               Delete
                             </AlertDialogAction>
                           </AlertDialogFooter>
@@ -618,27 +694,32 @@ export default function Jobs() {
   );
 
   const AddJobForm = () => (
-    <Dialog open={showAddJobDialog} onOpenChange={(open) => {
-      setShowAddJobDialog(open);
-      if (!open) {
-        setEditingJob(null);
-      }
-    }}>
+    <Dialog
+      open={showAddJobDialog}
+      onOpenChange={(open) => {
+        setShowAddJobDialog(open);
+        if (!open) {
+          setEditingJob(null);
+        }
+      }}
+    >
       <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{editingJob ? "Edit Job" : "Add New Job"}</DialogTitle>
           <DialogDescription>
-            {editingJob ? "Update the job details below." : "Create a new job posting with all the necessary details."}
+            {editingJob
+              ? "Update the job details below."
+              : "Create a new job posting with all the necessary details."}
           </DialogDescription>
         </DialogHeader>
-        
+
         <Tabs defaultValue="basic" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="basic">Basic Info</TabsTrigger>
             <TabsTrigger value="details">Job Details</TabsTrigger>
             <TabsTrigger value="team">Team & Budget</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="basic" className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -649,13 +730,22 @@ export default function Jobs() {
                 <Input
                   placeholder="jobs@company.com"
                   value={newJob.emailAlias}
-                  onChange={(e) => setNewJob({...newJob, emailAlias: e.target.value})}
+                  onChange={(e) =>
+                    setNewJob({ ...newJob, emailAlias: e.target.value })
+                  }
                   className="mt-1"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700">Department</label>
-                <Select value={newJob.department} onValueChange={(value) => setNewJob({...newJob, department: value})}>
+                <label className="text-sm font-medium text-slate-700">
+                  Department
+                </label>
+                <Select
+                  value={newJob.department}
+                  onValueChange={(value) =>
+                    setNewJob({ ...newJob, department: value })
+                  }
+                >
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Select department" />
                   </SelectTrigger>
@@ -670,20 +760,28 @@ export default function Jobs() {
                 </Select>
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700">Job Location</label>
+                <label className="text-sm font-medium text-slate-700">
+                  Job Location
+                </label>
                 <Input
                   placeholder="San Francisco, CA or Remote"
                   value={newJob.location}
-                  onChange={(e) => setNewJob({...newJob, location: e.target.value})}
+                  onChange={(e) =>
+                    setNewJob({ ...newJob, location: e.target.value })
+                  }
                   className="mt-1"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700">Job Position</label>
+                <label className="text-sm font-medium text-slate-700">
+                  Job Position
+                </label>
                 <Input
                   placeholder="Senior Software Engineer"
                   value={newJob.position}
-                  onChange={(e) => setNewJob({...newJob, position: e.target.value})}
+                  onChange={(e) =>
+                    setNewJob({ ...newJob, position: e.target.value })
+                  }
                   className="mt-1"
                 />
               </div>
@@ -692,7 +790,12 @@ export default function Jobs() {
                   Employment Type
                   <HelpTooltip content={helpContent.employmentType} />
                 </label>
-                <Select value={newJob.type} onValueChange={(value: any) => setNewJob({...newJob, type: value})}>
+                <Select
+                  value={newJob.type}
+                  onValueChange={(value: any) =>
+                    setNewJob({ ...newJob, type: value })
+                  }
+                >
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Select employment type" />
                   </SelectTrigger>
@@ -711,7 +814,9 @@ export default function Jobs() {
                 <Input
                   placeholder="Technology, Finance, Healthcare"
                   value={newJob.domain}
-                  onChange={(e) => setNewJob({...newJob, domain: e.target.value})}
+                  onChange={(e) =>
+                    setNewJob({ ...newJob, domain: e.target.value })
+                  }
                   className="mt-1"
                 />
               </div>
@@ -720,7 +825,12 @@ export default function Jobs() {
                   Priority
                   <HelpTooltip content={helpContent.priority} />
                 </label>
-                <Select value={newJob.priority} onValueChange={(value: any) => setNewJob({...newJob, priority: value})}>
+                <Select
+                  value={newJob.priority}
+                  onValueChange={(value: any) =>
+                    setNewJob({ ...newJob, priority: value })
+                  }
+                >
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Select priority" />
                   </SelectTrigger>
@@ -732,62 +842,88 @@ export default function Jobs() {
                 </Select>
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700">Deadline</label>
+                <label className="text-sm font-medium text-slate-700">
+                  Deadline
+                </label>
                 <Input
                   type="date"
                   value={newJob.deadline}
-                  onChange={(e) => setNewJob({...newJob, deadline: e.target.value})}
+                  onChange={(e) =>
+                    setNewJob({ ...newJob, deadline: e.target.value })
+                  }
                   className="mt-1"
                 />
               </div>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="details" className="space-y-4">
             <div className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-slate-700">Expected Skills</label>
+                <label className="text-sm font-medium text-slate-700">
+                  Expected Skills
+                </label>
                 <Input
                   placeholder="React, TypeScript, Node.js (comma separated)"
-                  onChange={(e) => setNewJob({...newJob, expectedSkills: e.target.value.split(',').map(s => s.trim()).filter(Boolean)})}
+                  onChange={(e) =>
+                    setNewJob({
+                      ...newJob,
+                      expectedSkills: e.target.value
+                        .split(",")
+                        .map((s) => s.trim())
+                        .filter(Boolean),
+                    })
+                  }
                   className="mt-1"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-slate-700">Salary Min</label>
+                  <label className="text-sm font-medium text-slate-700">
+                    Salary Min
+                  </label>
                   <Input
                     placeholder="80000"
                     type="number"
                     value={newJob.salaryMin}
-                    onChange={(e) => setNewJob({...newJob, salaryMin: e.target.value})}
+                    onChange={(e) =>
+                      setNewJob({ ...newJob, salaryMin: e.target.value })
+                    }
                     className="mt-1"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-slate-700">Salary Max</label>
+                  <label className="text-sm font-medium text-slate-700">
+                    Salary Max
+                  </label>
                   <Input
                     placeholder="120000"
                     type="number"
                     value={newJob.salaryMax}
-                    onChange={(e) => setNewJob({...newJob, salaryMax: e.target.value})}
+                    onChange={(e) =>
+                      setNewJob({ ...newJob, salaryMax: e.target.value })
+                    }
                     className="mt-1"
                   />
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700">Job Description</label>
+                <label className="text-sm font-medium text-slate-700">
+                  Job Description
+                </label>
                 <Textarea
                   placeholder="Describe the role, responsibilities, and requirements..."
                   value={newJob.description}
-                  onChange={(e) => setNewJob({...newJob, description: e.target.value})}
+                  onChange={(e) =>
+                    setNewJob({ ...newJob, description: e.target.value })
+                  }
                   className="mt-1"
                   rows={6}
                 />
               </div>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="team" className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -799,13 +935,25 @@ export default function Jobs() {
                   placeholder="2"
                   type="number"
                   value={newJob.headcount}
-                  onChange={(e) => setNewJob({...newJob, headcount: parseInt(e.target.value) || 1})}
+                  onChange={(e) =>
+                    setNewJob({
+                      ...newJob,
+                      headcount: parseInt(e.target.value) || 1,
+                    })
+                  }
                   className="mt-1"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700">Recruiter</label>
-                <Select value={newJob.recruiter} onValueChange={(value) => setNewJob({...newJob, recruiter: value})}>
+                <label className="text-sm font-medium text-slate-700">
+                  Recruiter
+                </label>
+                <Select
+                  value={newJob.recruiter}
+                  onValueChange={(value) =>
+                    setNewJob({ ...newJob, recruiter: value })
+                  }
+                >
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Select recruiter" />
                   </SelectTrigger>
@@ -818,7 +966,9 @@ export default function Jobs() {
               </div>
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-700">Interviewers</label>
+              <label className="text-sm font-medium text-slate-700">
+                Interviewers
+              </label>
               <Input
                 placeholder="Select team members who will conduct interviews"
                 className="mt-1"
@@ -833,12 +983,17 @@ export default function Jobs() {
                 placeholder="15000"
                 type="number"
                 value={newJob.estimatedCost}
-                onChange={(e) => setNewJob({...newJob, estimatedCost: e.target.value})}
+                onChange={(e) =>
+                  setNewJob({ ...newJob, estimatedCost: e.target.value })
+                }
                 className="mt-1"
               />
             </div>
             <div className="flex justify-end space-x-2 pt-4">
-              <Button variant="outline" onClick={() => setShowAddJobDialog(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setShowAddJobDialog(false)}
+              >
                 Cancel
               </Button>
               <Button onClick={editingJob ? handleUpdateJob : handleAddJob}>
@@ -858,7 +1013,8 @@ export default function Jobs() {
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Job Management</h1>
           <p className="text-slate-600 mt-1">
-            Manage job postings, track applications, and monitor hiring performance.
+            Manage job postings, track applications, and monitor hiring
+            performance.
           </p>
         </div>
         <div className="flex space-x-3">
@@ -881,7 +1037,9 @@ export default function Jobs() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-600">{stat.title}</p>
-                  <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
+                  <p className="text-2xl font-bold text-slate-900">
+                    {stat.value}
+                  </p>
                   <p className="text-sm text-green-600">
                     {stat.change} vs last month
                   </p>
@@ -935,10 +1093,14 @@ export default function Jobs() {
                         key={field}
                         checked={visible}
                         onCheckedChange={(checked) =>
-                          setVisibleFields((prev) => ({ ...prev, [field]: checked }))
+                          setVisibleFields((prev) => ({
+                            ...prev,
+                            [field]: checked,
+                          }))
                         }
                       >
-                        {field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1')}
+                        {field.charAt(0).toUpperCase() +
+                          field.slice(1).replace(/([A-Z])/g, " $1")}
                       </DropdownMenuCheckboxItem>
                     ))}
                   </DropdownMenuContent>
@@ -960,7 +1122,10 @@ export default function Jobs() {
                 </div>
               </div>
               <div className="flex gap-3">
-                <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+                <Select
+                  value={departmentFilter}
+                  onValueChange={setDepartmentFilter}
+                >
                   <SelectTrigger className="w-32">
                     <SelectValue placeholder="Department" />
                   </SelectTrigger>
@@ -985,7 +1150,10 @@ export default function Jobs() {
                     <SelectItem value="paused">Paused</SelectItem>
                   </SelectContent>
                 </Select>
-                <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+                <Select
+                  value={priorityFilter}
+                  onValueChange={setPriorityFilter}
+                >
                   <SelectTrigger className="w-32">
                     <SelectValue placeholder="Priority" />
                   </SelectTrigger>
@@ -1015,12 +1183,22 @@ export default function Jobs() {
           <Button variant="outline" size="sm" disabled>
             Previous
           </Button>
-          <Button variant="outline" size="sm" className="bg-blue-50 text-blue-600">
+          <Button
+            variant="outline"
+            size="sm"
+            className="bg-blue-50 text-blue-600"
+          >
             1
           </Button>
-          <Button variant="outline" size="sm">2</Button>
-          <Button variant="outline" size="sm">3</Button>
-          <Button variant="outline" size="sm">Next</Button>
+          <Button variant="outline" size="sm">
+            2
+          </Button>
+          <Button variant="outline" size="sm">
+            3
+          </Button>
+          <Button variant="outline" size="sm">
+            Next
+          </Button>
         </div>
       </div>
 
@@ -1038,7 +1216,11 @@ export default function Jobs() {
           <div className="space-y-4">
             <div className="flex items-center gap-2 p-3 bg-slate-50 rounded">
               <Input
-                value={shareJobId ? `${window.location.origin}/jobs/${shareJobId}/public` : ""}
+                value={
+                  shareJobId
+                    ? `${window.location.origin}/jobs/${shareJobId}/public`
+                    : ""
+                }
                 readOnly
                 className="flex-1"
               />

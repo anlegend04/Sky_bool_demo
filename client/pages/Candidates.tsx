@@ -118,34 +118,42 @@ export default function Candidates() {
     department: false,
   });
 
-
-
-  const stages = ["Applied", "Screening", "Interview", "Technical", "Offer", "Hired", "Rejected"];
+  const stages = [
+    "Applied",
+    "Screening",
+    "Interview",
+    "Technical",
+    "Offer",
+    "Hired",
+    "Rejected",
+  ];
 
   const stats = [
     {
       title: "Total Candidates",
       value: candidates.length.toString(),
       change: "+12%",
-      color: "blue"
+      color: "blue",
     },
     {
       title: "Active Pipeline",
-      value: candidates.filter(c => c.status === "Active").length.toString(),
+      value: candidates.filter((c) => c.status === "Active").length.toString(),
       change: "+8%",
-      color: "green"
+      color: "green",
     },
     {
       title: "Interviews Scheduled",
-      value: candidates.filter(c => c.stage === "Interview").length.toString(),
+      value: candidates
+        .filter((c) => c.stage === "Interview")
+        .length.toString(),
       change: "+15%",
-      color: "orange"
+      color: "orange",
     },
     {
       title: "Offers Extended",
-      value: candidates.filter(c => c.stage === "Offer").length.toString(),
+      value: candidates.filter((c) => c.stage === "Offer").length.toString(),
       change: "+3%",
-      color: "purple"
+      color: "purple",
     },
   ];
 
@@ -174,8 +182,14 @@ export default function Candidates() {
       recruiterFilter === "all" ||
       candidate.recruiter.toLowerCase().includes(recruiterFilter.toLowerCase());
 
-    return matchesSearch && matchesPosition && matchesStage && matchesLocation && 
-           matchesDepartment && matchesRecruiter;
+    return (
+      matchesSearch &&
+      matchesPosition &&
+      matchesStage &&
+      matchesLocation &&
+      matchesDepartment &&
+      matchesRecruiter
+    );
   });
 
   const CandidateCard = ({ candidate }: { candidate: CandidateData }) => (
@@ -196,7 +210,9 @@ export default function Candidates() {
               </AvatarFallback>
             </Avatar>
             <div>
-              <h3 className="font-semibold text-sm text-slate-900">{candidate.name}</h3>
+              <h3 className="font-semibold text-sm text-slate-900">
+                {candidate.name}
+              </h3>
               <p className="text-xs text-slate-600">{candidate.position}</p>
             </div>
           </Link>
@@ -319,11 +335,21 @@ export default function Candidates() {
                     </Link>
                   </TableCell>
                 )}
-                {visibleFields.appliedDate && <TableCell>{candidate.appliedDate}</TableCell>}
-                {visibleFields.email && <TableCell>{candidate.email}</TableCell>}
-                {visibleFields.phone && <TableCell>{candidate.phone}</TableCell>}
-                {visibleFields.position && <TableCell>{candidate.position}</TableCell>}
-                {visibleFields.recruiter && <TableCell>{candidate.recruiter}</TableCell>}
+                {visibleFields.appliedDate && (
+                  <TableCell>{candidate.appliedDate}</TableCell>
+                )}
+                {visibleFields.email && (
+                  <TableCell>{candidate.email}</TableCell>
+                )}
+                {visibleFields.phone && (
+                  <TableCell>{candidate.phone}</TableCell>
+                )}
+                {visibleFields.position && (
+                  <TableCell>{candidate.position}</TableCell>
+                )}
+                {visibleFields.recruiter && (
+                  <TableCell>{candidate.recruiter}</TableCell>
+                )}
                 {visibleFields.stage && (
                   <TableCell>
                     <Badge
@@ -347,10 +373,18 @@ export default function Candidates() {
                     </Badge>
                   </TableCell>
                 )}
-                {visibleFields.source && <TableCell>{candidate.source}</TableCell>}
-                {visibleFields.salary && <TableCell>{candidate.salary}</TableCell>}
-                {visibleFields.location && <TableCell>{candidate.location}</TableCell>}
-                {visibleFields.department && <TableCell>{candidate.department}</TableCell>}
+                {visibleFields.source && (
+                  <TableCell>{candidate.source}</TableCell>
+                )}
+                {visibleFields.salary && (
+                  <TableCell>{candidate.salary}</TableCell>
+                )}
+                {visibleFields.location && (
+                  <TableCell>{candidate.location}</TableCell>
+                )}
+                {visibleFields.department && (
+                  <TableCell>{candidate.department}</TableCell>
+                )}
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -388,7 +422,7 @@ export default function Candidates() {
     <div className="grid grid-cols-1 lg:grid-cols-7 gap-4">
       {stages.map((stage) => {
         const stageCandidates = filteredCandidates.filter(
-          (candidate) => candidate.stage === stage
+          (candidate) => candidate.stage === stage,
         );
         return (
           <div
@@ -415,7 +449,6 @@ export default function Candidates() {
         );
       })}
     </div>
-
   );
 
   return (
@@ -425,7 +458,8 @@ export default function Candidates() {
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Candidates</h1>
           <p className="text-slate-600 mt-1">
-            Manage candidate profiles, applications, and track their progress through your pipeline.
+            Manage candidate profiles, applications, and track their progress
+            through your pipeline.
           </p>
         </div>
         <div className="flex space-x-3">
@@ -440,7 +474,8 @@ export default function Candidates() {
               <DialogHeader>
                 <DialogTitle>Add New Candidate</DialogTitle>
                 <DialogDescription>
-                  Create a new candidate profile manually or upload their resume.
+                  Create a new candidate profile manually or upload their
+                  resume.
                 </DialogDescription>
               </DialogHeader>
               <Tabs defaultValue="manual" className="w-full">
@@ -451,33 +486,51 @@ export default function Candidates() {
                 <TabsContent value="manual" className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium text-slate-700">Full Name</label>
+                      <label className="text-sm font-medium text-slate-700">
+                        Full Name
+                      </label>
                       <Input placeholder="John Doe" className="mt-1" />
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-slate-700">Email</label>
-                      <Input type="email" placeholder="john@example.com" className="mt-1" />
+                      <label className="text-sm font-medium text-slate-700">
+                        Email
+                      </label>
+                      <Input
+                        type="email"
+                        placeholder="john@example.com"
+                        className="mt-1"
+                      />
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-slate-700">Phone</label>
+                      <label className="text-sm font-medium text-slate-700">
+                        Phone
+                      </label>
                       <Input placeholder="+1 (555) 123-4567" className="mt-1" />
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-slate-700">Location</label>
+                      <label className="text-sm font-medium text-slate-700">
+                        Location
+                      </label>
                       <Input placeholder="City, State" className="mt-1" />
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-slate-700">Position</label>
+                      <label className="text-sm font-medium text-slate-700">
+                        Position
+                      </label>
                       <Input placeholder="Software Engineer" className="mt-1" />
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-slate-700">Department</label>
+                      <label className="text-sm font-medium text-slate-700">
+                        Department
+                      </label>
                       <Select>
                         <SelectTrigger>
                           <SelectValue placeholder="Select department" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="engineering">Engineering</SelectItem>
+                          <SelectItem value="engineering">
+                            Engineering
+                          </SelectItem>
                           <SelectItem value="product">Product</SelectItem>
                           <SelectItem value="design">Design</SelectItem>
                           <SelectItem value="marketing">Marketing</SelectItem>
@@ -494,9 +547,12 @@ export default function Candidates() {
                 <TabsContent value="upload" className="space-y-4">
                   <div className="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center">
                     <FileText className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-                    <h4 className="text-lg font-medium text-slate-900 mb-2">Upload Resume/CV</h4>
+                    <h4 className="text-lg font-medium text-slate-900 mb-2">
+                      Upload Resume/CV
+                    </h4>
                     <p className="text-sm text-slate-600 mb-4">
-                      We'll automatically extract candidate information from the resume
+                      We'll automatically extract candidate information from the
+                      resume
                     </p>
                     <Button variant="outline">
                       <FileText className="w-4 h-4 mr-2" />
@@ -518,8 +574,12 @@ export default function Candidates() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-600">{stat.title}</p>
-                  <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
-                  <p className="text-sm text-green-600">{stat.change} vs last month</p>
+                  <p className="text-2xl font-bold text-slate-900">
+                    {stat.value}
+                  </p>
+                  <p className="text-sm text-green-600">
+                    {stat.change} vs last month
+                  </p>
                 </div>
                 <div className={`p-3 rounded-full bg-${stat.color}-100`}>
                   <User className={`w-6 h-6 text-${stat.color}-600`} />
@@ -570,10 +630,14 @@ export default function Candidates() {
                         key={field}
                         checked={visible}
                         onCheckedChange={(checked) =>
-                          setVisibleFields((prev) => ({ ...prev, [field]: checked }))
+                          setVisibleFields((prev) => ({
+                            ...prev,
+                            [field]: checked,
+                          }))
                         }
                       >
-                        {field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1')}
+                        {field.charAt(0).toUpperCase() +
+                          field.slice(1).replace(/([A-Z])/g, " $1")}
                       </DropdownMenuCheckboxItem>
                     ))}
                   </DropdownMenuContent>
@@ -595,7 +659,10 @@ export default function Candidates() {
                 </div>
               </div>
               <div className="flex gap-3">
-                <Select value={departmentFilter} onValueChange={setDepartmentFilter}>
+                <Select
+                  value={departmentFilter}
+                  onValueChange={setDepartmentFilter}
+                >
                   <SelectTrigger className="w-32">
                     <SelectValue placeholder="Department" />
                   </SelectTrigger>
@@ -621,7 +688,10 @@ export default function Candidates() {
                     ))}
                   </SelectContent>
                 </Select>
-                <Select value={recruiterFilter} onValueChange={setRecruiterFilter}>
+                <Select
+                  value={recruiterFilter}
+                  onValueChange={setRecruiterFilter}
+                >
                   <SelectTrigger className="w-32">
                     <SelectValue placeholder="Recruiter" />
                   </SelectTrigger>
@@ -632,7 +702,10 @@ export default function Candidates() {
                     <SelectItem value="mike wilson">Mike Wilson</SelectItem>
                   </SelectContent>
                 </Select>
-                <Dialog open={showMoreFilters} onOpenChange={setShowMoreFilters}>
+                <Dialog
+                  open={showMoreFilters}
+                  onOpenChange={setShowMoreFilters}
+                >
                   <DialogTrigger asChild>
                     <Button variant="outline" size="sm">
                       <Filter className="w-4 h-4 mr-2" />
@@ -643,40 +716,57 @@ export default function Candidates() {
                     <DialogHeader>
                       <DialogTitle>Advanced Filters</DialogTitle>
                       <DialogDescription>
-                        Apply additional filters to refine your candidate search.
+                        Apply additional filters to refine your candidate
+                        search.
                       </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="text-sm font-medium text-slate-700">Experience Level</label>
+                          <label className="text-sm font-medium text-slate-700">
+                            Experience Level
+                          </label>
                           <Select>
                             <SelectTrigger className="mt-1">
                               <SelectValue placeholder="Any experience" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="entry">Entry Level (0-2 years)</SelectItem>
-                              <SelectItem value="mid">Mid Level (3-5 years)</SelectItem>
-                              <SelectItem value="senior">Senior Level (5+ years)</SelectItem>
+                              <SelectItem value="entry">
+                                Entry Level (0-2 years)
+                              </SelectItem>
+                              <SelectItem value="mid">
+                                Mid Level (3-5 years)
+                              </SelectItem>
+                              <SelectItem value="senior">
+                                Senior Level (5+ years)
+                              </SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                         <div>
-                          <label className="text-sm font-medium text-slate-700">Salary Range</label>
+                          <label className="text-sm font-medium text-slate-700">
+                            Salary Range
+                          </label>
                           <Select>
                             <SelectTrigger className="mt-1">
                               <SelectValue placeholder="Any salary" />
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="50-75">$50k - $75k</SelectItem>
-                              <SelectItem value="75-100">$75k - $100k</SelectItem>
-                              <SelectItem value="100-150">$100k - $150k</SelectItem>
+                              <SelectItem value="75-100">
+                                $75k - $100k
+                              </SelectItem>
+                              <SelectItem value="100-150">
+                                $100k - $150k
+                              </SelectItem>
                               <SelectItem value="150+">$150k+</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                         <div>
-                          <label className="text-sm font-medium text-slate-700">Rating</label>
+                          <label className="text-sm font-medium text-slate-700">
+                            Rating
+                          </label>
                           <Select>
                             <SelectTrigger className="mt-1">
                               <SelectValue placeholder="Any rating" />
@@ -689,28 +779,41 @@ export default function Candidates() {
                           </Select>
                         </div>
                         <div>
-                          <label className="text-sm font-medium text-slate-700">Application Date</label>
+                          <label className="text-sm font-medium text-slate-700">
+                            Application Date
+                          </label>
                           <Select>
                             <SelectTrigger className="mt-1">
                               <SelectValue placeholder="Any date" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="last-week">Last Week</SelectItem>
-                              <SelectItem value="last-month">Last Month</SelectItem>
-                              <SelectItem value="last-quarter">Last Quarter</SelectItem>
+                              <SelectItem value="last-week">
+                                Last Week
+                              </SelectItem>
+                              <SelectItem value="last-month">
+                                Last Month
+                              </SelectItem>
+                              <SelectItem value="last-quarter">
+                                Last Quarter
+                              </SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-slate-700">Skills</label>
+                        <label className="text-sm font-medium text-slate-700">
+                          Skills
+                        </label>
                         <Input
                           placeholder="Search by specific skills..."
                           className="mt-1"
                         />
                       </div>
                       <div className="flex justify-end space-x-2">
-                        <Button variant="outline" onClick={() => setShowMoreFilters(false)}>
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowMoreFilters(false)}
+                        >
                           Cancel
                         </Button>
                         <Button
@@ -718,7 +821,8 @@ export default function Candidates() {
                             setShowMoreFilters(false);
                             toast({
                               title: "Filters Applied",
-                              description: "Advanced filters have been applied to the candidate list.",
+                              description:
+                                "Advanced filters have been applied to the candidate list.",
                             });
                           }}
                         >
@@ -743,12 +847,22 @@ export default function Candidates() {
           <Button variant="outline" size="sm" disabled>
             Previous
           </Button>
-          <Button variant="outline" size="sm" className="bg-blue-50 text-blue-600">
+          <Button
+            variant="outline"
+            size="sm"
+            className="bg-blue-50 text-blue-600"
+          >
             1
           </Button>
-          <Button variant="outline" size="sm">2</Button>
-          <Button variant="outline" size="sm">3</Button>
-          <Button variant="outline" size="sm">Next</Button>
+          <Button variant="outline" size="sm">
+            2
+          </Button>
+          <Button variant="outline" size="sm">
+            3
+          </Button>
+          <Button variant="outline" size="sm">
+            Next
+          </Button>
         </div>
       </div>
     </div>

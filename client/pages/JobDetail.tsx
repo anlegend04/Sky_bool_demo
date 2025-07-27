@@ -56,7 +56,12 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { getJob, getJobCandidates, JobData, CandidateData } from "@/data/hardcoded-data";
+import {
+  getJob,
+  getJobCandidates,
+  JobData,
+  CandidateData,
+} from "@/data/hardcoded-data";
 import { useToast } from "@/hooks/use-toast";
 import BudgetPanel from "@/components/BudgetPanel";
 
@@ -69,11 +74,20 @@ export default function JobDetail() {
   const [tempValue, setTempValue] = useState("");
   const [showAddStageDialog, setShowAddStageDialog] = useState(false);
   const [newStage, setNewStage] = useState("");
-  const [draggedCandidate, setDraggedCandidate] = useState<CandidateData | null>(null);
+  const [draggedCandidate, setDraggedCandidate] =
+    useState<CandidateData | null>(null);
   const [dragOverStage, setDragOverStage] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const stages = ["Applied", "Screening", "Interview", "Technical", "Offer", "Hired", "Rejected"];
+  const stages = [
+    "Applied",
+    "Screening",
+    "Interview",
+    "Technical",
+    "Offer",
+    "Hired",
+    "Rejected",
+  ];
 
   // Load job and candidates from hardcoded data
   useEffect(() => {
@@ -94,7 +108,9 @@ export default function JobDetail() {
       <div className="p-6">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-slate-900">Job not found</h2>
-          <p className="text-slate-600 mt-2">The job you're looking for doesn't exist.</p>
+          <p className="text-slate-600 mt-2">
+            The job you're looking for doesn't exist.
+          </p>
           <Link to="/jobs">
             <Button className="mt-4">Back to Jobs</Button>
           </Link>
@@ -151,8 +167,8 @@ export default function JobDetail() {
 
       if (updatedCandidate) {
         // Update local candidates state
-        setCandidates(prev =>
-          prev.map(c => c.id === candidateId ? updatedCandidate : c)
+        setCandidates((prev) =>
+          prev.map((c) => (c.id === candidateId ? updatedCandidate : c)),
         );
 
         // Show success toast with API simulation
@@ -165,10 +181,14 @@ export default function JobDetail() {
         if (job) {
           const updatedPipeline = { ...job.pipelineSummary };
           if (oldStage.toLowerCase() in updatedPipeline) {
-            updatedPipeline[oldStage.toLowerCase() as keyof typeof updatedPipeline]--;
+            updatedPipeline[
+              oldStage.toLowerCase() as keyof typeof updatedPipeline
+            ]--;
           }
           if (newStage.toLowerCase() in updatedPipeline) {
-            updatedPipeline[newStage.toLowerCase() as keyof typeof updatedPipeline]++;
+            updatedPipeline[
+              newStage.toLowerCase() as keyof typeof updatedPipeline
+            ]++;
           }
 
           // In a real app, this would update the job in the backend
@@ -183,14 +203,22 @@ export default function JobDetail() {
 
   const getStageColor = (stage: string) => {
     switch (stage) {
-      case "Applied": return "bg-blue-50 border-blue-200";
-      case "Screening": return "bg-yellow-50 border-yellow-200";
-      case "Interview": return "bg-purple-50 border-purple-200";
-      case "Technical": return "bg-orange-50 border-orange-200";
-      case "Offer": return "bg-green-50 border-green-200";
-      case "Hired": return "bg-emerald-50 border-emerald-200";
-      case "Rejected": return "bg-red-50 border-red-200";
-      default: return "bg-slate-50 border-slate-200";
+      case "Applied":
+        return "bg-blue-50 border-blue-200";
+      case "Screening":
+        return "bg-yellow-50 border-yellow-200";
+      case "Interview":
+        return "bg-purple-50 border-purple-200";
+      case "Technical":
+        return "bg-orange-50 border-orange-200";
+      case "Offer":
+        return "bg-green-50 border-green-200";
+      case "Hired":
+        return "bg-emerald-50 border-emerald-200";
+      case "Rejected":
+        return "bg-red-50 border-red-200";
+      default:
+        return "bg-slate-50 border-slate-200";
     }
   };
 
@@ -198,7 +226,8 @@ export default function JobDetail() {
     // Green = progressing, Red = blocked, Gray = in review
     if (candidate.stage === "Hired") return "border-l-green-500";
     if (candidate.stage === "Rejected") return "border-l-red-500";
-    if (["Interview", "Technical", "Offer"].includes(candidate.stage)) return "border-l-green-500";
+    if (["Interview", "Technical", "Offer"].includes(candidate.stage))
+      return "border-l-green-500";
     if (candidate.duration > 7) return "border-l-red-500"; // Blocked if more than 7 days
     return "border-l-gray-500"; // In review
   };
@@ -206,7 +235,7 @@ export default function JobDetail() {
   const CandidateCard = ({ candidate }: { candidate: CandidateData }) => (
     <Card
       className={`hover:shadow-md transition-shadow border-l-4 cursor-move ${getCandidateStatusColor(candidate)} ${
-        draggedCandidate?.id === candidate.id ? 'opacity-50 scale-95' : ''
+        draggedCandidate?.id === candidate.id ? "opacity-50 scale-95" : ""
       }`}
       draggable
       onDragStart={() => handleDragStart(candidate)}
@@ -218,7 +247,10 @@ export default function JobDetail() {
             <Avatar className="w-10 h-10">
               <AvatarImage src={candidate.avatar} />
               <AvatarFallback>
-                {candidate.name.split(" ").map(n => n[0]).join("")}
+                {candidate.name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")}
               </AvatarFallback>
             </Avatar>
             <div>
@@ -255,7 +287,7 @@ export default function JobDetail() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        
+
         <div className="space-y-2 text-xs text-slate-600">
           <div className="flex items-center gap-2">
             <Mail className="w-3 h-3" />
@@ -295,14 +327,16 @@ export default function JobDetail() {
   const PipelineGridView = () => (
     <div className="grid grid-cols-1 lg:grid-cols-7 gap-4">
       {stages.map((stage) => {
-        const stageCandidates = candidates.filter(c => c.stage === stage);
+        const stageCandidates = candidates.filter((c) => c.stage === stage);
         const isDropTarget = dragOverStage === stage;
 
         return (
           <div
             key={stage}
             className={`rounded-lg border p-4 transition-all ${getStageColor(stage)} ${
-              isDropTarget ? 'ring-2 ring-blue-500 ring-opacity-50 bg-blue-50' : ''
+              isDropTarget
+                ? "ring-2 ring-blue-500 ring-opacity-50 bg-blue-50"
+                : ""
             }`}
             onDragOver={(e) => handleDragOver(e, stage)}
             onDragLeave={handleDragLeave}
@@ -383,10 +417,11 @@ export default function JobDetail() {
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
-                            className={`w-3 h-3 ${i < candidate.rating
+                            className={`w-3 h-3 ${
+                              i < candidate.rating
                                 ? "text-yellow-400 fill-current"
                                 : "text-slate-300"
-                              }`}
+                            }`}
                           />
                         ))}
                       </div>
@@ -437,8 +472,15 @@ export default function JobDetail() {
     </Card>
   );
 
-
-  const EditableField = ({ field, value, type = "text" }: { field: string; value: any; type?: string }) => {
+  const EditableField = ({
+    field,
+    value,
+    type = "text",
+  }: {
+    field: string;
+    value: any;
+    type?: string;
+  }) => {
     if (editingField === field) {
       return (
         <div className="flex items-center gap-2">
@@ -449,10 +491,7 @@ export default function JobDetail() {
             type={type}
             autoFocus
           />
-          <Button
-            size="sm"
-            onClick={() => handleInlineEdit(field, tempValue)}
-          >
+          <Button size="sm" onClick={() => handleInlineEdit(field, tempValue)}>
             Save
           </Button>
           <Button
@@ -492,18 +531,34 @@ export default function JobDetail() {
               </Button>
             </Link>
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">{job.position}</h1>
-              <p className="text-slate-600">{job.department} • {job.location}</p>
+              <h1 className="text-2xl font-bold text-slate-900">
+                {job.position}
+              </h1>
+              <p className="text-slate-600">
+                {job.department} • {job.location}
+              </p>
             </div>
           </div>
           <div className="flex items-center space-x-2">
             <Badge
-              variant={job.priority === "High" ? "destructive" : job.priority === "Medium" ? "secondary" : "outline"}
+              variant={
+                job.priority === "High"
+                  ? "destructive"
+                  : job.priority === "Medium"
+                    ? "secondary"
+                    : "outline"
+              }
             >
               {job.priority} Priority
             </Badge>
             <Badge
-              variant={job.status === "Open" ? "default" : job.status === "Closed" ? "outline" : "secondary"}
+              variant={
+                job.status === "Open"
+                  ? "default"
+                  : job.status === "Closed"
+                    ? "outline"
+                    : "secondary"
+              }
             >
               {job.status}
             </Badge>
@@ -526,21 +581,29 @@ export default function JobDetail() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-slate-700">Description</label>
+                <label className="text-sm font-medium text-slate-700">
+                  Description
+                </label>
                 <p className="text-sm text-slate-600 mt-1">{job.description}</p>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-slate-700">Type</label>
+                  <label className="text-sm font-medium text-slate-700">
+                    Type
+                  </label>
                   <p className="text-sm text-slate-600">{job.type}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-slate-700">Domain</label>
+                  <label className="text-sm font-medium text-slate-700">
+                    Domain
+                  </label>
                   <p className="text-sm text-slate-600">{job.domain}</p>
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700">Skills Required</label>
+                <label className="text-sm font-medium text-slate-700">
+                  Skills Required
+                </label>
                 <div className="flex flex-wrap gap-2 mt-1">
                   {job.expectedSkills.map((skill) => (
                     <Badge key={skill} variant="secondary" className="text-xs">
@@ -566,8 +629,12 @@ export default function JobDetail() {
                   <EditableField field="recruiter" value={job.recruiter} />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-slate-700">Interviewers</label>
-                  <p className="text-sm text-slate-600">{job.interviewers.join(", ")}</p>
+                  <label className="text-sm font-medium text-slate-700">
+                    Interviewers
+                  </label>
+                  <p className="text-sm text-slate-600">
+                    {job.interviewers.join(", ")}
+                  </p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -576,10 +643,16 @@ export default function JobDetail() {
                     Headcount
                     <HelpTooltip content={helpContent.headcount} />
                   </label>
-                  <EditableField field="headcount" value={job.headcount} type="number" />
+                  <EditableField
+                    field="headcount"
+                    value={job.headcount}
+                    type="number"
+                  />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-slate-700">Hired</label>
+                  <label className="text-sm font-medium text-slate-700">
+                    Hired
+                  </label>
                   <p className="text-sm text-slate-600">{job.hired}</p>
                 </div>
               </div>
@@ -589,19 +662,29 @@ export default function JobDetail() {
                     Est. Budget
                     <HelpTooltip content={helpContent.estimatedBudget} />
                   </label>
-                  <EditableField field="estimatedCost" value={`$${job.estimatedCost}`} />
+                  <EditableField
+                    field="estimatedCost"
+                    value={`$${job.estimatedCost}`}
+                  />
                 </div>
                 <div>
                   <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                     Actual Cost
                     <HelpTooltip content={helpContent.actualBudget} />
                   </label>
-                  <EditableField field="actualCost" value={`$${job.actualCost}`} />
+                  <EditableField
+                    field="actualCost"
+                    value={`$${job.actualCost}`}
+                  />
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700">Salary Range</label>
-                <p className="text-sm text-slate-600">${job.salaryMin} - ${job.salaryMax}</p>
+                <label className="text-sm font-medium text-slate-700">
+                  Salary Range
+                </label>
+                <p className="text-sm text-slate-600">
+                  ${job.salaryMin} - ${job.salaryMax}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -624,26 +707,44 @@ export default function JobDetail() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-slate-700">Open Date</label>
+                  <label className="text-sm font-medium text-slate-700">
+                    Open Date
+                  </label>
                   <p className="text-sm text-slate-600">{job.openDate}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-slate-700">Deadline</label>
+                  <label className="text-sm font-medium text-slate-700">
+                    Deadline
+                  </label>
                   <p className="text-sm text-slate-600">{job.deadline}</p>
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700">Duration Since Created</label>
+                <label className="text-sm font-medium text-slate-700">
+                  Duration Since Created
+                </label>
                 <p className="text-sm text-slate-600">
-                  {Math.floor((new Date().getTime() - new Date(job.createdAt).getTime()) / (1000 * 60 * 60 * 24))} days
+                  {Math.floor(
+                    (new Date().getTime() - new Date(job.createdAt).getTime()) /
+                      (1000 * 60 * 60 * 24),
+                  )}{" "}
+                  days
                 </p>
               </div>
               <div className="pt-2 border-t">
-                <h4 className="text-sm font-medium text-slate-700 mb-2">Recent Activity</h4>
+                <h4 className="text-sm font-medium text-slate-700 mb-2">
+                  Recent Activity
+                </h4>
                 <div className="space-y-2 text-xs text-slate-600">
                   <div className="flex items-center gap-2">
                     <Activity className="w-3 h-3" />
-                    Job updated {Math.floor((new Date().getTime() - new Date(job.updatedAt).getTime()) / (1000 * 60 * 60))} hours ago
+                    Job updated{" "}
+                    {Math.floor(
+                      (new Date().getTime() -
+                        new Date(job.updatedAt).getTime()) /
+                        (1000 * 60 * 60),
+                    )}{" "}
+                    hours ago
                   </div>
                   <div className="flex items-center gap-2">
                     <User className="w-3 h-3" />
@@ -709,7 +810,9 @@ export default function JobDetail() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-600">Total Applications</p>
-                  <p className="text-2xl font-bold text-slate-900">{job.applications}</p>
+                  <p className="text-2xl font-bold text-slate-900">
+                    {job.applications}
+                  </p>
                 </div>
                 <Users className="w-8 h-8 text-blue-600" />
               </div>
@@ -721,7 +824,11 @@ export default function JobDetail() {
                 <div>
                   <p className="text-sm text-slate-600">In Interview</p>
                   <p className="text-2xl font-bold text-slate-900">
-                    {candidates.filter(c => ["Interview", "Technical"].includes(c.stage)).length}
+                    {
+                      candidates.filter((c) =>
+                        ["Interview", "Technical"].includes(c.stage),
+                      ).length
+                    }
                   </p>
                 </div>
                 <Calendar className="w-8 h-8 text-green-600" />
@@ -733,7 +840,9 @@ export default function JobDetail() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-600">Hired / Target</p>
-                  <p className="text-2xl font-bold text-slate-900">{job.hired} / {job.target}</p>
+                  <p className="text-2xl font-bold text-slate-900">
+                    {job.hired} / {job.target}
+                  </p>
                 </div>
                 <Target className="w-8 h-8 text-purple-600" />
               </div>
@@ -745,7 +854,11 @@ export default function JobDetail() {
                 <div>
                   <p className="text-sm text-slate-600">Budget Used</p>
                   <p className="text-2xl font-bold text-slate-900">
-                    {Math.round((parseInt(job.actualCost) / parseInt(job.estimatedCost)) * 100)}%
+                    {Math.round(
+                      (parseInt(job.actualCost) / parseInt(job.estimatedCost)) *
+                        100,
+                    )}
+                    %
                   </p>
                 </div>
                 <DollarSign className="w-8 h-8 text-orange-600" />
@@ -766,7 +879,9 @@ export default function JobDetail() {
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-slate-700">Stage Name</label>
+              <label className="text-sm font-medium text-slate-700">
+                Stage Name
+              </label>
               <Input
                 placeholder="e.g., Portfolio Review, Final Interview"
                 value={newStage}
@@ -775,7 +890,10 @@ export default function JobDetail() {
               />
             </div>
             <div className="flex justify-end space-x-2">
-              <Button variant="outline" onClick={() => setShowAddStageDialog(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setShowAddStageDialog(false)}
+              >
                 Cancel
               </Button>
               <Button

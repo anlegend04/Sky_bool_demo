@@ -34,7 +34,10 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { HARDCODED_NOTIFICATIONS, NotificationData } from "@/data/hardcoded-data";
+import {
+  HARDCODED_NOTIFICATIONS,
+  NotificationData,
+} from "@/data/hardcoded-data";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Notifications() {
@@ -53,8 +56,7 @@ export default function Notifications() {
       notification.message.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesType =
-      typeFilter === "all" ||
-      notification.type === typeFilter;
+      typeFilter === "all" || notification.type === typeFilter;
 
     const matchesStatus =
       statusFilter === "all" ||
@@ -73,26 +75,30 @@ export default function Notifications() {
     },
     {
       title: "Unread",
-      value: notifications.filter(n => !n.read).length.toString(),
+      value: notifications.filter((n) => !n.read).length.toString(),
       color: "red",
       icon: AlertTriangle,
     },
     {
       title: "Today",
-      value: notifications.filter(n => {
-        const today = new Date().toDateString();
-        return new Date(n.timestamp).toDateString() === today;
-      }).length.toString(),
+      value: notifications
+        .filter((n) => {
+          const today = new Date().toDateString();
+          return new Date(n.timestamp).toDateString() === today;
+        })
+        .length.toString(),
       color: "green",
       icon: Clock,
     },
     {
       title: "This Week",
-      value: notifications.filter(n => {
-        const weekAgo = new Date();
-        weekAgo.setDate(weekAgo.getDate() - 7);
-        return new Date(n.timestamp) > weekAgo;
-      }).length.toString(),
+      value: notifications
+        .filter((n) => {
+          const weekAgo = new Date();
+          weekAgo.setDate(weekAgo.getDate() - 7);
+          return new Date(n.timestamp) > weekAgo;
+        })
+        .length.toString(),
       color: "purple",
       icon: Calendar,
     },
@@ -151,18 +157,27 @@ export default function Notifications() {
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
     const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
+    const diffInMinutes = Math.floor(
+      (now.getTime() - date.getTime()) / (1000 * 60),
+    );
 
     if (diffInMinutes < 1) return "Just now";
     if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
     if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
-    if (diffInMinutes < 10080) return `${Math.floor(diffInMinutes / 1440)}d ago`;
-    
+    if (diffInMinutes < 10080)
+      return `${Math.floor(diffInMinutes / 1440)}d ago`;
+
     return date.toLocaleDateString();
   };
 
-  const NotificationCard = ({ notification }: { notification: NotificationData }) => (
-    <Card className={`hover:shadow-md transition-shadow ${!notification.read ? 'border-l-4 border-l-blue-500 bg-blue-50/50' : ''}`}>
+  const NotificationCard = ({
+    notification,
+  }: {
+    notification: NotificationData;
+  }) => (
+    <Card
+      className={`hover:shadow-md transition-shadow ${!notification.read ? "border-l-4 border-l-blue-500 bg-blue-50/50" : ""}`}
+    >
       <CardContent className="p-4">
         <div className="flex items-start space-x-3">
           <div className="flex-shrink-0 mt-1">
@@ -172,7 +187,9 @@ export default function Notifications() {
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className={`text-sm font-medium ${!notification.read ? 'text-slate-900' : 'text-slate-700'}`}>
+                  <h3
+                    className={`text-sm font-medium ${!notification.read ? "text-slate-900" : "text-slate-700"}`}
+                  >
                     {notification.title}
                   </h3>
                   {!notification.read && (
@@ -195,7 +212,9 @@ export default function Notifications() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   {!notification.read && (
-                    <DropdownMenuItem onClick={() => handleMarkAsRead(notification.id)}>
+                    <DropdownMenuItem
+                      onClick={() => handleMarkAsRead(notification.id)}
+                    >
                       <CheckCircle className="w-4 h-4 mr-2" />
                       Mark as Read
                     </DropdownMenuItem>
@@ -221,7 +240,7 @@ export default function Notifications() {
             </div>
           </div>
         </div>
-        
+
         {notification.actionUrl && (
           <div className="mt-3 pt-3 border-t border-slate-200">
             <Link to={notification.actionUrl}>
@@ -262,7 +281,9 @@ export default function Notifications() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-slate-600">{stat.title}</p>
-                  <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
+                  <p className="text-2xl font-bold text-slate-900">
+                    {stat.value}
+                  </p>
                 </div>
                 <div className={`p-3 rounded-full bg-${stat.color}-100`}>
                   <stat.icon className={`w-6 h-6 text-${stat.color}-600`} />
@@ -295,9 +316,13 @@ export default function Notifications() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="candidate_moved">Candidate Update</SelectItem>
+                  <SelectItem value="candidate_moved">
+                    Candidate Update
+                  </SelectItem>
                   <SelectItem value="interview_scheduled">Interview</SelectItem>
-                  <SelectItem value="application_received">Application</SelectItem>
+                  <SelectItem value="application_received">
+                    Application
+                  </SelectItem>
                   <SelectItem value="budget_exceeded">Budget Alert</SelectItem>
                   <SelectItem value="deadline_approaching">Deadline</SelectItem>
                 </SelectContent>
@@ -325,7 +350,10 @@ export default function Notifications() {
       <div className="space-y-4">
         {filteredNotifications.length > 0 ? (
           filteredNotifications.map((notification) => (
-            <NotificationCard key={notification.id} notification={notification} />
+            <NotificationCard
+              key={notification.id}
+              notification={notification}
+            />
           ))
         ) : (
           <Card>
@@ -351,12 +379,22 @@ export default function Notifications() {
             <Button variant="outline" size="sm" disabled>
               Previous
             </Button>
-            <Button variant="outline" size="sm" className="bg-blue-50 text-blue-600">
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-blue-50 text-blue-600"
+            >
               1
             </Button>
-            <Button variant="outline" size="sm">2</Button>
-            <Button variant="outline" size="sm">3</Button>
-            <Button variant="outline" size="sm">Next</Button>
+            <Button variant="outline" size="sm">
+              2
+            </Button>
+            <Button variant="outline" size="sm">
+              3
+            </Button>
+            <Button variant="outline" size="sm">
+              Next
+            </Button>
           </div>
         </div>
       )}

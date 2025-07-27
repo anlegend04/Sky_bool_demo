@@ -81,30 +81,41 @@ export default function BudgetPanel({ job, onJobUpdate }: BudgetPanelProps) {
     "Other",
   ];
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FFC658', '#FF7C7C'];
+  const COLORS = [
+    "#0088FE",
+    "#00C49F",
+    "#FFBB28",
+    "#FF8042",
+    "#8884D8",
+    "#82CA9D",
+    "#FFC658",
+    "#FF7C7C",
+  ];
 
   // Prepare data for charts
   const expenseData = job.budget?.expenses || [];
-  
-  const pieData = expenseCategories.map(category => {
-    const totalAmount = expenseData
-      .filter(expense => expense.category === category)
-      .reduce((sum, expense) => sum + expense.amount, 0);
-    return {
-      name: category,
-      value: totalAmount,
-    };
-  }).filter(item => item.value > 0);
+
+  const pieData = expenseCategories
+    .map((category) => {
+      const totalAmount = expenseData
+        .filter((expense) => expense.category === category)
+        .reduce((sum, expense) => sum + expense.amount, 0);
+      return {
+        name: category,
+        value: totalAmount,
+      };
+    })
+    .filter((item) => item.value > 0);
 
   const monthlyData = [
-    { month: 'Jan', spent: 5000, planned: 6000 },
-    { month: 'Feb', spent: 7500, planned: 8000 },
-    { month: 'Mar', spent: 3200, planned: 4000 },
-    { month: 'Apr', spent: 1800, planned: 2000 },
+    { month: "Jan", spent: 5000, planned: 6000 },
+    { month: "Feb", spent: 7500, planned: 8000 },
+    { month: "Mar", spent: 3200, planned: 4000 },
+    { month: "Apr", spent: 1800, planned: 2000 },
   ];
 
-  const budgetUsedPercentage = job.budget 
-    ? (job.budget.actual / job.budget.estimated) * 100 
+  const budgetUsedPercentage = job.budget
+    ? (job.budget.actual / job.budget.estimated) * 100
     : 0;
 
   const handleAddExpense = () => {
@@ -124,7 +135,9 @@ export default function BudgetPanel({ job, onJobUpdate }: BudgetPanelProps) {
       description: newExpense.description,
       expectedOutcome: newExpense.expectedOutcome,
       evaluationPeriod: newExpense.evaluationPeriod,
-      effectiveness: newExpense.effectiveness ? parseFloat(newExpense.effectiveness) : undefined,
+      effectiveness: newExpense.effectiveness
+        ? parseFloat(newExpense.effectiveness)
+        : undefined,
       notes: newExpense.notes || undefined,
       createdAt: new Date().toISOString(),
       createdBy: "Current User",
@@ -137,7 +150,7 @@ export default function BudgetPanel({ job, onJobUpdate }: BudgetPanelProps) {
     };
 
     // In a real app, this would update the job budget
-    
+
     if (updatedJob) {
       onJobUpdate(updatedJob);
       setShowAddExpenseDialog(false);
@@ -150,7 +163,7 @@ export default function BudgetPanel({ job, onJobUpdate }: BudgetPanelProps) {
         effectiveness: "",
         notes: "",
       });
-      
+
       toast({
         title: "Expense Added",
         description: `$${expense.amount} expense added to ${expense.category}`,
@@ -159,8 +172,10 @@ export default function BudgetPanel({ job, onJobUpdate }: BudgetPanelProps) {
   };
 
   const getBudgetStatus = () => {
-    if (budgetUsedPercentage > 100) return { color: "text-red-600", icon: AlertCircle, text: "Over Budget" };
-    if (budgetUsedPercentage > 80) return { color: "text-yellow-600", icon: Clock, text: "Nearly Full" };
+    if (budgetUsedPercentage > 100)
+      return { color: "text-red-600", icon: AlertCircle, text: "Over Budget" };
+    if (budgetUsedPercentage > 80)
+      return { color: "text-yellow-600", icon: Clock, text: "Nearly Full" };
     return { color: "text-green-600", icon: CheckCircle, text: "On Track" };
   };
 
@@ -200,19 +215,25 @@ export default function BudgetPanel({ job, onJobUpdate }: BudgetPanelProps) {
               </div>
             </div>
           </div>
-          
+
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span>Budget Usage</span>
-              <span>${(job.budget?.actual || 0).toLocaleString()} / ${(job.budget?.estimated || 0).toLocaleString()}</span>
+              <span>
+                ${(job.budget?.actual || 0).toLocaleString()} / $
+                {(job.budget?.estimated || 0).toLocaleString()}
+              </span>
             </div>
-            <Progress 
-              value={Math.min(budgetUsedPercentage, 100)} 
-              className={`h-3 ${budgetUsedPercentage > 100 ? 'bg-red-100' : ''}`}
+            <Progress
+              value={Math.min(budgetUsedPercentage, 100)}
+              className={`h-3 ${budgetUsedPercentage > 100 ? "bg-red-100" : ""}`}
             />
           </div>
 
-          <Button onClick={() => setShowAddExpenseDialog(true)} className="w-full">
+          <Button
+            onClick={() => setShowAddExpenseDialog(true)}
+            className="w-full"
+          >
             <Plus className="w-4 h-4 mr-2" />
             Add Expense
           </Button>
@@ -235,17 +256,25 @@ export default function BudgetPanel({ job, onJobUpdate }: BudgetPanelProps) {
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    label={({ name, percent }) =>
+                      `${name} ${(percent * 100).toFixed(0)}%`
+                    }
                     outerRadius={80}
                     fill="#8884d8"
                     dataKey="value"
                     stroke="none"
                   >
                     {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value) => [`$${value}`, 'Amount']} cursor={false} />
+                  <Tooltip
+                    formatter={(value) => [`$${value}`, "Amount"]}
+                    cursor={false}
+                  />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
@@ -265,9 +294,16 @@ export default function BudgetPanel({ job, onJobUpdate }: BudgetPanelProps) {
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={monthlyData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="month" allowDuplicatedCategory={false} tickLine={false} />
+                <XAxis
+                  dataKey="month"
+                  allowDuplicatedCategory={false}
+                  tickLine={false}
+                />
                 <YAxis allowDecimals={false} tickLine={false} />
-                <Tooltip formatter={(value) => [`$${value}`, '']} cursor={false} />
+                <Tooltip
+                  formatter={(value) => [`$${value}`, ""]}
+                  cursor={false}
+                />
                 <Legend iconType="line" />
                 <Line
                   type="monotone"
@@ -297,26 +333,45 @@ export default function BudgetPanel({ job, onJobUpdate }: BudgetPanelProps) {
           <div className="space-y-4">
             {expenseData.length > 0 ? (
               expenseData.map((expense) => (
-                <div key={expense.id} className="flex items-center justify-between p-4 border border-slate-200 rounded-lg">
+                <div
+                  key={expense.id}
+                  className="flex items-center justify-between p-4 border border-slate-200 rounded-lg"
+                >
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <DollarSign className="w-4 h-4 text-green-600" />
-                      <span className="font-medium">${expense.amount.toLocaleString()}</span>
+                      <span className="font-medium">
+                        ${expense.amount.toLocaleString()}
+                      </span>
                       <Badge variant="outline">{expense.category}</Badge>
                       {expense.effectiveness && (
-                        <Badge variant={expense.effectiveness >= 80 ? "default" : "secondary"}>
+                        <Badge
+                          variant={
+                            expense.effectiveness >= 80
+                              ? "default"
+                              : "secondary"
+                          }
+                        >
                           {expense.effectiveness}% Effective
                         </Badge>
                       )}
                     </div>
-                    <p className="text-sm text-slate-600 mb-1">{expense.description}</p>
+                    <p className="text-sm text-slate-600 mb-1">
+                      {expense.description}
+                    </p>
                     {expense.expectedOutcome && (
-                      <p className="text-xs text-slate-500">Expected: {expense.expectedOutcome}</p>
+                      <p className="text-xs text-slate-500">
+                        Expected: {expense.expectedOutcome}
+                      </p>
                     )}
                   </div>
                   <div className="text-right">
-                    <div className="text-xs text-slate-500">{new Date(expense.createdAt).toLocaleDateString()}</div>
-                    <div className="text-xs text-slate-500">by {expense.createdBy}</div>
+                    <div className="text-xs text-slate-500">
+                      {new Date(expense.createdAt).toLocaleDateString()}
+                    </div>
+                    <div className="text-xs text-slate-500">
+                      by {expense.createdBy}
+                    </div>
                   </div>
                 </div>
               ))
@@ -330,7 +385,10 @@ export default function BudgetPanel({ job, onJobUpdate }: BudgetPanelProps) {
       </Card>
 
       {/* Add Expense Dialog */}
-      <Dialog open={showAddExpenseDialog} onOpenChange={setShowAddExpenseDialog}>
+      <Dialog
+        open={showAddExpenseDialog}
+        onOpenChange={setShowAddExpenseDialog}
+      >
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>Add New Expense</DialogTitle>
@@ -338,22 +396,33 @@ export default function BudgetPanel({ job, onJobUpdate }: BudgetPanelProps) {
               Record a new expense for this job posting.
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-slate-700">Amount *</label>
+                <label className="text-sm font-medium text-slate-700">
+                  Amount *
+                </label>
                 <Input
                   type="number"
                   placeholder="5000"
                   value={newExpense.amount}
-                  onChange={(e) => setNewExpense({...newExpense, amount: e.target.value})}
+                  onChange={(e) =>
+                    setNewExpense({ ...newExpense, amount: e.target.value })
+                  }
                   className="mt-1"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700">Category *</label>
-                <Select value={newExpense.category} onValueChange={(value) => setNewExpense({...newExpense, category: value})}>
+                <label className="text-sm font-medium text-slate-700">
+                  Category *
+                </label>
+                <Select
+                  value={newExpense.category}
+                  onValueChange={(value) =>
+                    setNewExpense({ ...newExpense, category: value })
+                  }
+                >
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
@@ -367,17 +436,21 @@ export default function BudgetPanel({ job, onJobUpdate }: BudgetPanelProps) {
                 </Select>
               </div>
             </div>
-            
+
             <div>
-              <label className="text-sm font-medium text-slate-700">Description *</label>
+              <label className="text-sm font-medium text-slate-700">
+                Description *
+              </label>
               <Input
                 placeholder="LinkedIn Premium and Indeed postings"
                 value={newExpense.description}
-                onChange={(e) => setNewExpense({...newExpense, description: e.target.value})}
+                onChange={(e) =>
+                  setNewExpense({ ...newExpense, description: e.target.value })
+                }
                 className="mt-1"
               />
             </div>
-            
+
             <div>
               <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                 Expected Outcome
@@ -386,15 +459,27 @@ export default function BudgetPanel({ job, onJobUpdate }: BudgetPanelProps) {
               <Input
                 placeholder="Attract 50+ qualified candidates"
                 value={newExpense.expectedOutcome}
-                onChange={(e) => setNewExpense({...newExpense, expectedOutcome: e.target.value})}
+                onChange={(e) =>
+                  setNewExpense({
+                    ...newExpense,
+                    expectedOutcome: e.target.value,
+                  })
+                }
                 className="mt-1"
               />
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-slate-700">Evaluation Period</label>
-                <Select value={newExpense.evaluationPeriod} onValueChange={(value) => setNewExpense({...newExpense, evaluationPeriod: value})}>
+                <label className="text-sm font-medium text-slate-700">
+                  Evaluation Period
+                </label>
+                <Select
+                  value={newExpense.evaluationPeriod}
+                  onValueChange={(value) =>
+                    setNewExpense({ ...newExpense, evaluationPeriod: value })
+                  }
+                >
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Select period" />
                   </SelectTrigger>
@@ -417,30 +502,40 @@ export default function BudgetPanel({ job, onJobUpdate }: BudgetPanelProps) {
                   min="0"
                   max="100"
                   value={newExpense.effectiveness}
-                  onChange={(e) => setNewExpense({...newExpense, effectiveness: e.target.value})}
+                  onChange={(e) =>
+                    setNewExpense({
+                      ...newExpense,
+                      effectiveness: e.target.value,
+                    })
+                  }
                   className="mt-1"
                 />
               </div>
             </div>
-            
+
             <div>
-              <label className="text-sm font-medium text-slate-700">Notes</label>
+              <label className="text-sm font-medium text-slate-700">
+                Notes
+              </label>
               <Textarea
                 placeholder="Additional notes about this expense..."
                 value={newExpense.notes}
-                onChange={(e) => setNewExpense({...newExpense, notes: e.target.value})}
+                onChange={(e) =>
+                  setNewExpense({ ...newExpense, notes: e.target.value })
+                }
                 className="mt-1"
                 rows={3}
               />
             </div>
-            
+
             <div className="flex justify-end space-x-2 pt-4">
-              <Button variant="outline" onClick={() => setShowAddExpenseDialog(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setShowAddExpenseDialog(false)}
+              >
                 Cancel
               </Button>
-              <Button onClick={handleAddExpense}>
-                Add Expense
-              </Button>
+              <Button onClick={handleAddExpense}>Add Expense</Button>
             </div>
           </div>
         </DialogContent>
