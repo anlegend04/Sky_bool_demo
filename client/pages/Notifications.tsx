@@ -44,11 +44,7 @@ export default function Notifications() {
   const [statusFilter, setStatusFilter] = useState("all");
   const { toast } = useToast();
 
-  // Load notifications from localStorage on component mount
-  useEffect(() => {
-    const storedNotifications = storage.getNotifications();
-    setNotifications(storedNotifications);
-  }, []);
+  // Notifications loaded from hardcoded data
 
   // Filter notifications based on search and filters
   const filteredNotifications = notifications.filter((notification) => {
