@@ -94,9 +94,9 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-accent/20">
       {/* Header */}
-      <header className="bg-white/95 backdrop-blur-sm border-b border-border sticky top-0 z-50 shadow-sm">
-        <div className="container-responsive">
-          <div className="flex justify-between items-center h-16">
+      <header className="bg-white/95 backdrop-blur-sm border-b border-border sticky top-0 z-50 shadow-sm py-2 min-h-[64px]">
+        <div className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-4 h-auto py-2 sm:py-3">
             {/* Logo and Mobile Menu Button */}
             <div className="flex items-center">
               <Button
