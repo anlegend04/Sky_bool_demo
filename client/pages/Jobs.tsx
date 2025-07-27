@@ -81,7 +81,7 @@ import { HARDCODED_JOBS, JobData } from "@/data/hardcoded-data";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Jobs() {
-  const [jobs, setJobs] = useState<JobData[]>([]);
+  const [jobs] = useState<JobData[]>(HARDCODED_JOBS);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const [searchTerm, setSearchTerm] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("all");
