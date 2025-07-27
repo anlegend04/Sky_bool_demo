@@ -17,7 +17,6 @@ import CandidateDetail from "./pages/CandidateDetail";
 import Calendar from "./pages/Calendar";
 import EmailAutomation from "./pages/EmailAutomation";
 import Reports from "./pages/Reports";
-import Tasks from "./pages/Tasks";
 import Notifications from "./pages/Notifications";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -41,7 +40,6 @@ const App = () => (
             <Route path="/calendar" element={<Calendar />} />
             <Route path="/email" element={<EmailAutomation />} />
             <Route path="/reports" element={<Reports />} />
-            <Route path="/tasks" element={<Tasks />} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<NotFound />} />
