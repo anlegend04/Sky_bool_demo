@@ -143,10 +143,11 @@ export default function JobDetail() {
       const oldStage = draggedCandidate.stage;
 
       // Update candidate stage in storage
-      const updatedCandidate = storage.updateCandidate(candidateId, {
+      const updatedCandidate = {
+        ...draggedCandidate,
         stage: newStage,
         duration: 0, // Reset duration for new stage
-      });
+      };
 
       if (updatedCandidate) {
         // Update local candidates state
