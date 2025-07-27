@@ -132,16 +132,17 @@ export interface AttachmentData {
   uploadedAt: string;
   uploadedBy: string;
 }
+export type NotificationType = "candidate_moved" | "interview_scheduled" | "application_received" | "budget_exceeded" | "deadline_approaching"; 
 
 export interface NotificationData {
   id: string;
   title: string;
   message: string;
-  type: "info" | "success" | "warning" | "error";
-  read: boolean;
+  type: NotificationType;
   timestamp: string;
+  read: boolean;
   actionUrl?: string;
-  actionText?: string;
+  entityType?: "job" | "candidate";
 }
 
 export const HARDCODED_JOBS: JobData[] = [
@@ -640,33 +641,34 @@ export const HARDCODED_NOTIFICATIONS: NotificationData[] = [
     id: "notif_1",
     title: "New Application Received",
     message: "Sarah Johnson applied for Senior Frontend Developer position",
-    type: "info",
+    type: "application_received",
     read: false,
     timestamp: "2024-01-20T10:30:00Z",
     actionUrl: "/candidates/candidate_1",
-    actionText: "View Candidate",
+    entityType: "candidate", // Thêm entityType
   },
   {
     id: "notif_2",
     title: "Interview Scheduled",
     message: "Technical interview scheduled for Michael Chen on Jan 25th",
-    type: "success",
+    type: "interview_scheduled",
     read: true,
     timestamp: "2024-01-19T14:15:00Z",
     actionUrl: "/calendar",
-    actionText: "View Calendar",
+    entityType: "candidate",
   },
   {
     id: "notif_3",
     title: "Deadline Approaching",
     message: "UX Designer position deadline is in 5 days",
-    type: "warning",
+    type: "deadline_approaching",
     read: false,
     timestamp: "2024-01-18T09:00:00Z",
     actionUrl: "/jobs/job_3",
-    actionText: "View Job",
+    entityType: "job",
   },
 ];
+
 
 export const EMAIL_TEMPLATES = {
   interview_invitation:

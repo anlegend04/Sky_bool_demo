@@ -31,6 +31,7 @@ import {
   Eye,
   ExternalLink,
   Trash2,
+  AlertCircle,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -133,7 +134,7 @@ export default function Notifications() {
       case "deadline_approaching":
         return <AlertTriangle className="w-5 h-5 text-orange-600" />;
       default:
-        return <Bell className="w-5 h-5 text-slate-600" />;
+        return <AlertCircle className="w-5 h-5 text-slate-600" />;
     }
   };
 
@@ -150,7 +151,7 @@ export default function Notifications() {
       case "deadline_approaching":
         return <Badge variant="secondary">Deadline</Badge>;
       default:
-        return <Badge variant="outline">System</Badge>;
+        return <Badge variant="destructive">Unknown Type</Badge>;
     }
   };
 
@@ -243,12 +244,12 @@ export default function Notifications() {
 
         {notification.actionUrl && (
           <div className="mt-3 pt-3 border-t border-slate-200">
-            <Link to={notification.actionUrl}>
-              <Button variant="outline" size="sm" className="w-full">
+            <Button asChild variant="outline" size="sm" className="w-full">
+              <Link to={notification.actionUrl}>
                 <ExternalLink className="w-4 h-4 mr-2" />
                 View {notification.entityType === "job" ? "Job" : "Candidate"}
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         )}
       </CardContent>
