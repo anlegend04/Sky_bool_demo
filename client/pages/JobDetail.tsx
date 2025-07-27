@@ -56,7 +56,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { storage, JobData, CandidateData } from "@/lib/storage";
+import { getJob, getJobCandidates, JobData, CandidateData } from "@/data/hardcoded-data";
 import { useToast } from "@/hooks/use-toast";
 import BudgetPanel from "@/components/BudgetPanel";
 
