@@ -171,13 +171,8 @@ export default function JobDetail() {
             updatedPipeline[newStage.toLowerCase() as keyof typeof updatedPipeline]++;
           }
 
-          const updatedJob = storage.updateJob(job.id, {
-            pipelineSummary: updatedPipeline
-          });
-
-          if (updatedJob) {
-            setJob(updatedJob);
-          }
+          // In a real app, this would update the job in the backend
+          setJob({ ...job, pipelineSummary: updatedPipeline });
         }
       }
     }
