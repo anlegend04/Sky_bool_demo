@@ -28,7 +28,6 @@ import {
   UserCircle,
   LogOut,
   ChevronDown,
-  CheckSquare,
 } from "lucide-react";
 
 interface LayoutProps {
@@ -40,7 +39,6 @@ const navigation = [
   { name: "Jobs", href: "/jobs", icon: Briefcase },
   { name: "Candidates", href: "/candidates", icon: Users },
   { name: "Calendar", href: "/calendar", icon: Calendar },
-  { name: "Tasks", href: "/tasks", icon: CheckSquare },
   { name: "Email Automation", href: "/email", icon: Mail },
   { name: "Reports", href: "/reports", icon: BarChart3 },
   { name: "Notifications", href: "/notifications", icon: Bell },
