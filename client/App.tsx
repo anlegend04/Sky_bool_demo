@@ -20,6 +20,7 @@ import Reports from "./pages/Reports";
 import Notifications from "./pages/Notifications";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import { LanguageProvider } from "@/hooks/use-language";
 
 const queryClient = new QueryClient();
 
