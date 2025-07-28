@@ -161,7 +161,7 @@ export default function JobDetail() {
       // Update candidate stage in storage
       const updatedCandidate: CandidateData = {
         ...draggedCandidate,
-        stage: newStage as CandidateData['stage'],
+        stage: newStage as CandidateData["stage"],
         duration: 0, // Reset duration for new stage
       };
 
@@ -260,7 +260,9 @@ export default function JobDetail() {
               >
                 {candidate.name}
               </Link>
-              <p className="text-xs text-slate-600 truncate">{candidate.experience}</p>
+              <p className="text-xs text-slate-600 truncate">
+                {candidate.experience}
+              </p>
             </div>
           </div>
           <DropdownMenu>
@@ -299,7 +301,9 @@ export default function JobDetail() {
           </div>
           <div className="flex items-center gap-2 min-w-0">
             <Clock className="w-3 h-3 flex-shrink-0" />
-            <span className="text-xs truncate">{candidate.duration} days in stage</span>
+            <span className="text-xs truncate">
+              {candidate.duration} days in stage
+            </span>
           </div>
         </div>
 
@@ -316,7 +320,10 @@ export default function JobDetail() {
               />
             ))}
           </div>
-          <Badge variant="outline" className="text-xs flex-shrink-0 truncate max-w-20">
+          <Badge
+            variant="outline"
+            className="text-xs flex-shrink-0 truncate max-w-20"
+          >
             {candidate.source}
           </Badge>
         </div>
@@ -343,7 +350,9 @@ export default function JobDetail() {
             onDrop={(e) => handleDrop(e, stage)}
           >
             <div className="flex items-center justify-between mb-4 min-w-0">
-              <h3 className="font-semibold text-sm text-slate-900 truncate flex-1">{stage}</h3>
+              <h3 className="font-semibold text-sm text-slate-900 truncate flex-1">
+                {stage}
+              </h3>
               <Badge variant="outline" className="text-xs flex-shrink-0 ml-2">
                 {stageCandidates.length}
               </Badge>
@@ -634,9 +643,7 @@ export default function JobDetail() {
                   <label className="text-sm font-medium text-slate-700">
                     Requester
                   </label>
-                  <p className="text-sm text-slate-600">
-                    {job.requester}
-                  </p>
+                  <p className="text-sm text-slate-600">{job.requester}</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
