@@ -18,7 +18,7 @@ export interface LanguageOption {
 export const SUPPORTED_LANGUAGES: LanguageOption[] = [
   { code: "en", name: "English", nativeName: "English", flag: "🇺🇸" },
   { code: "vi", name: "Vietnamese", nativeName: "Tiếng Việt", flag: "🇻🇳" },
-  { code: "zh", name: "Chinese", nativeName: "中文", flag: "🇨🇳" },
+  { code: "zh", name: "Chinese", nativeName: "中文", flag: "����🇳" },
   { code: "ja", name: "Japanese", nativeName: "日本語", flag: "🇯🇵" },
   { code: "ko", name: "Korean", nativeName: "한국어", flag: "🇰🇷" },
   { code: "th", name: "Thai", nativeName: "ภาษาไทย", flag: "🇹🇭" },
@@ -811,7 +811,7 @@ const useTranslations = (language: Language) => {
       // Email Automation
       "email.title": "Tự động hóa Email",
       "email.subtitle":
-        "Quản lý mẫu email, quy trình làm việc và tự động hóa giao tiếp với ứng viên.",
+        "Quản lý m��u email, quy trình làm việc và tự động hóa giao tiếp với ứng viên.",
       "email.newWorkflow": "Quy trình mới",
       "email.newTemplate": "Mẫu mới",
       "email.activeTemplates": "Mẫu đang hoạt động",
@@ -1191,7 +1191,7 @@ const useTranslations = (language: Language) => {
       "email.createWorkflow": "Tạo quy trình",
       "email.createEmailTemplate": "Tạo mẫu Email",
       "email.createTemplateDesc":
-        "Tạo mẫu email mới để giao tiếp với ứng viên.",
+        "Tạo mẫu email mới đ�� giao tiếp với ứng viên.",
       "email.templateName": "Tên mẫu",
       "email.templateNamePlaceholder": "ví dụ: Xác nhận phỏng vấn",
       "email.templateType": "Loại mẫu",
@@ -1239,7 +1239,7 @@ const useTranslations = (language: Language) => {
       "email.reminderDesc": "Gửi email nhắc nhở 24 giờ trước phỏng vấn",
       "email.statusChangeNotifications": "Thông báo thay đổi trạng thái",
       "email.statusChangeDesc":
-        "Thông báo cho ứng viên khi trạng thái đơn ứng tuyển thay đổi",
+        "Thông báo cho ứng viên khi tr��ng thái đơn ứng tuyển thay đổi",
       "email.senderInformation": "Thông tin người gửi",
       "email.fromName": "Tên người gửi",
       "email.fromEmail": "Email người gửi",
@@ -1423,7 +1423,7 @@ const useTranslations = (language: Language) => {
       "settings.teamManagement": "Quản lý nhóm",
       "settings.teamMembers": "Thành viên nhóm",
       "settings.teamMembersDesc":
-        "Quản lý quyền truy cập và phân quyền người dùng",
+        "Quản lý quyền truy cập và phân quy���n người dùng",
       "settings.inviteMember": "Mời thành viên",
       "settings.admin": "Quản trị viên",
 
@@ -1536,18 +1536,44 @@ const useTranslations = (language: Language) => {
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [currentLanguage, setCurrentLanguage] = useState<Language>(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return (stored as Language) || "en";
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      // Validate that the stored language is supported
+      if (stored && SUPPORTED_LANGUAGES.find(lang => lang.code === stored)) {
+        return stored as Language;
+      }
+    } catch (error) {
+      console.warn('Failed to read language from localStorage:', error);
+    }
+    return "en";
   });
+
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const t = useTranslations(currentLanguage);
 
   const setLanguage = (language: Language) => {
+    // Validate the language before setting it
+    if (!SUPPORTED_LANGUAGES.find(lang => lang.code === language)) {
+      console.error(`Unsupported language: ${language}`);
+      return;
+    }
+
     setCurrentLanguage(language);
-    localStorage.setItem(STORAGE_KEY, language);
+
+    try {
+      localStorage.setItem(STORAGE_KEY, language);
+    } catch (error) {
+      console.warn('Failed to save language to localStorage:', error);
+    }
 
     // Update document language
     document.documentElement.lang = language;
+
+    // Force a small delay to ensure state updates propagate
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('languageChanged', { detail: language }));
+    }, 0);
   };
 
   const getCurrentLanguageInfo = (): LanguageOption => {
@@ -1558,8 +1584,29 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    // Set initial document language
     document.documentElement.lang = currentLanguage;
-  }, [currentLanguage]);
+
+    // Mark as initialized after first render
+    if (!isInitialized) {
+      setIsInitialized(true);
+    }
+  }, [currentLanguage, isInitialized]);
+
+  // Listen for storage changes from other tabs
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === STORAGE_KEY && e.newValue) {
+        const newLanguage = e.newValue as Language;
+        if (SUPPORTED_LANGUAGES.find(lang => lang.code === newLanguage)) {
+          setCurrentLanguage(newLanguage);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   return (
     <LanguageContext.Provider
