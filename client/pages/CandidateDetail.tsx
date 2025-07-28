@@ -5,6 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
 import {
   Select,
   SelectContent,
@@ -31,6 +39,7 @@ import { HelpTooltip, helpContent } from "@/components/ui/help-tooltip";
 import {
   ArrowLeft,
   Mail,
+  MailCheck,
   Phone,
   MapPin,
   Calendar,
@@ -67,7 +76,12 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { storage, CandidateData, EmailData, StageHistoryData } from "@/lib/storage";
+import {
+  storage,
+  CandidateData,
+  EmailData,
+  StageHistoryData,
+} from "@/lib/storage";
 import { useToast } from "@/hooks/use-toast";
 import { HARDCODED_CANDIDATES, EMAIL_TEMPLATES } from "@/data/hardcoded-data";
 
@@ -79,6 +93,8 @@ type StageData = {
   endDate?: string;
   notes?: string;
   reason?: string;
+  mailSent?: boolean;
+  mailConfirmed?: boolean;
 };
 
 export default function CandidateDetail() {
@@ -95,24 +111,28 @@ export default function CandidateDetail() {
   const [stageChangeReason, setStageChangeReason] = useState("");
   const [emailPreview, setEmailPreview] = useState("");
   const { toast } = useToast();
+  const [selectedEmail, setSelectedEmail] = useState(null);
 
   // Load candidate from hardcoded data or localStorage
   useEffect(() => {
     if (id) {
       // First try to get from hardcoded data
-      const hardcodedCandidate = HARDCODED_CANDIDATES.find(c => c.id === id);
-      
+      const hardcodedCandidate = HARDCODED_CANDIDATES.find((c) => c.id === id);
+
       if (hardcodedCandidate) {
         // Convert hardcoded data to storage format
         const convertedCandidate: CandidateData = {
           ...hardcodedCandidate,
           status: hardcodedCandidate.status as string,
-          emails: hardcodedCandidate.emails.map(email => ({
+          emails: hardcodedCandidate.emails.map((email) => ({
             ...email,
-            status: email.status === "pending" ? "sent" : email.status as "sent" | "draft" | "failed"
-          }))
+            status:
+              email.status === "pending"
+                ? "sent"
+                : (email.status as "sent" | "draft" | "failed"),
+          })),
         };
-        
+
         setCandidate(convertedCandidate);
         setCurrentStage(convertedCandidate.stage);
       } else {
@@ -130,8 +150,12 @@ export default function CandidateDetail() {
     return (
       <div className="p-6">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-slate-900">Candidate not found</h2>
-          <p className="text-slate-600 mt-2">The candidate you're looking for doesn't exist.</p>
+          <h2 className="text-2xl font-bold text-slate-900">
+            Candidate not found
+          </h2>
+          <p className="text-slate-600 mt-2">
+            The candidate you're looking for doesn't exist.
+          </p>
           <Link to="/candidates">
             <Button className="mt-4">Back to Candidates</Button>
           </Link>
@@ -148,7 +172,9 @@ export default function CandidateDetail() {
       duration: 1,
       startDate: "2024-01-15",
       endDate: "2024-01-16",
-      notes: "Application received via LinkedIn. Strong profile match with required skills.",
+      notes:
+        "Application received via LinkedIn. Strong profile match with required skills.",
+      mailSent: true,
     },
     {
       name: "Screening",
@@ -156,21 +182,29 @@ export default function CandidateDetail() {
       duration: 3,
       startDate: "2024-01-16",
       endDate: "2024-01-19",
-      notes: "Initial screening call completed. Excellent communication skills and cultural fit.",
+      notes:
+        "Initial screening call completed. Excellent communication skills and cultural fit.",
+      mailSent: true,
     },
     {
       name: "Interview",
       completed: false,
       duration: 5,
       startDate: "2024-01-19",
-      notes: "Scheduled for panel interview on Jan 25th. Technical assessment completed successfully.",
+      notes:
+        "Scheduled for panel interview on Jan 25th. Technical assessment completed successfully.",
+      mailSent: true,
+      mailConfirmed: true,
     },
     {
       name: "Technical",
       completed: false,
       duration: 0,
       startDate: "",
-      notes: "Technical round pending - coding challenge and system design discussion.",
+      notes:
+        "Technical round pending - coding challenge and system design discussion.",
+      mailSent: false,
+      mailConfirmed: false,
     },
     {
       name: "Offer",
@@ -178,6 +212,8 @@ export default function CandidateDetail() {
       duration: 0,
       startDate: "",
       notes: "Final offer stage - salary negotiation and benefits discussion.",
+      mailSent: false,
+      mailConfirmed: false,
     },
     {
       name: "Hired",
@@ -185,6 +221,8 @@ export default function CandidateDetail() {
       duration: 0,
       startDate: "",
       notes: "Onboarding and start date coordination.",
+      mailSent: false,
+      mailConfirmed: false,
     },
   ];
 
@@ -196,8 +234,10 @@ export default function CandidateDetail() {
       action: "Moved to Interview stage",
       user: "Alex Chen",
       timestamp: "2024-01-19 10:30 AM",
-      reason: "Passed initial screening successfully with strong technical background",
-      content: "Candidate demonstrated excellent problem-solving skills during screening call.",
+      reason:
+        "Passed initial screening successfully with strong technical background",
+      content:
+        "Candidate demonstrated excellent problem-solving skills during screening call.",
     },
     {
       id: 2,
@@ -205,7 +245,8 @@ export default function CandidateDetail() {
       action: "Added detailed note",
       user: "Sarah Kim",
       timestamp: "2024-01-18 2:15 PM",
-      content: "Great cultural fit, strong technical background. Portfolio shows impressive React projects. Recommended for technical interview.",
+      content:
+        "Great cultural fit, strong technical background. Portfolio shows impressive React projects. Recommended for technical interview.",
     },
     {
       id: 3,
@@ -213,7 +254,8 @@ export default function CandidateDetail() {
       action: "Sent interview invitation",
       user: "Alex Chen",
       timestamp: "2024-01-17 9:00 AM",
-      content: "Interview invitation sent with calendar link and preparation materials.",
+      content:
+        "Interview invitation sent with calendar link and preparation materials.",
     },
     {
       id: 4,
@@ -222,7 +264,8 @@ export default function CandidateDetail() {
       user: "Alex Chen",
       timestamp: "2024-01-16 3:30 PM",
       duration: "45 minutes",
-      content: "Discussed technical background, career goals, and company culture. Very positive impression.",
+      content:
+        "Discussed technical background, career goals, and company culture. Very positive impression.",
     },
     {
       id: 5,
@@ -230,7 +273,8 @@ export default function CandidateDetail() {
       action: "Technical assessment scheduled",
       user: "Sarah Kim",
       timestamp: "2024-01-20 11:00 AM",
-      content: "Scheduled technical round with senior developers for Jan 25th, 2:00 PM.",
+      content:
+        "Scheduled technical round with senior developers for Jan 25th, 2:00 PM.",
     },
     {
       id: 6,
@@ -238,7 +282,8 @@ export default function CandidateDetail() {
       action: "Resume review completed",
       user: "Mike Wilson",
       timestamp: "2024-01-15 4:45 PM",
-      content: "Resume shows strong React/TypeScript experience. Previous work at top tech companies is impressive.",
+      content:
+        "Resume shows strong React/TypeScript experience. Previous work at top tech companies is impressive.",
     },
   ];
 
@@ -247,7 +292,8 @@ export default function CandidateDetail() {
     {
       id: "email_1",
       subject: "Interview Invitation - Senior Product Manager",
-      content: "Hi Marissa, Thank you for your interest in the Senior Product Manager position. We would like to invite you for an interview on January 25th at 2:00 PM. Please find the calendar invitation attached. We'll be discussing your background, technical skills, and how you approach product challenges. Looking forward to meeting you!",
+      content:
+        "Hi Marissa, Thank you for your interest in the Senior Product Manager position. We would like to invite you for an interview on January 25th at 2:00 PM. Please find the calendar invitation attached. We'll be discussing your background, technical skills, and how you approach product challenges. Looking forward to meeting you!",
       from: "alex.chen@company.com",
       to: candidate.email,
       timestamp: "2024-01-17 9:00 AM",
@@ -257,7 +303,8 @@ export default function CandidateDetail() {
     {
       id: "email_2",
       subject: "Application Received - Senior Product Manager",
-      content: "Thank you for applying to our Senior Product Manager position. We have received your application and will review it shortly. You can expect to hear from us within 3-5 business days. In the meantime, feel free to explore our company culture and values on our website.",
+      content:
+        "Thank you for applying to our Senior Product Manager position. We have received your application and will review it shortly. You can expect to hear from us within 3-5 business days. In the meantime, feel free to explore our company culture and values on our website.",
       from: "noreply@company.com",
       to: candidate.email,
       timestamp: "2024-01-15 2:30 PM",
@@ -267,7 +314,8 @@ export default function CandidateDetail() {
     {
       id: "email_3",
       subject: "Technical Assessment Details",
-      content: "Hi Marissa, Following our successful initial interview, we'd like to proceed with the technical assessment. This will include a coding challenge and system design discussion. Please find the assessment materials attached. You have 48 hours to complete this. Good luck!",
+      content:
+        "Hi Marissa, Following our successful initial interview, we'd like to proceed with the technical assessment. This will include a coding challenge and system design discussion. Please find the assessment materials attached. You have 48 hours to complete this. Good luck!",
       from: "sarah.kim@company.com",
       to: candidate.email,
       timestamp: "2024-01-20 3:15 PM",
@@ -290,7 +338,7 @@ export default function CandidateDetail() {
       setCurrentStage(newStage);
       setShowStageChangeDialog(false);
       setStageChangeReason("");
-      
+
       toast({
         title: "Stage Updated",
         description: `${candidate.name} has been moved to ${newStage} stage.`,
@@ -325,7 +373,7 @@ export default function CandidateDetail() {
       setEmailSubject(subject);
       setEmailContent(emailTemplates[template] || "");
       setShowEmailDialog(true);
-      
+
       toast({
         title: "Email Suggested",
         description: `Would you like to send a ${stage.toLowerCase()} email to ${candidate.name}?`,
@@ -334,7 +382,7 @@ export default function CandidateDetail() {
   };
 
   const handleSendEmail = () => {
-    const emailData: Omit<EmailData, 'id'> = {
+    const emailData: Omit<EmailData, "id"> = {
       subject: emailSubject,
       content: emailContent,
       from: "recruiter@company.com",
@@ -357,7 +405,7 @@ export default function CandidateDetail() {
   };
 
   const handleSaveDraft = () => {
-    const emailData: Omit<EmailData, 'id'> = {
+    const emailData: Omit<EmailData, "id"> = {
       subject: emailSubject,
       content: emailContent,
       from: "recruiter@company.com",
@@ -376,22 +424,24 @@ export default function CandidateDetail() {
   const handleTemplateSelect = (templateKey: string) => {
     setSelectedTemplate(templateKey);
     const template = emailTemplates[templateKey] || "";
-    
+
     // Replace template variables
     const processedTemplate = template
       .replace(/{{name}}/g, candidate.name)
       .replace(/{{position}}/g, candidate.position)
       .replace(/{{company}}/g, "TalentFlow");
-    
+
     setEmailContent(processedTemplate);
     setEmailPreview(processedTemplate);
   };
 
   const StatusTracker = () => {
-    const currentStageIndex = stages.findIndex(stage => stage.name === currentStage);
-    const completedStages = stages.filter(s => s.completed).length;
+    const currentStageIndex = stages.findIndex(
+      (stage) => stage.name === currentStage,
+    );
+    const completedStages = stages.filter((s) => s.completed).length;
     const totalStages = stages.length;
-    
+
     return (
       <Card className="mb-4 sm:mb-6">
         <CardHeader>
@@ -402,7 +452,11 @@ export default function CandidateDetail() {
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="w-full sm:w-auto">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full sm:w-auto"
+                >
                   Update Stage
                 </Button>
               </DropdownMenuTrigger>
@@ -427,10 +481,17 @@ export default function CandidateDetail() {
           {/* Progress Bar */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-slate-700">Overall Progress</span>
-              <span className="text-sm text-slate-500">{completedStages} of {totalStages} stages</span>
+              <span className="text-sm font-medium text-slate-700">
+                Overall Progress
+              </span>
+              <span className="text-sm text-slate-500">
+                {completedStages} of {totalStages} stages
+              </span>
             </div>
-            <Progress value={(completedStages / totalStages) * 100} className="h-2" />
+            <Progress
+              value={(completedStages / totalStages) * 100}
+              className="h-2"
+            />
           </div>
 
           {/* Current Stage Highlight */}
@@ -440,9 +501,12 @@ export default function CandidateDetail() {
                 <Circle className="w-5 h-5 fill-current text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-blue-900 truncate">Current: {currentStage}</h4>
-                <p className="text-sm text-blue-700 truncate">
-                  {stages.find(s => s.name === currentStage)?.notes || "Stage in progress"}
+                <h4 className="font-medium text-blue-900 truncate">
+                  Current: {currentStage}
+                </h4>
+                <p className="text-sm text-blue-700 text-wrap">
+                  {stages.find((s) => s.name === currentStage)?.notes ||
+                    "Stage in progress"}
                 </p>
               </div>
             </div>
@@ -451,7 +515,37 @@ export default function CandidateDetail() {
           {/* Stages Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             {stages.map((stage, index) => (
-              <div key={stage.name} className="text-center">
+              <div key={stage.name} className="text-center relative">
+                <div className="flex justify-center mb-1">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        {stage.mailSent ? (
+                          stage.mailConfirmed ? (
+                            <CheckCircle className="w-4 h-4 text-blue-500" />
+                          ) : (
+                            <MailCheck className="w-4 h-4 text-green-500" />
+                          )
+                        ) : (
+                          <Mail className="w-4 h-4 text-slate-300" />
+                        )}
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        {stage.mailSent ? (
+                          stage.mailConfirmed ? (
+                            <p>Email sent and confirmed by recipient</p>
+                          ) : (
+                            <p>Email sent, waiting for confirmation</p>
+                          )
+                        ) : (
+                          <p>Email not sent</p>
+                        )}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+
+                {/* Circle stage */}
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center border-2 mx-auto mb-2 ${
                     stage.completed
@@ -469,7 +563,13 @@ export default function CandidateDetail() {
                     <Circle className="w-4 h-4" />
                   )}
                 </div>
-                <div className="text-xs font-medium text-slate-700 truncate px-1">{stage.name}</div>
+
+                {/* Stage name */}
+                <div className="text-xs font-medium text-slate-700 truncate px-1">
+                  {stage.name}
+                </div>
+
+                {/* Duration nếu có */}
                 {stage.duration > 0 && (
                   <div className="text-xs text-slate-500 flex items-center justify-center gap-1 mt-1">
                     <Clock className="w-3 h-3" />
@@ -479,14 +579,15 @@ export default function CandidateDetail() {
               </div>
             ))}
           </div>
-          
+
           {/* Stage Details */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mt-6">
             <div className="flex items-center space-x-2 p-3 bg-slate-50 rounded-lg">
               <Clock className="w-4 h-4 text-slate-500 flex-shrink-0" />
               <div className="min-w-0 flex-1">
                 <span className="text-sm text-slate-600 truncate block">
-                  Total Time: {stages.reduce((acc, stage) => acc + stage.duration, 0)} days
+                  Total Time:{" "}
+                  {stages.reduce((acc, stage) => acc + stage.duration, 0)} days
                 </span>
               </div>
             </div>
@@ -494,7 +595,9 @@ export default function CandidateDetail() {
               <Target className="w-4 h-4 text-slate-500 flex-shrink-0" />
               <div className="min-w-0 flex-1">
                 <span className="text-sm text-slate-600 truncate block">
-                  Current: {currentStage} ({stages.find(s => s.name === currentStage)?.duration || 0} days)
+                  Current: {currentStage} (
+                  {stages.find((s) => s.name === currentStage)?.duration || 0}{" "}
+                  days)
                 </span>
               </div>
             </div>
@@ -522,12 +625,19 @@ export default function CandidateDetail() {
               <Avatar className="w-16 h-16 mx-auto sm:mx-0">
                 <AvatarImage src={candidate.avatar} />
                 <AvatarFallback className="text-lg">
-                  {candidate.name.split(" ").map(n => n[0]).join("")}
+                  {candidate.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
                 </AvatarFallback>
               </Avatar>
               <div className="text-center sm:text-left min-w-0 flex-1">
-                <h2 className="text-lg sm:text-xl font-bold text-slate-900 truncate">{candidate.name}</h2>
-                <p className="text-sm sm:text-base text-slate-600 text-wrap">{candidate.position}</p>
+                <h2 className="text-lg sm:text-xl font-bold text-slate-900 truncate">
+                  {candidate.name}
+                </h2>
+                <p className="text-sm sm:text-base text-slate-600 text-wrap">
+                  {candidate.position}
+                </p>
                 <div className="flex items-center justify-center sm:justify-start space-x-1 mt-1">
                   {[...Array(5)].map((_, i) => (
                     <Star
@@ -546,7 +656,6 @@ export default function CandidateDetail() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="w-full sm:w-auto">
                   <MoreHorizontal className="w-4 h-4 mr-2" />
-                  
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -590,7 +699,9 @@ export default function CandidateDetail() {
             </div>
             <div className="flex items-center space-x-3 min-w-0">
               <User className="w-4 h-4 text-slate-500 flex-shrink-0" />
-              <span className="text-sm truncate">Recruiter: {candidate.recruiter}</span>
+              <span className="text-sm truncate">
+                Recruiter: {candidate.recruiter}
+              </span>
             </div>
             <div className="flex items-center space-x-3 min-w-0">
               <DollarSign className="w-4 h-4 text-slate-500 flex-shrink-0" />
@@ -598,7 +709,9 @@ export default function CandidateDetail() {
             </div>
             <div className="flex items-center space-x-3 min-w-0">
               <GraduationCap className="w-4 h-4 text-slate-500 flex-shrink-0" />
-              <span className="text-sm truncate">Experience: {candidate.experience}</span>
+              <span className="text-sm truncate">
+                Experience: {candidate.experience}
+              </span>
             </div>
           </div>
 
@@ -606,7 +719,11 @@ export default function CandidateDetail() {
             <h4 className="font-medium text-slate-900 mb-2">Skills</h4>
             <div className="flex flex-wrap gap-2">
               {candidate.skills.map((skill) => (
-                <Badge key={skill} variant="secondary" className="truncate max-w-full">
+                <Badge
+                  key={skill}
+                  variant="secondary"
+                  className="truncate max-w-full"
+                >
                   {skill}
                 </Badge>
               ))}
@@ -617,7 +734,11 @@ export default function CandidateDetail() {
             <h4 className="font-medium text-slate-900 mb-2">Tags</h4>
             <div className="flex flex-wrap gap-2">
               {candidate.tags.map((tag) => (
-                <Badge key={tag} variant="outline" className="truncate max-w-full">
+                <Badge
+                  key={tag}
+                  variant="outline"
+                  className="truncate max-w-full"
+                >
                   {tag}
                 </Badge>
               ))}
@@ -635,8 +756,12 @@ export default function CandidateDetail() {
                 <div className="flex items-center gap-3 min-w-0 flex-1">
                   <FileText className="w-8 h-8 text-slate-500 flex-shrink-0" />
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-sm truncate">{candidate.resume}</p>
-                    <p className="text-xs text-slate-500 truncate">PDF Document</p>
+                    <p className="font-medium text-sm truncate">
+                      {candidate.resume}
+                    </p>
+                    <p className="text-xs text-slate-500 truncate">
+                      PDF Document
+                    </p>
                   </div>
                 </div>
                 <Button variant="outline" size="sm" className="flex-shrink-0">
@@ -650,7 +775,7 @@ export default function CandidateDetail() {
       </Card>
 
       {/* Quick Actions */}
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle className="text-lg sm:text-xl">Quick Actions</CardTitle>
         </CardHeader>
@@ -673,14 +798,81 @@ export default function CandidateDetail() {
               <span className="truncate">Send Assessment</span>
             </Button>
           </div>
-          <Button 
-            className="w-full justify-start text-sm" 
+          <Button
+            className="w-full justify-start text-sm"
             variant="outline"
             onClick={() => setShowEmailDialog(true)}
           >
             <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
             <span className="truncate">Send Email</span>
           </Button>
+        </CardContent>
+      </Card> */}
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+            Send Email
+            <HelpTooltip content={helpContent.template} />
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3 sm:space-y-4">
+          <Button
+            className="w-full justify-start text-sm"
+            onClick={() => setShowEmailDialog(true)}
+          >
+            <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
+            <span className="truncate">Compose Email</span>
+          </Button>
+
+          <div className="pt-3 sm:pt-4 border-t">
+            <h4 className="font-medium text-slate-900 mb-2 flex items-center gap-2 text-sm sm:text-base">
+              Quick Templates
+              <HelpTooltip content={helpContent.template} />
+            </h4>
+            <div className="space-y-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full justify-start text-sm"
+                onClick={() => {
+                  handleTemplateSelect("interview_invitation");
+                  setEmailSubject(
+                    `Interview Invitation - ${candidate.position}`,
+                  );
+                  setShowEmailDialog(true);
+                }}
+              >
+                <span className="truncate">Interview Invitation</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full justify-start text-sm"
+                onClick={() => {
+                  handleTemplateSelect("offer_letter");
+                  setEmailSubject(`Job Offer - ${candidate.position}`);
+                  setShowEmailDialog(true);
+                }}
+              >
+                <span className="truncate">Offer Letter</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full justify-start text-sm"
+                onClick={() => {
+                  handleTemplateSelect("rejection_notice");
+                  setEmailSubject(
+                    `Thank you for your application - ${candidate.position}`,
+                  );
+                  setShowEmailDialog(true);
+                }}
+              >
+                <span className="truncate">Rejection Notice</span>
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
@@ -693,10 +885,14 @@ export default function CandidateDetail() {
       {/* Notes and Activities */}
       <Tabs defaultValue="notes" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="notes" className="text-sm sm:text-base">Notes & Timeline</TabsTrigger>
-          <TabsTrigger value="activities" className="text-sm sm:text-base">Activity Log</TabsTrigger>
+          <TabsTrigger value="notes" className="text-sm sm:text-base">
+            Notes & Timeline
+          </TabsTrigger>
+          <TabsTrigger value="activities" className="text-sm sm:text-base">
+            Activity Log
+          </TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="notes" className="space-y-4">
           <Card>
             <CardHeader>
@@ -723,28 +919,38 @@ export default function CandidateDetail() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {stages.filter(stage => stage.startDate).map((stage) => (
-                  <div key={stage.name} className="flex items-start space-x-3 pb-4 border-b border-slate-100 last:border-b-0">
-                    <div className={`w-3 h-3 rounded-full mt-2 ${stage.completed ? 'bg-green-500' : 'bg-blue-500'}`} />
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <h4 className="font-medium text-slate-900">{stage.name}</h4>
-                        <span className="text-xs text-slate-500 flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {stage.duration} days
-                        </span>
-                      </div>
-                      <p className="text-sm text-slate-600 mt-1">
-                        {stage.startDate} {stage.endDate && `- ${stage.endDate}`}
-                      </p>
-                      {stage.notes && (
-                        <p className="text-sm text-slate-600 mt-2 bg-slate-50 p-2 rounded">
-                          {stage.notes}
+                {stages
+                  .filter((stage) => stage.startDate)
+                  .map((stage) => (
+                    <div
+                      key={stage.name}
+                      className="flex items-start space-x-3 pb-4 border-b border-slate-100 last:border-b-0"
+                    >
+                      <div
+                        className={`w-3 h-3 rounded-full mt-2 ${stage.completed ? "bg-green-500" : "bg-blue-500"}`}
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium text-slate-900">
+                            {stage.name}
+                          </h4>
+                          <span className="text-xs text-slate-500 flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {stage.duration} days
+                          </span>
+                        </div>
+                        <p className="text-sm text-slate-600 mt-1">
+                          {stage.startDate}{" "}
+                          {stage.endDate && `- ${stage.endDate}`}
                         </p>
-                      )}
+                        {stage.notes && (
+                          <p className="text-sm text-slate-600 mt-2 bg-slate-50 p-2 rounded">
+                            {stage.notes}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             </CardContent>
           </Card>
@@ -758,20 +964,39 @@ export default function CandidateDetail() {
             <CardContent>
               <div className="space-y-4">
                 {activities.map((activity) => (
-                  <div key={activity.id} className="flex items-start space-x-3 pb-4 border-b border-slate-100 last:border-b-0">
+                  <div
+                    key={activity.id}
+                    className="flex items-start space-x-3 pb-4 border-b border-slate-100 last:border-b-0"
+                  >
                     <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                      {activity.type === "stage_change" && <Zap className="w-4 h-4 text-blue-600" />}
-                      {activity.type === "note" && <FileText className="w-4 h-4 text-green-600" />}
-                      {activity.type === "email" && <Mail className="w-4 h-4 text-purple-600" />}
-                      {activity.type === "call" && <Phone className="w-4 h-4 text-orange-600" />}
-                      {activity.type === "interview" && <Video className="w-4 h-4 text-indigo-600" />}
+                      {activity.type === "stage_change" && (
+                        <Zap className="w-4 h-4 text-blue-600" />
+                      )}
+                      {activity.type === "note" && (
+                        <FileText className="w-4 h-4 text-green-600" />
+                      )}
+                      {activity.type === "email" && (
+                        <Mail className="w-4 h-4 text-purple-600" />
+                      )}
+                      {activity.type === "call" && (
+                        <Phone className="w-4 h-4 text-orange-600" />
+                      )}
+                      {activity.type === "interview" && (
+                        <Video className="w-4 h-4 text-indigo-600" />
+                      )}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <h4 className="font-medium text-slate-900">{activity.action}</h4>
-                        <span className="text-xs text-slate-500">{activity.timestamp}</span>
+                        <h4 className="font-medium text-slate-900">
+                          {activity.action}
+                        </h4>
+                        <span className="text-xs text-slate-500">
+                          {activity.timestamp}
+                        </span>
                       </div>
-                      <p className="text-sm text-slate-600">by {activity.user}</p>
+                      <p className="text-sm text-slate-600">
+                        by {activity.user}
+                      </p>
                       {activity.content && (
                         <p className="text-sm text-slate-600 mt-1 bg-slate-50 p-2 rounded">
                           {activity.content}
@@ -779,12 +1004,14 @@ export default function CandidateDetail() {
                       )}
                       {activity.reason && (
                         <p className="text-sm text-slate-600 mt-1">
-                          <span className="font-medium">Reason:</span> {activity.reason}
+                          <span className="font-medium">Reason:</span>{" "}
+                          {activity.reason}
                         </p>
                       )}
                       {activity.duration && (
                         <p className="text-sm text-slate-600 mt-1">
-                          <span className="font-medium">Duration:</span> {activity.duration}
+                          <span className="font-medium">Duration:</span>{" "}
+                          {activity.duration}
                         </p>
                       )}
                     </div>
@@ -801,68 +1028,7 @@ export default function CandidateDetail() {
   const RightPanel = () => (
     <div className="space-y-4 sm:space-y-6">
       {/* Send Email Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-            Send Email
-            <HelpTooltip content={helpContent.template} />
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3 sm:space-y-4">
-          <Button 
-            className="w-full justify-start text-sm" 
-            onClick={() => setShowEmailDialog(true)}
-          >
-            <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
-            <span className="truncate">Compose Email</span>
-          </Button>
-          
-          <div className="pt-3 sm:pt-4 border-t">
-            <h4 className="font-medium text-slate-900 mb-2 flex items-center gap-2 text-sm sm:text-base">
-              Quick Templates
-              <HelpTooltip content={helpContent.template} />
-            </h4>
-            <div className="space-y-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="w-full justify-start text-sm"
-                onClick={() => {
-                  handleTemplateSelect("interview_invitation");
-                  setEmailSubject(`Interview Invitation - ${candidate.position}`);
-                  setShowEmailDialog(true);
-                }}
-              >
-                <span className="truncate">Interview Invitation</span>
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="w-full justify-start text-sm"
-                onClick={() => {
-                  handleTemplateSelect("offer_letter");
-                  setEmailSubject(`Job Offer - ${candidate.position}`);
-                  setShowEmailDialog(true);
-                }}
-              >
-                <span className="truncate">Offer Letter</span>
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="w-full justify-start text-sm"
-                onClick={() => {
-                  handleTemplateSelect("rejection_notice");
-                  setEmailSubject(`Thank you for your application - ${candidate.position}`);
-                  setShowEmailDialog(true);
-                }}
-              >
-                <span className="truncate">Rejection Notice</span>
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      
 
       {/* Email History */}
       <Card>
@@ -872,42 +1038,53 @@ export default function CandidateDetail() {
         <CardContent>
           <div className="space-y-3 sm:space-y-4">
             {emailHistory.map((email) => (
-              <div key={email.id} className="p-3 border border-slate-200 rounded-lg hover:bg-slate-50">
+              <div
+                key={email.id}
+                className="p-3 border border-slate-200 rounded-lg hover:bg-slate-50"
+              >
                 <div className="flex items-center justify-between mb-2 min-w-0">
                   <h4 className="font-medium text-sm text-slate-900 truncate flex items-center gap-2 min-w-0 flex-1">
-                    <span className="truncate">{email.subject}</span>
-                    <Badge variant={email.status === "sent" ? "default" : "secondary"} className="text-xs flex-shrink-0">
+                    <span className="text-wrap">{email.subject}</span>
+                    {/* <Badge
+                      variant={
+                        email.status === "sent" ? "default" : "secondary"
+                      }
+                      className="text-xs flex-shrink-0"
+                    >
                       {email.status}
-                    </Badge>
+                    </Badge> */}
                   </h4>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="flex-shrink-0">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="flex-shrink-0"
+                      >
                         <MoreHorizontal className="w-4 h-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setSelectedEmail(email)}>
                         <Eye className="w-4 h-4 mr-2" />
                         View Full
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
+
+                      {/* <DropdownMenuItem>
                         <Forward className="w-4 h-4 mr-2" />
                         Forward
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
+                      </DropdownMenuItem> */}
+                      {/* <DropdownMenuItem>
                         <Copy className="w-4 h-4 mr-2" />
                         Resend
-                      </DropdownMenuItem>
+                      </DropdownMenuItem> */}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
                 <p className="text-xs text-slate-600 mb-1 truncate">
                   From: {email.from}
                 </p>
-                <p className="text-xs text-slate-600 mb-2">
-                  {email.timestamp}
-                </p>
+                <p className="text-xs text-slate-600 mb-2">{email.timestamp}</p>
                 <p className="text-xs text-slate-600 line-clamp-2">
                   {email.content}
                 </p>
@@ -936,7 +1113,9 @@ export default function CandidateDetail() {
             <div className="flex items-center justify-between p-3 border border-slate-200 rounded-lg">
               <div className="flex items-center space-x-3 min-w-0 flex-1">
                 <FileText className="w-4 h-4 text-slate-500 flex-shrink-0" />
-                <span className="text-sm font-medium truncate">Cover_Letter.pdf</span>
+                <span className="text-sm font-medium truncate">
+                  Cover_Letter.pdf
+                </span>
               </div>
               <Button variant="ghost" size="sm" className="flex-shrink-0">
                 <Download className="w-4 h-4" />
@@ -945,7 +1124,9 @@ export default function CandidateDetail() {
             <div className="flex items-center justify-between p-3 border border-slate-200 rounded-lg">
               <div className="flex items-center space-x-3 min-w-0 flex-1">
                 <FileText className="w-4 h-4 text-slate-500 flex-shrink-0" />
-                <span className="text-sm font-medium truncate">Portfolio.pdf</span>
+                <span className="text-sm font-medium truncate">
+                  Portfolio.pdf
+                </span>
               </div>
               <Button variant="ghost" size="sm" className="flex-shrink-0">
                 <Download className="w-4 h-4" />
@@ -953,6 +1134,27 @@ export default function CandidateDetail() {
             </div>
           </div>
         </CardContent>
+        <Dialog
+          open={!!selectedEmail}
+          onOpenChange={() => setSelectedEmail(null)}
+        >
+          <DialogContent className="sm:max-w-xl">
+            <DialogHeader>
+              <DialogTitle>{selectedEmail?.subject}</DialogTitle>
+              <DialogDescription>
+                Sent on {selectedEmail?.timestamp}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-2">
+              <p className="text-sm text-slate-600">
+                <strong>From:</strong> {selectedEmail?.from}
+              </p>
+              <p className="text-sm text-slate-600 whitespace-pre-line">
+                {selectedEmail?.content}
+              </p>
+            </div>
+          </DialogContent>
+        </Dialog>
       </Card>
     </div>
   );
@@ -970,17 +1172,30 @@ export default function CandidateDetail() {
               </Button>
             </Link>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Candidate Profile</h1>
-              <p className="text-sm sm:text-base text-slate-600">Manage candidate information and track progress</p>
+              <h1 className="text-xl sm:text-2xl font-bold text-slate-900">
+                Candidate Profile
+              </h1>
+              <p className="text-sm sm:text-base text-slate-600">
+                Manage candidate information and track progress
+              </p>
             </div>
           </div>
           <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
-            <Badge variant="outline" className="flex items-center gap-1 w-full sm:w-auto justify-center sm:justify-start">
+            <Badge
+              variant="outline"
+              className="flex items-center gap-1 w-full sm:w-auto justify-center sm:justify-start"
+            >
               <span className="text-slate-600">{candidate.source}</span>
               <HelpTooltip content={helpContent.source} />
             </Badge>
             <Badge
-              variant={currentStage === "Hired" ? "default" : currentStage === "Rejected" ? "destructive" : "secondary"}
+              variant={
+                currentStage === "Hired"
+                  ? "default"
+                  : currentStage === "Rejected"
+                    ? "destructive"
+                    : "secondary"
+              }
               className="flex items-center gap-1 w-full sm:w-auto justify-center sm:justify-start"
             >
               {currentStage}
@@ -1009,17 +1224,23 @@ export default function CandidateDetail() {
       </div>
 
       {/* Stage Change Dialog */}
-      <Dialog open={showStageChangeDialog} onOpenChange={setShowStageChangeDialog}>
+      <Dialog
+        open={showStageChangeDialog}
+        onOpenChange={setShowStageChangeDialog}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Change Candidate Stage</DialogTitle>
             <DialogDescription>
-              Moving candidate to {newStage} stage. Please provide a reason for this change.
+              Moving candidate to {newStage} stage. Please provide a reason for
+              this change.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-slate-700">Reason for stage change</label>
+              <label className="text-sm font-medium text-slate-700">
+                Reason for stage change
+              </label>
               <Textarea
                 placeholder="Explain why you're moving this candidate to the next stage..."
                 value={stageChangeReason}
@@ -1037,9 +1258,7 @@ export default function CandidateDetail() {
               >
                 Cancel
               </Button>
-              <Button onClick={handleStageChange}>
-                Update Stage
-              </Button>
+              <Button onClick={handleStageChange}>Update Stage</Button>
             </div>
           </div>
         </DialogContent>
@@ -1057,34 +1276,43 @@ export default function CandidateDetail() {
               Send an email to {candidate.name} ({candidate.email})
             </DialogDescription>
           </DialogHeader>
-          
+
           <Tabs defaultValue="compose" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="compose">Compose</TabsTrigger>
               <TabsTrigger value="preview">Preview</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="compose" className="space-y-4">
               <div>
                 <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
                   Email Template
                   <HelpTooltip content={helpContent.template} />
                 </label>
-                <Select value={selectedTemplate} onValueChange={handleTemplateSelect}>
+                <Select
+                  value={selectedTemplate}
+                  onValueChange={handleTemplateSelect}
+                >
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Select a template or compose manually" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="">Manual Compose</SelectItem>
-                    <SelectItem value="interview_invitation">Interview Invitation</SelectItem>
+                    <SelectItem value="interview_invitation">
+                      Interview Invitation
+                    </SelectItem>
                     <SelectItem value="offer_letter">Offer Letter</SelectItem>
-                    <SelectItem value="rejection_notice">Rejection Notice</SelectItem>
+                    <SelectItem value="rejection_notice">
+                      Rejection Notice
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div>
-                <label className="text-sm font-medium text-slate-700">Subject Line</label>
+                <label className="text-sm font-medium text-slate-700">
+                  Subject Line
+                </label>
                 <Input
                   value={emailSubject}
                   onChange={(e) => setEmailSubject(e.target.value)}
@@ -1092,9 +1320,11 @@ export default function CandidateDetail() {
                   className="mt-1"
                 />
               </div>
-              
+
               <div>
-                <label className="text-sm font-medium text-slate-700">Email Content</label>
+                <label className="text-sm font-medium text-slate-700">
+                  Email Content
+                </label>
                 <Textarea
                   value={emailContent}
                   onChange={(e) => setEmailContent(e.target.value)}
@@ -1103,7 +1333,7 @@ export default function CandidateDetail() {
                   className="mt-1"
                 />
               </div>
-              
+
               <div className="flex items-center justify-between pt-4">
                 <Button variant="outline" size="sm">
                   <Paperclip className="w-4 h-4 mr-2" />
@@ -1121,7 +1351,7 @@ export default function CandidateDetail() {
                 </div>
               </div>
             </TabsContent>
-            
+
             <TabsContent value="preview" className="space-y-4">
               <div className="border border-slate-200 rounded-lg p-4 bg-slate-50">
                 <div className="space-y-3 mb-4 pb-4 border-b border-slate-200">
@@ -1140,7 +1370,7 @@ export default function CandidateDetail() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex justify-end space-x-2">
                 <Button variant="outline" onClick={handleSaveDraft}>
                   <Save className="w-4 h-4 mr-2" />

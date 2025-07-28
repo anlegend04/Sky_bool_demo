@@ -101,6 +101,8 @@ export interface StageHistoryData {
   notes: string;
   userId: string;
   userName: string;
+  mailSent?: boolean;
+  mailConfirmed?: boolean;
 }
 
 export interface NoteData {
@@ -335,6 +337,8 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         notes: "Strong technical background",
         userId: "user_1",
         userName: "Alex Chen",
+        mailSent: true,
+
       },
       {
         id: "stage_2",
@@ -346,6 +350,7 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         notes: "Excellent communication skills",
         userId: "user_1",
         userName: "Alex Chen",
+        mailSent: true,
       },
       {
         id: "stage_3",
@@ -356,6 +361,8 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         notes: "Panel interview scheduled for Jan 25th",
         userId: "user_1",
         userName: "Alex Chen",
+        mailSent: true,
+        mailConfirmed: true,
       },
     ],
     notes: [
@@ -403,13 +410,7 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
     location: "New York, NY",
     position: "Product Manager",
     experience: "7+ years",
-    skills: [
-      "Product Strategy",
-      "Agile",
-      "Data Analysis",
-      "User Research",
-      "Roadmapping",
-    ],
+    skills: ["Product Strategy", "Agile", "Data Analysis", "User Research", "Roadmapping"],
     status: "Active",
     stage: "Technical",
     rating: 4,
@@ -512,13 +513,7 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
     location: "Remote",
     position: "UX Designer",
     experience: "4+ years",
-    skills: [
-      "Figma",
-      "Sketch",
-      "User Research",
-      "Prototyping",
-      "Design Systems",
-    ],
+    skills: ["Figma", "Sketch", "User Research", "Prototyping", "Design Systems"],
     status: "Active",
     stage: "Hired",
     rating: 5,
@@ -590,8 +585,7 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
     notes: [
       {
         id: "note_1",
-        content:
-          "Outstanding portfolio showcasing user-centered design approach",
+        content: "Outstanding portfolio showcasing user-centered design approach",
         userId: "user_3",
         userName: "Mike Wilson",
         timestamp: "2024-01-09T11:00:00Z",
@@ -599,8 +593,7 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
       },
       {
         id: "note_2",
-        content:
-          "Successfully completed design challenge with innovative solutions",
+        content: "Successfully completed design challenge with innovative solutions",
         userId: "user_3",
         userName: "Mike Wilson",
         timestamp: "2024-01-15T16:30:00Z",
@@ -635,6 +628,7 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
     updatedAt: "2024-01-18T17:00:00Z",
   },
 ];
+
 
 export const HARDCODED_NOTIFICATIONS: NotificationData[] = [
   {
