@@ -43,6 +43,7 @@ import { useLanguage } from "@/hooks/use-language";
 import { useState } from "react";
 
 export default function EmailAutomation() {
+  const { t } = useLanguage();
   const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
   const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
   const [isWorkflowDialogOpen, setIsWorkflowDialogOpen] = useState(false);
