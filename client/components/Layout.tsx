@@ -111,12 +111,13 @@ export default function Layout({ children }: LayoutProps) {
                 {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </Button>
               <div className="flex-shrink-0 flex items-center">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">HR</span>
+                <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-md">
+                  <span className="text-white font-bold text-lg">TD</span>
                 </div>
-                <span className="ml-2 text-xl font-semibold text-slate-900 hidden sm:block text-wrap-safe">
-                  TalentFlow
-                </span>
+                <div className="ml-3 hidden sm:block">
+                  <div className="text-xl font-bold text-primary">{t('company.name')}</div>
+                  <div className="text-xs text-secondary font-medium -mt-1">{t('company.tagline')}</div>
+                </div>
               </div>
             </div>
 
