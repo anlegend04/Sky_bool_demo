@@ -390,30 +390,32 @@ export default function Reports() {
                 <CardTitle>{t("reports.recruiterPerformance")}</CardTitle>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={recruiterData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis
-                      dataKey="name"
-                      allowDuplicatedCategory={false}
-                      tickLine={false}
-                    />
-                    <YAxis allowDecimals={false} tickLine={false} />
-                    <Tooltip cursor={false} />
-                    <Legend iconType="rect" />
-                    <Bar
-                      dataKey="applications"
-                      fill="#8884d8"
-                      name="Applications"
-                    />
-                    <Bar
-                      dataKey="interviews"
-                      fill="#82ca9d"
-                      name="Interviews"
-                    />
-                    <Bar dataKey="hires" fill="#ffc658" name="Hires" />
-                  </BarChart>
-                </ResponsiveContainer>
+                <RechartsWarningSuppress>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={recruiterData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis
+                        dataKey="name"
+                        allowDuplicatedCategory={false}
+                        tickLine={false}
+                      />
+                      <YAxis allowDecimals={false} tickLine={false} />
+                      <Tooltip cursor={false} />
+                      <Legend iconType="rect" />
+                      <Bar
+                        dataKey="applications"
+                        fill="#8884d8"
+                        name="Applications"
+                      />
+                      <Bar
+                        dataKey="interviews"
+                        fill="#82ca9d"
+                        name="Interviews"
+                      />
+                      <Bar dataKey="hires" fill="#ffc658" name="Hires" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </RechartsWarningSuppress>
               </CardContent>
             </Card>
 
@@ -423,37 +425,39 @@ export default function Reports() {
                 <CardTitle>{t("reports.jobPerformanceComparison")}</CardTitle>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <RadarChart
-                    data={jobPerformanceData}
-                    margin={{ top: 20, right: 80, bottom: 20, left: 80 }}
-                  >
-                    <PolarGrid stroke="#f0f0f0" />
-                    <PolarAngleAxis dataKey="subject" tick={{ fontSize: 12 }} />
-                    <PolarRadiusAxis
-                      angle={90}
-                      domain={[0, 150]}
-                      tick={{ fontSize: 10 }}
-                    />
-                    <Radar
-                      name="Job A"
-                      dataKey="A"
-                      stroke="#8884d8"
-                      fill="#8884d8"
-                      fillOpacity={0.6}
-                      strokeWidth={2}
-                    />
-                    <Radar
-                      name="Job B"
-                      dataKey="B"
-                      stroke="#82ca9d"
-                      fill="#82ca9d"
-                      fillOpacity={0.6}
-                      strokeWidth={2}
-                    />
-                    <Legend iconType="rect" />
-                  </RadarChart>
-                </ResponsiveContainer>
+                <RechartsWarningSuppress>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <RadarChart
+                      data={jobPerformanceData}
+                      margin={{ top: 20, right: 80, bottom: 20, left: 80 }}
+                    >
+                      <PolarGrid stroke="#f0f0f0" />
+                      <PolarAngleAxis dataKey="subject" tick={{ fontSize: 12 }} />
+                      <PolarRadiusAxis
+                        angle={90}
+                        domain={[0, 150]}
+                        tick={{ fontSize: 10 }}
+                      />
+                      <Radar
+                        name="Job A"
+                        dataKey="A"
+                        stroke="#8884d8"
+                        fill="#8884d8"
+                        fillOpacity={0.6}
+                        strokeWidth={2}
+                      />
+                      <Radar
+                        name="Job B"
+                        dataKey="B"
+                        stroke="#82ca9d"
+                        fill="#82ca9d"
+                        fillOpacity={0.6}
+                        strokeWidth={2}
+                      />
+                      <Legend iconType="rect" />
+                    </RadarChart>
+                  </ResponsiveContainer>
+                </RechartsWarningSuppress>
               </CardContent>
             </Card>
           </div>
@@ -506,26 +510,28 @@ export default function Reports() {
                 <CardTitle>Application Sources</CardTitle>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-                    <Pie
-                      data={sourceData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, value }) => `${name}: ${value}`}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                      stroke="none"
-                    >
-                      {sourceData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip cursor={false} />
-                  </PieChart>
-                </ResponsiveContainer>
+                <RechartsWarningSuppress>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+                      <Pie
+                        data={sourceData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, value }) => `${name}: ${value}`}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                        stroke="none"
+                      >
+                        {sourceData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip cursor={false} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </RechartsWarningSuppress>
               </CardContent>
             </Card>
 
@@ -535,23 +541,25 @@ export default function Reports() {
                 <CardTitle>Source Effectiveness</CardTitle>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={sourceData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis
-                      dataKey="name"
-                      allowDuplicatedCategory={false}
-                      tickLine={false}
-                    />
-                    <YAxis allowDecimals={false} tickLine={false} />
-                    <Tooltip cursor={false} />
-                    <Bar
-                      dataKey="effectiveness"
-                      fill="#82ca9d"
-                      name="Effectiveness %"
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
+                <RechartsWarningSuppress>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={sourceData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis
+                        dataKey="name"
+                        allowDuplicatedCategory={false}
+                        tickLine={false}
+                      />
+                      <YAxis allowDecimals={false} tickLine={false} />
+                      <Tooltip cursor={false} />
+                      <Bar
+                        dataKey="effectiveness"
+                        fill="#82ca9d"
+                        name="Effectiveness %"
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </RechartsWarningSuppress>
               </CardContent>
             </Card>
           </div>
