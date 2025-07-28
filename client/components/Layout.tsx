@@ -39,17 +39,6 @@ interface LayoutProps {
   children: React.ReactNode;
 }
 
-const navigation = [
-  { name: "Dashboard", href: "/", icon: Home },
-  { name: "Jobs", href: "/jobs", icon: Briefcase },
-  { name: "Candidates", href: "/candidates", icon: Users },
-  { name: "Calendar", href: "/calendar", icon: Calendar },
-  { name: "Email Automation", href: "/email", icon: Mail },
-  { name: "Reports", href: "/reports", icon: BarChart3 },
-  { name: "Notifications", href: "/notifications", icon: Bell },
-  { name: "Settings", href: "/settings", icon: Settings },
-];
-
 export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
   const [unreadCount, setUnreadCount] = useState(0);
@@ -57,6 +46,18 @@ export default function Layout({ children }: LayoutProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  const { t, setLanguage, getCurrentLanguageInfo } = useLanguage();
+
+  const navigation = [
+    { name: t('nav.dashboard'), href: "/", icon: Home },
+    { name: t('nav.jobs'), href: "/jobs", icon: Briefcase },
+    { name: t('nav.candidates'), href: "/candidates", icon: Users },
+    { name: t('nav.calendar'), href: "/calendar", icon: Calendar },
+    { name: t('nav.email'), href: "/email", icon: Mail },
+    { name: t('nav.reports'), href: "/reports", icon: BarChart3 },
+    { name: t('nav.notifications'), href: "/notifications", icon: Bell },
+    { name: t('nav.settings'), href: "/settings", icon: Settings },
+  ];
 
   // Update notification count
   useEffect(() => {
