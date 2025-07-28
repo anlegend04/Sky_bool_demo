@@ -9,49 +9,42 @@ const originalError = console.error;
 // Helper function to check if a warning should be suppressed
 const shouldSuppressWarning = (args: any[]): boolean => {
   try {
-    const firstArg = String(args[0] || '');
-    const secondArg = String(args[1] || '');
-    const allArgs = args.map(arg => String(arg)).join(' ');
+    // Convert all arguments to strings for analysis
+    const stringArgs = args.map(arg => String(arg || ''));
+    const allArgs = stringArgs.join(' ');
+    const firstArg = stringArgs[0] || '';
 
-    // Comprehensive check for defaultProps warnings
-    const isDefaultPropsWarning = 
-      firstArg.includes('Support for defaultProps will be removed') ||
-      secondArg.includes('Support for defaultProps will be removed') ||
+    // Check for React's formatted warning pattern: "Warning: %s: Support for defaultProps..."
+    const isFormattedDefaultPropsWarning =
+      firstArg.includes('Warning:') &&
+      firstArg.includes('%s') &&
+      firstArg.includes('Support for defaultProps will be removed');
+
+    // Direct check for defaultProps warnings in any argument
+    const isDefaultPropsWarning =
       allArgs.includes('Support for defaultProps will be removed') ||
-      firstArg.includes('defaultProps will be removed') ||
       allArgs.includes('defaultProps will be removed');
 
-    // Additional check for specific Recharts components including numbered variants
-    const isRechartsWarning =
-      allArgs.includes('XAxis') ||
-      allArgs.includes('YAxis') ||
-      allArgs.includes('XAxis2') ||
-      allArgs.includes('YAxis2') ||
-      allArgs.includes('CartesianGrid') ||
-      allArgs.includes('Tooltip') ||
-      allArgs.includes('Legend') ||
-      allArgs.includes('ResponsiveContainer') ||
-      allArgs.includes('BarChart') ||
-      allArgs.includes('LineChart') ||
-      allArgs.includes('PieChart') ||
-      allArgs.includes('Area') ||
-      allArgs.includes('Bar') ||
-      allArgs.includes('Line') ||
-      allArgs.includes('Pie') ||
-      allArgs.includes('Cell') ||
-      allArgs.includes('Surface') ||
-      allArgs.includes('ReferenceLine') ||
-      allArgs.includes('ReferenceArea') ||
-      allArgs.includes('Brush') ||
-      allArgs.includes('FunnelChart') ||
-      allArgs.includes('Funnel') ||
-      allArgs.includes('RadarChart') ||
-      allArgs.includes('Radar') ||
-      allArgs.includes('PolarGrid') ||
-      allArgs.includes('PolarAngleAxis') ||
-      allArgs.includes('PolarRadiusAxis');
+    // Check if any argument mentions Recharts component names
+    const rechartsComponents = [
+      'XAxis', 'YAxis', 'XAxis2', 'YAxis2', 'CartesianGrid', 'Tooltip', 'Legend',
+      'ResponsiveContainer', 'BarChart', 'LineChart', 'PieChart', 'Area', 'Bar',
+      'Line', 'Pie', 'Cell', 'Surface', 'ReferenceLine', 'ReferenceArea', 'Brush',
+      'FunnelChart', 'Funnel', 'RadarChart', 'Radar', 'PolarGrid', 'PolarAngleAxis',
+      'PolarRadiusAxis', 'ChartLayoutContextProvider', 'CategoricalChartWrapper'
+    ];
 
-    return isDefaultPropsWarning || isRechartsWarning;
+    const hasRechartsComponent = rechartsComponents.some(component =>
+      allArgs.includes(component)
+    );
+
+    // Specific check for the exact warning pattern we're seeing
+    const isSpecificRechartsWarning =
+      firstArg.includes('Warning:') &&
+      firstArg.includes('Support for defaultProps') &&
+      hasRechartsComponent;
+
+    return isFormattedDefaultPropsWarning || isDefaultPropsWarning || isSpecificRechartsWarning;
   } catch (error) {
     // If there's an error checking, don't suppress to be safe
     return false;
