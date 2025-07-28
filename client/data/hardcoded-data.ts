@@ -24,7 +24,7 @@ export interface JobData {
   salaryMax: string;
   domain: string;
   headcount: number;
-  interviewers: string[];
+  requester: string;
   pipelineSummary: {
     applied: number;
     screening: number;
@@ -180,7 +180,7 @@ export const HARDCODED_JOBS: JobData[] = [
     salaryMax: "150000",
     domain: "Technology",
     headcount: 2,
-    interviewers: ["john.doe@company.com", "jane.smith@company.com"],
+    requester: "john.doe@company.com",
     pipelineSummary: {
       applied: 45,
       screening: 12,
@@ -251,7 +251,7 @@ export const HARDCODED_JOBS: JobData[] = [
     salaryMax: "140000",
     domain: "Technology",
     headcount: 1,
-    interviewers: ["pm.lead@company.com"],
+    requester: "pm.lead@company.com",
     pipelineSummary: {
       applied: 67,
       screening: 20,
@@ -289,7 +289,7 @@ export const HARDCODED_JOBS: JobData[] = [
     salaryMax: "105000",
     domain: "Technology",
     headcount: 1,
-    interviewers: ["design.lead@company.com"],
+    requester: "design.lead@company.com",
     pipelineSummary: {
       applied: 34,
       screening: 15,

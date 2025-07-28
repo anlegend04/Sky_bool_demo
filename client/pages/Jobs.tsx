@@ -108,7 +108,7 @@ export default function Jobs() {
     domain: "",
     headcount: 1,
     recruiter: "",
-    interviewers: [] as string[],
+    requester: "",
     description: "",
     priority: "Medium" as "High" | "Medium" | "Low",
     deadline: "",
@@ -233,7 +233,7 @@ export default function Jobs() {
         domain: "",
         headcount: 1,
         recruiter: "",
-        interviewers: [],
+        requester: "",
         description: "",
         priority: "Medium",
         deadline: "",
@@ -267,7 +267,7 @@ export default function Jobs() {
       domain: job.domain,
       headcount: job.headcount,
       recruiter: job.recruiter,
-      interviewers: job.interviewers,
+      requester: job.requester,
       description: job.description,
       priority: job.priority as "High" | "Medium" | "Low",
       deadline: job.deadline,
@@ -1067,10 +1067,10 @@ export default function Jobs() {
             </div>
             <div>
               <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
-                Interviewers
+                Requester
               </label>
               <Input
-                placeholder="Select team members who will conduct interviews"
+                placeholder="Select requester who requested this job"
                 className="mt-1 text-wrap-safe"
               />
             </div>
