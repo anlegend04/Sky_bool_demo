@@ -7,15 +7,38 @@ const originalError = console.error;
 
 // Suppress console.warn
 console.warn = (...args: any[]) => {
-  // Suppress ALL defaultProps warnings - they're all from Recharts in this app
-  const allArgs = args.join(" ");
+  // Check multiple formats of arguments
+  const firstArg = String(args[0] || '');
+  const secondArg = String(args[1] || '');
+  const allArgs = args.map(arg => String(arg)).join(' ');
 
-  if (
-    allArgs.includes(
-      "Support for defaultProps will be removed from function components",
-    )
-  ) {
-    // Suppress all defaultProps warnings - they're from third-party libraries (Recharts)
+  // Comprehensive check for defaultProps warnings
+  const isDefaultPropsWarning =
+    firstArg.includes('Support for defaultProps will be removed') ||
+    secondArg.includes('Support for defaultProps will be removed') ||
+    allArgs.includes('Support for defaultProps will be removed') ||
+    firstArg.includes('defaultProps will be removed') ||
+    allArgs.includes('defaultProps will be removed');
+
+  // Additional check for specific Recharts components
+  const isRechartsWarning =
+    allArgs.includes('XAxis') ||
+    allArgs.includes('YAxis') ||
+    allArgs.includes('CartesianGrid') ||
+    allArgs.includes('Tooltip') ||
+    allArgs.includes('Legend') ||
+    allArgs.includes('ResponsiveContainer') ||
+    allArgs.includes('BarChart') ||
+    allArgs.includes('LineChart') ||
+    allArgs.includes('PieChart') ||
+    allArgs.includes('Area') ||
+    allArgs.includes('Bar') ||
+    allArgs.includes('Line') ||
+    allArgs.includes('Pie') ||
+    allArgs.includes('Cell');
+
+  if (isDefaultPropsWarning || isRechartsWarning) {
+    // Suppress these warnings - they're from Recharts library
     return;
   }
 
