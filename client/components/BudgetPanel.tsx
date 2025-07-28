@@ -51,6 +51,7 @@ import {
 import { useState } from "react";
 import { JobData, ExpenseData } from "@/data/hardcoded-data";
 import { useToast } from "@/hooks/use-toast";
+import { RechartsWarningSuppress } from "./RechartsWarningSuppress";
 
 interface BudgetPanelProps {
   job: JobData;
@@ -249,34 +250,36 @@ export default function BudgetPanel({ job, onJobUpdate }: BudgetPanelProps) {
           </CardHeader>
           <CardContent>
             {pieData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) =>
-                      `${name} ${(percent * 100).toFixed(0)}%`
-                    }
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                    stroke="none"
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={COLORS[index % COLORS.length]}
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    formatter={(value) => [`$${value}`, "Amount"]}
-                    cursor={false}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+              <RechartsWarningSuppress>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+                    <Pie
+                      data={pieData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) =>
+                        `${name} ${(percent * 100).toFixed(0)}%`
+                      }
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                      stroke="none"
+                    >
+                      {pieData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      formatter={(value) => [`$${value}`, "Amount"]}
+                      cursor={false}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </RechartsWarningSuppress>
             ) : (
               <div className="h-[300px] flex items-center justify-center text-slate-500">
                 No expense data available
@@ -291,35 +294,37 @@ export default function BudgetPanel({ job, onJobUpdate }: BudgetPanelProps) {
             <CardTitle>Monthly Spending Trend</CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={monthlyData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis
-                  dataKey="month"
-                  allowDuplicatedCategory={false}
-                  tickLine={false}
-                />
-                <YAxis allowDecimals={false} tickLine={false} />
-                <Tooltip
-                  formatter={(value) => [`$${value}`, ""]}
-                  cursor={false}
-                />
-                <Legend iconType="line" />
-                <Line
-                  type="monotone"
-                  dataKey="planned"
-                  stroke="#8884d8"
-                  strokeDasharray="5 5"
-                  name="Planned"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="spent"
-                  stroke="#82ca9d"
-                  name="Actual"
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            <RechartsWarningSuppress>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={monthlyData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis
+                    dataKey="month"
+                    allowDuplicatedCategory={false}
+                    tickLine={false}
+                  />
+                  <YAxis allowDecimals={false} tickLine={false} />
+                  <Tooltip
+                    formatter={(value) => [`$${value}`, ""]}
+                    cursor={false}
+                  />
+                  <Legend iconType="line" />
+                  <Line
+                    type="monotone"
+                    dataKey="planned"
+                    stroke="#8884d8"
+                    strokeDasharray="5 5"
+                    name="Planned"
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="spent"
+                    stroke="#82ca9d"
+                    name="Actual"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </RechartsWarningSuppress>
           </CardContent>
         </Card>
       </div>
