@@ -1021,10 +1021,9 @@ export default function Jobs() {
       {/* Header */}
       <div className="flex-responsive justify-responsive items-responsive space-y-4 sm:space-y-0">
         <div className="min-w-0 flex-1">
-          <h1 className="heading-responsive text-wrap-safe">Job Management</h1>
+          <h1 className="heading-responsive text-wrap-safe">{t('jobs.title')}</h1>
           <p className="text-responsive-base text-slate-600 mt-1 text-wrap-safe">
-            Manage job postings, track applications, and monitor hiring
-            performance.
+            {t('jobs.subtitle')}
           </p>
         </div>
         <div className="btn-group-mobile">
