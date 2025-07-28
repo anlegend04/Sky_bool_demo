@@ -19,7 +19,20 @@ import { Link } from "react-router-dom";
 import { useLanguage } from "@/hooks/use-language";
 
 export default function Dashboard() {
-  const { t } = useLanguage();
+  // Add error boundary for useLanguage hook
+  let t;
+  try {
+    const { t: translate } = useLanguage();
+    t = translate;
+  } catch (error) {
+    console.warn("LanguageProvider not available in Dashboard, using fallback");
+    // Fallback translation function
+    t = (key: string, fallback?: string) => {
+      const parts = key.split(".");
+      const lastPart = parts[parts.length - 1];
+      return fallback || lastPart.charAt(0).toUpperCase() + lastPart.slice(1).replace(/([A-Z])/g, " $1");
+    };
+  }
 
   const stats = [
     {
