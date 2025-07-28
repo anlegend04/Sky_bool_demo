@@ -35,6 +35,7 @@ import {
   Sun,
   Monitor,
 } from "lucide-react";
+import { useLanguage, SUPPORTED_LANGUAGES } from "@/hooks/use-language";
 
 export default function Settings() {
   const integrations = [
