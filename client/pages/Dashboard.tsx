@@ -19,6 +19,8 @@ import { Link } from "react-router-dom";
 import { useLanguage } from "@/hooks/use-language";
 
 export default function Dashboard() {
+  const { t } = useLanguage();
+
   const stats = [
     {
       title: "Active Jobs",
