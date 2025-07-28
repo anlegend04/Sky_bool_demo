@@ -16,6 +16,7 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useLanguage } from "@/hooks/use-language";
 
 export default function Dashboard() {
   const stats = [
