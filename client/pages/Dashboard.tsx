@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/hooks/use-language";
+import { LanguageDebug } from "@/components/LanguageDebug";
 
 export default function Dashboard() {
   const { t } = useLanguage();
