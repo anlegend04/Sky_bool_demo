@@ -43,6 +43,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 
 export default function Notifications() {
+  const { t } = useLanguage();
   const [notifications] = useState<NotificationData[]>(HARDCODED_NOTIFICATIONS);
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
