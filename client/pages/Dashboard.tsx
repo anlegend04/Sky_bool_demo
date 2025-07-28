@@ -30,7 +30,11 @@ export default function Dashboard() {
     t = (key: string, fallback?: string) => {
       const parts = key.split(".");
       const lastPart = parts[parts.length - 1];
-      return fallback || lastPart.charAt(0).toUpperCase() + lastPart.slice(1).replace(/([A-Z])/g, " $1");
+      return (
+        fallback ||
+        lastPart.charAt(0).toUpperCase() +
+          lastPart.slice(1).replace(/([A-Z])/g, " $1")
+      );
     };
   }
 
