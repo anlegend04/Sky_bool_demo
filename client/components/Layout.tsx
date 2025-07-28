@@ -142,7 +142,7 @@ export default function Layout({ children }: LayoutProps) {
               </Button>
 
               {/* Quick Add Dropdown - Hidden on mobile */}
-              <DropdownMenu>
+              {/* <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button size="sm" className="bg-blue-600 hover:bg-blue-700 hidden sm:flex btn-mobile">
                     <Plus className="w-4 h-4 mr-2" />
@@ -160,7 +160,7 @@ export default function Layout({ children }: LayoutProps) {
                     Add Candidate
                   </DropdownMenuItem>
                 </DropdownMenuContent>
-              </DropdownMenu>
+              </DropdownMenu> */}
 
               {/* Notifications */}
               <Link to="/notifications">
