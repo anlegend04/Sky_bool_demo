@@ -267,7 +267,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <Link to="/profile">
+                  <Link to="/settings">
                     <DropdownMenuItem>
                       <User className="w-4 h-4 mr-2" />
                       {t("profile.profile")}
