@@ -262,7 +262,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   <Link to="/profile">
                     <DropdownMenuItem>
                       <User className="w-4 h-4 mr-2" />
-                      Profile
+                      {t("profile.profile")}
                     </DropdownMenuItem>
                   </Link>
                   <Link to="/settings">
@@ -273,7 +273,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   </Link>
                   <DropdownMenuItem>
                     <LogOut className="w-4 h-4 mr-2" />
-                    Logout
+                    {t("profile.logout")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
