@@ -91,7 +91,12 @@ if (typeof window !== 'undefined' && (window as any).__REACT_DEVTOOLS_GLOBAL_HOO
       } catch (error) {
         // Suppress React DevTools errors related to defaultProps
         const errorMessage = String(error);
-        if (errorMessage.includes('defaultProps') || errorMessage.includes('XAxis') || errorMessage.includes('YAxis')) {
+        if (errorMessage.includes('defaultProps') ||
+            errorMessage.includes('XAxis') ||
+            errorMessage.includes('YAxis') ||
+            errorMessage.includes('XAxis2') ||
+            errorMessage.includes('YAxis2') ||
+            errorMessage.includes('recharts')) {
           return;
         }
         throw error;
