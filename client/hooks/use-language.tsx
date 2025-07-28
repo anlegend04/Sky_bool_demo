@@ -1549,11 +1549,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       // Validate that the stored language is supported
-      if (stored && SUPPORTED_LANGUAGES.find(lang => lang.code === stored)) {
+      if (stored && SUPPORTED_LANGUAGES.find((lang) => lang.code === stored)) {
         return stored as Language;
       }
     } catch (error) {
-      console.warn('Failed to read language from localStorage:', error);
+      console.warn("Failed to read language from localStorage:", error);
     }
     return "en";
   });
@@ -1564,7 +1564,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const setLanguage = (language: Language) => {
     // Validate the language before setting it
-    if (!SUPPORTED_LANGUAGES.find(lang => lang.code === language)) {
+    if (!SUPPORTED_LANGUAGES.find((lang) => lang.code === language)) {
       console.error(`Unsupported language: ${language}`);
       return;
     }
@@ -1574,7 +1574,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     try {
       localStorage.setItem(STORAGE_KEY, language);
     } catch (error) {
-      console.warn('Failed to save language to localStorage:', error);
+      console.warn("Failed to save language to localStorage:", error);
     }
 
     // Update document language
@@ -1582,7 +1582,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
     // Force a small delay to ensure state updates propagate
     setTimeout(() => {
-      window.dispatchEvent(new CustomEvent('languageChanged', { detail: language }));
+      window.dispatchEvent(
+        new CustomEvent("languageChanged", { detail: language }),
+      );
     }, 0);
   };
 
@@ -1608,14 +1610,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === STORAGE_KEY && e.newValue) {
         const newLanguage = e.newValue as Language;
-        if (SUPPORTED_LANGUAGES.find(lang => lang.code === newLanguage)) {
+        if (SUPPORTED_LANGUAGES.find((lang) => lang.code === newLanguage)) {
           setCurrentLanguage(newLanguage);
         }
       }
     };
 
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
   return (

@@ -11,7 +11,8 @@ const suppressRechartsWarnings = (...args: any[]): boolean => {
   const fullString = JSON.stringify(args);
 
   // Check for defaultProps warnings (multiple variations)
-  const isDefaultPropsWarning = message.includes("Support for defaultProps will be removed") ||
+  const isDefaultPropsWarning =
+    message.includes("Support for defaultProps will be removed") ||
     message.includes("defaultProps will be removed") ||
     message.includes("Use JavaScript default parameters instead") ||
     fullString.includes("defaultProps");
@@ -28,14 +29,17 @@ const suppressRechartsWarnings = (...args: any[]): boolean => {
     fullString.includes("recharts");
 
   // Also check for the specific pattern in the stack trace
-  const hasRechartsStack = message.includes("deps/recharts.js") ||
+  const hasRechartsStack =
+    message.includes("deps/recharts.js") ||
     fullString.includes("deps/recharts.js") ||
     message.includes("CategoricalChartWrapper") ||
     message.includes("ChartLayoutContextProvider");
 
   // Suppress if it's a defaultProps warning related to Recharts
-  return (isDefaultPropsWarning && isRechartsComponent) ||
-         (isDefaultPropsWarning && hasRechartsStack);
+  return (
+    (isDefaultPropsWarning && isRechartsComponent) ||
+    (isDefaultPropsWarning && hasRechartsStack)
+  );
 };
 
 // Immediately override console methods
@@ -92,10 +96,10 @@ if (typeof window !== "undefined") {
   // Add specific override for React's console warnings
   if (globalConsole && globalConsole.warn) {
     const reactWarnOverride = globalConsole.warn;
-    globalConsole.warn = function(format: string, ...args: any[]) {
+    globalConsole.warn = function (format: string, ...args: any[]) {
       // Check if this is a React warning about defaultProps
-      if (typeof format === 'string' && format.includes('%s')) {
-        const fullMessage = format + ' ' + args.join(' ');
+      if (typeof format === "string" && format.includes("%s")) {
+        const fullMessage = format + " " + args.join(" ");
         if (suppressRechartsWarnings(fullMessage, ...args)) {
           return;
         }
@@ -210,7 +214,7 @@ if (typeof window !== "undefined") {
   // Additional global error handler
   const originalOnError = window.onerror;
   window.onerror = (message, source, lineno, colno, error) => {
-    if (typeof message === 'string' && suppressRechartsWarnings(message)) {
+    if (typeof message === "string" && suppressRechartsWarnings(message)) {
       return true; // Prevent the error from being logged
     }
     if (originalOnError) {
@@ -235,7 +239,10 @@ if (typeof window !== "undefined") {
 // Force immediate execution of suppression
 (() => {
   // Run suppression setup immediately
-  console.log('%c🔇 Recharts warning suppression active', 'color: #888; font-size: 11px;');
+  console.log(
+    "%c🔇 Recharts warning suppression active",
+    "color: #888; font-size: 11px;",
+  );
 })();
 
 export default {};

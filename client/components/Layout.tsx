@@ -39,18 +39,24 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   try {
     languageContext = useLanguage();
   } catch (error) {
-    console.warn('LanguageProvider not found, using fallback:', error);
+    console.warn("LanguageProvider not found, using fallback:", error);
     // Fallback if LanguageProvider is not available
     languageContext = {
       t: (key: string, fallback?: string) => {
         // Return a more meaningful fallback
-        const parts = key.split('.');
+        const parts = key.split(".");
         const lastPart = parts[parts.length - 1];
-        return fallback || lastPart.charAt(0).toUpperCase() + lastPart.slice(1).replace(/([A-Z])/g, ' $1');
+        return (
+          fallback ||
+          lastPart.charAt(0).toUpperCase() +
+            lastPart.slice(1).replace(/([A-Z])/g, " $1")
+        );
       },
       currentLanguage: "en" as const,
       setLanguage: (lang: string) => {
-        console.warn('Language switching not available without LanguageProvider');
+        console.warn(
+          "Language switching not available without LanguageProvider",
+        );
       },
       getCurrentLanguageInfo: () => ({
         code: "en",
@@ -219,7 +225,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                         <div className="flex items-center space-x-3">
                           <span className="text-lg">{language.flag}</span>
                           <div className="flex flex-col">
-                            <span className="font-medium">{language.nativeName}</span>
+                            <span className="font-medium">
+                              {language.nativeName}
+                            </span>
                             <span className="text-xs text-muted-foreground">
                               {language.name}
                             </span>

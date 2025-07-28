@@ -224,10 +224,18 @@ export default function Reports() {
                   <SelectValue placeholder="Date Range" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="last7">{t("reports.last7days")}</SelectItem>
-                  <SelectItem value="last30">{t("reports.last30days")}</SelectItem>
-                  <SelectItem value="last90">{t("reports.last90days")}</SelectItem>
-                  <SelectItem value="last365">{t("reports.lastYear")}</SelectItem>
+                  <SelectItem value="last7">
+                    {t("reports.last7days")}
+                  </SelectItem>
+                  <SelectItem value="last30">
+                    {t("reports.last30days")}
+                  </SelectItem>
+                  <SelectItem value="last90">
+                    {t("reports.last90days")}
+                  </SelectItem>
+                  <SelectItem value="last365">
+                    {t("reports.lastYear")}
+                  </SelectItem>
                 </SelectContent>
               </Select>
 
@@ -253,7 +261,9 @@ export default function Reports() {
                   <SelectValue placeholder={t("reports.recruiter")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{t("reports.allRecruiters")}</SelectItem>
+                  <SelectItem value="all">
+                    {t("reports.allRecruiters")}
+                  </SelectItem>
                   <SelectItem value="alex-chen">Alex Chen</SelectItem>
                   <SelectItem value="sarah-kim">Sarah Kim</SelectItem>
                   <SelectItem value="mike-wilson">Mike Wilson</SelectItem>
@@ -301,7 +311,9 @@ export default function Reports() {
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">{t("reports.overview")}</TabsTrigger>
-          <TabsTrigger value="performance">{t("reports.performance")}</TabsTrigger>
+          <TabsTrigger value="performance">
+            {t("reports.performance")}
+          </TabsTrigger>
           <TabsTrigger value="sources">{t("reports.sources")}</TabsTrigger>
           <TabsTrigger value="advanced">{t("reports.advanced")}</TabsTrigger>
         </TabsList>
@@ -432,7 +444,10 @@ export default function Reports() {
                       margin={{ top: 20, right: 80, bottom: 20, left: 80 }}
                     >
                       <PolarGrid stroke="#f0f0f0" />
-                      <PolarAngleAxis dataKey="subject" tick={{ fontSize: 12 }} />
+                      <PolarAngleAxis
+                        dataKey="subject"
+                        tick={{ fontSize: 12 }}
+                      />
                       <PolarRadiusAxis
                         angle={90}
                         domain={[0, 150]}
