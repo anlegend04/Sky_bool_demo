@@ -271,7 +271,8 @@ export default function Candidates() {
           <Table>
             <TableHeader>
               <TableRow>
-                {visibleFields.name && <TableHead>Candidate Name</TableHead>}
+                {/* FIxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx */}
+                {visibleFields.name && <TableHead>{t("candidates.name")}</TableHead>}
                 {visibleFields.appliedDate && <TableHead>Applied On</TableHead>}
                 {visibleFields.email && <TableHead>Email</TableHead>}
                 {visibleFields.phone && <TableHead>Phone</TableHead>}
