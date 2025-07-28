@@ -48,6 +48,7 @@ import { useState } from "react";
 import { useLanguage } from "@/hooks/use-language";
 
 export default function Calendar() {
+  const { t } = useLanguage();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isEventDialogOpen, setIsEventDialogOpen] = useState(false);
   const [view, setView] = useState("month"); // month, week, day
