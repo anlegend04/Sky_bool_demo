@@ -14,6 +14,7 @@ import { getUnreadNotificationCount } from "@/data/hardcoded-data";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useLanguage, SUPPORTED_LANGUAGES } from "@/hooks/use-language";
 import {
   Users,
   Briefcase,
@@ -29,6 +30,7 @@ import {
   UserCircle,
   LogOut,
   ChevronDown,
+  Languages,
   Menu,
   X,
 } from "lucide-react";
