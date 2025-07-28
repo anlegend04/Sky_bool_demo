@@ -1,6 +1,21 @@
 import "@/lib/suppress-warnings";
 import "./global.css";
 
+// Additional aggressive React warning suppression
+(() => {
+  const originalReactWarn = console.warn;
+  console.warn = function(format: any, ...args: any[]) {
+    // Specifically target React's warning format
+    if (typeof format === 'string' && format.includes('%s') &&
+        args.some((arg: any) => typeof arg === 'string' &&
+        (arg.includes('XAxis') || arg.includes('YAxis')) &&
+        format.includes('defaultProps'))) {
+      return; // Suppress Recharts defaultProps warnings
+    }
+    return originalReactWarn.apply(console, [format, ...args]);
+  };
+})();
+
 import { Toaster } from "@/components/ui/toaster";
 import { createRoot } from "react-dom/client";
 import { Toaster as Sonner } from "@/components/ui/sonner";
