@@ -8,20 +8,34 @@ const originalConsoleError = console.error.bind(console);
 // Create the most aggressive suppression function
 const suppressRechartsWarnings = (...args: any[]): boolean => {
   const message = args.join(" ");
+  const fullString = JSON.stringify(args);
 
-  // Check for defaultProps warnings
-  const isDefaultPropsWarning = message.includes(
-    "Support for defaultProps will be removed",
-  );
+  // Check for defaultProps warnings (multiple variations)
+  const isDefaultPropsWarning = message.includes("Support for defaultProps will be removed") ||
+    message.includes("defaultProps will be removed") ||
+    message.includes("Use JavaScript default parameters instead") ||
+    fullString.includes("defaultProps");
 
-  // Check for Recharts components
+  // More comprehensive Recharts component detection
   const isRechartsComponent =
     /\b(XAxis|YAxis|XAxis2|YAxis2|CartesianGrid|Tooltip|Legend|ResponsiveContainer|BarChart|LineChart|PieChart|Area|Bar|Line|Pie|Cell|Surface|ReferenceLine|ReferenceArea|Brush|FunnelChart|Funnel|RadarChart|Radar|PolarGrid|PolarAngleAxis|PolarRadiusAxis|ChartLayoutContextProvider|CategoricalChartWrapper)\b/.test(
       message,
-    );
+    ) ||
+    /\b(XAxis|YAxis|XAxis2|YAxis2|CartesianGrid|Tooltip|Legend|ResponsiveContainer|BarChart|LineChart|PieChart|Area|Bar|Line|Pie|Cell|Surface|ReferenceLine|ReferenceArea|Brush|FunnelChart|Funnel|RadarChart|Radar|PolarGrid|PolarAngleAxis|PolarRadiusAxis|ChartLayoutContextProvider|CategoricalChartWrapper)\b/.test(
+      fullString,
+    ) ||
+    message.includes("recharts") ||
+    fullString.includes("recharts");
+
+  // Also check for the specific pattern in the stack trace
+  const hasRechartsStack = message.includes("deps/recharts.js") ||
+    fullString.includes("deps/recharts.js") ||
+    message.includes("CategoricalChartWrapper") ||
+    message.includes("ChartLayoutContextProvider");
 
   // Suppress if it's a defaultProps warning related to Recharts
-  return isDefaultPropsWarning && isRechartsComponent;
+  return (isDefaultPropsWarning && isRechartsComponent) ||
+         (isDefaultPropsWarning && hasRechartsStack);
 };
 
 // Immediately override console methods
@@ -39,6 +53,15 @@ console.error = (...args: any[]) => {
   originalConsoleError(...args);
 };
 
+// Also override console.log as a fallback
+const originalConsoleLog = console.log.bind(console);
+console.log = (...args: any[]) => {
+  if (suppressRechartsWarnings(...args)) {
+    return; // Suppress this log
+  }
+  originalConsoleLog(...args);
+};
+
 // Override at window level immediately
 if (typeof window !== "undefined") {
   const globalConsole = window.console;
@@ -53,19 +76,33 @@ if (typeof window !== "undefined") {
   }
 
   // Intercept all console methods that might be used for warnings
-  ["warn", "error", "log"].forEach((method) => {
+  ["warn", "error", "log", "info", "debug"].forEach((method) => {
     if (globalConsole && globalConsole[method]) {
       const originalMethod = globalConsole[method].bind(globalConsole);
       globalConsole[method] = (...args: any[]) => {
-        if (method === "warn" || method === "error") {
-          if (suppressRechartsWarnings(...args)) {
-            return;
-          }
+        // Check all methods for Recharts warnings
+        if (suppressRechartsWarnings(...args)) {
+          return;
         }
         originalMethod(...args);
       };
     }
   });
+
+  // Add specific override for React's console warnings
+  if (globalConsole && globalConsole.warn) {
+    const reactWarnOverride = globalConsole.warn;
+    globalConsole.warn = function(format: string, ...args: any[]) {
+      // Check if this is a React warning about defaultProps
+      if (typeof format === 'string' && format.includes('%s')) {
+        const fullMessage = format + ' ' + args.join(' ');
+        if (suppressRechartsWarnings(fullMessage, ...args)) {
+          return;
+        }
+      }
+      return reactWarnOverride.call(this, format, ...args);
+    };
+  }
 
   // Try to intercept React's warning system
   const interceptReactWarnings = () => {
@@ -169,6 +206,36 @@ if (typeof window !== "undefined") {
     };
     return originalSetInterval(wrappedFn, delay, ...args);
   }) as any;
+
+  // Additional global error handler
+  const originalOnError = window.onerror;
+  window.onerror = (message, source, lineno, colno, error) => {
+    if (typeof message === 'string' && suppressRechartsWarnings(message)) {
+      return true; // Prevent the error from being logged
+    }
+    if (originalOnError) {
+      return originalOnError(message, source, lineno, colno, error);
+    }
+    return false;
+  };
+
+  // Additional unhandled promise rejection handler
+  const originalOnUnhandledRejection = window.onunhandledrejection;
+  window.onunhandledrejection = (event) => {
+    if (event.reason && suppressRechartsWarnings(String(event.reason))) {
+      event.preventDefault();
+      return;
+    }
+    if (originalOnUnhandledRejection) {
+      originalOnUnhandledRejection(event);
+    }
+  };
 }
+
+// Force immediate execution of suppression
+(() => {
+  // Run suppression setup immediately
+  console.log('%c🔇 Recharts warning suppression active', 'color: #888; font-size: 11px;');
+})();
 
 export default {};
