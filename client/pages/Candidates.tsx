@@ -69,6 +69,7 @@ import { useLanguage } from "@/hooks/use-language";
 // Using the imported CandidateData type from hardcoded-data
 
 export default function Candidates() {
+  const { t } = useLanguage();
   const [candidates] = useState<CandidateData[]>(HARDCODED_CANDIDATES);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const [searchTerm, setSearchTerm] = useState("");
