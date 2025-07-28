@@ -52,6 +52,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { HARDCODED_JOBS, HARDCODED_CANDIDATES } from "@/data/hardcoded-data";
+import { useLanguage } from "@/hooks/use-language";
 
 export default function Reports() {
   const [dateRange, setDateRange] = useState("last30");
