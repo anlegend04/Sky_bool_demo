@@ -325,18 +325,18 @@ export default function Dashboard() {
                     to={`/jobs/${job.id}`}
                     className="font-medium text-slate-900 hover:text-blue-600 text-responsive-base text-wrap-safe min-w-0 flex-1 truncate"
                   >
-                    {job.title}
+                    {getJobTitle(job.titleKey)}
                   </Link>
                   <Badge
-                    variant={job.status === "Active" ? "default" : "secondary"}
+                    variant={job.statusKey === "Active" ? "default" : "secondary"}
                     className="badge-mobile flex-shrink-0"
                   >
-                    {job.status}
+                    {getStatus(job.statusKey)}
                   </Badge>
                 </div>
                 <div className="flex justify-between items-center text-responsive-sm text-slate-600 min-w-0">
                   <span className="text-wrap-safe truncate flex-1">
-                    {job.department}
+                    {getDepartment(job.departmentKey)}
                   </span>
                   <span className="text-wrap-safe flex-shrink-0 ml-2">
                     {job.applicants} {t("dashboard.applicants")}
@@ -345,15 +345,15 @@ export default function Dashboard() {
                 <div className="flex justify-between items-center">
                   <Badge
                     variant={
-                      job.priority === "High"
+                      job.priorityKey === "High"
                         ? "destructive"
-                        : job.priority === "Medium"
+                        : job.priorityKey === "Medium"
                           ? "default"
                           : "secondary"
                     }
                     className="badge-mobile"
                   >
-                    {job.priority}
+                    {getPriority(job.priorityKey)}
                   </Badge>
                 </div>
               </div>
