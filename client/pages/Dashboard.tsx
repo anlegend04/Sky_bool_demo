@@ -436,8 +436,8 @@ export default function Dashboard() {
         </CardContent>
       </Card>
 
-      {/* Debug component for language testing */}
-      {process.env.NODE_ENV === 'development' && <LanguageDebug />}
+      // {/* Debug component for language testing */}
+      // {process.env.NODE_ENV === 'development' && <LanguageDebug />}
     </div>
   );
 }
