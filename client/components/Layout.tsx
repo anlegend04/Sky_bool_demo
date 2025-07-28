@@ -170,12 +170,48 @@ export default function Layout({ children }: LayoutProps) {
                 <Button variant="ghost" size="sm" className="relative icon-mobile">
                   <Bell className="w-5 h-5" />
                   {unreadCount > 0 && (
-                    <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs bg-red-500 flex items-center justify-center badge-mobile">
+                    <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs bg-primary text-primary-foreground flex items-center justify-center badge-mobile">
                       {unreadCount > 99 ? "99+" : unreadCount}
                     </Badge>
                   )}
                 </Button>
               </Link>
+
+              {/* Language Switcher */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="relative icon-mobile">
+                    <Languages className="w-5 h-5" />
+                    <span className="hidden sm:inline ml-2 text-sm">
+                      {getCurrentLanguageInfo().flag}
+                    </span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48 dropdown-mobile">
+                  <div className="px-3 py-2 text-sm font-medium text-muted-foreground">
+                    {t('header.language')}
+                  </div>
+                  <DropdownMenuSeparator />
+                  {SUPPORTED_LANGUAGES.map((language) => (
+                    <DropdownMenuItem
+                      key={language.code}
+                      onClick={() => setLanguage(language.code)}
+                      className={`flex items-center space-x-3 ${
+                        getCurrentLanguageInfo().code === language.code ? 'bg-accent' : ''
+                      }`}
+                    >
+                      <span className="text-base">{language.flag}</span>
+                      <div className="flex flex-col">
+                        <span className="font-medium">{language.nativeName}</span>
+                        <span className="text-xs text-muted-foreground">{language.name}</span>
+                      </div>
+                      {getCurrentLanguageInfo().code === language.code && (
+                        <div className="ml-auto w-2 h-2 bg-primary rounded-full"></div>
+                      )}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
 
               {/* User Avatar Dropdown */}
               <DropdownMenu>
