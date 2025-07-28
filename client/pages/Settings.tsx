@@ -38,6 +38,8 @@ import {
 import { useLanguage, SUPPORTED_LANGUAGES } from "@/hooks/use-language";
 
 export default function Settings() {
+  const { t, currentLanguage, setLanguage, getCurrentLanguageInfo } = useLanguage();
+
   const integrations = [
     {
       name: "Google Calendar",
