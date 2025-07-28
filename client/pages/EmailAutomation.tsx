@@ -173,11 +173,10 @@ export default function EmailAutomation() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">
-            Email Automation
+            {t('email.title')}
           </h1>
           <p className="text-slate-600 mt-1">
-            Manage email templates, workflows, and automate candidate
-            communication.
+            {t('email.subtitle')}
           </p>
         </div>
         <div className="flex space-x-3">
