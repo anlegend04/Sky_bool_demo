@@ -92,11 +92,11 @@ export default function Layout({ children }: LayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-accent/20">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="bg-white/95 backdrop-blur-sm border-b border-border sticky top-0 z-50 shadow-sm py-2 min-h-[64px]">
-        <div className="w-full max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-4 h-auto py-2 sm:py-3">
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div className="container-responsive">
+          <div className="flex justify-between items-center h-16">
             {/* Logo and Mobile Menu Button */}
             <div className="flex items-center">
               <Button
@@ -105,24 +105,15 @@ export default function Layout({ children }: LayoutProps) {
                 className="lg:hidden mr-2 icon-mobile"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
               >
-                {sidebarOpen ? (
-                  <X className="w-5 h-5" />
-                ) : (
-                  <Menu className="w-5 h-5" />
-                )}
+                {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </Button>
               <div className="flex-shrink-0 flex items-center">
-                <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-md">
-                  <span className="text-white font-bold text-lg">TD</span>
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">HR</span>
                 </div>
-                <div className="ml-3 hidden sm:block">
-                  <div className="text-xl font-bold text-primary">
-                    TD CONSULTING
-                  </div>
-                  <div className="text-xs text-secondary font-medium -mt-1">
-                    Trusted Recruitment Partner
-                  </div>
-                </div>
+                <span className="ml-2 text-xl font-semibold text-slate-900 hidden sm:block text-wrap-safe">
+                  TalentFlow
+                </span>
               </div>
             </div>
 
@@ -153,29 +144,18 @@ export default function Layout({ children }: LayoutProps) {
               {/* Quick Add Dropdown - Hidden on mobile */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    size="sm"
-                    className="bg-primary hover:bg-primary/90 hidden sm:flex btn-mobile text-primary-foreground"
-                  >
+                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700 hidden sm:flex btn-mobile">
                     <Plus className="w-4 h-4 mr-2" />
-                    <span className="hidden lg:inline text-wrap-safe">
-                      Quick Add
-                    </span>
+                    <span className="hidden lg:inline text-wrap-safe">Quick Add</span>
                     <ChevronDown className="w-4 h-4 ml-1" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="dropdown-mobile">
-                  <DropdownMenuItem
-                    onClick={handleQuickAddJob}
-                    className="text-wrap-safe"
-                  >
+                  <DropdownMenuItem onClick={handleQuickAddJob} className="text-wrap-safe">
                     <Briefcase className="w-4 h-4 mr-2" />
                     Add Job
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={handleQuickAddCandidate}
-                    className="text-wrap-safe"
-                  >
+                  <DropdownMenuItem onClick={handleQuickAddCandidate} className="text-wrap-safe">
                     <Users className="w-4 h-4 mr-2" />
                     Add Candidate
                   </DropdownMenuItem>
@@ -184,14 +164,10 @@ export default function Layout({ children }: LayoutProps) {
 
               {/* Notifications */}
               <Link to="/notifications">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="relative icon-mobile"
-                >
+                <Button variant="ghost" size="sm" className="relative icon-mobile">
                   <Bell className="w-5 h-5" />
                   {unreadCount > 0 && (
-                    <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs bg-primary text-primary-foreground flex items-center justify-center badge-mobile">
+                    <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs bg-red-500 flex items-center justify-center badge-mobile">
                       {unreadCount > 99 ? "99+" : unreadCount}
                     </Badge>
                   )}
@@ -208,19 +184,14 @@ export default function Layout({ children }: LayoutProps) {
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  className="w-56 dropdown-mobile"
-                >
+                <DropdownMenuContent align="end" className="w-56 dropdown-mobile">
                   <div className="flex items-center gap-2 p-2">
                     <Avatar className="w-8 h-8">
                       <AvatarImage src="" />
                       <AvatarFallback>JD</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col space-y-1 min-w-0 flex-1">
-                      <p className="text-sm font-medium text-wrap-safe">
-                        John Doe
-                      </p>
+                      <p className="text-sm font-medium text-wrap-safe">John Doe</p>
                       <p className="text-xs text-slate-500 text-wrap-safe truncate">
                         john.doe@company.com
                       </p>
@@ -269,7 +240,7 @@ export default function Layout({ children }: LayoutProps) {
         </div>
       </header>
 
-      <div className="flex h-[calc(100vh-4rem)]">
+      <div className="flex">
         {/* Sidebar - Mobile Overlay */}
         {sidebarOpen && (
           <div
@@ -283,23 +254,18 @@ export default function Layout({ children }: LayoutProps) {
         {/* Sidebar */}
         <nav
           className={cn(
-            "fixed lg:static top-[4rem] lg:top-0 left-0 z-50 w-64 bg-white border-r border-slate-200 h-[calc(100vh-4rem)] lg:h-auto overflow-y-auto lg:overflow-visible transform transition-transform duration-300 ease-in-out lg:translate-x-0 nav-mobile",
-            sidebarOpen ? "translate-x-0" : "-translate-x-full",
+            "fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 nav-mobile",
+            sidebarOpen ? "translate-x-0" : "-translate-x-full"
           )}
         >
           <div className="flex items-center justify-between p-4 border-b border-slate-200 lg:hidden">
             <div className="flex items-center">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">TD</span>
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">HR</span>
               </div>
-              <div className="ml-2">
-                <div className="text-lg font-bold text-primary">
-                  TD CONSULTING
-                </div>
-                <div className="text-xs text-secondary font-medium -mt-1">
-                  Trusted Partner
-                </div>
-              </div>
+              <span className="ml-2 text-xl font-semibold text-slate-900 text-wrap-safe">
+                TalentFlow
+              </span>
             </div>
             <Button
               variant="ghost"
@@ -322,8 +288,8 @@ export default function Layout({ children }: LayoutProps) {
                       className={cn(
                         "nav-item-mobile text-wrap-safe",
                         isActive
-                          ? "bg-primary/10 text-primary border-r-2 border-primary"
-                          : "text-slate-700 hover:bg-accent hover:text-accent-foreground",
+                          ? "bg-blue-50 text-blue-700 border-r-2 border-blue-700"
+                          : "text-slate-700 hover:bg-slate-50 hover:text-slate-900",
                       )}
                     >
                       <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />

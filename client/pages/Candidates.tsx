@@ -193,7 +193,9 @@ export default function Candidates() {
               <h3 className="font-semibold text-sm text-slate-900 truncate">
                 {candidate.name}
               </h3>
-              <p className="text-xs text-slate-600 truncate">{candidate.position}</p>
+              <p className="text-xs text-slate-600 truncate">
+                {candidate.position}
+              </p>
             </div>
           </Link>
           <DropdownMenu>
@@ -299,7 +301,9 @@ export default function Candidates() {
                           </AvatarFallback>
                         </Avatar>
                         <div className="min-w-0 flex-1">
-                          <div className="font-medium truncate">{candidate.name}</div>
+                          <div className="font-medium truncate">
+                            {candidate.name}
+                          </div>
                           <div className="flex items-center space-x-1 mt-1">
                             {[...Array(5)].map((_, i) => (
                               <Star
@@ -317,19 +321,29 @@ export default function Candidates() {
                     </TableCell>
                   )}
                   {visibleFields.appliedDate && (
-                    <TableCell className="truncate max-w-32">{candidate.appliedDate}</TableCell>
+                    <TableCell className="truncate max-w-32">
+                      {candidate.appliedDate}
+                    </TableCell>
                   )}
                   {visibleFields.email && (
-                    <TableCell className="truncate max-w-48">{candidate.email}</TableCell>
+                    <TableCell className="truncate max-w-48">
+                      {candidate.email}
+                    </TableCell>
                   )}
                   {visibleFields.phone && (
-                    <TableCell className="truncate max-w-32">{candidate.phone}</TableCell>
+                    <TableCell className="truncate max-w-32">
+                      {candidate.phone}
+                    </TableCell>
                   )}
                   {visibleFields.position && (
-                    <TableCell className="truncate max-w-40">{candidate.position}</TableCell>
+                    <TableCell className="truncate max-w-40">
+                      {candidate.position}
+                    </TableCell>
                   )}
                   {visibleFields.recruiter && (
-                    <TableCell className="truncate max-w-32">{candidate.recruiter}</TableCell>
+                    <TableCell className="truncate max-w-32">
+                      {candidate.recruiter}
+                    </TableCell>
                   )}
                   {visibleFields.stage && (
                     <TableCell>
@@ -356,21 +370,33 @@ export default function Candidates() {
                     </TableCell>
                   )}
                   {visibleFields.source && (
-                    <TableCell className="truncate max-w-32">{candidate.source}</TableCell>
+                    <TableCell className="truncate max-w-32">
+                      {candidate.source}
+                    </TableCell>
                   )}
                   {visibleFields.salary && (
-                    <TableCell className="truncate max-w-32">{candidate.salary}</TableCell>
+                    <TableCell className="truncate max-w-32">
+                      {candidate.salary}
+                    </TableCell>
                   )}
                   {visibleFields.location && (
-                    <TableCell className="truncate max-w-40">{candidate.location}</TableCell>
+                    <TableCell className="truncate max-w-40">
+                      {candidate.location}
+                    </TableCell>
                   )}
                   {visibleFields.department && (
-                    <TableCell className="truncate max-w-40">{candidate.department}</TableCell>
+                    <TableCell className="truncate max-w-40">
+                      {candidate.department}
+                    </TableCell>
                   )}
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="flex-shrink-0">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="flex-shrink-0"
+                        >
                           <MoreHorizontal className="w-4 h-4" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -439,7 +465,9 @@ export default function Candidates() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Candidates</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
+            Candidates
+          </h1>
           <p className="text-slate-600 mt-1 text-sm sm:text-base">
             Manage candidate profiles, applications, and track their progress
             through your pipeline.
@@ -498,16 +526,37 @@ export default function Candidates() {
                     </div>
                     <div>
                       <label className="text-sm font-medium text-slate-700">
-                        Position
+                        Job Position
                       </label>
-                      <Input placeholder="Software Engineer" className="mt-1" />
+                      <Select>
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder="Select position" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="software-engineer">
+                            Software Engineer
+                          </SelectItem>
+                          <SelectItem value="product-manager">
+                            Product Manager
+                          </SelectItem>
+                          <SelectItem value="ux-designer">
+                            UX Designer
+                          </SelectItem>
+                          <SelectItem value="data-analyst">
+                            Data Analyst
+                          </SelectItem>
+                          <SelectItem value="marketing-specialist">
+                            Marketing Specialist
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-slate-700">
                         Department
                       </label>
                       <Select>
-                        <SelectTrigger>
+                        <SelectTrigger className="mt-1">
                           <SelectValue placeholder="Select department" />
                         </SelectTrigger>
                         <SelectContent>
@@ -521,6 +570,25 @@ export default function Candidates() {
                         </SelectContent>
                       </Select>
                     </div>
+                    <div>
+                      <label className="text-sm font-medium text-slate-700">
+                        Source
+                      </label>
+                      <Select>
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder="Select source" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="linkedin">LinkedIn</SelectItem>
+                          <SelectItem value="topcv">TopCV</SelectItem>
+                          <SelectItem value="facebook">Facebook</SelectItem>
+                          <SelectItem value="third-party">
+                            Third Party
+                          </SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                   <div className="flex justify-end space-x-2">
                     <Button variant="outline">Cancel</Button>
@@ -528,20 +596,184 @@ export default function Candidates() {
                   </div>
                 </TabsContent>
                 <TabsContent value="upload" className="space-y-4">
-                  <div className="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center">
-                    <FileText className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-                    <h4 className="text-lg font-medium text-slate-900 mb-2">
-                      Upload Resume/CV
-                    </h4>
-                    <p className="text-sm text-slate-600 mb-4">
-                      We'll automatically extract candidate information from the
-                      resume
-                    </p>
-                    <Button variant="outline">
-                      <FileText className="w-4 h-4 mr-2" />
-                      Choose File
-                    </Button>
-                  </div>
+                  <Tabs defaultValue="single" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="single">Single Resume</TabsTrigger>
+                      <TabsTrigger value="multiple">
+                        Multiple Resumes
+                      </TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="single" className="space-y-4">
+                      <div className="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center">
+                        <FileText className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+                        <h4 className="text-lg font-medium text-slate-900 mb-2">
+                          Upload Resume/CV
+                        </h4>
+                        <p className="text-sm text-slate-600 mb-4">
+                          We'll automatically extract candidate information from
+                          the resume
+                        </p>
+                        <input
+                          type="file"
+                          accept=".pdf,.doc,.docx"
+                          className="hidden"
+                          id="single-file-upload"
+                        />
+                        <label htmlFor="single-file-upload">
+                          <Button variant="outline" asChild>
+                            <span>
+                              <FileText className="w-4 h-4 mr-2" />
+                              Choose File
+                            </span>
+                          </Button>
+                        </label>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium text-slate-700">
+                            Job Position
+                          </label>
+                          <Select>
+                            <SelectTrigger className="mt-1">
+                              <SelectValue placeholder="Select position" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="software-engineer">
+                                Software Engineer
+                              </SelectItem>
+                              <SelectItem value="product-manager">
+                                Product Manager
+                              </SelectItem>
+                              <SelectItem value="ux-designer">
+                                UX Designer
+                              </SelectItem>
+                              <SelectItem value="data-analyst">
+                                Data Analyst
+                              </SelectItem>
+                              <SelectItem value="marketing-specialist">
+                                Marketing Specialist
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-700">
+                            Source
+                          </label>
+                          <Select>
+                            <SelectTrigger className="mt-1">
+                              <SelectValue placeholder="Select source" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="linkedin">LinkedIn</SelectItem>
+                              <SelectItem value="topcv">TopCV</SelectItem>
+                              <SelectItem value="facebook">Facebook</SelectItem>
+                              <SelectItem value="third-party">
+                                Third Party
+                              </SelectItem>
+                              <SelectItem value="other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <div className="flex justify-end space-x-2">
+                        <Button variant="outline">Cancel</Button>
+                        <Button>Create Candidate</Button>
+                      </div>
+                    </TabsContent>
+                    <TabsContent value="multiple" className="space-y-4">
+                      <div className="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center">
+                        <FileText className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+                        <h4 className="text-lg font-medium text-slate-900 mb-2">
+                          Upload Resumes/CVs
+                        </h4>
+                        <p className="text-sm text-slate-600 mb-4">
+                          Upload multiple resumes and select job position and
+                          source for each
+                        </p>
+                        <input
+                          type="file"
+                          accept=".pdf,.doc,.docx"
+                          multiple
+                          className="hidden"
+                          id="multiple-file-upload"
+                        />
+                        <label htmlFor="multiple-file-upload">
+                          <Button variant="outline" asChild>
+                            <span>
+                              <FileText className="w-4 h-4 mr-2" />
+                              Choose Files
+                            </span>
+                          </Button>
+                        </label>
+                      </div>
+                      <div className="space-y-4">
+                        <h4 className="text-sm font-medium text-slate-700">
+                          Uploaded Files
+                        </h4>
+                        <div className="grid grid-cols-12 gap-4 items-center">
+                          <div className="col-span-4">
+                            <p className="text-sm text-slate-600 truncate">
+                              example_resume.pdf
+                            </p>
+                          </div>
+                          <div className="col-span-3">
+                            <Select>
+                              <SelectTrigger className="mt-1">
+                                <SelectValue placeholder="Select position" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="software-engineer">
+                                  Software Engineer
+                                </SelectItem>
+                                <SelectItem value="product-manager">
+                                  Product Manager
+                                </SelectItem>
+                                <SelectItem value="ux-designer">
+                                  UX Designer
+                                </SelectItem>
+                                <SelectItem value="data-analyst">
+                                  Data Analyst
+                                </SelectItem>
+                                <SelectItem value="marketing-specialist">
+                                  Marketing Specialist
+                                </SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="col-span-3">
+                            <Select>
+                              <SelectTrigger className="mt-1">
+                                <SelectValue placeholder="Select source" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="linkedin">
+                                  LinkedIn
+                                </SelectItem>
+                                <SelectItem value="topcv">TopCV</SelectItem>
+                                <SelectItem value="facebook">
+                                  Facebook
+                                </SelectItem>
+                                <SelectItem value="third-party">
+                                  Third Party
+                                </SelectItem>
+                                <SelectItem value="other">Other</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="col-span-2">
+                            <Button variant="ghost" size="sm">
+                              <Trash2 className="w-4 h-4 text-red-500" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex justify-end space-x-2">
+                        <Button variant="outline">Cancel</Button>
+                        <Button>Create Candidates</Button>
+                      </div>
+                    </TabsContent>
+                  </Tabs>
                 </TabsContent>
               </Tabs>
             </DialogContent>
