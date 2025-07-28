@@ -25,6 +25,7 @@ export interface JobData {
   domain: string;
   headcount: number;
   requester: string;
+  interviewers?: string[];
   pipelineSummary: {
     applied: number;
     screening: number;
