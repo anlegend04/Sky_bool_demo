@@ -127,7 +127,7 @@ export default function Dashboard() {
       <div className="stats-mobile">
         {stats.map((stat) => (
           <Card
-            key={stat.title}
+            key={stat.titleKey}
             className="relative overflow-hidden card-responsive"
           >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
