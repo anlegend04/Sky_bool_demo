@@ -34,6 +34,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useLanguage } from "@/hooks/use-language";
 import { Link } from "react-router-dom";
 import {
   HARDCODED_NOTIFICATIONS,
