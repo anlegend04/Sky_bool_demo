@@ -79,6 +79,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { HARDCODED_JOBS, JobData } from "@/data/hardcoded-data";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/hooks/use-language";
 
 export default function Jobs() {
   const [jobs] = useState<JobData[]>(HARDCODED_JOBS);
