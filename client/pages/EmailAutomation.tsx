@@ -39,6 +39,7 @@ import {
   CheckCircle,
   AlertCircle,
 } from "lucide-react";
+import { useLanguage } from "@/hooks/use-language";
 import { useState } from "react";
 
 export default function EmailAutomation() {
