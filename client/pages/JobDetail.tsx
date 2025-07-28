@@ -635,7 +635,7 @@ export default function JobDetail() {
                     Interviewers
                   </label>
                   <p className="text-sm text-slate-600">
-                    {job.interviewers.join(", ")}
+                    {job.interviewers ? job.interviewers.join(", ") : "Not assigned"}
                   </p>
                 </div>
               </div>
