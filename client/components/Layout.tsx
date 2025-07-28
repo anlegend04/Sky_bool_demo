@@ -1,411 +1,290 @@
-import { Link, useLocation } from "react-router-dom";
-import { cn } from "@/lib/utils";
+import { useLocation, Link } from "react-router-dom";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getUnreadNotificationCount } from "@/data/hardcoded-data";
-import { useState, useEffect } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { useLanguage, SUPPORTED_LANGUAGES } from "@/hooks/use-language";
+import { Badge } from "@/components/ui/badge";
 import {
-  Users,
+  Search,
+  Bell,
+  Settings,
+  LogOut,
+  User,
+  Plus,
   Briefcase,
+  Users,
   Calendar,
   Mail,
   BarChart3,
-  Settings,
+  MessageSquare,
   Home,
-  Plus,
-  Search,
-  Bell,
-  User,
-  UserCircle,
-  LogOut,
-  ChevronDown,
-  Languages,
   Menu,
   X,
+  Languages,
 } from "lucide-react";
+import { useLanguage, SUPPORTED_LANGUAGES } from "@/hooks/use-language";
 
-interface LayoutProps {
-  children: React.ReactNode;
-}
-
-export default function Layout({ children }: LayoutProps) {
+export default function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const { toast } = useToast();
-  const isMobile = useIsMobile();
-  const { t, setLanguage, getCurrentLanguageInfo } = useLanguage();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { t, currentLanguage, setLanguage, getCurrentLanguageInfo } =
+    useLanguage();
 
-  const navigation = [
-    { name: t("nav.dashboard"), href: "/", icon: Home },
-    { name: t("nav.jobs"), href: "/jobs", icon: Briefcase },
-    { name: t("nav.candidates"), href: "/candidates", icon: Users },
-    { name: t("nav.calendar"), href: "/calendar", icon: Calendar },
-    { name: t("nav.email"), href: "/email", icon: Mail },
-    { name: t("nav.reports"), href: "/reports", icon: BarChart3 },
-    { name: t("nav.notifications"), href: "/notifications", icon: Bell },
-    { name: t("nav.settings"), href: "/settings", icon: Settings },
+  const navItems = [
+    {
+      name: t("nav.dashboard"),
+      path: "/",
+      icon: Home,
+    },
+    {
+      name: t("nav.jobs"),
+      path: "/jobs",
+      icon: Briefcase,
+    },
+    {
+      name: t("nav.candidates"),
+      path: "/candidates",
+      icon: Users,
+    },
+    {
+      name: t("nav.calendar"),
+      path: "/calendar",
+      icon: Calendar,
+    },
+    {
+      name: t("nav.email"),
+      path: "/email-automation",
+      icon: Mail,
+    },
+    {
+      name: t("nav.reports"),
+      path: "/reports",
+      icon: BarChart3,
+    },
+    {
+      name: t("nav.notifications"),
+      path: "/notifications",
+      icon: MessageSquare,
+    },
+    {
+      name: t("nav.settings"),
+      path: "/settings",
+      icon: Settings,
+    },
   ];
 
-  // Update notification count
-  useEffect(() => {
-    const updateNotificationCount = () => {
-      const count = getUnreadNotificationCount();
-      setUnreadCount(count);
-    };
-
-    updateNotificationCount();
-  }, []);
-
-  // Close sidebar when route changes on mobile
-  useEffect(() => {
-    if (isMobile) {
-      setSidebarOpen(false);
-    }
-  }, [location.pathname, isMobile]);
-
-  const handleQuickAddJob = () => {
-    // In a real app, this would open the Add Job dialog
-    toast({
-      title: "Quick Add",
-      description: "Add Job dialog would open here.",
-    });
-    window.location.href = "/jobs";
-  };
-
-  const handleQuickAddCandidate = () => {
-    // In a real app, this would open the Add Candidate dialog
-    toast({
-      title: "Quick Add",
-      description: "Add Candidate dialog would open here.",
-    });
-    window.location.href = "/candidates";
-  };
+  const quickActions = [
+    {
+      name: t("header.addJob"),
+      path: "/jobs/create",
+      icon: Briefcase,
+    },
+    {
+      name: t("header.addCandidate"),
+      path: "/candidates/create",
+      icon: Users,
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
-        <div className="container-responsive">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo and Mobile Menu Button */}
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div className="px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
             <div className="flex items-center">
+              {/* Mobile menu button */}
               <Button
                 variant="ghost"
                 size="sm"
-                className="lg:hidden mr-2 icon-mobile"
-                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="md:hidden mr-2"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               >
-                {sidebarOpen ? (
-                  <X className="w-5 h-5" />
+                {isMobileMenuOpen ? (
+                  <X className="h-6 w-6" />
                 ) : (
-                  <Menu className="w-5 h-5" />
+                  <Menu className="h-6 w-6" />
                 )}
               </Button>
+
+              {/* Logo */}
               <div className="flex-shrink-0 flex items-center">
-                <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-md">
-                  <span className="text-white font-bold text-lg">TD</span>
+                <div className="text-2xl font-bold text-primary">
+                  {t("company.name")}
                 </div>
-                <div className="ml-3 hidden sm:block">
-                  <div className="text-xl font-bold text-primary">
-                    {t("company.name")}
-                  </div>
-                  <div className="text-xs text-secondary font-medium -mt-1">
-                    {t("company.tagline")}
-                  </div>
+                <div className="hidden sm:block ml-3 text-sm text-gray-600">
+                  {t("company.tagline")}
                 </div>
               </div>
             </div>
 
-            {/* Search - Hidden on mobile, shown in header on larger screens */}
+            {/* Desktop search */}
             <div className="hidden md:flex flex-1 max-w-lg mx-8">
               <div className="relative w-full">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-                <input
-                  type="text"
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
                   placeholder={t("header.search")}
-                  className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-wrap-safe"
+                  className="pl-10"
                 />
               </div>
             </div>
 
-            {/* Actions */}
-            <div className="flex items-center space-x-2 sm:space-x-4">
-              {/* Mobile Search Button */}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="md:hidden icon-mobile"
-                onClick={() => setSearchOpen(!searchOpen)}
-              >
-                <Search className="w-5 h-5" />
-              </Button>
-
-              {/* Quick Add Dropdown - Hidden on mobile */}
-              {/* <DropdownMenu>
+            {/* Header actions */}
+            <div className="flex items-center space-x-3">
+              {/* Quick Add dropdown */}
+              <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button size="sm" className="bg-blue-600 hover:bg-blue-700 hidden sm:flex btn-mobile">
+                  <Button variant="outline" size="sm" className="hidden sm:flex">
                     <Plus className="w-4 h-4 mr-2" />
-                    <span className="hidden lg:inline text-wrap-safe">Quick Add</span>
-                    <ChevronDown className="w-4 h-4 ml-1" />
+                    {t("header.quickAdd")}
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="dropdown-mobile">
-                  <DropdownMenuItem onClick={handleQuickAddJob} className="text-wrap-safe">
-                    <Briefcase className="w-4 h-4 mr-2" />
-                    Add Job
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleQuickAddCandidate} className="text-wrap-safe">
-                    <Users className="w-4 h-4 mr-2" />
-                    Add Candidate
-                  </DropdownMenuItem>
+                <DropdownMenuContent align="end">
+                  {quickActions.map((action) => (
+                    <Link key={action.path} to={action.path}>
+                      <DropdownMenuItem>
+                        <action.icon className="w-4 h-4 mr-2" />
+                        {action.name}
+                      </DropdownMenuItem>
+                    </Link>
+                  ))}
                 </DropdownMenuContent>
-              </DropdownMenu> */}
-
-              {/* Notifications */}
-              <Link to="/notifications">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="relative icon-mobile"
-                >
-                  <Bell className="w-5 h-5" />
-                  {unreadCount > 0 && (
-                    <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs bg-primary text-primary-foreground flex items-center justify-center badge-mobile">
-                      {unreadCount > 99 ? "99+" : unreadCount}
-                    </Badge>
-                  )}
-                </Button>
-              </Link>
+              </DropdownMenu>
 
               {/* Language Switcher */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="relative icon-mobile"
-                  >
+                  <Button variant="ghost" size="sm" className="relative">
                     <Languages className="w-5 h-5" />
                     <span className="hidden sm:inline ml-2 text-sm">
                       {getCurrentLanguageInfo().flag}
                     </span>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  className="w-48 dropdown-mobile"
-                >
-                  <div className="px-3 py-2 text-sm font-medium text-muted-foreground">
-                    {t("header.language")}
-                  </div>
-                  <DropdownMenuSeparator />
+                <DropdownMenuContent align="end" className="w-56">
                   {SUPPORTED_LANGUAGES.map((language) => (
                     <DropdownMenuItem
                       key={language.code}
                       onClick={() => setLanguage(language.code)}
-                      className={`flex items-center space-x-3 ${
-                        getCurrentLanguageInfo().code === language.code
-                          ? "bg-accent"
-                          : ""
-                      }`}
+                      className={currentLanguage === language.code ? "bg-accent" : ""}
                     >
-                      <span className="text-base">{language.flag}</span>
-                      <div className="flex flex-col">
-                        <span className="font-medium">
-                          {language.nativeName}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          {language.name}
+                      <div className="flex items-center space-x-2">
+                        <span>{language.flag}</span>
+                        <span>{language.nativeName}</span>
+                        <span className="text-sm text-muted-foreground">
+                          ({language.name})
                         </span>
                       </div>
-                      {getCurrentLanguageInfo().code === language.code && (
-                        <div className="ml-auto w-2 h-2 bg-primary rounded-full"></div>
-                      )}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              {/* User Avatar Dropdown */}
+              {/* Notifications */}
+              <Button variant="ghost" size="sm" className="relative">
+                <Bell className="w-5 h-5" />
+                <Badge
+                  variant="destructive"
+                  className="absolute -top-1 -right-1 h-5 w-5 text-xs p-0 flex items-center justify-center"
+                >
+                  3
+                </Badge>
+              </Button>
+
+              {/* User menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="relative">
-                    <Avatar className="w-6 h-6">
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8">
                       <AvatarImage src="" />
                       <AvatarFallback>JD</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  className="w-56 dropdown-mobile"
-                >
-                  <div className="flex items-center gap-2 p-2">
-                    <Avatar className="w-8 h-8">
-                      <AvatarImage src="" />
-                      <AvatarFallback>JD</AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col space-y-1 min-w-0 flex-1">
-                      <p className="text-sm font-medium text-wrap-safe">
-                        John Doe
-                      </p>
-                      <p className="text-xs text-slate-500 text-wrap-safe truncate">
-                        john.doe@company.com
-                      </p>
-                    </div>
-                  </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-wrap-safe">
-                    <UserCircle className="w-4 h-4 mr-2" />
-                    Profile
-                  </DropdownMenuItem>
+                <DropdownMenuContent align="end">
+                  <Link to="/profile">
+                    <DropdownMenuItem>
+                      <User className="w-4 h-4 mr-2" />
+                      Profile
+                    </DropdownMenuItem>
+                  </Link>
                   <Link to="/settings">
-                    <DropdownMenuItem className="text-wrap-safe">
+                    <DropdownMenuItem>
                       <Settings className="w-4 h-4 mr-2" />
-                      Settings
+                      {t("nav.settings")}
                     </DropdownMenuItem>
                   </Link>
-                  <Link to="/notifications">
-                    <DropdownMenuItem className="text-wrap-safe">
-                      <Bell className="w-4 h-4 mr-2" />
-                      Notifications
-                    </DropdownMenuItem>
-                  </Link>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-red-600 text-wrap-safe">
+                  <DropdownMenuItem>
                     <LogOut className="w-4 h-4 mr-2" />
-                    Sign Out
+                    Logout
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
           </div>
+        </div>
 
-          {/* Mobile Search Bar */}
-          {searchOpen && (
-            <div className="md:hidden pb-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-                <input
-                  type="text"
-                  placeholder={t("header.search")}
-                  className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-wrap-safe"
-                />
-              </div>
-            </div>
-          )}
+        {/* Mobile search */}
+        <div className="md:hidden px-4 pb-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              placeholder={t("header.search")}
+              className="pl-10"
+            />
+          </div>
         </div>
       </header>
 
       <div className="flex">
-        {/* Sidebar - Mobile Overlay */}
-        {sidebarOpen && (
+        {/* Sidebar */}
+        <aside
+          className={`${
+            isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+          } md:translate-x-0 fixed md:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out`}
+        >
+          <nav className="mt-5 px-2 space-y-1">
+            {navItems.map((item) => {
+              const isActive = location.pathname === item.path;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors ${
+                    isActive
+                      ? "bg-primary text-primary-foreground"
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <item.icon
+                    className={`mr-3 h-5 w-5 ${
+                      isActive ? "text-primary-foreground" : "text-gray-500"
+                    }`}
+                  />
+                  {item.name}
+                </Link>
+              );
+            })}
+          </nav>
+        </aside>
+
+        {/* Overlay for mobile */}
+        {isMobileMenuOpen && (
           <div
-            className="fixed inset-0 z-40 lg:hidden"
-            onClick={() => setSidebarOpen(false)}
-          >
-            <div className="fixed inset-0 bg-black bg-opacity-50" />
-          </div>
+            className="fixed inset-0 z-30 bg-black bg-opacity-50 md:hidden"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
         )}
 
-        {/* Sidebar */}
-        <nav
-          className={cn(
-            "fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 nav-mobile",
-            sidebarOpen ? "translate-x-0" : "-translate-x-full",
-          )}
-        >
-          <div className="flex items-center justify-between p-4 border-b border-slate-200 lg:hidden">
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">TD</span>
-              </div>
-              <div className="ml-2">
-                <div className="text-lg font-bold text-primary">
-                  {t("company.name")}
-                </div>
-                <div className="text-xs text-secondary font-medium -mt-1">
-                  {t("company.tagline")}
-                </div>
-              </div>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSidebarOpen(false)}
-              className="icon-mobile"
-            >
-              <X className="w-5 h-5" />
-            </Button>
-          </div>
-
-          <div className="p-4">
-            <ul className="space-y-1">
-              {navigation.map((item) => {
-                const isActive = location.pathname === item.href;
-                return (
-                  <li key={item.name}>
-                    <Link
-                      to={item.href}
-                      className={cn(
-                        "nav-item-mobile text-wrap-safe",
-                        isActive
-                          ? "bg-blue-50 text-blue-700 border-r-2 border-blue-700"
-                          : "text-slate-700 hover:bg-slate-50 hover:text-slate-900",
-                      )}
-                    >
-                      <item.icon className="mr-3 h-5 w-5 flex-shrink-0" />
-                      <span className="text-wrap-safe">{item.name}</span>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-
-            {/* Mobile Quick Actions */}
-            <div className="mt-6 pt-6 border-t border-slate-200 lg:hidden">
-              <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3 text-wrap-safe">
-                Quick Actions
-              </h3>
-              <div className="space-y-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full justify-start text-wrap-safe"
-                  onClick={handleQuickAddJob}
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Job
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full justify-start text-wrap-safe"
-                  onClick={handleQuickAddCandidate}
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Candidate
-                </Button>
-              </div>
-            </div>
-          </div>
-        </nav>
-
-        {/* Main Content */}
-        <main className="flex-1 overflow-auto min-h-[calc(100vh-4rem)]">
+        {/* Main content */}
+        <main className="flex-1 min-w-0">
           {children}
         </main>
       </div>
