@@ -632,10 +632,10 @@ export default function JobDetail() {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-slate-700">
-                    Interviewers
+                    Requester
                   </label>
                   <p className="text-sm text-slate-600">
-                    {job.interviewers.join(", ")}
+                    {job.requester}
                   </p>
                 </div>
               </div>
