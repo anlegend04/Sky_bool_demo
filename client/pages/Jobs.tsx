@@ -74,6 +74,7 @@ import {
   ExternalLink,
   Copy,
   AlertTriangle,
+  Trash,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -274,6 +275,29 @@ export default function Jobs() {
       estimatedCost: job.estimatedCost,
     });
     setShowAddJobDialog(true);
+  };
+
+  const defaultStages = ["Applied", "Screening", "Interview", "Offer", "Hired"];
+  const [jobStages, setJobStages] = useState(
+    defaultStages.map((name) => ({ name, durationHours: "" })),
+  );
+
+  const updateStage = (
+    index: number,
+    newStage: { name: string; durationHours: string },
+  ) => {
+    const updated = [...jobStages];
+    updated[index] = newStage;
+    setJobStages(updated);
+  };
+
+  const addNewStage = () => {
+    setJobStages([...jobStages, { name: "", durationHours: "" }]);
+  };
+
+  const removeStage = (index: number) => {
+    const updated = jobStages.filter((_, i) => i !== index);
+    setJobStages(updated);
   };
 
   const handleUpdateJob = () => {
@@ -778,7 +802,7 @@ export default function Jobs() {
         </DialogHeader>
 
         <Tabs defaultValue="basic" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="basic" className="text-wrap-safe">
               Basic Info
             </TabsTrigger>
@@ -787,6 +811,9 @@ export default function Jobs() {
             </TabsTrigger>
             <TabsTrigger value="team" className="text-wrap-safe">
               Team & Budget
+            </TabsTrigger>
+            <TabsTrigger value="pipeline" className="text-wrap-safe">
+              Stages
             </TabsTrigger>
           </TabsList>
 
@@ -1102,6 +1129,65 @@ export default function Jobs() {
                 className="btn-mobile"
               >
                 {editingJob ? "Update Job" : "Create Job"}
+              </Button>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="pipeline" className="form-responsive">
+            <div className="space-y-3">
+              <label className="text-responsive-sm font-medium text-slate-700">
+                Recruitment Stages
+              </label>
+
+              <div className="space-y-2">
+                {jobStages.map((stage, index) => (
+                  <div
+                    key={index}
+                    className="flex flex-col gap-2 border border-slate-200 rounded-xl p-3 bg-slate-50"
+                  >
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <Input
+                        value={stage.name}
+                        onChange={(e) =>
+                          updateStage(index, { ...stage, name: e.target.value })
+                        }
+                        className="flex-1"
+                        placeholder="Stage name"
+                      />
+                      <Input
+                        type="number"
+                        min={1}
+                        value={stage.durationHours || ""}
+                        onChange={(e) =>
+                          updateStage(index, {
+                            ...stage,
+                            durationHours: e.target.value,
+                          })
+                        }
+                        className="w-36"
+                        placeholder="Duration (h)"
+                      />
+                      {!defaultStages.includes(stage.name) && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => removeStage(index)}
+                          className="text-red-500"
+                        >
+                          <Trash className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <Button
+                variant="outline"
+                onClick={addNewStage}
+                className="text-sm"
+              >
+                + Add Stage
               </Button>
             </div>
           </TabsContent>
