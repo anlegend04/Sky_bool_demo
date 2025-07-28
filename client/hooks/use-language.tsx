@@ -789,7 +789,7 @@ const useTranslations = (language: Language) => {
       "jobs.department": "Phòng ban",
       "jobs.applications": "Đơn ứng tuyển",
       "jobs.status": "Trạng thái",
-      "jobs.deadline": "Hạn chót",
+      "jobs.deadline": "H���n chót",
       "jobs.performance": "Hiệu suất",
       "jobs.recruiter": "Nhà tuyển dụng",
       "jobs.location": "Địa điểm",
@@ -983,7 +983,7 @@ const useTranslations = (language: Language) => {
       "candidates.uploadedFiles": "Tệp đã tải lên",
       "candidates.createCandidate": "Tạo ứng viên",
       "candidates.createCandidates": "Tạo ứng viên",
-      "candidates.manualEntry": "Nhập thủ công",
+      "candidates.manualEntry": "Nh��p thủ công",
       "candidates.uploadResumeTab": "Tải lên CV",
       "candidates.addNewCandidate": "Thêm ứng viên mới",
       "candidates.createCandidateProfile":
@@ -1055,7 +1055,7 @@ const useTranslations = (language: Language) => {
       "jobs.jobUpdated": "Đã cập nhật công việc",
       "jobs.jobUpdatedDesc": '"{position}" đã được cập nhật thành công.',
       "jobs.jobDeleted": "Đã xóa công việc",
-      "jobs.jobDeletedDesc": "Công việc đã được xóa thành công.",
+      "jobs.jobDeletedDesc": "C��ng việc đã được xóa thành công.",
       "jobs.error": "Lỗi",
       "jobs.createError": "Không thể tạo công việc. Vui lòng thử lại.",
       "jobs.updateError": "Không thể cập nhật công việc. Vui lòng thử lại.",
@@ -1122,7 +1122,7 @@ const useTranslations = (language: Language) => {
       "calendar.teamMeeting": "Họp nhóm",
       "calendar.offerDiscussion": "Thảo luận đề nghị",
       "calendar.meetingType": "Loại cuộc họp",
-      "calendar.selectFormat": "Chọn định dạng",
+      "calendar.selectFormat": "Ch��n định dạng",
       "calendar.inPerson": "Trực tiếp",
       "calendar.videoCall": "Cuộc gọi video",
       "calendar.phoneCall": "Cuộc gọi điện thoại",
@@ -1318,7 +1318,7 @@ const useTranslations = (language: Language) => {
       "settings.jobTitle": "Chức vụ",
       "settings.humanResources": "Nhân sự",
       "settings.engineering": "Kỹ thuật",
-      "settings.product": "Sản phẩm",
+      "settings.product": "Sản ph��m",
       "settings.design": "Thiết kế",
       "settings.marketing": "Marketing",
       "settings.saveChanges": "Lưu thay đổi",
@@ -1454,6 +1454,16 @@ const useTranslations = (language: Language) => {
       // Company
       "company.name": "TD CONSULTING",
       "company.tagline": "Đối tác Tuyển dụng Đáng tin cậy",
+
+      // Profile and user menu
+      "profile.profile": "Hồ sơ",
+      "profile.logout": "Đăng xuất",
+
+      // Common interface elements
+      "interface.overview": "Tổng quan",
+      "interface.performance": "Hiệu suất",
+      "interface.sources": "Nguồn",
+      "interface.advanced": "Nâng cao",
     },
     zh: {
       "nav.dashboard": "仪表板",
