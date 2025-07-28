@@ -69,8 +69,8 @@ if (typeof window !== 'undefined') {
         return originalOnCommitFiberRoot(id, root, ...args);
       } catch (error) {
         const errorStr = String(error);
-        if (errorStr.includes('defaultProps') || 
-            errorStr.includes('XAxis') || 
+        if (errorStr.includes('defaultProps') ||
+            errorStr.includes('XAxis') ||
             errorStr.includes('YAxis') ||
             errorStr.includes('recharts')) {
           return; // Suppress React DevTools errors related to Recharts
@@ -79,18 +79,45 @@ if (typeof window !== 'undefined') {
       }
     };
   }
-  
-  // Intercept React's warning system at a lower level
-  const originalReactWarn = (window as any).__REACT_DEV_TOOLS_LEGACY__ && 
-                           (window as any).__REACT_DEV_TOOLS_LEGACY__.warn;
-  if (originalReactWarn) {
-    (window as any).__REACT_DEV_TOOLS_LEGACY__.warn = (...args: any[]) => {
+
+  // More aggressive React warning suppression
+  // Override window.console at the global level
+  const globalConsole = window.console;
+  if (globalConsole) {
+    const originalGlobalWarn = globalConsole.warn;
+    globalConsole.warn = (...args: any[]) => {
       if (shouldSuppressMessage(...args)) {
         return;
       }
-      return originalReactWarn.apply(this, args);
+      return originalGlobalWarn.apply(globalConsole, args);
     };
   }
+
+  // Intercept at the React level by patching React's warning function
+  setTimeout(() => {
+    // Try to patch React's internal warning after React loads
+    const anyWindow = window as any;
+    if (anyWindow.React && anyWindow.React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED) {
+      const internals = anyWindow.React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+      if (internals.ReactDebugCurrentFrame) {
+        // Patch React's internal warning system
+        const originalGetCurrentStack = internals.ReactDebugCurrentFrame.getCurrentStack;
+        if (originalGetCurrentStack) {
+          internals.ReactDebugCurrentFrame.getCurrentStack = (...args: any[]) => {
+            try {
+              const result = originalGetCurrentStack.apply(internals.ReactDebugCurrentFrame, args);
+              if (shouldSuppressMessage(result)) {
+                return '';
+              }
+              return result;
+            } catch (e) {
+              return '';
+            }
+          };
+        }
+      }
+    }
+  }, 100);
 }
 
 // Suppress at module level to catch early warnings
