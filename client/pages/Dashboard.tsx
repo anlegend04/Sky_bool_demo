@@ -112,7 +112,7 @@ export default function Dashboard() {
         <div className="btn-group-mobile">
           <Button variant="outline" size="sm" className="btn-mobile">
             <Filter className="icon-mobile mr-2" />
-            Filter
+            {t('dashboard.filter')}
           </Button>
           {/* <Button variant="outline" size="sm" className="btn-mobile">
             <Link to="/jobs/create">
@@ -160,7 +160,7 @@ export default function Dashboard() {
                   {stat.change}
                 </span>
                 <span className="text-responsive-sm text-slate-500 ml-2 hidden sm:inline text-wrap-safe">
-                  vs last month
+                  {t('dashboard.vsLastMonth')}
                 </span>
               </div>
             </CardContent>
@@ -175,7 +175,7 @@ export default function Dashboard() {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span className="text-responsive-lg text-wrap-safe">
-                Recruitment Pipeline
+                {t('dashboard.recruitmentPipeline')}
               </span>
               <Button variant="ghost" size="sm" className="icon-mobile">
                 <MoreHorizontal className="w-4 h-4" />
@@ -220,13 +220,13 @@ export default function Dashboard() {
         <Card>
           <CardHeader>
             <CardTitle className="text-responsive-lg text-wrap-safe">
-              Quick Stats
+              {t('dashboard.quickStats')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-mobile">
             <div className="flex justify-between items-center">
               <span className="text-slate-600 text-responsive-base text-wrap-safe">
-                Cost per Hire
+                {t('dashboard.costPerHire')}
               </span>
               <span className="font-semibold text-responsive-base text-wrap-safe">
                 $3,200
@@ -234,7 +234,7 @@ export default function Dashboard() {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-slate-600 text-responsive-base text-wrap-safe">
-                Hiring Success Rate
+                {t('dashboard.hiringSuccessRate')}
               </span>
               <span className="font-semibold text-green-600 text-responsive-base text-wrap-safe">
                 85%
@@ -242,7 +242,7 @@ export default function Dashboard() {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-slate-600 text-responsive-base text-wrap-safe">
-                Source Effectiveness
+                {t('dashboard.sourceEffectiveness')}
               </span>
               <span className="font-semibold text-responsive-base text-wrap-safe">
                 LinkedIn: 45%
@@ -250,7 +250,7 @@ export default function Dashboard() {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-slate-600 text-responsive-base text-wrap-safe">
-                Pending Interviews
+                {t('dashboard.pendingInterviews')}
               </span>
               <span className="font-semibold text-orange-600 text-responsive-base text-wrap-safe">
                 12
@@ -265,10 +265,10 @@ export default function Dashboard() {
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span className="text-responsive-lg text-wrap-safe">
-              Recent Job Postings
+              {t('dashboard.recentJobPostings')}
             </span>
             <Button variant="ghost" size="sm" asChild className="btn-mobile">
-              <Link to="/jobs">View All</Link>
+              <Link to="/jobs">{t('dashboard.viewAll')}</Link>
             </Button>
           </CardTitle>
         </CardHeader>
@@ -299,7 +299,7 @@ export default function Dashboard() {
                     {job.department}
                   </span>
                   <span className="text-wrap-safe flex-shrink-0 ml-2">
-                    {job.applicants} applicants
+                    {job.applicants} {t('dashboard.applicants')}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
@@ -326,19 +326,19 @@ export default function Dashboard() {
               <thead>
                 <tr className="border-b border-slate-200">
                   <th className="text-left py-3 text-responsive-sm font-medium text-slate-600 text-wrap-safe">
-                    Job Title
+                    {t('dashboard.jobTitle')}
                   </th>
                   <th className="text-left py-3 text-responsive-sm font-medium text-slate-600 text-wrap-safe">
-                    Department
+                    {t('dashboard.department')}
                   </th>
                   <th className="text-left py-3 text-responsive-sm font-medium text-slate-600 text-wrap-safe">
-                    Applicants
+                    {t('dashboard.applicants')}
                   </th>
                   <th className="text-left py-3 text-responsive-sm font-medium text-slate-600 text-wrap-safe">
-                    Status
+                    {t('dashboard.status')}
                   </th>
                   <th className="text-left py-3 text-responsive-sm font-medium text-slate-600 text-wrap-safe">
-                    Priority
+                    {t('dashboard.priority')}
                   </th>
                 </tr>
               </thead>
