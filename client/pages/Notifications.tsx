@@ -263,9 +263,9 @@ export default function Notifications() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Notifications</h1>
+          <h1 className="text-3xl font-bold text-slate-900">{t('notifications.title')}</h1>
           <p className="text-slate-600 mt-1">
-            Stay updated with system notifications and important updates.
+            {t('notifications.subtitle')}
           </p>
         </div>
         <div className="flex space-x-3">
