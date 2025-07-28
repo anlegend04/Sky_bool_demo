@@ -23,7 +23,7 @@ export default function Dashboard() {
 
   const stats = [
     {
-      title: "Active Jobs",
+      titleKey: "dashboard.activeJobs",
       value: "24",
       change: "+12%",
       changeType: "positive" as const,
@@ -31,7 +31,7 @@ export default function Dashboard() {
       color: "blue",
     },
     {
-      title: "Total Candidates",
+      titleKey: "dashboard.totalCandidates",
       value: "1,847",
       change: "+8%",
       changeType: "positive" as const,
@@ -39,7 +39,7 @@ export default function Dashboard() {
       color: "green",
     },
     {
-      title: "Interviews This Week",
+      titleKey: "dashboard.interviewsThisWeek",
       value: "67",
       change: "-5%",
       changeType: "negative" as const,
@@ -47,7 +47,7 @@ export default function Dashboard() {
       color: "orange",
     },
     {
-      title: "Avg. Time to Hire",
+      titleKey: "dashboard.avgTimeToHire",
       value: "18 days",
       change: "-2 days",
       changeType: "positive" as const,
