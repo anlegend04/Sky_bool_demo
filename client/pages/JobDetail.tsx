@@ -635,11 +635,7 @@ export default function JobDetail() {
                     Requester
                   </label>
                   <p className="text-sm text-slate-600">
-<<<<<<< HEAD
-                    {job.interviewers ? job.interviewers.join(", ") : "Not assigned"}
-=======
                     {job.requester}
->>>>>>> origin/main
                   </p>
                 </div>
               </div>
