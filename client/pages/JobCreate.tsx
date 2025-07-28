@@ -126,7 +126,7 @@ export default function JobCreate() {
             </p>
           </div>
         </div>
-        <div className="flex space-x-3">
+        {/* <div className="flex space-x-3">
           <Dialog open={isImportOpen} onOpenChange={setIsImportOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" size="sm">
@@ -163,7 +163,7 @@ export default function JobCreate() {
               </div>
             </DialogContent>
           </Dialog>
-        </div>
+        </div> */}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
