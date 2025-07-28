@@ -20,7 +20,7 @@ import { useLanguage } from "@/hooks/use-language";
 import { LanguageDebug } from "@/components/LanguageDebug";
 
 export default function Dashboard() {
-  const { t } = useLanguage();
+  const { t, currentLanguage } = useLanguage();
 
   const stats = [
     {
@@ -57,38 +57,75 @@ export default function Dashboard() {
     },
   ];
 
+  const getJobTitle = (titleKey: string) => {
+    const jobTitles: { [key: string]: string } = {
+      'senior_frontend_developer': currentLanguage === 'vi' ? 'Lập trình viên Frontend cấp cao' : 'Senior Frontend Developer',
+      'product_manager': currentLanguage === 'vi' ? 'Quản lý sản phẩm' : 'Product Manager',
+      'ux_designer': currentLanguage === 'vi' ? 'Nhà thiết kế UX' : 'UX Designer',
+      'data_scientist': currentLanguage === 'vi' ? 'Nhà khoa học dữ liệu' : 'Data Scientist'
+    };
+    return jobTitles[titleKey] || titleKey;
+  };
+
+  const getDepartment = (deptKey: string) => {
+    const departments: { [key: string]: string } = {
+      'Engineering': currentLanguage === 'vi' ? 'Kỹ thuật' : 'Engineering',
+      'Product': currentLanguage === 'vi' ? 'Sản phẩm' : 'Product',
+      'Design': currentLanguage === 'vi' ? 'Thiết kế' : 'Design',
+      'Analytics': currentLanguage === 'vi' ? 'Phân tích' : 'Analytics'
+    };
+    return departments[deptKey] || deptKey;
+  };
+
+  const getStatus = (statusKey: string) => {
+    const statuses: { [key: string]: string } = {
+      'Active': t('dashboard.active'),
+      'Draft': t('dashboard.draft')
+    };
+    return statuses[statusKey] || statusKey;
+  };
+
+  const getPriority = (priorityKey: string) => {
+    const priorities: { [key: string]: string } = {
+      'High': t('dashboard.high'),
+      'Medium': t('dashboard.medium'),
+      'Low': t('dashboard.low')
+    };
+    return priorities[priorityKey] || priorityKey;
+  };
+
   const recentJobs = [
     {
       id: 1,
-      title: "Senior Frontend Developer",
-      department: "Engineering",
+      titleKey: "senior_frontend_developer",
+      departmentKey: "Engineering",
       applicants: 45,
-      status: "Active",
-      priority: "High",
+      statusKey: "Active",
+      priorityKey: "High",
     },
     {
       id: 2,
-      title: "Product Manager",
-      department: "Product",
+      titleKey: "product_manager",
+      departmentKey: "Product",
       applicants: 32,
-      status: "Active",
-      priority: "Medium",
+      statusKey: "Active",
+      priorityKey: "Medium",
     },
     {
       id: 3,
-      title: "UX Designer",
-      department: "Design",
+      titleKey: "ux_designer",
+      departmentKey: "Design",
       applicants: 28,
-      status: "Draft",
-      priority: "Low",
+      statusKey: "Draft",
+      priorityKey: "Low",
     },
     {
       id: 4,
-      title: "Data Scientist",
-      department: "Analytics",
+      titleKey: "data_scientist",
+      departmentKey: "Analytics",
       applicants: 19,
-      status: "Active",
-      priority: "High",
+      statusKey: "Active",
+      priorityKey: "High",
     },
   ];
 
@@ -356,11 +393,11 @@ export default function Dashboard() {
                         to={`/jobs/${job.id}`}
                         className="font-medium text-slate-900 hover:text-blue-600 text-wrap-safe truncate max-w-48 block"
                       >
-                        {job.title}
+                        {getJobTitle(job.titleKey)}
                       </Link>
                     </td>
                     <td className="py-3 text-slate-600 text-wrap-safe truncate max-w-32">
-                      {job.department}
+                      {getDepartment(job.departmentKey)}
                     </td>
                     <td className="py-3">
                       <Badge variant="secondary" className="badge-mobile">
@@ -370,25 +407,25 @@ export default function Dashboard() {
                     <td className="py-3">
                       <Badge
                         variant={
-                          job.status === "Active" ? "default" : "secondary"
+                          job.statusKey === "Active" ? "default" : "secondary"
                         }
                         className="badge-mobile"
                       >
-                        {job.status}
+                        {getStatus(job.statusKey)}
                       </Badge>
                     </td>
                     <td className="py-3">
                       <Badge
                         variant={
-                          job.priority === "High"
+                          job.priorityKey === "High"
                             ? "destructive"
-                            : job.priority === "Medium"
+                            : job.priorityKey === "Medium"
                               ? "default"
                               : "secondary"
                         }
                         className="badge-mobile"
                       >
-                        {job.priority}
+                        {getPriority(job.priorityKey)}
                       </Badge>
                     </td>
                   </tr>
