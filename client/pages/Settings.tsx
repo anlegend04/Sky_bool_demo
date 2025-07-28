@@ -38,7 +38,8 @@ import {
 import { useLanguage, SUPPORTED_LANGUAGES } from "@/hooks/use-language";
 
 export default function Settings() {
-  const { t, currentLanguage, setLanguage, getCurrentLanguageInfo } = useLanguage();
+  const { t, currentLanguage, setLanguage, getCurrentLanguageInfo } =
+    useLanguage();
 
   const integrations = [
     {
@@ -84,31 +85,39 @@ export default function Settings() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">{t('settings.title')}</h1>
-          <p className="text-slate-600 mt-1">
-            {t('settings.subtitle')}
-          </p>
+          <h1 className="text-3xl font-bold text-slate-900">
+            {t("settings.title")}
+          </h1>
+          <p className="text-slate-600 mt-1">{t("settings.subtitle")}</p>
         </div>
         <div className="flex space-x-3">
           <Button variant="outline" size="sm">
             <Download className="w-4 h-4 mr-2" />
-            {t('settings.exportSettings')}
+            {t("settings.exportSettings")}
           </Button>
           <Button variant="outline" size="sm">
             <Upload className="w-4 h-4 mr-2" />
-            {t('settings.importSettings')}
+            {t("settings.importSettings")}
           </Button>
         </div>
       </div>
 
       <Tabs defaultValue="profile" className="space-y-6">
         <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="profile">{t('settings.profile')}</TabsTrigger>
-          <TabsTrigger value="notifications">{t('settings.notifications')}</TabsTrigger>
-          <TabsTrigger value="appearance">{t('settings.appearance')}</TabsTrigger>
-          <TabsTrigger value="security">{t('settings.security')}</TabsTrigger>
-          <TabsTrigger value="integrations">{t('settings.integrations')}</TabsTrigger>
-          <TabsTrigger value="organization">{t('settings.organization')}</TabsTrigger>
+          <TabsTrigger value="profile">{t("settings.profile")}</TabsTrigger>
+          <TabsTrigger value="notifications">
+            {t("settings.notifications")}
+          </TabsTrigger>
+          <TabsTrigger value="appearance">
+            {t("settings.appearance")}
+          </TabsTrigger>
+          <TabsTrigger value="security">{t("settings.security")}</TabsTrigger>
+          <TabsTrigger value="integrations">
+            {t("settings.integrations")}
+          </TabsTrigger>
+          <TabsTrigger value="organization">
+            {t("settings.organization")}
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="space-y-6">
@@ -183,7 +192,7 @@ export default function Settings() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label>{t('settings.language')}</Label>
+                  <Label>{t("settings.language")}</Label>
                   <Select value={currentLanguage} onValueChange={setLanguage}>
                     <SelectTrigger className="mt-1">
                       <SelectValue />
@@ -194,7 +203,9 @@ export default function Settings() {
                           <div className="flex items-center space-x-2">
                             <span>{language.flag}</span>
                             <span>{language.nativeName}</span>
-                            <span className="text-sm text-muted-foreground">({language.name})</span>
+                            <span className="text-sm text-muted-foreground">
+                              ({language.name})
+                            </span>
                           </div>
                         </SelectItem>
                       ))}

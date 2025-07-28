@@ -49,14 +49,14 @@ export default function Layout({ children }: LayoutProps) {
   const { t, setLanguage, getCurrentLanguageInfo } = useLanguage();
 
   const navigation = [
-    { name: t('nav.dashboard'), href: "/", icon: Home },
-    { name: t('nav.jobs'), href: "/jobs", icon: Briefcase },
-    { name: t('nav.candidates'), href: "/candidates", icon: Users },
-    { name: t('nav.calendar'), href: "/calendar", icon: Calendar },
-    { name: t('nav.email'), href: "/email", icon: Mail },
-    { name: t('nav.reports'), href: "/reports", icon: BarChart3 },
-    { name: t('nav.notifications'), href: "/notifications", icon: Bell },
-    { name: t('nav.settings'), href: "/settings", icon: Settings },
+    { name: t("nav.dashboard"), href: "/", icon: Home },
+    { name: t("nav.jobs"), href: "/jobs", icon: Briefcase },
+    { name: t("nav.candidates"), href: "/candidates", icon: Users },
+    { name: t("nav.calendar"), href: "/calendar", icon: Calendar },
+    { name: t("nav.email"), href: "/email", icon: Mail },
+    { name: t("nav.reports"), href: "/reports", icon: BarChart3 },
+    { name: t("nav.notifications"), href: "/notifications", icon: Bell },
+    { name: t("nav.settings"), href: "/settings", icon: Settings },
   ];
 
   // Update notification count
@@ -108,15 +108,23 @@ export default function Layout({ children }: LayoutProps) {
                 className="lg:hidden mr-2 icon-mobile"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
               >
-                {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                {sidebarOpen ? (
+                  <X className="w-5 h-5" />
+                ) : (
+                  <Menu className="w-5 h-5" />
+                )}
               </Button>
               <div className="flex-shrink-0 flex items-center">
                 <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-md">
                   <span className="text-white font-bold text-lg">TD</span>
                 </div>
                 <div className="ml-3 hidden sm:block">
-                  <div className="text-xl font-bold text-primary">{t('company.name')}</div>
-                  <div className="text-xs text-secondary font-medium -mt-1">{t('company.tagline')}</div>
+                  <div className="text-xl font-bold text-primary">
+                    {t("company.name")}
+                  </div>
+                  <div className="text-xs text-secondary font-medium -mt-1">
+                    {t("company.tagline")}
+                  </div>
                 </div>
               </div>
             </div>
@@ -127,7 +135,7 @@ export default function Layout({ children }: LayoutProps) {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
                 <input
                   type="text"
-                  placeholder={t('header.search')}
+                  placeholder={t("header.search")}
                   className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-wrap-safe"
                 />
               </div>
@@ -168,7 +176,11 @@ export default function Layout({ children }: LayoutProps) {
 
               {/* Notifications */}
               <Link to="/notifications">
-                <Button variant="ghost" size="sm" className="relative icon-mobile">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="relative icon-mobile"
+                >
                   <Bell className="w-5 h-5" />
                   {unreadCount > 0 && (
                     <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs bg-primary text-primary-foreground flex items-center justify-center badge-mobile">
@@ -181,16 +193,23 @@ export default function Layout({ children }: LayoutProps) {
               {/* Language Switcher */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="relative icon-mobile">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="relative icon-mobile"
+                  >
                     <Languages className="w-5 h-5" />
                     <span className="hidden sm:inline ml-2 text-sm">
                       {getCurrentLanguageInfo().flag}
                     </span>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 dropdown-mobile">
+                <DropdownMenuContent
+                  align="end"
+                  className="w-48 dropdown-mobile"
+                >
                   <div className="px-3 py-2 text-sm font-medium text-muted-foreground">
-                    {t('header.language')}
+                    {t("header.language")}
                   </div>
                   <DropdownMenuSeparator />
                   {SUPPORTED_LANGUAGES.map((language) => (
@@ -198,13 +217,19 @@ export default function Layout({ children }: LayoutProps) {
                       key={language.code}
                       onClick={() => setLanguage(language.code)}
                       className={`flex items-center space-x-3 ${
-                        getCurrentLanguageInfo().code === language.code ? 'bg-accent' : ''
+                        getCurrentLanguageInfo().code === language.code
+                          ? "bg-accent"
+                          : ""
                       }`}
                     >
                       <span className="text-base">{language.flag}</span>
                       <div className="flex flex-col">
-                        <span className="font-medium">{language.nativeName}</span>
-                        <span className="text-xs text-muted-foreground">{language.name}</span>
+                        <span className="font-medium">
+                          {language.nativeName}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {language.name}
+                        </span>
                       </div>
                       {getCurrentLanguageInfo().code === language.code && (
                         <div className="ml-auto w-2 h-2 bg-primary rounded-full"></div>
@@ -224,14 +249,19 @@ export default function Layout({ children }: LayoutProps) {
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 dropdown-mobile">
+                <DropdownMenuContent
+                  align="end"
+                  className="w-56 dropdown-mobile"
+                >
                   <div className="flex items-center gap-2 p-2">
                     <Avatar className="w-8 h-8">
                       <AvatarImage src="" />
                       <AvatarFallback>JD</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col space-y-1 min-w-0 flex-1">
-                      <p className="text-sm font-medium text-wrap-safe">John Doe</p>
+                      <p className="text-sm font-medium text-wrap-safe">
+                        John Doe
+                      </p>
                       <p className="text-xs text-slate-500 text-wrap-safe truncate">
                         john.doe@company.com
                       </p>
@@ -271,7 +301,7 @@ export default function Layout({ children }: LayoutProps) {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
                 <input
                   type="text"
-                  placeholder={t('header.search')}
+                  placeholder={t("header.search")}
                   className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-wrap-safe"
                 />
               </div>
@@ -295,7 +325,7 @@ export default function Layout({ children }: LayoutProps) {
         <nav
           className={cn(
             "fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0 nav-mobile",
-            sidebarOpen ? "translate-x-0" : "-translate-x-full"
+            sidebarOpen ? "translate-x-0" : "-translate-x-full",
           )}
         >
           <div className="flex items-center justify-between p-4 border-b border-slate-200 lg:hidden">
@@ -304,8 +334,12 @@ export default function Layout({ children }: LayoutProps) {
                 <span className="text-white font-bold text-sm">TD</span>
               </div>
               <div className="ml-2">
-                <div className="text-lg font-bold text-primary">{t('company.name')}</div>
-                <div className="text-xs text-secondary font-medium -mt-1">{t('company.tagline')}</div>
+                <div className="text-lg font-bold text-primary">
+                  {t("company.name")}
+                </div>
+                <div className="text-xs text-secondary font-medium -mt-1">
+                  {t("company.tagline")}
+                </div>
               </div>
             </div>
             <Button
