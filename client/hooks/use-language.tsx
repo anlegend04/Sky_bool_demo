@@ -44,14 +44,97 @@ const useTranslations = (language: Language) => {
       'nav.reports': 'Reports',
       'nav.notifications': 'Notifications',
       'nav.settings': 'Settings',
-      
+
       // Header
       'header.search': 'Search candidates, jobs...',
       'header.quickAdd': 'Quick Add',
       'header.addJob': 'Add Job',
       'header.addCandidate': 'Add Candidate',
       'header.language': 'Language',
-      
+
+      // Dashboard
+      'dashboard.title': 'Dashboard',
+      'dashboard.subtitle': 'Welcome back! Here\'s an overview of your recruitment activities.',
+      'dashboard.activeJobs': 'Active Jobs',
+      'dashboard.totalCandidates': 'Total Candidates',
+      'dashboard.interviewsThisWeek': 'Interviews This Week',
+      'dashboard.avgTimeToHire': 'Avg. Time to Hire',
+      'dashboard.totalRevenue': 'Total Revenue',
+      'dashboard.recentJobs': 'Recent Jobs',
+      'dashboard.topCandidates': 'Top Candidates',
+      'dashboard.recentActivity': 'Recent Activity',
+      'dashboard.viewAll': 'View All',
+
+      // Jobs
+      'jobs.title': 'Jobs',
+      'jobs.subtitle': 'Manage job postings, track applications, and monitor hiring progress.',
+      'jobs.createJob': 'Create Job',
+      'jobs.filterJobs': 'Filter Jobs',
+      'jobs.position': 'Position',
+      'jobs.department': 'Department',
+      'jobs.applications': 'Applications',
+      'jobs.status': 'Status',
+      'jobs.deadline': 'Deadline',
+      'jobs.performance': 'Performance',
+      'jobs.recruiter': 'Recruiter',
+      'jobs.location': 'Location',
+      'jobs.priority': 'Priority',
+
+      // Candidates
+      'candidates.title': 'Candidates',
+      'candidates.subtitle': 'Manage candidate profiles, track progress, and schedule interviews.',
+      'candidates.addCandidate': 'Add Candidate',
+      'candidates.moreFilters': 'More Filters',
+      'candidates.name': 'Name',
+      'candidates.position': 'Position',
+      'candidates.stage': 'Stage',
+      'candidates.rating': 'Rating',
+      'candidates.appliedDate': 'Applied Date',
+      'candidates.source': 'Source',
+
+      // Email Automation
+      'email.title': 'Email Automation',
+      'email.subtitle': 'Manage email templates, workflows, and automate candidate communication.',
+      'email.newWorkflow': 'New Workflow',
+      'email.newTemplate': 'New Template',
+      'email.activeTemplates': 'Active Templates',
+      'email.emailsSent': 'Emails Sent (30d)',
+      'email.avgOpenRate': 'Avg. Open Rate',
+      'email.activeWorkflows': 'Active Workflows',
+      'email.templates': 'Email Templates',
+      'email.workflows': 'Automation Workflows',
+      'email.analytics': 'Analytics',
+      'email.settings': 'Settings',
+
+      // Calendar
+      'calendar.title': 'Calendar',
+      'calendar.subtitle': 'Schedule interviews, meetings, and track all your appointments.',
+      'calendar.scheduleEvent': 'Schedule Event',
+      'calendar.filterEvents': 'Filter Events',
+      'calendar.month': 'Month',
+      'calendar.week': 'Week',
+      'calendar.day': 'Day',
+      'calendar.todaySchedule': 'Today\'s Schedule',
+      'calendar.upcomingEvents': 'Upcoming Events',
+      'calendar.eventTypes': 'Event Types',
+
+      // Reports
+      'reports.title': 'Reports',
+      'reports.subtitle': 'Analyze recruitment performance and generate insights.',
+      'reports.overview': 'Overview',
+      'reports.performance': 'Performance',
+      'reports.sources': 'Sources',
+      'reports.advanced': 'Advanced',
+      'reports.exportReport': 'Export Report',
+      'reports.dateRange': 'Date Range',
+
+      // Notifications
+      'notifications.title': 'Notifications',
+      'notifications.subtitle': 'Stay updated with important recruitment activities and system alerts.',
+      'notifications.markAllRead': 'Mark All as Read',
+      'notifications.filter': 'Filter',
+      'notifications.noNotifications': 'No notifications',
+
       // Settings
       'settings.title': 'Settings',
       'settings.subtitle': 'Manage your account, preferences, and system configuration.',
@@ -75,7 +158,7 @@ const useTranslations = (language: Language) => {
       'settings.remove': 'Remove',
       'settings.exportSettings': 'Export Settings',
       'settings.importSettings': 'Import Settings',
-      
+
       // Common
       'common.loading': 'Loading...',
       'common.save': 'Save',
@@ -87,7 +170,19 @@ const useTranslations = (language: Language) => {
       'common.filter': 'Filter',
       'common.export': 'Export',
       'common.import': 'Import',
-      
+      'common.create': 'Create',
+      'common.update': 'Update',
+      'common.close': 'Close',
+      'common.back': 'Back',
+      'common.next': 'Next',
+      'common.previous': 'Previous',
+      'common.yes': 'Yes',
+      'common.no': 'No',
+      'common.actions': 'Actions',
+      'common.details': 'Details',
+      'common.view': 'View',
+      'common.manage': 'Manage',
+
       // Company
       'company.name': 'TD CONSULTING',
       'company.tagline': 'Trusted Recruitment Partner',
