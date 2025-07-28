@@ -84,15 +84,15 @@ export default function Settings() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Settings</h1>
+          <h1 className="text-3xl font-bold text-slate-900">{t('settings.title')}</h1>
           <p className="text-slate-600 mt-1">
-            Manage your account, preferences, and system configuration.
+            {t('settings.subtitle')}
           </p>
         </div>
         <div className="flex space-x-3">
           <Button variant="outline" size="sm">
             <Download className="w-4 h-4 mr-2" />
-            Export Settings
+            {t('settings.exportSettings')}
           </Button>
           <Button variant="outline" size="sm">
             <Upload className="w-4 h-4 mr-2" />
