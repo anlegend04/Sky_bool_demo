@@ -21,10 +21,12 @@ const shouldSuppressWarning = (args: any[]): boolean => {
       firstArg.includes('defaultProps will be removed') ||
       allArgs.includes('defaultProps will be removed');
 
-    // Additional check for specific Recharts components
-    const isRechartsWarning = 
+    // Additional check for specific Recharts components including numbered variants
+    const isRechartsWarning =
       allArgs.includes('XAxis') ||
       allArgs.includes('YAxis') ||
+      allArgs.includes('XAxis2') ||
+      allArgs.includes('YAxis2') ||
       allArgs.includes('CartesianGrid') ||
       allArgs.includes('Tooltip') ||
       allArgs.includes('Legend') ||
@@ -40,7 +42,14 @@ const shouldSuppressWarning = (args: any[]): boolean => {
       allArgs.includes('Surface') ||
       allArgs.includes('ReferenceLine') ||
       allArgs.includes('ReferenceArea') ||
-      allArgs.includes('Brush');
+      allArgs.includes('Brush') ||
+      allArgs.includes('FunnelChart') ||
+      allArgs.includes('Funnel') ||
+      allArgs.includes('RadarChart') ||
+      allArgs.includes('Radar') ||
+      allArgs.includes('PolarGrid') ||
+      allArgs.includes('PolarAngleAxis') ||
+      allArgs.includes('PolarRadiusAxis');
 
     return isDefaultPropsWarning || isRechartsWarning;
   } catch (error) {
