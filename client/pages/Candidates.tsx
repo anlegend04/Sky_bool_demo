@@ -64,6 +64,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { HARDCODED_CANDIDATES, CandidateData } from "@/data/hardcoded-data";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/hooks/use-language";
 
 // Using the imported CandidateData type from hardcoded-data
 
