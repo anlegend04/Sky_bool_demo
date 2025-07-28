@@ -196,21 +196,38 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     </span>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuContent align="end" className="w-64">
+                  <div className="px-2 py-1 text-xs font-medium text-muted-foreground border-b mb-1">
+                    {t("header.language")}
+                  </div>
                   {SUPPORTED_LANGUAGES.map((language) => (
                     <DropdownMenuItem
                       key={language.code}
-                      onClick={() => setLanguage(language.code)}
+                      onClick={() => {
+                        if (language.code !== currentLanguage) {
+                          setLanguage(language.code);
+                        }
+                      }}
                       className={
-                        currentLanguage === language.code ? "bg-accent" : ""
+                        currentLanguage === language.code
+                          ? "bg-accent font-medium"
+                          : "cursor-pointer hover:bg-accent/50"
                       }
+                      disabled={currentLanguage === language.code}
                     >
-                      <div className="flex items-center space-x-2">
-                        <span>{language.flag}</span>
-                        <span>{language.nativeName}</span>
-                        <span className="text-sm text-muted-foreground">
-                          ({language.name})
-                        </span>
+                      <div className="flex items-center justify-between w-full">
+                        <div className="flex items-center space-x-3">
+                          <span className="text-lg">{language.flag}</span>
+                          <div className="flex flex-col">
+                            <span className="font-medium">{language.nativeName}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {language.name}
+                            </span>
+                          </div>
+                        </div>
+                        {currentLanguage === language.code && (
+                          <span className="text-xs text-green-600">•</span>
+                        )}
                       </div>
                     </DropdownMenuItem>
                   ))}
