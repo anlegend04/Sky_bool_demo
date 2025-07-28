@@ -208,7 +208,7 @@ export default function Reports() {
         <div className="flex space-x-3">
           <Button variant="outline" size="sm">
             <Download className="w-4 h-4 mr-2" />
-            Export Report
+            {t("reports.exportReport")}
           </Button>
         </div>
       </div>
@@ -223,19 +223,19 @@ export default function Reports() {
                   <SelectValue placeholder="Date Range" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="last7">Last 7 days</SelectItem>
-                  <SelectItem value="last30">Last 30 days</SelectItem>
-                  <SelectItem value="last90">Last 90 days</SelectItem>
-                  <SelectItem value="last365">Last year</SelectItem>
+                  <SelectItem value="last7">{t("reports.last7days")}</SelectItem>
+                  <SelectItem value="last30">{t("reports.last30days")}</SelectItem>
+                  <SelectItem value="last90">{t("reports.last90days")}</SelectItem>
+                  <SelectItem value="last365">{t("reports.lastYear")}</SelectItem>
                 </SelectContent>
               </Select>
 
               <Select value={selectedJob} onValueChange={setSelectedJob}>
                 <SelectTrigger className="w-40">
-                  <SelectValue placeholder="Job" />
+                  <SelectValue placeholder={t("reports.job")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Jobs</SelectItem>
+                  <SelectItem value="all">{t("reports.allJobs")}</SelectItem>
                   {jobs.map((job: any) => (
                     <SelectItem key={job.id} value={job.id}>
                       {job.position}
@@ -249,10 +249,10 @@ export default function Reports() {
                 onValueChange={setSelectedRecruiter}
               >
                 <SelectTrigger className="w-40">
-                  <SelectValue placeholder="Recruiter" />
+                  <SelectValue placeholder={t("reports.recruiter")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Recruiters</SelectItem>
+                  <SelectItem value="all">{t("reports.allRecruiters")}</SelectItem>
                   <SelectItem value="alex-chen">Alex Chen</SelectItem>
                   <SelectItem value="sarah-kim">Sarah Kim</SelectItem>
                   <SelectItem value="mike-wilson">Mike Wilson</SelectItem>
@@ -299,10 +299,10 @@ export default function Reports() {
       {/* Main Analytics */}
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="performance">Performance</TabsTrigger>
-          <TabsTrigger value="sources">Sources</TabsTrigger>
-          <TabsTrigger value="advanced">Advanced</TabsTrigger>
+          <TabsTrigger value="overview">{t("reports.overview")}</TabsTrigger>
+          <TabsTrigger value="performance">{t("reports.performance")}</TabsTrigger>
+          <TabsTrigger value="sources">{t("reports.sources")}</TabsTrigger>
+          <TabsTrigger value="advanced">{t("reports.advanced")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -310,7 +310,7 @@ export default function Reports() {
             {/* Conversion Funnel */}
             <Card>
               <CardHeader>
-                <CardTitle>Conversion Funnel</CardTitle>
+                <CardTitle>{t("reports.conversionFunnel")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -338,7 +338,7 @@ export default function Reports() {
             {/* Monthly Trends */}
             <Card>
               <CardHeader>
-                <CardTitle>Monthly Trends</CardTitle>
+                <CardTitle>{t("reports.monthlyTrends")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -382,7 +382,7 @@ export default function Reports() {
             {/* Recruiter Performance */}
             <Card>
               <CardHeader>
-                <CardTitle>Recruiter Performance</CardTitle>
+                <CardTitle>{t("reports.recruiterPerformance")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -415,7 +415,7 @@ export default function Reports() {
             {/* Job Performance Radar */}
             <Card>
               <CardHeader>
-                <CardTitle>Job Performance Comparison</CardTitle>
+                <CardTitle>{t("reports.jobPerformanceComparison")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
@@ -456,7 +456,7 @@ export default function Reports() {
           {/* Recruiter Performance Table */}
           <Card>
             <CardHeader>
-              <CardTitle>Detailed Recruiter Metrics</CardTitle>
+              <CardTitle>{t("reports.detailedRecruiterMetrics")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
