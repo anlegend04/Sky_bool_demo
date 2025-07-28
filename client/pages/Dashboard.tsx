@@ -104,9 +104,9 @@ export default function Dashboard() {
       {/* Header */}
       <div className="flex-responsive justify-responsive items-responsive space-y-4 sm:space-y-0">
         <div className="min-w-0 flex-1">
-          <h1 className="heading-responsive text-wrap-safe">Dashboard</h1>
+          <h1 className="heading-responsive text-wrap-safe">{t('dashboard.title')}</h1>
           <p className="text-responsive-base text-slate-600 mt-1 text-wrap-safe">
-            Welcome back! Here's what's happening with your recruitment.
+            {t('dashboard.subtitle')}
           </p>
         </div>
         <div className="btn-group-mobile">
