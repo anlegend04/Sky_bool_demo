@@ -132,7 +132,7 @@ export default function Dashboard() {
           >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-responsive-sm font-medium text-slate-600 text-wrap-safe">
-                {stat.title}
+                {t(stat.titleKey)}
               </CardTitle>
               <div
                 className={`p-2 rounded-lg bg-${stat.color}-100 flex-shrink-0`}
