@@ -468,11 +468,10 @@ export default function Candidates() {
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
-            Candidates
+            {t('candidates.title')}
           </h1>
           <p className="text-slate-600 mt-1 text-sm sm:text-base">
-            Manage candidate profiles, applications, and track their progress
-            through your pipeline.
+            {t('candidates.subtitle')}
           </p>
         </div>
         <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
