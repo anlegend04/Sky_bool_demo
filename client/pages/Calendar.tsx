@@ -45,6 +45,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useState } from "react";
+import { useLanguage } from "@/hooks/use-language";
 
 export default function Calendar() {
   const [selectedDate, setSelectedDate] = useState(new Date());
