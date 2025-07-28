@@ -160,7 +160,7 @@ export default function Reports() {
 
   const stats = [
     {
-      title: "Total Applications",
+      titleKey: "reports.totalApplications",
       value: "324",
       change: "+12%",
       trend: "up",
@@ -168,7 +168,7 @@ export default function Reports() {
       color: "blue",
     },
     {
-      title: "Conversion Rate",
+      titleKey: "reports.conversionRate",
       value: "4.8%",
       change: "+0.8%",
       trend: "up",
@@ -176,15 +176,15 @@ export default function Reports() {
       color: "green",
     },
     {
-      title: "Avg. Time to Hire",
-      value: "28 days",
-      change: "-3 days",
+      titleKey: "reports.avgTimeToHire",
+      value: "28 " + t("reports.days"),
+      change: "-3 " + t("reports.days"),
       trend: "up",
       icon: Clock,
       color: "purple",
     },
     {
-      title: "Cost per Hire",
+      titleKey: "reports.costPerHire",
       value: "$2,450",
       change: "-$150",
       trend: "up",
@@ -266,11 +266,11 @@ export default function Reports() {
       {/* KPI Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {stats.map((stat) => (
-          <Card key={stat.title}>
+          <Card key={stat.titleKey}>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-slate-600">{stat.title}</p>
+                  <p className="text-sm text-slate-600">{t(stat.titleKey)}</p>
                   <p className="text-2xl font-bold text-slate-900">
                     {stat.value}
                   </p>
