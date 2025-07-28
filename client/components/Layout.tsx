@@ -34,16 +34,24 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Add error boundary for useLanguage hook
+  // Add error boundary for useLanguage hook with better fallback
   let languageContext;
   try {
     languageContext = useLanguage();
   } catch (error) {
+    console.warn('LanguageProvider not found, using fallback:', error);
     // Fallback if LanguageProvider is not available
     languageContext = {
-      t: (key: string, fallback?: string) => fallback || key,
+      t: (key: string, fallback?: string) => {
+        // Return a more meaningful fallback
+        const parts = key.split('.');
+        const lastPart = parts[parts.length - 1];
+        return fallback || lastPart.charAt(0).toUpperCase() + lastPart.slice(1).replace(/([A-Z])/g, ' $1');
+      },
       currentLanguage: "en" as const,
-      setLanguage: () => {},
+      setLanguage: (lang: string) => {
+        console.warn('Language switching not available without LanguageProvider');
+      },
       getCurrentLanguageInfo: () => ({
         code: "en",
         name: "English",
