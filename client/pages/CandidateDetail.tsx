@@ -527,7 +527,7 @@ export default function CandidateDetail() {
               </Avatar>
               <div className="text-center sm:text-left min-w-0 flex-1">
                 <h2 className="text-lg sm:text-xl font-bold text-slate-900 truncate">{candidate.name}</h2>
-                <p className="text-sm sm:text-base text-slate-600 truncate">{candidate.position}</p>
+                <p className="text-sm sm:text-base text-slate-600 text-wrap">{candidate.position}</p>
                 <div className="flex items-center justify-center sm:justify-start space-x-1 mt-1">
                   {[...Array(5)].map((_, i) => (
                     <Star
@@ -546,7 +546,7 @@ export default function CandidateDetail() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="w-full sm:w-auto">
                   <MoreHorizontal className="w-4 h-4 mr-2" />
-                  Actions
+                  
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">

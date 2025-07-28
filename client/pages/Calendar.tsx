@@ -179,10 +179,10 @@ export default function Calendar() {
           <p className="text-slate-600 mt-1">{t("calendar.subtitle")}</p>
         </div>
         <div className="flex space-x-3">
-          <Button variant="outline" size="sm">
+          {/* <Button variant="outline" size="sm">
             <Filter className="w-4 h-4 mr-2" />
             Filter Events
-          </Button>
+          </Button> */}
           <Dialog open={isEventDialogOpen} onOpenChange={setIsEventDialogOpen}>
             <DialogTrigger asChild>
               <Button size="sm">

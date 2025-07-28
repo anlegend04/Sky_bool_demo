@@ -309,13 +309,13 @@ export default function Reports() {
 
       {/* Main Analytics */}
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="overview">{t("reports.overview")}</TabsTrigger>
           <TabsTrigger value="performance">
             {t("reports.performance")}
           </TabsTrigger>
           <TabsTrigger value="sources">{t("reports.sources")}</TabsTrigger>
-          <TabsTrigger value="advanced">{t("reports.advanced")}</TabsTrigger>
+          {/* <TabsTrigger value="advanced">{t("reports.advanced")}</TabsTrigger> */}
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">

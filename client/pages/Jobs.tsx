@@ -1123,10 +1123,10 @@ export default function Jobs() {
           </p>
         </div>
         <div className="btn-group-mobile">
-          <Button variant="outline" size="sm" className="btn-mobile">
+          {/* <Button variant="outline" size="sm" className="btn-mobile">
             <FileText className="icon-mobile mr-2" />
             Export Report
-          </Button>
+          </Button> */}
           <Button
             size="sm"
             onClick={() => setShowAddJobDialog(true)}

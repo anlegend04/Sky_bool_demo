@@ -353,8 +353,8 @@ export default function EmailAutomation() {
       </div>
 
       {/* Main Content */}
-      <Tabs defaultValue="templates" className="space-y-6">
-        <TabsList>
+      <Tabs defaultValue="templates" className=" space-y-6">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="templates">Email Templates</TabsTrigger>
           <TabsTrigger value="workflows">Automation Workflows</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
@@ -631,7 +631,7 @@ export default function EmailAutomation() {
 
         <TabsContent value="settings" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle>Email Settings</CardTitle>
               </CardHeader>
@@ -667,7 +667,7 @@ export default function EmailAutomation() {
                   <Switch />
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
 
             <Card>
               <CardHeader>
