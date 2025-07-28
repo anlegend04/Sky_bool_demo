@@ -42,13 +42,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     // Fallback if LanguageProvider is not available
     languageContext = {
       t: (key: string, fallback?: string) => fallback || key,
-      currentLanguage: 'en' as const,
+      currentLanguage: "en" as const,
       setLanguage: () => {},
-      getCurrentLanguageInfo: () => ({ code: 'en', name: 'English', nativeName: 'English', flag: '🇺🇸' })
+      getCurrentLanguageInfo: () => ({
+        code: "en",
+        name: "English",
+        nativeName: "English",
+        flag: "🇺🇸",
+      }),
     };
   }
 
-  const { t, currentLanguage, setLanguage, getCurrentLanguageInfo } = languageContext;
+  const { t, currentLanguage, setLanguage, getCurrentLanguageInfo } =
+    languageContext;
 
   const navItems = [
     {
