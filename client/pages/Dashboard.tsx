@@ -186,13 +186,13 @@ export default function Dashboard() {
             <div className="space-mobile">
               {pipeline.map((stage) => (
                 <div
-                  key={stage.stage}
+                  key={stage.stageKey}
                   className="flex items-center justify-between"
                 >
                   <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
                     <div className="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0"></div>
                     <span className="font-medium text-slate-700 text-responsive-base truncate-mobile text-wrap-safe">
-                      {stage.stage}
+                      {t(stage.stageKey)}
                     </span>
                     <Badge
                       variant="secondary"
