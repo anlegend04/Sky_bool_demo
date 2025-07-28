@@ -55,6 +55,7 @@ import { HARDCODED_JOBS, HARDCODED_CANDIDATES } from "@/data/hardcoded-data";
 import { useLanguage } from "@/hooks/use-language";
 
 export default function Reports() {
+  const { t } = useLanguage();
   const [dateRange, setDateRange] = useState("last30");
   const [selectedJob, setSelectedJob] = useState("all");
   const [selectedRecruiter, setSelectedRecruiter] = useState("all");
