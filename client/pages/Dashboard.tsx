@@ -104,15 +104,17 @@ export default function Dashboard() {
       {/* Header */}
       <div className="flex-responsive justify-responsive items-responsive space-y-4 sm:space-y-0">
         <div className="min-w-0 flex-1">
-          <h1 className="heading-responsive text-wrap-safe">{t('dashboard.title')}</h1>
+          <h1 className="heading-responsive text-wrap-safe">
+            {t("dashboard.title")}
+          </h1>
           <p className="text-responsive-base text-slate-600 mt-1 text-wrap-safe">
-            {t('dashboard.subtitle')}
+            {t("dashboard.subtitle")}
           </p>
         </div>
         <div className="btn-group-mobile">
           <Button variant="outline" size="sm" className="btn-mobile">
             <Filter className="icon-mobile mr-2" />
-            {t('dashboard.filter')}
+            {t("dashboard.filter")}
           </Button>
           {/* <Button variant="outline" size="sm" className="btn-mobile">
             <Link to="/jobs/create">
@@ -160,7 +162,7 @@ export default function Dashboard() {
                   {stat.change}
                 </span>
                 <span className="text-responsive-sm text-slate-500 ml-2 hidden sm:inline text-wrap-safe">
-                  {t('dashboard.vsLastMonth')}
+                  {t("dashboard.vsLastMonth")}
                 </span>
               </div>
             </CardContent>
@@ -175,7 +177,7 @@ export default function Dashboard() {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span className="text-responsive-lg text-wrap-safe">
-                {t('dashboard.recruitmentPipeline')}
+                {t("dashboard.recruitmentPipeline")}
               </span>
               <Button variant="ghost" size="sm" className="icon-mobile">
                 <MoreHorizontal className="w-4 h-4" />
@@ -220,13 +222,13 @@ export default function Dashboard() {
         <Card>
           <CardHeader>
             <CardTitle className="text-responsive-lg text-wrap-safe">
-              {t('dashboard.quickStats')}
+              {t("dashboard.quickStats")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-mobile">
             <div className="flex justify-between items-center">
               <span className="text-slate-600 text-responsive-base text-wrap-safe">
-                {t('dashboard.costPerHire')}
+                {t("dashboard.costPerHire")}
               </span>
               <span className="font-semibold text-responsive-base text-wrap-safe">
                 $3,200
@@ -234,7 +236,7 @@ export default function Dashboard() {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-slate-600 text-responsive-base text-wrap-safe">
-                {t('dashboard.hiringSuccessRate')}
+                {t("dashboard.hiringSuccessRate")}
               </span>
               <span className="font-semibold text-green-600 text-responsive-base text-wrap-safe">
                 85%
@@ -242,7 +244,7 @@ export default function Dashboard() {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-slate-600 text-responsive-base text-wrap-safe">
-                {t('dashboard.sourceEffectiveness')}
+                {t("dashboard.sourceEffectiveness")}
               </span>
               <span className="font-semibold text-responsive-base text-wrap-safe">
                 LinkedIn: 45%
@@ -250,7 +252,7 @@ export default function Dashboard() {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-slate-600 text-responsive-base text-wrap-safe">
-                {t('dashboard.pendingInterviews')}
+                {t("dashboard.pendingInterviews")}
               </span>
               <span className="font-semibold text-orange-600 text-responsive-base text-wrap-safe">
                 12
@@ -265,10 +267,10 @@ export default function Dashboard() {
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span className="text-responsive-lg text-wrap-safe">
-              {t('dashboard.recentJobPostings')}
+              {t("dashboard.recentJobPostings")}
             </span>
             <Button variant="ghost" size="sm" asChild className="btn-mobile">
-              <Link to="/jobs">{t('dashboard.viewAll')}</Link>
+              <Link to="/jobs">{t("dashboard.viewAll")}</Link>
             </Button>
           </CardTitle>
         </CardHeader>
@@ -299,7 +301,7 @@ export default function Dashboard() {
                     {job.department}
                   </span>
                   <span className="text-wrap-safe flex-shrink-0 ml-2">
-                    {job.applicants} {t('dashboard.applicants')}
+                    {job.applicants} {t("dashboard.applicants")}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
@@ -326,19 +328,19 @@ export default function Dashboard() {
               <thead>
                 <tr className="border-b border-slate-200">
                   <th className="text-left py-3 text-responsive-sm font-medium text-slate-600 text-wrap-safe">
-                    {t('dashboard.jobTitle')}
+                    {t("dashboard.jobTitle")}
                   </th>
                   <th className="text-left py-3 text-responsive-sm font-medium text-slate-600 text-wrap-safe">
-                    {t('dashboard.department')}
+                    {t("dashboard.department")}
                   </th>
                   <th className="text-left py-3 text-responsive-sm font-medium text-slate-600 text-wrap-safe">
-                    {t('dashboard.applicants')}
+                    {t("dashboard.applicants")}
                   </th>
                   <th className="text-left py-3 text-responsive-sm font-medium text-slate-600 text-wrap-safe">
-                    {t('dashboard.status')}
+                    {t("dashboard.status")}
                   </th>
                   <th className="text-left py-3 text-responsive-sm font-medium text-slate-600 text-wrap-safe">
-                    {t('dashboard.priority')}
+                    {t("dashboard.priority")}
                   </th>
                 </tr>
               </thead>

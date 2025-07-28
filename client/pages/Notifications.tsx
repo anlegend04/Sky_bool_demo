@@ -263,10 +263,10 @@ export default function Notifications() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">{t('notifications.title')}</h1>
-          <p className="text-slate-600 mt-1">
-            {t('notifications.subtitle')}
-          </p>
+          <h1 className="text-3xl font-bold text-slate-900">
+            {t("notifications.title")}
+          </h1>
+          <p className="text-slate-600 mt-1">{t("notifications.subtitle")}</p>
         </div>
         <div className="flex space-x-3">
           <Button variant="outline" size="sm" onClick={handleMarkAllAsRead}>

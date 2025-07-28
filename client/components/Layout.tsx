@@ -128,10 +128,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <div className="hidden md:flex flex-1 max-w-lg mx-8">
               <div className="relative w-full">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input
-                  placeholder={t("header.search")}
-                  className="pl-10"
-                />
+                <Input placeholder={t("header.search")} className="pl-10" />
               </div>
             </div>
 
@@ -140,7 +137,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               {/* Quick Add dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="hidden sm:flex">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="hidden sm:flex"
+                  >
                     <Plus className="w-4 h-4 mr-2" />
                     {t("header.quickAdd")}
                   </Button>
@@ -172,7 +173,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     <DropdownMenuItem
                       key={language.code}
                       onClick={() => setLanguage(language.code)}
-                      className={currentLanguage === language.code ? "bg-accent" : ""}
+                      className={
+                        currentLanguage === language.code ? "bg-accent" : ""
+                      }
                     >
                       <div className="flex items-center space-x-2">
                         <span>{language.flag}</span>
@@ -200,7 +203,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               {/* User menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Button
+                    variant="ghost"
+                    className="relative h-8 w-8 rounded-full"
+                  >
                     <Avatar className="h-8 w-8">
                       <AvatarImage src="" />
                       <AvatarFallback>JD</AvatarFallback>
@@ -234,10 +240,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <div className="md:hidden px-4 pb-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <Input
-              placeholder={t("header.search")}
-              className="pl-10"
-            />
+            <Input placeholder={t("header.search")} className="pl-10" />
           </div>
         </div>
       </header>
@@ -284,9 +287,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         )}
 
         {/* Main content */}
-        <main className="flex-1 min-w-0">
-          {children}
-        </main>
+        <main className="flex-1 min-w-0">{children}</main>
       </div>
     </div>
   );

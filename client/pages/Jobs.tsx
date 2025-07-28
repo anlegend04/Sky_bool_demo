@@ -385,7 +385,9 @@ export default function Jobs() {
                 {getPriorityBadge(job.priority)}
               </div>
             </div>
-            <p className="text-responsive-sm text-slate-600 mb-2 text-wrap-safe truncate">{job.department}</p>
+            <p className="text-responsive-sm text-slate-600 mb-2 text-wrap-safe truncate">
+              {job.department}
+            </p>
             <div className="flex items-center gap-4 text-responsive-sm text-slate-500 min-w-0">
               <span className="flex items-center gap-1 text-wrap-safe min-w-0 flex-1">
                 <MapPin className="icon-mobile flex-shrink-0" />
@@ -399,7 +401,11 @@ export default function Jobs() {
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="icon-mobile flex-shrink-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="icon-mobile flex-shrink-0"
+              >
                 <MoreHorizontal className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -410,11 +416,17 @@ export default function Jobs() {
                   View Details
                 </DropdownMenuItem>
               </Link>
-              <DropdownMenuItem onClick={() => handleEditJob(job)} className="text-wrap-safe">
+              <DropdownMenuItem
+                onClick={() => handleEditJob(job)}
+                className="text-wrap-safe"
+              >
                 <Edit className="icon-mobile mr-2" />
                 Edit Job
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setShareJobId(job.id)} className="text-wrap-safe">
+              <DropdownMenuItem
+                onClick={() => setShareJobId(job.id)}
+                className="text-wrap-safe"
+              >
                 <Share className="icon-mobile mr-2" />
                 Share
               </DropdownMenuItem>
@@ -430,15 +442,22 @@ export default function Jobs() {
                 </AlertDialogTrigger>
                 <AlertDialogContent className="modal-mobile">
                   <AlertDialogHeader>
-                    <AlertDialogTitle className="text-wrap-safe">Delete Job</AlertDialogTitle>
+                    <AlertDialogTitle className="text-wrap-safe">
+                      Delete Job
+                    </AlertDialogTitle>
                     <AlertDialogDescription className="text-wrap-safe">
                       Are you sure you want to delete "{job.position}"? This
                       action cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel className="btn-mobile">Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => handleDeleteJob(job.id)} className="btn-mobile">
+                    <AlertDialogCancel className="btn-mobile">
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => handleDeleteJob(job.id)}
+                      className="btn-mobile"
+                    >
                       Delete
                     </AlertDialogAction>
                   </AlertDialogFooter>
@@ -450,8 +469,12 @@ export default function Jobs() {
       </CardHeader>
       <CardContent className="space-y-3 card-mobile">
         <div className="flex items-center justify-between">
-          <span className="text-responsive-sm text-slate-600 text-wrap-safe">Applications</span>
-          <Badge variant="outline" className="badge-mobile">{job.applications}</Badge>
+          <span className="text-responsive-sm text-slate-600 text-wrap-safe">
+            Applications
+          </span>
+          <Badge variant="outline" className="badge-mobile">
+            {job.applications}
+          </Badge>
         </div>
 
         <div className="space-y-2">
@@ -463,15 +486,21 @@ export default function Jobs() {
           </div>
           <div className="grid grid-cols-3 gap-1 text-responsive-sm">
             <div className="text-center p-1 bg-blue-50 rounded">
-              <div className="font-medium text-wrap-safe">{job.pipelineSummary.applied}</div>
+              <div className="font-medium text-wrap-safe">
+                {job.pipelineSummary.applied}
+              </div>
               <div className="text-slate-600 text-wrap-safe">Applied</div>
             </div>
             <div className="text-center p-1 bg-yellow-50 rounded">
-              <div className="font-medium text-wrap-safe">{job.pipelineSummary.interview}</div>
+              <div className="font-medium text-wrap-safe">
+                {job.pipelineSummary.interview}
+              </div>
               <div className="text-slate-600 text-wrap-safe">Interview</div>
             </div>
             <div className="text-center p-1 bg-green-50 rounded">
-              <div className="font-medium text-wrap-safe">{job.pipelineSummary.hired}</div>
+              <div className="font-medium text-wrap-safe">
+                {job.pipelineSummary.hired}
+              </div>
               <div className="text-slate-600 text-wrap-safe">Hired</div>
             </div>
           </div>
@@ -479,16 +508,18 @@ export default function Jobs() {
 
         <div className="flex items-center justify-between pt-3 border-t border-slate-100">
           <div className="flex items-center gap-2 min-w-0 flex-1">
-            <div className="flex-shrink-0">
-              {getStatusBadge(job.status)}
-            </div>
-            <span className="text-responsive-sm text-slate-500 text-wrap-safe truncate">by {job.recruiter}</span>
+            <div className="flex-shrink-0">{getStatusBadge(job.status)}</div>
+            <span className="text-responsive-sm text-slate-500 text-wrap-safe truncate">
+              by {job.recruiter}
+            </span>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             <TrendingUp
               className={`icon-mobile ${getPerformanceColor(job.performance)}`}
             />
-            <span className={`text-responsive-sm ${getPerformanceColor(job.performance)} text-wrap-safe`}>
+            <span
+              className={`text-responsive-sm ${getPerformanceColor(job.performance)} text-wrap-safe`}
+            >
               {job.performance}%
             </span>
           </div>
@@ -519,9 +550,13 @@ export default function Jobs() {
                 )}
                 {visibleFields.openDate && <TableHead>Open Date</TableHead>}
                 {visibleFields.deadline && <TableHead>Deadline</TableHead>}
-                {visibleFields.estimatedCost && <TableHead>Est. Cost</TableHead>}
+                {visibleFields.estimatedCost && (
+                  <TableHead>Est. Cost</TableHead>
+                )}
                 {visibleFields.actualCost && <TableHead>Actual Cost</TableHead>}
-                {visibleFields.performance && <TableHead>Performance</TableHead>}
+                {visibleFields.performance && (
+                  <TableHead>Performance</TableHead>
+                )}
                 <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -540,10 +575,14 @@ export default function Jobs() {
                     </TableCell>
                   )}
                   {visibleFields.department && (
-                    <TableCell className="truncate max-w-32">{job.department}</TableCell>
+                    <TableCell className="truncate max-w-32">
+                      {job.department}
+                    </TableCell>
                   )}
                   {visibleFields.recruiter && (
-                    <TableCell className="truncate max-w-32">{job.recruiter}</TableCell>
+                    <TableCell className="truncate max-w-32">
+                      {job.recruiter}
+                    </TableCell>
                   )}
                   {visibleFields.priority && (
                     <TableCell>
@@ -606,16 +645,24 @@ export default function Jobs() {
                     </TableCell>
                   )}
                   {visibleFields.openDate && (
-                    <TableCell className="truncate max-w-32">{job.openDate}</TableCell>
+                    <TableCell className="truncate max-w-32">
+                      {job.openDate}
+                    </TableCell>
                   )}
                   {visibleFields.deadline && (
-                    <TableCell className="truncate max-w-32">{job.deadline}</TableCell>
+                    <TableCell className="truncate max-w-32">
+                      {job.deadline}
+                    </TableCell>
                   )}
                   {visibleFields.estimatedCost && (
-                    <TableCell className="truncate max-w-32">{job.estimatedCost}</TableCell>
+                    <TableCell className="truncate max-w-32">
+                      {job.estimatedCost}
+                    </TableCell>
                   )}
                   {visibleFields.actualCost && (
-                    <TableCell className="truncate max-w-32">{job.actualCost}</TableCell>
+                    <TableCell className="truncate max-w-32">
+                      {job.actualCost}
+                    </TableCell>
                   )}
                   {visibleFields.performance && (
                     <TableCell>
@@ -637,7 +684,11 @@ export default function Jobs() {
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="flex-shrink-0">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="flex-shrink-0"
+                        >
                           <MoreHorizontal className="w-4 h-4" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -670,13 +721,15 @@ export default function Jobs() {
                             <AlertDialogHeader>
                               <AlertDialogTitle>Delete Job</AlertDialogTitle>
                               <AlertDialogDescription>
-                                Are you sure you want to delete "{job.position}"? This
-                                action cannot be undone.
+                                Are you sure you want to delete "{job.position}
+                                "? This action cannot be undone.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                               <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => handleDeleteJob(job.id)}>
+                              <AlertDialogAction
+                                onClick={() => handleDeleteJob(job.id)}
+                              >
                                 Delete
                               </AlertDialogAction>
                             </AlertDialogFooter>
@@ -714,7 +767,9 @@ export default function Jobs() {
     >
       <DialogContent className="modal-mobile max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-wrap-safe">{editingJob ? "Edit Job" : "Add New Job"}</DialogTitle>
+          <DialogTitle className="text-wrap-safe">
+            {editingJob ? "Edit Job" : "Add New Job"}
+          </DialogTitle>
           <DialogDescription className="text-wrap-safe">
             {editingJob
               ? "Update the job details below."
@@ -724,9 +779,15 @@ export default function Jobs() {
 
         <Tabs defaultValue="basic" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="basic" className="text-wrap-safe">Basic Info</TabsTrigger>
-            <TabsTrigger value="details" className="text-wrap-safe">Job Details</TabsTrigger>
-            <TabsTrigger value="team" className="text-wrap-safe">Team & Budget</TabsTrigger>
+            <TabsTrigger value="basic" className="text-wrap-safe">
+              Basic Info
+            </TabsTrigger>
+            <TabsTrigger value="details" className="text-wrap-safe">
+              Job Details
+            </TabsTrigger>
+            <TabsTrigger value="team" className="text-wrap-safe">
+              Team & Budget
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="basic" className="form-responsive">
@@ -759,12 +820,24 @@ export default function Jobs() {
                     <SelectValue placeholder="Select department" />
                   </SelectTrigger>
                   <SelectContent className="dropdown-mobile">
-                    <SelectItem value="Engineering" className="text-wrap-safe">Engineering</SelectItem>
-                    <SelectItem value="Product" className="text-wrap-safe">Product</SelectItem>
-                    <SelectItem value="Design" className="text-wrap-safe">Design</SelectItem>
-                    <SelectItem value="Marketing" className="text-wrap-safe">Marketing</SelectItem>
-                    <SelectItem value="Data" className="text-wrap-safe">Data</SelectItem>
-                    <SelectItem value="Sales" className="text-wrap-safe">Sales</SelectItem>
+                    <SelectItem value="Engineering" className="text-wrap-safe">
+                      Engineering
+                    </SelectItem>
+                    <SelectItem value="Product" className="text-wrap-safe">
+                      Product
+                    </SelectItem>
+                    <SelectItem value="Design" className="text-wrap-safe">
+                      Design
+                    </SelectItem>
+                    <SelectItem value="Marketing" className="text-wrap-safe">
+                      Marketing
+                    </SelectItem>
+                    <SelectItem value="Data" className="text-wrap-safe">
+                      Data
+                    </SelectItem>
+                    <SelectItem value="Sales" className="text-wrap-safe">
+                      Sales
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -809,9 +882,15 @@ export default function Jobs() {
                     <SelectValue placeholder="Select employment type" />
                   </SelectTrigger>
                   <SelectContent className="dropdown-mobile">
-                    <SelectItem value="Full-time" className="text-wrap-safe">Full-time</SelectItem>
-                    <SelectItem value="Part-time" className="text-wrap-safe">Part-time</SelectItem>
-                    <SelectItem value="Contract" className="text-wrap-safe">Contract</SelectItem>
+                    <SelectItem value="Full-time" className="text-wrap-safe">
+                      Full-time
+                    </SelectItem>
+                    <SelectItem value="Part-time" className="text-wrap-safe">
+                      Part-time
+                    </SelectItem>
+                    <SelectItem value="Contract" className="text-wrap-safe">
+                      Contract
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -844,9 +923,15 @@ export default function Jobs() {
                     <SelectValue placeholder="Select priority" />
                   </SelectTrigger>
                   <SelectContent className="dropdown-mobile">
-                    <SelectItem value="High" className="text-wrap-safe">High</SelectItem>
-                    <SelectItem value="Medium" className="text-wrap-safe">Medium</SelectItem>
-                    <SelectItem value="Low" className="text-wrap-safe">Low</SelectItem>
+                    <SelectItem value="High" className="text-wrap-safe">
+                      High
+                    </SelectItem>
+                    <SelectItem value="Medium" className="text-wrap-safe">
+                      Medium
+                    </SelectItem>
+                    <SelectItem value="Low" className="text-wrap-safe">
+                      Low
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -967,9 +1052,15 @@ export default function Jobs() {
                     <SelectValue placeholder="Select recruiter" />
                   </SelectTrigger>
                   <SelectContent className="dropdown-mobile">
-                    <SelectItem value="Alex Chen" className="text-wrap-safe">Alex Chen</SelectItem>
-                    <SelectItem value="Sarah Kim" className="text-wrap-safe">Sarah Kim</SelectItem>
-                    <SelectItem value="Mike Wilson" className="text-wrap-safe">Mike Wilson</SelectItem>
+                    <SelectItem value="Alex Chen" className="text-wrap-safe">
+                      Alex Chen
+                    </SelectItem>
+                    <SelectItem value="Sarah Kim" className="text-wrap-safe">
+                      Sarah Kim
+                    </SelectItem>
+                    <SelectItem value="Mike Wilson" className="text-wrap-safe">
+                      Mike Wilson
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -1006,7 +1097,10 @@ export default function Jobs() {
               >
                 Cancel
               </Button>
-              <Button onClick={editingJob ? handleUpdateJob : handleAddJob} className="btn-mobile">
+              <Button
+                onClick={editingJob ? handleUpdateJob : handleAddJob}
+                className="btn-mobile"
+              >
                 {editingJob ? "Update Job" : "Create Job"}
               </Button>
             </div>
@@ -1021,9 +1115,11 @@ export default function Jobs() {
       {/* Header */}
       <div className="flex-responsive justify-responsive items-responsive space-y-4 sm:space-y-0">
         <div className="min-w-0 flex-1">
-          <h1 className="heading-responsive text-wrap-safe">{t('jobs.title')}</h1>
+          <h1 className="heading-responsive text-wrap-safe">
+            {t("jobs.title")}
+          </h1>
           <p className="text-responsive-base text-slate-600 mt-1 text-wrap-safe">
-            {t('jobs.subtitle')}
+            {t("jobs.subtitle")}
           </p>
         </div>
         <div className="btn-group-mobile">
@@ -1031,7 +1127,11 @@ export default function Jobs() {
             <FileText className="icon-mobile mr-2" />
             Export Report
           </Button>
-          <Button size="sm" onClick={() => setShowAddJobDialog(true)} className="btn-mobile">
+          <Button
+            size="sm"
+            onClick={() => setShowAddJobDialog(true)}
+            className="btn-mobile"
+          >
             <Plus className="icon-mobile mr-2" />
             Add New Job
           </Button>
@@ -1045,7 +1145,9 @@ export default function Jobs() {
             <CardContent className="pt-6 card-mobile">
               <div className="flex items-center justify-between">
                 <div className="min-w-0 flex-1">
-                  <p className="text-responsive-sm text-slate-600 text-wrap-safe">{stat.title}</p>
+                  <p className="text-responsive-sm text-slate-600 text-wrap-safe">
+                    {stat.title}
+                  </p>
                   <p className="text-responsive-xl font-bold text-slate-900 text-wrap-safe">
                     {stat.value}
                   </p>
@@ -1053,7 +1155,9 @@ export default function Jobs() {
                     {stat.change} vs last month
                   </p>
                 </div>
-                <div className={`p-3 rounded-full bg-${stat.color}-100 flex-shrink-0`}>
+                <div
+                  className={`p-3 rounded-full bg-${stat.color}-100 flex-shrink-0`}
+                >
                   <Briefcase className={`icon-mobile text-${stat.color}-600`} />
                 </div>
               </div>
@@ -1142,12 +1246,24 @@ export default function Jobs() {
                     <SelectValue placeholder="Department" />
                   </SelectTrigger>
                   <SelectContent className="dropdown-mobile">
-                    <SelectItem value="all" className="text-wrap-safe">All Departments</SelectItem>
-                    <SelectItem value="engineering" className="text-wrap-safe">Engineering</SelectItem>
-                    <SelectItem value="product" className="text-wrap-safe">Product</SelectItem>
-                    <SelectItem value="design" className="text-wrap-safe">Design</SelectItem>
-                    <SelectItem value="marketing" className="text-wrap-safe">Marketing</SelectItem>
-                    <SelectItem value="data" className="text-wrap-safe">Data</SelectItem>
+                    <SelectItem value="all" className="text-wrap-safe">
+                      All Departments
+                    </SelectItem>
+                    <SelectItem value="engineering" className="text-wrap-safe">
+                      Engineering
+                    </SelectItem>
+                    <SelectItem value="product" className="text-wrap-safe">
+                      Product
+                    </SelectItem>
+                    <SelectItem value="design" className="text-wrap-safe">
+                      Design
+                    </SelectItem>
+                    <SelectItem value="marketing" className="text-wrap-safe">
+                      Marketing
+                    </SelectItem>
+                    <SelectItem value="data" className="text-wrap-safe">
+                      Data
+                    </SelectItem>
                   </SelectContent>
                 </Select>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -1155,11 +1271,21 @@ export default function Jobs() {
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
                   <SelectContent className="dropdown-mobile">
-                    <SelectItem value="all" className="text-wrap-safe">All Status</SelectItem>
-                    <SelectItem value="open" className="text-wrap-safe">Open</SelectItem>
-                    <SelectItem value="closed" className="text-wrap-safe">Closed</SelectItem>
-                    <SelectItem value="in progress" className="text-wrap-safe">In Progress</SelectItem>
-                    <SelectItem value="paused" className="text-wrap-safe">Paused</SelectItem>
+                    <SelectItem value="all" className="text-wrap-safe">
+                      All Status
+                    </SelectItem>
+                    <SelectItem value="open" className="text-wrap-safe">
+                      Open
+                    </SelectItem>
+                    <SelectItem value="closed" className="text-wrap-safe">
+                      Closed
+                    </SelectItem>
+                    <SelectItem value="in progress" className="text-wrap-safe">
+                      In Progress
+                    </SelectItem>
+                    <SelectItem value="paused" className="text-wrap-safe">
+                      Paused
+                    </SelectItem>
                   </SelectContent>
                 </Select>
                 <Select
@@ -1170,10 +1296,18 @@ export default function Jobs() {
                     <SelectValue placeholder="Priority" />
                   </SelectTrigger>
                   <SelectContent className="dropdown-mobile">
-                    <SelectItem value="all" className="text-wrap-safe">All Priority</SelectItem>
-                    <SelectItem value="high" className="text-wrap-safe">High</SelectItem>
-                    <SelectItem value="medium" className="text-wrap-safe">Medium</SelectItem>
-                    <SelectItem value="low" className="text-wrap-safe">Low</SelectItem>
+                    <SelectItem value="all" className="text-wrap-safe">
+                      All Priority
+                    </SelectItem>
+                    <SelectItem value="high" className="text-wrap-safe">
+                      High
+                    </SelectItem>
+                    <SelectItem value="medium" className="text-wrap-safe">
+                      Medium
+                    </SelectItem>
+                    <SelectItem value="low" className="text-wrap-safe">
+                      Low
+                    </SelectItem>
                   </SelectContent>
                 </Select>
                 <Button variant="outline" size="sm" className="btn-mobile">
@@ -1246,7 +1380,11 @@ export default function Jobs() {
               </Button>
             </div>
             <div className="flex justify-end">
-              <Button variant="outline" onClick={() => setShareJobId(null)} className="btn-mobile">
+              <Button
+                variant="outline"
+                onClick={() => setShareJobId(null)}
+                className="btn-mobile"
+              >
                 Close
               </Button>
             </div>

@@ -53,8 +53,10 @@ export default function Calendar() {
   const [isEventDialogOpen, setIsEventDialogOpen] = useState(false);
   const [view, setView] = useState("month"); // month, week, day
   const [popupDate, setPopupDate] = useState<Date | null>(null);
-const [popupPosition, setPopupPosition] = useState<{ x: number; y: number } | null>(null);
-
+  const [popupPosition, setPopupPosition] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
 
   const events = [
     {
@@ -171,10 +173,10 @@ const [popupPosition, setPopupPosition] = useState<{ x: number; y: number } | nu
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">{t('calendar.title')}</h1>
-          <p className="text-slate-600 mt-1">
-            {t('calendar.subtitle')}
-          </p>
+          <h1 className="text-3xl font-bold text-slate-900">
+            {t("calendar.title")}
+          </h1>
+          <p className="text-slate-600 mt-1">{t("calendar.subtitle")}</p>
         </div>
         <div className="flex space-x-3">
           <Button variant="outline" size="sm">
@@ -367,9 +369,12 @@ const [popupPosition, setPopupPosition] = useState<{ x: number; y: number } | nu
                         onClick={(e) => {
                           setSelectedDate(date);
                           setPopupDate(date);
-                          const rect = (e.target as HTMLElement).getBoundingClientRect();
+                          const rect = (
+                            e.target as HTMLElement
+                          ).getBoundingClientRect();
                           setPopupPosition({ x: rect.left, y: rect.bottom });
-                        }}                        className={`p-2 min-h-[80px] border rounded-md cursor-pointer hover:bg-slate-50 ${
+                        }}
+                        className={`p-2 min-h-[80px] border rounded-md cursor-pointer hover:bg-slate-50 ${
                           !isCurrentMonth ? "text-slate-400 bg-slate-50" : ""
                         } ${isToday ? "bg-blue-50 border-blue-200" : "border-slate-200"}`}
                       >
@@ -398,9 +403,13 @@ const [popupPosition, setPopupPosition] = useState<{ x: number; y: number } | nu
                 <div className="space-y-4">
                   {[...Array(7)].map((_, i) => {
                     const currentDate = new Date(selectedDate);
-                    currentDate.setDate(selectedDate.getDate() - selectedDate.getDay() + i);
+                    currentDate.setDate(
+                      selectedDate.getDate() - selectedDate.getDay() + i,
+                    );
                     const dateStr = currentDate.toISOString().split("T")[0];
-                    const dailyEvents = events.filter((e) => e.date === dateStr);
+                    const dailyEvents = events.filter(
+                      (e) => e.date === dateStr,
+                    );
 
                     return (
                       <div key={i}>
@@ -420,7 +429,9 @@ const [popupPosition, setPopupPosition] = useState<{ x: number; y: number } | nu
                             ))}
                           </ul>
                         ) : (
-                          <p className="ml-4 text-slate-400 text-sm">No events</p>
+                          <p className="ml-4 text-slate-400 text-sm">
+                            No events
+                          </p>
                         )}
                       </div>
                     );
@@ -428,14 +439,16 @@ const [popupPosition, setPopupPosition] = useState<{ x: number; y: number } | nu
                 </div>
               )}
 
-
               {view === "day" && (
                 <div className="space-y-4">
                   <h2 className="text-lg font-semibold text-slate-700">
                     {selectedDate.toDateString()}
                   </h2>
                   {events
-                    .filter((event) => event.date === selectedDate.toISOString().split("T")[0])
+                    .filter(
+                      (event) =>
+                        event.date === selectedDate.toISOString().split("T")[0],
+                    )
                     .map((event) => (
                       <div
                         key={event.id}
@@ -449,7 +462,6 @@ const [popupPosition, setPopupPosition] = useState<{ x: number; y: number } | nu
                     ))}
                 </div>
               )}
-
             </CardContent>
           </Card>
         </div>
@@ -598,12 +610,14 @@ const [popupPosition, setPopupPosition] = useState<{ x: number; y: number } | nu
             </button>
           </div>
           <div className="space-y-2 max-h-60 overflow-y-auto">
-            {events.filter(e => e.date === popupDate.toISOString().split("T")[0]).length === 0 ? (
+            {events.filter(
+              (e) => e.date === popupDate.toISOString().split("T")[0],
+            ).length === 0 ? (
               <p className="text-slate-400 text-sm">No events</p>
             ) : (
               events
-                .filter(e => e.date === popupDate.toISOString().split("T")[0])
-                .map(event => (
+                .filter((e) => e.date === popupDate.toISOString().split("T")[0])
+                .map((event) => (
                   <div
                     key={event.id}
                     className={`p-2 border rounded ${getEventTypeColor(event.type)} text-sm`}
@@ -612,7 +626,9 @@ const [popupPosition, setPopupPosition] = useState<{ x: number; y: number } | nu
                     <div className="text-slate-600">
                       {event.startTime} - {event.endTime}
                     </div>
-                    <div className="text-slate-500 text-xs">{event.location}</div>
+                    <div className="text-slate-500 text-xs">
+                      {event.location}
+                    </div>
                   </div>
                 ))
             )}
