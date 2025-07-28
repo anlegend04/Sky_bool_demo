@@ -40,7 +40,7 @@ export default function Dashboard() {
 
   const stats = [
     {
-      titleKey: "dashboard.activeJobs",
+      titleKey: "dashboard.activeUsers",
       value: "24",
       change: "+12%",
       changeType: "positive" as const,

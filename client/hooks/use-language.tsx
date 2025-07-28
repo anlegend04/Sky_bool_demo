@@ -18,7 +18,7 @@ export interface LanguageOption {
 export const SUPPORTED_LANGUAGES: LanguageOption[] = [
   { code: "en", name: "English", nativeName: "English", flag: "🇺🇸" },
   { code: "vi", name: "Vietnamese", nativeName: "Tiếng Việt", flag: "🇻🇳" },
-  { code: "zh", name: "Chinese", nativeName: "中文", flag: "����🇳" },
+  { code: "zh", name: "Chinese", nativeName: "中文", flag: "🇨🇳" },
   { code: "ja", name: "Japanese", nativeName: "日本語", flag: "🇯🇵" },
   { code: "ko", name: "Korean", nativeName: "한국어", flag: "🇰🇷" },
   { code: "th", name: "Thai", nativeName: "ภาษาไทย", flag: "🇹🇭" },
@@ -246,7 +246,6 @@ const useTranslations = (language: Language) => {
       "candidates.jobPosition": "Job Position",
       "candidates.recruiter": "Recruiter",
       "candidates.currentStage": "Current Stage",
-      "candidates.source": "Source",
       "candidates.salary": "Salary",
       "candidates.location": "Location",
       "candidates.actions": "Actions",
@@ -295,7 +294,6 @@ const useTranslations = (language: Language) => {
       "candidates.75to100k": "$75k - $100k",
       "candidates.100to150k": "$100k - $150k",
       "candidates.150kPlus": "$150k+",
-      "candidates.rating": "Rating",
       "candidates.anyRating": "Any rating",
       "candidates.5stars": "5 Stars",
       "candidates.4plusStars": "4+ Stars",
@@ -336,7 +334,6 @@ const useTranslations = (language: Language) => {
       "jobs.target": "Target",
       "jobs.process": "Process",
       "jobs.openDate": "Open Date",
-      "jobs.deadline": "Deadline",
       "jobs.estimatedCost": "Est. Cost",
       "jobs.actualCost": "Actual Cost",
       "jobs.editJob": "Edit Job",
@@ -395,7 +392,6 @@ const useTranslations = (language: Language) => {
       "jobs.interviewersPlaceholder":
         "Select team members who will conduct interviews",
       "jobs.estimatedBudget": "Estimated Budget",
-      "jobs.createJob": "Create Job",
       "jobs.updateJob": "Update Job",
       "jobs.pipelineSummary": "Pipeline Summary",
       "jobs.interviewing": "Interviewing",
@@ -404,8 +400,7 @@ const useTranslations = (language: Language) => {
       "jobs.hired": "Hired",
 
       // Calendar Page
-      "calendar.filterEvents": "Filter Events",
-      "calendar.scheduleEvent": "Schedule Event",
+
       "calendar.scheduleNewEvent": "Schedule New Event",
       "calendar.createEvent":
         "Create a new interview, meeting, or appointment.",
@@ -440,9 +435,7 @@ const useTranslations = (language: Language) => {
       "calendar.notes": "Notes",
       "calendar.notesPlaceholder": "Additional notes or agenda items...",
       "calendar.january2024": "January 2024",
-      "calendar.month": "Month",
-      "calendar.week": "Week",
-      "calendar.day": "Day",
+
       "calendar.sun": "Sun",
       "calendar.mon": "Mon",
       "calendar.tue": "Tue",
@@ -451,22 +444,18 @@ const useTranslations = (language: Language) => {
       "calendar.fri": "Fri",
       "calendar.sat": "Sat",
       "calendar.noEvents": "No events",
-      "calendar.todaySchedule": "Today's Schedule",
       "calendar.totalEvents": "Total Events",
       "calendar.interviews": "Interviews",
       "calendar.meetings": "Meetings",
       "calendar.freeTime": "Free Time",
       "calendar.4hours": "4 hours",
-      "calendar.upcomingEvents": "Upcoming Events",
       "calendar.editEvent": "Edit Event",
       "calendar.viewAttendees": "View Attendees",
       "calendar.cancelEvent": "Cancel Event",
-      "calendar.eventTypes": "Event Types",
       "calendar.eventsOn": "Events on {date}",
 
       // Email Automation Page
-      "email.newWorkflow": "New Workflow",
-      "email.newTemplate": "New Template",
+
       "email.createEmailWorkflow": "Create Email Workflow",
       "email.setupAutomatedSequence":
         "Set up an automated email sequence for candidates.",
@@ -505,8 +494,7 @@ const useTranslations = (language: Language) => {
       "email.createTemplate": "Create Template",
       "email.emailTemplates": "Email Templates",
       "email.automationWorkflows": "Automation Workflows",
-      "email.analytics": "Analytics",
-      "email.settings": "Settings",
+
       "email.active": "Active",
       "email.usage30d": "Usage (30d):",
       "email.openRate": "Open Rate:",
@@ -542,8 +530,7 @@ const useTranslations = (language: Language) => {
       "email.saveSettings": "Save Settings",
 
       // Reports Page
-      "reports.exportReport": "Export Report",
-      "reports.dateRange": "Date Range",
+
       "reports.last7days": "Last 7 days",
       "reports.last30days": "Last 30 days",
       "reports.last90days": "Last 90 days",
@@ -595,28 +582,20 @@ const useTranslations = (language: Language) => {
       "reports.timeToFill": "Time to Fill",
       "reports.costEfficiency": "Cost Efficiency",
       "reports.candidateSatisfaction": "Candidate Satisfaction",
-      "reports.applications": "Applications",
-      "reports.interviews": "Interviews",
-      "reports.hires": "Hires",
+
       "reports.effectivenessPercent": "Effectiveness %",
       "reports.days": "days",
 
       // Settings Page
-      "settings.personalInfo": "Personal Information",
-      "settings.changePhoto": "Change Photo",
-      "settings.remove": "Remove",
-      "settings.firstName": "First Name",
-      "settings.lastName": "Last Name",
+
       "settings.emailAddress": "Email Address",
       "settings.phoneNumber": "Phone Number",
-      "settings.jobTitle": "Job Title",
       "settings.humanResources": "Human Resources",
       "settings.engineering": "Engineering",
       "settings.product": "Product",
       "settings.design": "Design",
       "settings.marketing": "Marketing",
-      "settings.saveChanges": "Save Changes",
-      "settings.preferences": "Preferences",
+
       "settings.timezone": "Timezone",
       "settings.pacificStandardTime": "Pacific Standard Time",
       "settings.easternStandardTime": "Eastern Standard Time",
@@ -719,30 +698,6 @@ const useTranslations = (language: Language) => {
       "settings.inviteMember": "Invite Member",
       "settings.admin": "Admin",
 
-      // Common UI Elements
-      "common.loading": "Loading...",
-      "common.save": "Save",
-      "common.cancel": "Cancel",
-      "common.edit": "Edit",
-      "common.delete": "Delete",
-      "common.add": "Add",
-      "common.search": "Search",
-      "common.filter": "Filter",
-      "common.export": "Export",
-      "common.import": "Import",
-      "common.create": "Create",
-      "common.update": "Update",
-      "common.close": "Close",
-      "common.back": "Back",
-      "common.next": "Next",
-      "common.previous": "Previous",
-      "common.yes": "Yes",
-      "common.no": "No",
-      "common.actions": "Actions",
-      "common.details": "Details",
-      "common.view": "View",
-      "common.manage": "Manage",
-
       // Company
       "company.name": "TD CONSULTING",
       "company.tagline": "Trusted Recruitment Partner",
@@ -789,7 +744,7 @@ const useTranslations = (language: Language) => {
       "jobs.department": "Phòng ban",
       "jobs.applications": "Đơn ứng tuyển",
       "jobs.status": "Trạng thái",
-      "jobs.deadline": "H���n chót",
+      "jobs.deadline": "Hạn chót",
       "jobs.performance": "Hiệu suất",
       "jobs.recruiter": "Nhà tuyển dụng",
       "jobs.location": "Địa điểm",
@@ -811,7 +766,7 @@ const useTranslations = (language: Language) => {
       // Email Automation
       "email.title": "Tự động hóa Email",
       "email.subtitle":
-        "Quản lý m��u email, quy trình làm việc và tự động hóa giao tiếp với ứng viên.",
+        "Quản lý mẫu email, quy trình làm việc và tự động hóa giao tiếp với ứng viên.",
       "email.newWorkflow": "Quy trình mới",
       "email.newTemplate": "Mẫu mới",
       "email.activeTemplates": "Mẫu đang hoạt động",
@@ -951,7 +906,6 @@ const useTranslations = (language: Language) => {
       "candidates.jobPosition": "Vị trí công việc",
       "candidates.recruiter": "Nhà tuyển dụng",
       "candidates.currentStage": "Giai đoạn hiện tại",
-      "candidates.source": "Nguồn",
       "candidates.salary": "Lương",
       "candidates.location": "Địa điểm",
       "candidates.actions": "Hành động",
@@ -983,7 +937,7 @@ const useTranslations = (language: Language) => {
       "candidates.uploadedFiles": "Tệp đã tải lên",
       "candidates.createCandidate": "Tạo ứng viên",
       "candidates.createCandidates": "Tạo ứng viên",
-      "candidates.manualEntry": "Nh��p thủ công",
+      "candidates.manualEntry": "Nhập thủ công",
       "candidates.uploadResumeTab": "Tải lên CV",
       "candidates.addNewCandidate": "Thêm ứng viên mới",
       "candidates.createCandidateProfile":
@@ -999,7 +953,6 @@ const useTranslations = (language: Language) => {
       "candidates.75to100k": "$75k - $100k",
       "candidates.100to150k": "$100k - $150k",
       "candidates.150kPlus": "$150k+",
-      "candidates.rating": "Đánh giá",
       "candidates.anyRating": "Bất kỳ đánh giá nào",
       "candidates.5stars": "5 sao",
       "candidates.4plusStars": "4+ sao",
@@ -1041,7 +994,6 @@ const useTranslations = (language: Language) => {
       "jobs.target": "Mục tiêu",
       "jobs.process": "Quy trình",
       "jobs.openDate": "Ngày mở",
-      "jobs.deadline": "Hạn chót",
       "jobs.estimatedCost": "Chi phí ước tính",
       "jobs.actualCost": "Chi phí thực tế",
       "jobs.editJob": "Sửa công việc",
@@ -1055,7 +1007,7 @@ const useTranslations = (language: Language) => {
       "jobs.jobUpdated": "Đã cập nhật công việc",
       "jobs.jobUpdatedDesc": '"{position}" đã được cập nhật thành công.',
       "jobs.jobDeleted": "Đã xóa công việc",
-      "jobs.jobDeletedDesc": "C��ng việc đã được xóa thành công.",
+      "jobs.jobDeletedDesc": "Công việc đã được xóa thành công.",
       "jobs.error": "Lỗi",
       "jobs.createError": "Không thể tạo công việc. Vui lòng thử lại.",
       "jobs.updateError": "Không thể cập nhật công việc. Vui lòng thử lại.",
@@ -1101,7 +1053,6 @@ const useTranslations = (language: Language) => {
       "jobs.interviewersPlaceholder":
         "Chọn thành viên nhóm sẽ tiến hành phỏng vấn",
       "jobs.estimatedBudget": "Ngân sách ước tính",
-      "jobs.createJob": "Tạo công việc",
       "jobs.updateJob": "Cập nhật công việc",
       "jobs.pipelineSummary": "Tóm tắt quy trình",
       "jobs.interviewing": "Đang phỏng vấn",
@@ -1110,8 +1061,6 @@ const useTranslations = (language: Language) => {
       "jobs.hired": "Đã tuyển",
 
       // Calendar Page
-      "calendar.filterEvents": "Lọc sự kiện",
-      "calendar.scheduleEvent": "Lập lịch sự kiện",
       "calendar.scheduleNewEvent": "Lập lịch sự kiện mới",
       "calendar.createEvent": "Tạo phỏng vấn, cuộc họp hoặc cuộc hẹn mới.",
       "calendar.eventType": "Loại sự kiện",
@@ -1122,7 +1071,7 @@ const useTranslations = (language: Language) => {
       "calendar.teamMeeting": "Họp nhóm",
       "calendar.offerDiscussion": "Thảo luận đề nghị",
       "calendar.meetingType": "Loại cuộc họp",
-      "calendar.selectFormat": "Ch��n định dạng",
+      "calendar.selectFormat": "Chọn định dạng",
       "calendar.inPerson": "Trực tiếp",
       "calendar.videoCall": "Cuộc gọi video",
       "calendar.phoneCall": "Cuộc gọi điện thoại",
@@ -1147,9 +1096,7 @@ const useTranslations = (language: Language) => {
       "calendar.notesPlaceholder":
         "Ghi chú bổ sung hoặc các mục chương trình...",
       "calendar.january2024": "Tháng 1 năm 2024",
-      "calendar.month": "Tháng",
-      "calendar.week": "Tuần",
-      "calendar.day": "Ngày",
+
       "calendar.sun": "CN",
       "calendar.mon": "T2",
       "calendar.tue": "T3",
@@ -1158,22 +1105,18 @@ const useTranslations = (language: Language) => {
       "calendar.fri": "T6",
       "calendar.sat": "T7",
       "calendar.noEvents": "Không có sự kiện",
-      "calendar.todaySchedule": "Lịch hôm nay",
       "calendar.totalEvents": "Tổng số sự kiện",
       "calendar.interviews": "Phỏng vấn",
       "calendar.meetings": "Cuộc họp",
       "calendar.freeTime": "Thời gian rảnh",
       "calendar.4hours": "4 giờ",
-      "calendar.upcomingEvents": "Sự kiện sắp tới",
       "calendar.editEvent": "Sửa sự kiện",
       "calendar.viewAttendees": "Xem người tham gia",
       "calendar.cancelEvent": "Hủy sự kiện",
-      "calendar.eventTypes": "Loại sự kiện",
       "calendar.eventsOn": "Sự kiện vào ngày {date}",
 
       // Email Automation Page
-      "email.newWorkflow": "Quy trình mới",
-      "email.newTemplate": "Mẫu mới",
+
       "email.createEmailWorkflow": "Tạo quy trình Email",
       "email.setupAutomatedSequence":
         "Thiết lập chuỗi email tự động cho ứng viên.",
@@ -1191,7 +1134,7 @@ const useTranslations = (language: Language) => {
       "email.createWorkflow": "Tạo quy trình",
       "email.createEmailTemplate": "Tạo mẫu Email",
       "email.createTemplateDesc":
-        "Tạo mẫu email mới đ�� giao tiếp với ứng viên.",
+        "Tạo mẫu email mới để giao tiếp với ứng viên.",
       "email.templateName": "Tên mẫu",
       "email.templateNamePlaceholder": "ví dụ: Xác nhận phỏng vấn",
       "email.templateType": "Loại mẫu",
@@ -1212,8 +1155,7 @@ const useTranslations = (language: Language) => {
       "email.createTemplate": "Tạo mẫu",
       "email.emailTemplates": "Mẫu Email",
       "email.automationWorkflows": "Quy trình tự động",
-      "email.analytics": "Phân tích",
-      "email.settings": "Cài đặt",
+
       "email.active": "Đang hoạt động",
       "email.usage30d": "Sử dụng (30 ngày):",
       "email.openRate": "Tỷ lệ mở:",
@@ -1239,7 +1181,7 @@ const useTranslations = (language: Language) => {
       "email.reminderDesc": "Gửi email nhắc nhở 24 giờ trước phỏng vấn",
       "email.statusChangeNotifications": "Thông báo thay đổi trạng thái",
       "email.statusChangeDesc":
-        "Thông báo cho ứng viên khi tr��ng thái đơn ứng tuyển thay đổi",
+        "Thông báo cho ứng viên khi trạng thái đơn ứng tuyển thay đổi",
       "email.senderInformation": "Thông tin người gửi",
       "email.fromName": "Tên người gửi",
       "email.fromEmail": "Email người gửi",
@@ -1247,8 +1189,7 @@ const useTranslations = (language: Language) => {
       "email.saveSettings": "Lưu cài đặt",
 
       // Reports Page
-      "reports.exportReport": "Xuất báo cáo",
-      "reports.dateRange": "Khoảng thời gian",
+
       "reports.last7days": "7 ngày qua",
       "reports.last30days": "30 ngày qua",
       "reports.last90days": "90 ngày qua",
@@ -1301,28 +1242,18 @@ const useTranslations = (language: Language) => {
       "reports.timeToFill": "Thời gian tuyển",
       "reports.costEfficiency": "Hiệu quả chi phí",
       "reports.candidateSatisfaction": "Sự hài lòng của ứng viên",
-      "reports.applications": "Đơn ứng tuyển",
-      "reports.interviews": "Phỏng vấn",
-      "reports.hires": "Tuy���n dụng",
       "reports.effectivenessPercent": "Hiệu quả %",
       "reports.days": "ngày",
 
       // Settings Page
-      "settings.personalInfo": "Thông tin cá nhân",
-      "settings.changePhoto": "Đổi ảnh",
-      "settings.remove": "Xóa",
-      "settings.firstName": "Tên",
-      "settings.lastName": "Họ",
+
       "settings.emailAddress": "Địa chỉ Email",
       "settings.phoneNumber": "Số điện thoại",
-      "settings.jobTitle": "Chức vụ",
       "settings.humanResources": "Nhân sự",
       "settings.engineering": "Kỹ thuật",
-      "settings.product": "Sản ph��m",
+      "settings.product": "Sản phẩm",
       "settings.design": "Thiết kế",
       "settings.marketing": "Marketing",
-      "settings.saveChanges": "Lưu thay đổi",
-      "settings.preferences": "Tùy chọn",
       "settings.timezone": "Múi giờ",
       "settings.pacificStandardTime": "Giờ chuẩn Thái Bình Dương",
       "settings.easternStandardTime": "Giờ chuẩn Đông",
@@ -1423,47 +1354,15 @@ const useTranslations = (language: Language) => {
       "settings.teamManagement": "Quản lý nhóm",
       "settings.teamMembers": "Thành viên nhóm",
       "settings.teamMembersDesc":
-        "Quản lý quyền truy cập và phân quy���n người dùng",
+        "Quản lý quyền truy cập và phân quyền người dùng",
       "settings.inviteMember": "Mời thành viên",
       "settings.admin": "Quản trị viên",
 
       // Common UI Elements
-      "common.loading": "Đang tải...",
-      "common.save": "Lưu",
-      "common.cancel": "Hủy",
-      "common.edit": "Sửa",
-      "common.delete": "Xóa",
-      "common.add": "Thêm",
-      "common.search": "Tìm kiếm",
-      "common.filter": "Lọc",
-      "common.export": "Xuất",
-      "common.import": "Nhập",
-      "common.create": "Tạo",
-      "common.update": "Cập nhật",
-      "common.close": "Đóng",
-      "common.back": "Quay lại",
-      "common.next": "Tiếp theo",
-      "common.previous": "Trước đó",
-      "common.yes": "Có",
-      "common.no": "Không",
-      "common.actions": "Hành động",
-      "common.details": "Chi tiết",
-      "common.view": "Xem",
-      "common.manage": "Quản lý",
 
       // Company
       "company.name": "TD CONSULTING",
       "company.tagline": "Đối tác Tuyển dụng Đáng tin cậy",
-
-      // Profile and user menu
-      "profile.profile": "Hồ sơ",
-      "profile.logout": "Đăng xuất",
-
-      // Common interface elements
-      "interface.overview": "Tổng quan",
-      "interface.performance": "Hiệu suất",
-      "interface.sources": "Nguồn",
-      "interface.advanced": "Nâng cao",
     },
     zh: {
       "nav.dashboard": "仪表板",
@@ -1546,46 +1445,18 @@ const useTranslations = (language: Language) => {
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [currentLanguage, setCurrentLanguage] = useState<Language>(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      // Validate that the stored language is supported
-      if (stored && SUPPORTED_LANGUAGES.find((lang) => lang.code === stored)) {
-        return stored as Language;
-      }
-    } catch (error) {
-      console.warn("Failed to read language from localStorage:", error);
-    }
-    return "en";
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return (stored as Language) || "en";
   });
-
-  const [isInitialized, setIsInitialized] = useState(false);
 
   const t = useTranslations(currentLanguage);
 
   const setLanguage = (language: Language) => {
-    // Validate the language before setting it
-    if (!SUPPORTED_LANGUAGES.find((lang) => lang.code === language)) {
-      console.error(`Unsupported language: ${language}`);
-      return;
-    }
-
     setCurrentLanguage(language);
-
-    try {
-      localStorage.setItem(STORAGE_KEY, language);
-    } catch (error) {
-      console.warn("Failed to save language to localStorage:", error);
-    }
+    localStorage.setItem(STORAGE_KEY, language);
 
     // Update document language
     document.documentElement.lang = language;
-
-    // Force a small delay to ensure state updates propagate
-    setTimeout(() => {
-      window.dispatchEvent(
-        new CustomEvent("languageChanged", { detail: language }),
-      );
-    }, 0);
   };
 
   const getCurrentLanguageInfo = (): LanguageOption => {
@@ -1596,29 +1467,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    // Set initial document language
     document.documentElement.lang = currentLanguage;
-
-    // Mark as initialized after first render
-    if (!isInitialized) {
-      setIsInitialized(true);
-    }
-  }, [currentLanguage, isInitialized]);
-
-  // Listen for storage changes from other tabs
-  useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === STORAGE_KEY && e.newValue) {
-        const newLanguage = e.newValue as Language;
-        if (SUPPORTED_LANGUAGES.find((lang) => lang.code === newLanguage)) {
-          setCurrentLanguage(newLanguage);
-        }
-      }
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
+  }, [currentLanguage]);
 
   return (
     <LanguageContext.Provider

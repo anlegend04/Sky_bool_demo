@@ -112,7 +112,8 @@ export default function Candidates() {
 
   const stats = [
     {
-      title: "Total Candidates",
+      // Fixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      title: t("candidates.title"),
       value: candidates.length.toString(),
       change: "+12%",
       color: "blue",
