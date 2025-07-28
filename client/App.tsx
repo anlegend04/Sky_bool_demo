@@ -26,28 +26,30 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/jobs" element={<Jobs />} />
-            <Route path="/jobs/create" element={<JobCreate />} />
-            <Route path="/jobs/:id" element={<JobDetail />} />
-            <Route path="/candidates" element={<Candidates />} />
-            <Route path="/candidates/:id" element={<CandidateDetail />} />
-            <Route path="/calendar" element={<Calendar />} />
-            <Route path="/email" element={<EmailAutomation />} />
-            <Route path="/reports" element={<Reports />} />
-            <Route path="/notifications" element={<Notifications />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Layout>
-      </BrowserRouter>
-    </TooltipProvider>
+    <LanguageProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/jobs" element={<Jobs />} />
+              <Route path="/jobs/create" element={<JobCreate />} />
+              <Route path="/jobs/:id" element={<JobDetail />} />
+              <Route path="/candidates" element={<Candidates />} />
+              <Route path="/candidates/:id" element={<CandidateDetail />} />
+              <Route path="/calendar" element={<Calendar />} />
+              <Route path="/email" element={<EmailAutomation />} />
+              <Route path="/reports" element={<Reports />} />
+              <Route path="/notifications" element={<Notifications />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Layout>
+        </BrowserRouter>
+      </TooltipProvider>
+    </LanguageProvider>
   </QueryClientProvider>
 );
 
