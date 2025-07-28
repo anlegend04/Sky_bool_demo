@@ -183,17 +183,21 @@ export default function Settings() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label>Language</Label>
-                  <Select defaultValue="en">
+                  <Label>{t('settings.language')}</Label>
+                  <Select value={currentLanguage} onValueChange={setLanguage}>
                     <SelectTrigger className="mt-1">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="en">English</SelectItem>
-                      <SelectItem value="es">Spanish</SelectItem>
-                      <SelectItem value="fr">French</SelectItem>
-                      <SelectItem value="de">German</SelectItem>
-                      <SelectItem value="ja">Japanese</SelectItem>
+                      {SUPPORTED_LANGUAGES.map((language) => (
+                        <SelectItem key={language.code} value={language.code}>
+                          <div className="flex items-center space-x-2">
+                            <span>{language.flag}</span>
+                            <span>{language.nativeName}</span>
+                            <span className="text-sm text-muted-foreground">({language.name})</span>
+                          </div>
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
