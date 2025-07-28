@@ -92,11 +92,11 @@ export default function Dashboard() {
   ];
 
   const pipeline = [
-    { stage: "Applied", count: 145, percentage: 100 },
-    { stage: "Screening", count: 67, percentage: 46 },
-    { stage: "Interview", count: 23, percentage: 16 },
-    { stage: "Offer", count: 8, percentage: 6 },
-    { stage: "Hired", count: 5, percentage: 3 },
+    { stageKey: "dashboard.applied", count: 145, percentage: 100 },
+    { stageKey: "dashboard.screening", count: 67, percentage: 46 },
+    { stageKey: "dashboard.interview", count: 23, percentage: 16 },
+    { stageKey: "dashboard.offer", count: 8, percentage: 6 },
+    { stageKey: "dashboard.hired", count: 5, percentage: 3 },
   ];
 
   return (
