@@ -53,6 +53,7 @@ import {
 import { useState, useEffect } from "react";
 import { HARDCODED_JOBS, HARDCODED_CANDIDATES } from "@/data/hardcoded-data";
 import { useLanguage } from "@/hooks/use-language";
+import { RechartsWarningSuppress } from "@/components/RechartsWarningSuppress";
 
 export default function Reports() {
   const { t } = useLanguage();
@@ -313,25 +314,27 @@ export default function Reports() {
                 <CardTitle>{t("reports.conversionFunnel")}</CardTitle>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={funnelData} layout="horizontal">
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis
-                      type="number"
-                      allowDecimals={false}
-                      tickLine={false}
-                    />
-                    <YAxis
-                      dataKey="name"
-                      type="category"
-                      width={80}
-                      allowDuplicatedCategory={false}
-                      tickLine={false}
-                    />
-                    <Tooltip cursor={false} />
-                    <Bar dataKey="value" fill="#8884d8" />
-                  </BarChart>
-                </ResponsiveContainer>
+                <RechartsWarningSuppress>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={funnelData} layout="horizontal">
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis
+                        type="number"
+                        allowDecimals={false}
+                        tickLine={false}
+                      />
+                      <YAxis
+                        dataKey="name"
+                        type="category"
+                        width={80}
+                        allowDuplicatedCategory={false}
+                        tickLine={false}
+                      />
+                      <Tooltip cursor={false} />
+                      <Bar dataKey="value" fill="#8884d8" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </RechartsWarningSuppress>
               </CardContent>
             </Card>
 
@@ -341,37 +344,39 @@ export default function Reports() {
                 <CardTitle>{t("reports.monthlyTrends")}</CardTitle>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={monthlyData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis
-                      dataKey="month"
-                      allowDuplicatedCategory={false}
-                      tickLine={false}
-                    />
-                    <YAxis allowDecimals={false} tickLine={false} />
-                    <Tooltip cursor={false} />
-                    <Legend iconType="line" />
-                    <Line
-                      type="monotone"
-                      dataKey="applications"
-                      stroke="#8884d8"
-                      name="Applications"
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="interviews"
-                      stroke="#82ca9d"
-                      name="Interviews"
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="hires"
-                      stroke="#ffc658"
-                      name="Hires"
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+                <RechartsWarningSuppress>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={monthlyData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis
+                        dataKey="month"
+                        allowDuplicatedCategory={false}
+                        tickLine={false}
+                      />
+                      <YAxis allowDecimals={false} tickLine={false} />
+                      <Tooltip cursor={false} />
+                      <Legend iconType="line" />
+                      <Line
+                        type="monotone"
+                        dataKey="applications"
+                        stroke="#8884d8"
+                        name="Applications"
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="interviews"
+                        stroke="#82ca9d"
+                        name="Interviews"
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="hires"
+                        stroke="#ffc658"
+                        name="Hires"
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </RechartsWarningSuppress>
               </CardContent>
             </Card>
           </div>
