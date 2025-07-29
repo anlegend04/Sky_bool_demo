@@ -68,7 +68,7 @@ import {
   UserPlus,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Link } from "react-router-dom"; // Added for navigation
+import { Link } from "react-router-dom";
 import {
   HARDCODED_CANDIDATES,
   type CandidateData,
@@ -82,7 +82,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-// Extended types remain the same
+// Các type definitions giữ nguyên như trước
 interface FollowUpCandidate extends CandidateData {
   lastInteraction: string;
   nextFollowUp: string;
@@ -135,7 +135,6 @@ interface EmailTemplate {
   variables: string[];
 }
 
-// Mock job data for the apply-to-job dialog
 interface Job {
   id: string;
   position: string;
@@ -151,26 +150,30 @@ export default function FollowUpDashboard() {
     { id: "job3", position: "Data Scientist" },
   ];
 
-  // State for field visibility in list view
+  // Cập nhật trạng thái visibleFields để chỉ hiển thị các field liên quan đến follow-up stage
   const [visibleFields, setVisibleFields] = useState({
     name: true,
-    appliedDate: true,
-    email: true,
-    phone: true,
-    position: true,
-    recruiter: true,
     stage: true,
-    source: true,
-    salary: true,
-    location: true,
-    department: true,
+    daysInStage: true,
+    lastInteraction: true,
+    nextFollowUp: true,
+    urgencyLevel: true,
+    appliedDate: false,
+    email: false,
+    phone: false,
+    position: false,
+    recruiter: false,
+    source: false,
+    salary: false,
+    location: false,
+    department: false,
   });
 
-  // State for job application dialog
+  // State cho job application dialog
   const [applyCandidateId, setApplyCandidateId] = useState<string | null>(null);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
 
-  // Mock candidate data transformation (same as original)
+  // Mock candidate data transformation (giữ nguyên)
   const [candidates] = useState<FollowUpCandidate[]>(
     HARDCODED_CANDIDATES.map((candidate, index) => ({
       ...candidate,
@@ -185,8 +188,8 @@ export default function FollowUpDashboard() {
       lastEmailSent:
         Math.random() > 0.3
           ? new Date(
-            Date.now() - Math.random() * 3 * 24 * 60 * 60 * 1000,
-          ).toISOString()
+              Date.now() - Math.random() * 3 * 24 * 60 * 60 * 1000,
+            ).toISOString()
           : undefined,
       responseRate: Math.floor(Math.random() * 100),
       urgencyLevel: ["low", "medium", "high", "critical"][
@@ -246,7 +249,7 @@ export default function FollowUpDashboard() {
   const [emailTemplate, setEmailTemplate] = useState("");
   const [bulkAction, setBulkAction] = useState("");
 
-  // Email templates (same as original)
+  // Email templates (giữ nguyên)
   const emailTemplates: EmailTemplate[] = [
     {
       id: "interview_invitation",
@@ -274,7 +277,7 @@ export default function FollowUpDashboard() {
     },
   ];
 
-  // Filter and search logic (same as original)
+  // Filter and search logic (giữ nguyên)
   const filteredCandidates = useMemo(() => {
     return candidates.filter((candidate) => {
       const matchesSearch =
@@ -295,7 +298,7 @@ export default function FollowUpDashboard() {
     });
   }, [candidates, searchTerm, filterStage, filterJob, filterUrgency]);
 
-  // Statistics (same as original)
+  // Statistics (giữ nguyên)
   const stats = useMemo(() => {
     const total = candidates.length;
     const needingFollowUp = candidates.filter(
@@ -310,7 +313,7 @@ export default function FollowUpDashboard() {
     return { total, needingFollowUp, overdue, activeToday };
   }, [candidates]);
 
-  // Handlers (same as original)
+  // Handlers (giữ nguyên)
   const handleCandidateSelect = useCallback((candidateId: string) => {
     setSelectedCandidates((prev) =>
       prev.includes(candidateId)
@@ -395,7 +398,6 @@ export default function FollowUpDashboard() {
     return `${diffInDays}d ago`;
   };
 
-  // Mock apply candidate to job function
   const applyCandidateToJob = useCallback(
     (candidateId: string, jobId: string) => {
       const candidate = candidates.find((c) => c.id === candidateId);
@@ -410,13 +412,14 @@ export default function FollowUpDashboard() {
     [candidates, jobs, toast],
   );
 
-  // Candidate Card Component (same as original)
+  // Candidate Card Component (giữ nguyên)
   const CandidateCard = ({ candidate }: { candidate: FollowUpCandidate }) => (
     <Card
-      className={`hover:shadow-lg transition-all border-l-4 cursor-pointer rounded-lg ${selectedCandidates.includes(candidate.id)
+      className={`hover:shadow-lg transition-all border-l-4 cursor-pointer rounded-lg ${
+        selectedCandidates.includes(candidate.id)
           ? "ring-2 ring-blue-500 bg-blue-50"
           : ""
-        } border-slate-200 hover:border-blue-300 group`}
+      } border-slate-200 hover:border-blue-300 group`}
       style={{ minHeight: 80 }}
     >
       <CardHeader className="pb-3">
@@ -473,7 +476,7 @@ export default function FollowUpDashboard() {
     </Card>
   );
 
-  // Pipeline View Component (same as original)
+  // Pipeline View Component (giữ nguyên)
   const PipelineView = () => {
     const stages = [
       "Applied",
@@ -554,7 +557,7 @@ export default function FollowUpDashboard() {
     );
   };
 
-  // Updated Pipeline List View Component
+  // Cập nhật Pipeline List View Component
   const PipelineListView = () => {
     const applyCandidate = candidates.find((c) => c.id === applyCandidateId);
 
@@ -566,6 +569,19 @@ export default function FollowUpDashboard() {
               <TableHeader>
                 <TableRow>
                   {visibleFields.name && <TableHead>Name</TableHead>}
+                  {visibleFields.stage && <TableHead>Current Stage</TableHead>}
+                  {visibleFields.daysInStage && (
+                    <TableHead>Days in Stage</TableHead>
+                  )}
+                  {visibleFields.lastInteraction && (
+                    <TableHead>Last Interaction</TableHead>
+                  )}
+                  {visibleFields.nextFollowUp && (
+                    <TableHead>Next Follow-Up</TableHead>
+                  )}
+                  {visibleFields.urgencyLevel && (
+                    <TableHead>Urgency Level</TableHead>
+                  )}
                   {visibleFields.appliedDate && (
                     <TableHead>Applied On</TableHead>
                   )}
@@ -573,7 +589,6 @@ export default function FollowUpDashboard() {
                   {visibleFields.phone && <TableHead>Phone</TableHead>}
                   {visibleFields.position && <TableHead>Job Position</TableHead>}
                   {visibleFields.recruiter && <TableHead>Recruiter</TableHead>}
-                  {visibleFields.stage && <TableHead>Current Stage</TableHead>}
                   {visibleFields.source && <TableHead>Source</TableHead>}
                   {visibleFields.salary && <TableHead>Salary</TableHead>}
                   {visibleFields.location && <TableHead>Location</TableHead>}
@@ -607,15 +622,66 @@ export default function FollowUpDashboard() {
                               {[...Array(5)].map((_, i) => (
                                 <Star
                                   key={i}
-                                  className={`w-3 h-3 ${i < candidate.rating
+                                  className={`w-3 h-3 ${
+                                    i < candidate.rating
                                       ? "text-yellow-400 fill-current"
                                       : "text-slate-300"
-                                    }`}
+                                  }`}
                                 />
                               ))}
                             </div>
                           </div>
                         </Link>
+                      </TableCell>
+                    )}
+                    {visibleFields.stage && (
+                      <TableCell>
+                        <Badge
+                          variant={
+                            candidate.stage === "Offer"
+                              ? "default"
+                              : candidate.stage === "Hired"
+                              ? "default"
+                              : candidate.stage === "Technical"
+                              ? "secondary"
+                              : candidate.stage === "Interview"
+                              ? "outline"
+                              : candidate.stage === "Screening"
+                              ? "secondary"
+                              : candidate.stage === "Applied"
+                              ? "outline"
+                              : "destructive"
+                          }
+                          className="truncate max-w-24"
+                        >
+                          {candidate.stage}
+                        </Badge>
+                      </TableCell>
+                    )}
+                    {visibleFields.daysInStage && (
+                      <TableCell className="truncate max-w-32">
+                        {candidate.daysInStage} days
+                      </TableCell>
+                    )}
+                    {visibleFields.lastInteraction && (
+                      <TableCell className="truncate max-w-32">
+                        {formatTimeAgo(candidate.lastInteraction)}
+                      </TableCell>
+                    )}
+                    {visibleFields.nextFollowUp && (
+                      <TableCell className="truncate max-w-32">
+                        {formatTimeAgo(candidate.nextFollowUp)}
+                      </TableCell>
+                    )}
+                    {visibleFields.urgencyLevel && (
+                      <TableCell>
+                        <Badge
+                          className={`truncate max-w-24 ${getUrgencyColor(
+                            candidate.urgencyLevel,
+                          )}`}
+                        >
+                          {candidate.urgencyLevel}
+                        </Badge>
                       </TableCell>
                     )}
                     {visibleFields.appliedDate && (
@@ -641,30 +707,6 @@ export default function FollowUpDashboard() {
                     {visibleFields.recruiter && (
                       <TableCell className="truncate max-w-32">
                         {candidate.recruiter}
-                      </TableCell>
-                    )}
-                    {visibleFields.stage && (
-                      <TableCell>
-                        <Badge
-                          variant={
-                            candidate.stage === "Offer"
-                              ? "default"
-                              : candidate.stage === "Hired"
-                                ? "default"
-                                : candidate.stage === "Technical"
-                                  ? "secondary"
-                                  : candidate.stage === "Interview"
-                                    ? "outline"
-                                    : candidate.stage === "Screening"
-                                      ? "secondary"
-                                      : candidate.stage === "Applied"
-                                        ? "outline"
-                                        : "destructive"
-                          }
-                          className="truncate max-w-24"
-                        >
-                          {candidate.stage}
-                        </Badge>
                       </TableCell>
                     )}
                     {visibleFields.source && (
@@ -792,7 +834,7 @@ export default function FollowUpDashboard() {
     );
   };
 
-  // Rest of the component remains unchanged
+  // Phần còn lại của component giữ nguyên
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
       {/* Header */}
