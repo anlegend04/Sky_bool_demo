@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { Mail, Send, AlertCircle, FileText, X } from "lucide-react";
 import { CandidateData } from "@/data/hardcoded-data";
+import { getTemplatesForStage, generateEmailContent, EmailTemplate } from "@/lib/email-utils";
 
 interface EmailTemplate {
   id: number;
