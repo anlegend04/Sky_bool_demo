@@ -1160,6 +1160,8 @@ export default function Candidates() {
         </div>
       </div>
 
+
+
       {/* CV Upload Dialog */}
       <Dialog open={showCVUpload} onOpenChange={setShowCVUpload}>
         <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
