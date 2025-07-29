@@ -519,15 +519,20 @@ export default function Reports() {
                         data={chartData.stageDistribution}
                         cx="50%"
                         cy="50%"
-                        outerRadius={80}
+                        outerRadius={100}
                         dataKey="value"
-                        label={({name, value}) => value > 0 ? `${name}: ${value}` : ''}
+                        label={({name, value, percent}) => value > 0 ? `${name}: ${value} (${(percent * 100).toFixed(0)}%)` : ''}
+                        labelLine={false}
                       >
                         {chartData.stageDistribution.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.fill} />
                         ))}
                       </Pie>
-                      <Tooltip />
+                      <Tooltip formatter={(value, name) => [`${value} candidates`, name]} />
+                      <Legend
+                        formatter={(value, entry) => `${value} (${entry.payload.value})`}
+                        wrapperStyle={{ paddingTop: '20px' }}
+                      />
                     </PieChart>
                   </ResponsiveContainer>
                 )}
