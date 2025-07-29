@@ -345,7 +345,8 @@ const AddJobForm = memo(
   }) => {
     const [newJob, setNewJob] = useState(initialJobState);
     const [jobStages, setJobStages] = useState(
-      ["Applied", "Screening", "Interview", "Offer", "Hired"].map((name) => ({
+      ["Applied", "Screening", "Interview", "Offer", "Hired"].map((name, index) => ({
+        id: `stage-${index}`,
         name,
         durationHours: "",
       })),
