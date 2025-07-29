@@ -1000,7 +1000,7 @@ export default function Candidates() {
         </div>
         <div className="flex items-center text-xs text-slate-600 min-w-0">
           <Clock className="w-3 h-3 mr-1 flex-shrink-0" />
-          <span className="truncate">{candidate.duration} days in stage</span>
+          <span className="line-clamp-1">{candidate.duration} days in stage</span>
         </div>
         <div className="flex items-center justify-between pt-2 border-t border-slate-100">
           <div className="flex items-center space-x-1">
@@ -1015,7 +1015,7 @@ export default function Candidates() {
               />
             ))}
           </div>
-          <Badge variant="outline" className="text-xs truncate max-w-20">
+          <Badge variant="outline" className="text-xs line-clamp-1 max-w-20" title={candidate.recruiter}>
             {candidate.recruiter}
           </Badge>
         </div>
@@ -1083,7 +1083,7 @@ export default function Candidates() {
                           </AvatarFallback>
                         </Avatar>
                         <div className="min-w-0 flex-1">
-                          <div className="font-medium truncate">
+                          <div className="font-medium line-clamp-1" title={candidate.name}>
                             {candidate.name}
                           </div>
                           <div className="flex items-center space-x-1 mt-1">
