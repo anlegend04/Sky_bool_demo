@@ -98,7 +98,13 @@ const initialJobState = {
 
 // These will be moved inside the AddJobForm component where they belong
 
-function StageItem({ id, index, stage, updateStage, removeStage }: {
+function StageItem({
+  id,
+  index,
+  stage,
+  updateStage,
+  removeStage,
+}: {
   id: string;
   index: number;
   stage: any;
@@ -345,11 +351,13 @@ const AddJobForm = memo(
   }) => {
     const [newJob, setNewJob] = useState(initialJobState);
     const [jobStages, setJobStages] = useState(
-      ["Applied", "Screening", "Interview", "Offer", "Hired"].map((name, index) => ({
-        id: `stage-${index}`,
-        name,
-        durationHours: "",
-      })),
+      ["Applied", "Screening", "Interview", "Offer", "Hired"].map(
+        (name, index) => ({
+          id: `stage-${index}`,
+          name,
+          durationHours: "",
+        }),
+      ),
     );
 
     // Reset form when editingJob changes
@@ -390,7 +398,10 @@ const AddJobForm = memo(
     );
 
     const addNewStage = useCallback(() => {
-      setJobStages((prev) => [...prev, { id: `stage-${Date.now()}`, name: "", durationHours: "" }]);
+      setJobStages((prev) => [
+        ...prev,
+        { id: `stage-${Date.now()}`, name: "", durationHours: "" },
+      ]);
     }, []);
 
     const removeStage = useCallback((index: number) => {
@@ -426,11 +437,13 @@ const AddJobForm = memo(
 
       setNewJob(initialJobState);
       setJobStages(
-        ["Applied", "Screening", "Interview", "Offer", "Hired"].map((name, index) => ({
-          id: `stage-${index}`,
-          name,
-          durationHours: "",
-        })),
+        ["Applied", "Screening", "Interview", "Offer", "Hired"].map(
+          (name, index) => ({
+            id: `stage-${index}`,
+            name,
+            durationHours: "",
+          }),
+        ),
       );
       onOpenChange(false);
     }, [newJob, editingJob, onAddJob, onUpdateJob, onOpenChange]);
