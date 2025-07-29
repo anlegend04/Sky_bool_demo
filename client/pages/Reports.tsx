@@ -12,7 +12,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SearchableSelect, SelectOption } from "@/components/ui/searchable-select";
+import {
+  SearchableSelect,
+  SelectOption,
+} from "@/components/ui/searchable-select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   BarChart,
@@ -92,7 +95,11 @@ export default function Reports() {
 
   // Prepare options for enhanced dropdowns
   const sourceOptions: SelectOption[] = [
-    { value: "all", label: "All Sources", description: "Show data from all sources" },
+    {
+      value: "all",
+      label: "All Sources",
+      description: "Show data from all sources",
+    },
     ...sources.map((source) => ({
       value: source,
       label: source,
@@ -103,7 +110,11 @@ export default function Reports() {
   ];
 
   const stageOptions: SelectOption[] = [
-    { value: "all", label: "All Stages", description: "Show candidates in all stages" },
+    {
+      value: "all",
+      label: "All Stages",
+      description: "Show candidates in all stages",
+    },
     ...stages.map((stage) => ({
       value: stage,
       label: stage,
@@ -146,7 +157,13 @@ export default function Reports() {
   // Auto-apply filters when filter values change
   useEffect(() => {
     applyFilters();
-  }, [selectedJob, selectedRecruiter, selectedSource, selectedStage, dateRange]);
+  }, [
+    selectedJob,
+    selectedRecruiter,
+    selectedSource,
+    selectedStage,
+    dateRange,
+  ]);
 
   // Filtered data based on current filters
   const filteredData = useMemo(() => {
@@ -530,7 +547,8 @@ export default function Reports() {
                   setSelectedStage("all");
                   toast({
                     title: "Filters Reset",
-                    description: "All filters have been reset to default values.",
+                    description:
+                      "All filters have been reset to default values.",
                   });
                 }}
                 variant="outline"
@@ -662,10 +680,10 @@ export default function Reports() {
                         ]}
                         labelFormatter={(label) => `Stage: ${label}`}
                         contentStyle={{
-                          backgroundColor: 'white',
-                          border: '1px solid #e5e7eb',
-                          borderRadius: '6px',
-                          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                          backgroundColor: "white",
+                          border: "1px solid #e5e7eb",
+                          borderRadius: "6px",
+                          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
                         }}
                       />
                       <Legend
@@ -718,10 +736,10 @@ export default function Reports() {
                         }}
                         labelFormatter={(label) => `Recruiter: ${label}`}
                         contentStyle={{
-                          backgroundColor: 'white',
-                          border: '1px solid #e5e7eb',
-                          borderRadius: '6px',
-                          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                          backgroundColor: "white",
+                          border: "1px solid #e5e7eb",
+                          borderRadius: "6px",
+                          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
                         }}
                       />
                       <Legend
@@ -813,36 +831,67 @@ export default function Reports() {
                     data={[
                       {
                         month: "Jan",
-                        applications: Math.max(1, Math.round(filteredData.length * 0.3)),
-                        hires: Math.max(0, Math.round(
-                          filteredData.filter((c) => c.stage === "Hired")
-                            .length * 0.2,
-                        )),
-                        interviews: Math.max(0, Math.round(filteredData.length * 0.15)),
+                        applications: Math.max(
+                          1,
+                          Math.round(filteredData.length * 0.3),
+                        ),
+                        hires: Math.max(
+                          0,
+                          Math.round(
+                            filteredData.filter((c) => c.stage === "Hired")
+                              .length * 0.2,
+                          ),
+                        ),
+                        interviews: Math.max(
+                          0,
+                          Math.round(filteredData.length * 0.15),
+                        ),
                       },
                       {
                         month: "Feb",
-                        applications: Math.max(1, Math.round(filteredData.length * 0.5)),
-                        hires: Math.max(0, Math.round(
-                          filteredData.filter((c) => c.stage === "Hired")
-                            .length * 0.4,
-                        )),
-                        interviews: Math.max(0, Math.round(filteredData.length * 0.25)),
+                        applications: Math.max(
+                          1,
+                          Math.round(filteredData.length * 0.5),
+                        ),
+                        hires: Math.max(
+                          0,
+                          Math.round(
+                            filteredData.filter((c) => c.stage === "Hired")
+                              .length * 0.4,
+                          ),
+                        ),
+                        interviews: Math.max(
+                          0,
+                          Math.round(filteredData.length * 0.25),
+                        ),
                       },
                       {
                         month: "Mar",
-                        applications: Math.max(1, Math.round(filteredData.length * 0.8)),
-                        hires: Math.max(0, Math.round(
-                          filteredData.filter((c) => c.stage === "Hired")
-                            .length * 0.7,
-                        )),
-                        interviews: Math.max(0, Math.round(filteredData.length * 0.4)),
+                        applications: Math.max(
+                          1,
+                          Math.round(filteredData.length * 0.8),
+                        ),
+                        hires: Math.max(
+                          0,
+                          Math.round(
+                            filteredData.filter((c) => c.stage === "Hired")
+                              .length * 0.7,
+                          ),
+                        ),
+                        interviews: Math.max(
+                          0,
+                          Math.round(filteredData.length * 0.4),
+                        ),
                       },
                       {
                         month: "Apr",
                         applications: Math.max(1, filteredData.length),
-                        hires: filteredData.filter((c) => c.stage === "Hired").length,
-                        interviews: Math.max(0, Math.round(filteredData.length * 0.5)),
+                        hires: filteredData.filter((c) => c.stage === "Hired")
+                          .length,
+                        interviews: Math.max(
+                          0,
+                          Math.round(filteredData.length * 0.5),
+                        ),
                       },
                     ]}
                   >
@@ -860,10 +909,10 @@ export default function Reports() {
                       }}
                       labelFormatter={(label) => `Month: ${label}`}
                       contentStyle={{
-                        backgroundColor: 'white',
-                        border: '1px solid #e5e7eb',
-                        borderRadius: '6px',
-                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                        backgroundColor: "white",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: "6px",
+                        boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
                       }}
                     />
                     <Legend
@@ -950,16 +999,26 @@ export default function Reports() {
                               <div className="space-y-1">
                                 <p className="text-blue-600 flex justify-between">
                                   <span>Applications:</span>
-                                  <span className="font-medium">{data.value}</span>
+                                  <span className="font-medium">
+                                    {data.value}
+                                  </span>
                                 </p>
                                 <p className="text-green-600 flex justify-between">
                                   <span>Success Rate:</span>
-                                  <span className="font-medium">{data.effectiveness}%</span>
+                                  <span className="font-medium">
+                                    {data.effectiveness}%
+                                  </span>
                                 </p>
                                 <p className="text-purple-600 flex justify-between">
                                   <span>Hired:</span>
                                   <span className="font-medium">
-                                    {filteredData.filter(c => c.source === label && c.stage === 'Hired').length}
+                                    {
+                                      filteredData.filter(
+                                        (c) =>
+                                          c.source === label &&
+                                          c.stage === "Hired",
+                                      ).length
+                                    }
                                   </span>
                                 </p>
                               </div>

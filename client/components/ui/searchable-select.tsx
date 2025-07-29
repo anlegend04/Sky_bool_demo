@@ -80,7 +80,7 @@ export function SearchableSelect({
     return options.filter(
       (option) =>
         option.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        option.description?.toLowerCase().includes(searchQuery.toLowerCase())
+        option.description?.toLowerCase().includes(searchQuery.toLowerCase()),
     );
   }, [options, searchQuery]);
 
@@ -148,7 +148,7 @@ export function SearchableSelect({
             className={cn(
               "w-full justify-between",
               !value && "text-muted-foreground",
-              className
+              className,
             )}
             disabled={disabled}
           >
@@ -238,7 +238,7 @@ export function SearchableSelect({
                           "mr-2 h-4 w-4",
                           selectedValues.includes(option.value)
                             ? "opacity-100"
-                            : "opacity-0"
+                            : "opacity-0",
                         )}
                       />
                       <div className="flex-1 min-w-0">
@@ -314,10 +314,7 @@ export function SearchableSelect({
             >
               Cancel
             </Button>
-            <Button
-              onClick={handleAddCustom}
-              disabled={!customValue.trim()}
-            >
+            <Button onClick={handleAddCustom} disabled={!customValue.trim()}>
               <Plus className="h-4 w-4 mr-2" />
               Add Option
             </Button>

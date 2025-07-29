@@ -15,7 +15,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SearchableSelect, SelectOption } from "@/components/ui/searchable-select";
+import {
+  SearchableSelect,
+  SelectOption,
+} from "@/components/ui/searchable-select";
 import {
   Dialog,
   DialogContent,
@@ -395,7 +398,10 @@ export default function CVEvaluation() {
       fileName: selectedFile?.name,
     };
 
-    localStorage.setItem(`cv-analysis-${Date.now()}`, JSON.stringify(analysisData));
+    localStorage.setItem(
+      `cv-analysis-${Date.now()}`,
+      JSON.stringify(analysisData),
+    );
     setIsSaved(true);
 
     toast({
@@ -454,7 +460,7 @@ export default function CVEvaluation() {
       // In a real app, this would generate a PDF
       const candidateName = selectedCandidate?.name || "Candidate";
       const jobTitle = selectedJob?.position || "Position";
-      const fileName = `CV_Analysis_${candidateName}_${jobTitle}_${new Date().toISOString().split('T')[0]}.pdf`;
+      const fileName = `CV_Analysis_${candidateName}_${jobTitle}_${new Date().toISOString().split("T")[0]}.pdf`;
 
       toast({
         title: "PDF Export Complete",
@@ -1154,11 +1160,7 @@ export default function CVEvaluation() {
             <div>
               <Label className="text-sm font-medium">Shareable Link</Label>
               <div className="flex items-center space-x-2 mt-1">
-                <Input
-                  value={shareUrl}
-                  readOnly
-                  className="flex-1"
-                />
+                <Input value={shareUrl} readOnly className="flex-1" />
                 <Button
                   size="sm"
                   onClick={handleCopyShareLink}
@@ -1170,8 +1172,9 @@ export default function CVEvaluation() {
             </div>
             <div className="bg-blue-50 p-3 rounded-lg">
               <p className="text-sm text-blue-800">
-                <strong>Note:</strong> This link allows view-only access to the analysis results.
-                The shared analysis will be available for 30 days.
+                <strong>Note:</strong> This link allows view-only access to the
+                analysis results. The shared analysis will be available for 30
+                days.
               </p>
             </div>
             <div className="flex space-x-2">
@@ -1184,7 +1187,7 @@ export default function CVEvaluation() {
               </Button>
               <Button
                 onClick={() => {
-                  window.open(shareUrl, '_blank');
+                  window.open(shareUrl, "_blank");
                 }}
                 className="flex-1"
               >
