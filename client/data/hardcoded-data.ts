@@ -1853,6 +1853,47 @@ export const HARDCODED_ACTIVITIES: ActivityData[] = [
     timestamp: getRandomDateTime(30),
     metadata: { noteId: "note_4", content: "Outstanding design portfolio..." },
   },
+  {
+    id: "activity_6",
+    type: "stage_change",
+    description: "Moved Marissa Torres from Offer to Hired stage",
+    entityType: "candidate",
+    entityId: "candidate_1",
+    userId: "user_5",
+    userName: "David Park",
+    timestamp: getRandomDateTime(3),
+    metadata: {
+      fromStage: "Offer",
+      toStage: "Hired",
+      reason: "Offer accepted, successfully onboarded",
+    },
+  },
+  {
+    id: "activity_7",
+    type: "email_sent",
+    description: "Sent welcome email to Marissa Torres",
+    entityType: "candidate",
+    entityId: "candidate_1",
+    userId: "user_5",
+    userName: "David Park",
+    timestamp: getRandomDateTime(2),
+    metadata: { emailId: "email_4", template: "welcome_hired" },
+  },
+  {
+    id: "activity_8",
+    type: "stage_change",
+    description: "Moved James Chen from Technical to Offer stage",
+    entityType: "candidate",
+    entityId: "candidate_2",
+    userId: "user_2",
+    userName: "Sarah Kim",
+    timestamp: getRandomDateTime(4),
+    metadata: {
+      fromStage: "Technical",
+      toStage: "Offer",
+      reason: "Excellent technical assessment performance",
+    },
+  },
 ];
 
 // Helper function to calculate dashboard stats from actual data
