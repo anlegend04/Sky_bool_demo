@@ -8,6 +8,18 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import {
+  addMonths,
+  subMonths,
+  format,
+  addWeeks,
+  subWeeks,
+  addDays,
+  subDays,
+  startOfWeek,
+  endOfWeek,
+} from "date-fns";
+
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -53,6 +65,7 @@ export default function Calendar() {
   const [isEventDialogOpen, setIsEventDialogOpen] = useState(false);
   const [view, setView] = useState("month"); // month, week, day
   const [popupDate, setPopupDate] = useState<Date | null>(null);
+  const [currentDate, setCurrentDate] = useState(new Date());
   const [popupPosition, setPopupPosition] = useState<{
     x: number;
     y: number;
@@ -65,7 +78,7 @@ export default function Calendar() {
       type: "interview",
       startTime: "10:00 AM",
       endTime: "11:00 AM",
-      date: "2024-01-15",
+      date: "2025-07-15",
       candidate: "Sarah Johnson",
       interviewer: "John Smith",
       position: "Senior Frontend Developer",
@@ -79,7 +92,7 @@ export default function Calendar() {
       type: "screening",
       startTime: "2:00 PM",
       endTime: "2:30 PM",
-      date: "2024-01-15",
+      date: "2025-07-15",
       candidate: "Michael Chen",
       interviewer: "Lisa Garcia",
       position: "Product Manager",
@@ -93,7 +106,7 @@ export default function Calendar() {
       type: "final",
       startTime: "3:30 PM",
       endTime: "4:30 PM",
-      date: "2024-01-16",
+      date: "2025-07-16",
       candidate: "Emily Davis",
       interviewer: "David Kim",
       position: "UX Designer",
@@ -107,7 +120,7 @@ export default function Calendar() {
       type: "meeting",
       startTime: "9:00 AM",
       endTime: "10:00 AM",
-      date: "2024-01-17",
+      date: "2025-07-17",
       attendees: 8,
       location: "Conference Room B",
       meetingType: "in-person",
@@ -119,7 +132,7 @@ export default function Calendar() {
       type: "offer",
       startTime: "11:00 AM",
       endTime: "11:30 AM",
-      date: "2024-01-17",
+      date: "2025-07-17",
       candidate: "Robert Taylor",
       interviewer: "Jessica Brown",
       position: "Data Scientist",
@@ -163,9 +176,23 @@ export default function Calendar() {
     }
   };
 
+  // const calendarDays = Array.from({ length: 35 }, (_, i) => {
+  //   const date = new Date(2024, 0, i - 6); // January 2024 calendar
+  //   return date;
+  // });
+
   const calendarDays = Array.from({ length: 35 }, (_, i) => {
-    const date = new Date(2024, 0, i - 6); // January 2024 calendar
-    return date;
+    const firstDayOfMonth = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      1,
+    );
+    const dayOfWeek = firstDayOfMonth.getDay(); // 0 (Sun) - 6 (Sat)
+    return new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      i - dayOfWeek + 1,
+    );
   });
 
   return (
@@ -305,14 +332,49 @@ export default function Calendar() {
             <CardHeader>
               <div className="flex justify-between items-center">
                 <CardTitle className="flex items-center space-x-4">
-                  <Button variant="ghost" size="sm">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      if (view === "month")
+                        setCurrentDate(subMonths(currentDate, 1));
+                      else if (view === "week")
+                        setCurrentDate(subWeeks(currentDate, 1));
+                      else setCurrentDate(subDays(currentDate, 1));
+                    }}
+                  >
                     <ChevronLeft className="w-4 h-4" />
                   </Button>
-                  <span>January 2024</span>
-                  <Button variant="ghost" size="sm">
+
+                  <span>
+                    {view === "month"
+                      ? format(currentDate, "MMMM yyyy")
+                      : view === "week"
+                        ? `${format(startOfWeek(currentDate, { weekStartsOn: 0 }), "MMM d")} - ${format(
+                            addDays(
+                              startOfWeek(currentDate, { weekStartsOn: 0 }),
+                              6,
+                            ),
+                            "MMM d, yyyy",
+                          )}`
+                        : format(currentDate, "EEEE, MMM d, yyyy")}
+                  </span>
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      if (view === "month")
+                        setCurrentDate(addMonths(currentDate, 1));
+                      else if (view === "week")
+                        setCurrentDate(addWeeks(currentDate, 1));
+                      else setCurrentDate(addDays(currentDate, 1));
+                    }}
+                  >
                     <ChevronRight className="w-4 h-4" />
                   </Button>
                 </CardTitle>
+
                 <div className="flex space-x-2">
                   <Button
                     variant={view === "month" ? "default" : "outline"}
@@ -401,12 +463,10 @@ export default function Calendar() {
 
               {view === "week" && (
                 <div className="space-y-4">
-                  {[...Array(7)].map((_, i) => {
-                    const currentDate = new Date(selectedDate);
-                    currentDate.setDate(
-                      selectedDate.getDate() - selectedDate.getDay() + i,
-                    );
-                    const dateStr = currentDate.toISOString().split("T")[0];
+                  {Array.from({ length: 7 }).map((_, i) => {
+                    const start = startOfWeek(currentDate, { weekStartsOn: 0 }); // Chủ Nhật
+                    const day = addDays(start, i);
+                    const dateStr = day.toISOString().split("T")[0];
                     const dailyEvents = events.filter(
                       (e) => e.date === dateStr,
                     );
@@ -414,7 +474,7 @@ export default function Calendar() {
                     return (
                       <div key={i}>
                         <h3 className="text-slate-800 font-medium">
-                          {currentDate.toLocaleDateString("en-US", {
+                          {day.toLocaleDateString("en-US", {
                             weekday: "long",
                             month: "short",
                             day: "numeric",

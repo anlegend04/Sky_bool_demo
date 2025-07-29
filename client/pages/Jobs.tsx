@@ -906,12 +906,12 @@ export default function Jobs() {
       change: "+2",
       color: "purple",
     },
-    {
-      title: "Avg. Time to Fill",
-      value: "28 days",
-      change: "-5",
-      color: "orange",
-    },
+    // {
+    //   title: "Avg. Time to Fill",
+    //   value: "28 days",
+    //   change: "-5",
+    //   color: "orange",
+    // },
   ];
 
   const handleAddJob = useCallback(
@@ -1342,7 +1342,7 @@ export default function Jobs() {
       </div>
 
       {/* Stats */}
-      <div className="stats-mobile">
+      <div className="stats-mobile grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
         {stats.map((stat) => (
           <Card key={stat.title}>
             <CardContent className="pt-6 card-mobile">

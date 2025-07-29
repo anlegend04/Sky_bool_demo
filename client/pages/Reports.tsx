@@ -2,6 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { CSVLink } from "react-csv";
+
 import {
   Select,
   SelectContent,
@@ -64,13 +66,31 @@ export default function Reports() {
   const [candidates, setCandidates] = useState([]);
 
   useEffect(() => {
-    // Load hardcoded data
-    let jobsData = HARDCODED_JOBS;
-    let candidatesData = HARDCODED_CANDIDATES;
+    const jobsData = HARDCODED_JOBS;
+    const candidatesData = HARDCODED_CANDIDATES;
 
     setJobs(jobsData);
-    setCandidates(candidatesData);
-  }, []);
+
+    const filtered = filterCandidates(
+      candidatesData,
+      selectedJob,
+      selectedRecruiter,
+      dateRange,
+    );
+    setCandidates(filtered);
+  }, [selectedJob, selectedRecruiter, dateRange]);
+
+  const hardcodedData = [
+    { name: "Alice", job: "Developer", status: "Hired" },
+    { name: "Bob", job: "Designer", status: "Interview" },
+    { name: "Charlie", job: "Manager", status: "Screening" },
+  ];
+
+  const headers = [
+    { label: "Name", key: "name" },
+    { label: "Job", key: "job" },
+    { label: "Status", key: "status" },
+  ];
 
   // Conversion Funnel Data
   const funnelData = [
@@ -194,6 +214,41 @@ export default function Reports() {
     },
   ];
 
+  function filterCandidates(
+    candidates: any[],
+    selectedJob: string,
+    selectedRecruiter: string,
+    dateRange: string,
+  ) {
+    const now = new Date();
+    let startDate = new Date();
+
+    switch (dateRange) {
+      case "last7":
+        startDate.setDate(now.getDate() - 7);
+        break;
+      case "last30":
+        startDate.setDate(now.getDate() - 30);
+        break;
+      case "last90":
+        startDate.setDate(now.getDate() - 90);
+        break;
+      case "last365":
+        startDate.setFullYear(now.getFullYear() - 1);
+        break;
+    }
+
+    return candidates.filter((c) => {
+      const matchJob = selectedJob === "all" || c.jobId === selectedJob;
+      const matchRecruiter =
+        selectedRecruiter === "all" || c.recruiterId === selectedRecruiter;
+      const createdAt = new Date(c.createdAt);
+      const matchDate = createdAt >= startDate;
+
+      return matchJob && matchRecruiter && matchDate;
+    });
+  }
+
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 
   return (
@@ -271,6 +326,22 @@ export default function Reports() {
               </Select>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Filtered Candidates</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ul className="list-disc pl-6 space-y-1">
+            {candidates.map((c) => (
+              <li key={c.id}>
+                {c.name} — {c.jobId} — {c.recruiterId} —{" "}
+                {new Date(c.createdAt).toLocaleDateString()}
+              </li>
+            ))}
+          </ul>
         </CardContent>
       </Card>
 
@@ -621,7 +692,7 @@ export default function Reports() {
 
         <TabsContent value="advanced" className="space-y-6">
           {/* Application Heatmap */}
-          <Card>
+          {/* <Card>
             <CardHeader>
               <CardTitle>Application Frequency Heatmap</CardTitle>
             </CardHeader>
@@ -661,10 +732,10 @@ export default function Reports() {
                 )}
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
 
           {/* Advanced Metrics */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -741,7 +812,7 @@ export default function Reports() {
                 </div>
               </CardContent>
             </Card>
-          </div>
+          </div> */}
         </TabsContent>
       </Tabs>
     </div>

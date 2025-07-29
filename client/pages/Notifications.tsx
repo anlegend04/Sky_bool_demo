@@ -249,7 +249,20 @@ export default function Notifications() {
             <Button asChild variant="outline" size="sm" className="w-full">
               <Link to={notification.actionUrl}>
                 <ExternalLink className="w-4 h-4 mr-2" />
-                View {notification.entityType === "job" ? "Job" : "Candidate"}
+                View{" "}
+                {notification.entityType === "job"
+                  ? "Job"
+                  : notification.entityType === "candidate"
+                    ? "Candidate"
+                    : notification.entityType === "interview"
+                      ? "Interview"
+                      : notification.entityType === "budget"
+                        ? "Budget"
+                        : notification.entityType === "deadline"
+                          ? "Deadline"
+                          : notification.entityType === "schedule"
+                            ? "Schedule"
+                            : "Other"}
               </Link>
             </Button>
           </div>

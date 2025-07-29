@@ -152,7 +152,7 @@ export default function EmailAutomation() {
       change: "+18%",
       color: "green",
     },
-    { title: "Avg. Open Rate", value: "87%", change: "+5%", color: "orange" },
+    // { title: "Avg. Open Rate", value: "87%", change: "+5%", color: "orange" },
     { title: "Active Workflows", value: "6", change: "+1", color: "purple" },
   ];
 
@@ -329,7 +329,7 @@ export default function EmailAutomation() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {stats.map((stat) => (
           <Card key={stat.title}>
             <CardContent className="pt-6">

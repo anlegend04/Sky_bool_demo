@@ -150,7 +150,14 @@ export interface NotificationData {
   timestamp: string;
   read: boolean;
   actionUrl?: string;
-  entityType?: "job" | "candidate";
+  entityType?:
+    | "job"
+    | "candidate"
+    | "interview"
+    | "budget"
+    | "deadline"
+    | "other"
+    | "schedule";
 }
 
 export const HARDCODED_JOBS: JobData[] = [
@@ -667,7 +674,7 @@ export const HARDCODED_NOTIFICATIONS: NotificationData[] = [
     read: true,
     timestamp: "2024-01-19T14:15:00Z",
     actionUrl: "/calendar",
-    entityType: "candidate",
+    entityType: "schedule",
   },
   {
     id: "notif_3",
@@ -680,6 +687,71 @@ export const HARDCODED_NOTIFICATIONS: NotificationData[] = [
     entityType: "job",
   },
 ];
+
+export const candidateFilters = {
+  status: ["Active", "Inactive", "Hired"],
+  stage: ["Applied", "Screening", "Interview", "Technical", "Offer", "Hired"],
+  rating: [1, 2, 3, 4, 5],
+  recruiter: ["Alex Chen", "Sarah Kim", "Mike Wilson"],
+  department: ["Engineering", "Product", "Design"],
+  position: ["Senior Frontend Developer", "Product Manager", "UX Designer"],
+  tags: [
+    "High Priority",
+    "Cultural Fit",
+    "Technical Expert",
+    "Experienced",
+    "Strategic Thinker",
+    "Design Expert",
+    "Hired",
+    "Remote Worker",
+  ],
+  source: ["LinkedIn", "Indeed", "Company Website"],
+  location: ["San Francisco, CA", "New York, NY", "Remote"],
+  skills: [
+    "React",
+    "TypeScript",
+    "Node.js",
+    "GraphQL",
+    "JavaScript",
+    "CSS",
+    "Product Strategy",
+    "Agile",
+    "Data Analysis",
+    "User Research",
+    "Roadmapping",
+    "Figma",
+    "Sketch",
+    "Prototyping",
+    "Design Systems",
+    "HTML",
+  ],
+};
+
+export const jobFilters = {
+  status: ["Open", "In Progress", "Closed"],
+  recruiter: ["Alex Chen", "Sarah Kim", "Mike Wilson"],
+  department: ["Engineering", "Product", "Design"],
+  position: ["Senior Frontend Developer", "Product Manager", "UX Designer"],
+  priority: ["High", "Medium", "Low"],
+  location: ["San Francisco, CA", "New York, NY", "Remote"],
+  type: ["Full-time", "Part-time", "Contract"],
+  domain: ["Technology"],
+  expectedSkills: [
+    "React",
+    "TypeScript",
+    "Node.js",
+    "JavaScript",
+    "CSS",
+    "HTML",
+    "Product Strategy",
+    "Agile",
+    "Data Analysis",
+    "User Research",
+    "Figma",
+    "Sketch",
+    "Prototyping",
+  ],
+};
 
 export const EMAIL_TEMPLATES = {
   interview_invitation:

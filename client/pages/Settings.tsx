@@ -103,18 +103,18 @@ export default function Settings() {
       </div>
 
       <Tabs defaultValue="profile" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="profile">{t("settings.profile")}</TabsTrigger>
-          <TabsTrigger value="notifications">
+          {/* <TabsTrigger value="notifications">
             {t("settings.notifications")}
-          </TabsTrigger>
+          </TabsTrigger> */}
           <TabsTrigger value="appearance">
             {t("settings.appearance")}
           </TabsTrigger>
           <TabsTrigger value="security">{t("settings.security")}</TabsTrigger>
-          <TabsTrigger value="integrations">
+          {/* <TabsTrigger value="integrations">
             {t("settings.integrations")}
-          </TabsTrigger>
+          </TabsTrigger> */}
           <TabsTrigger value="organization">
             {t("settings.organization")}
           </TabsTrigger>

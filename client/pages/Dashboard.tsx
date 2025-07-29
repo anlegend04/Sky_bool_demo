@@ -63,14 +63,14 @@ export default function Dashboard() {
       icon: Clock,
       color: "orange",
     },
-    {
-      titleKey: "dashboard.avgTimeToHire",
-      value: "18 days",
-      change: "-2 days",
-      changeType: "positive" as const,
-      icon: Target,
-      color: "purple",
-    },
+    // {
+    //   titleKey: "dashboard.avgTimeToHire",
+    //   value: "18 days",
+    //   change: "-2 days",
+    //   changeType: "positive" as const,
+    //   icon: Target,
+    //   color: "purple",
+    // },
   ];
 
   const recentJobs = [
@@ -129,10 +129,10 @@ export default function Dashboard() {
           </p>
         </div>
         <div className="btn-group-mobile">
-          <Button variant="outline" size="sm" className="btn-mobile">
+          {/* <Button variant="outline" size="sm" className="btn-mobile">
             <Filter className="icon-mobile mr-2" />
             {t("dashboard.filter")}
-          </Button>
+          </Button> */}
           {/* <Button variant="outline" size="sm" className="btn-mobile">
             <Link to="/jobs/create">
               <Plus className="icon-mobile mr-2" />
@@ -143,13 +143,13 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Cards */}
-      <div className="stats-mobile">
+      <div className="stats-mobile grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
         {stats.map((stat) => (
           <Card
             key={stat.titleKey}
             className="relative overflow-hidden card-responsive"
           >
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardHeader className=" flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-responsive-sm font-medium text-slate-600 text-wrap-safe">
                 {t(stat.titleKey)}
               </CardTitle>
