@@ -101,11 +101,17 @@ const JobCard = memo(
     onEdit,
     onShare,
     onDelete,
+    getStatusBadge,
+    getPriorityBadge,
+    getPerformanceColor,
   }: {
     job: JobData;
     onEdit: (job: JobData) => void;
     onShare: (jobId: string) => void;
     onDelete: (jobId: string) => void;
+    getStatusBadge: (status: JobData["status"]) => JSX.Element;
+    getPriorityBadge: (priority: JobData["priority"]) => JSX.Element;
+    getPerformanceColor: (performance: number) => string;
   }) => (
     <Card className="hover:shadow-md transition-shadow card-responsive">
       <CardHeader className="pb-3 card-mobile">
@@ -799,7 +805,7 @@ export default function Jobs() {
   const [shareJobId, setShareJobId] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const visibleFields = useState({
+  const [visibleFields, setVisibleFields] = useState({
     position: true,
     department: true,
     recruiter: true,
@@ -814,7 +820,7 @@ export default function Jobs() {
     performance: true,
     priority: true,
     pipelineSummary: true,
-  })[0];
+  });
 
   const filteredJobs = jobs.filter((job) => {
     const matchesSearch =
@@ -1223,6 +1229,9 @@ export default function Jobs() {
           onEdit={handleEditJob}
           onShare={setShareJobId}
           onDelete={handleDeleteJob}
+          getPerformanceColor={getPerformanceColor}
+          getStatusBadge={getStatusBadge}
+          getPriorityBadge={getPriorityBadge}
         />
       ))}
     </div>
