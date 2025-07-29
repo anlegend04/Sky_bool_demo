@@ -1,13 +1,21 @@
-import React, { useState, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
+import { Link } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/hooks/use-language";
+import { HARDCODED_JOBS, JobData } from "@/data/hardcoded-data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   Select,
   SelectContent,
@@ -19,11 +27,21 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,930 +49,1392 @@ import {
   DropdownMenuTrigger,
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
+import { HelpTooltip, helpContent } from "@/components/ui/help-tooltip";
 import {
-  AlertTriangle,
-  Bell,
-  Calendar,
-  ChevronRight,
-  Clock,
-  Eye,
-  Filter,
-  Mail,
-  MessageSquare,
-  MoreHorizontal,
-  Phone,
   Plus,
-  RefreshCw,
   Search,
-  Send,
-  Timer,
-  TrendingUp,
-  User,
+  Filter,
+  MoreHorizontal,
   Users,
-  Zap,
-  CheckCircle,
-  XCircle,
-  ArrowRight,
-  FileText,
-  Star,
-  AlertCircle,
-  Calendar as CalendarIcon,
-  Archive,
-  Edit3,
-  Settings,
-  Edit,
-  Download,
   UserPlus,
+  MapPin,
+  Calendar,
+  Edit,
+  Eye,
+  Trash2,
+  Share,
+  Briefcase,
+  Grid3X3,
+  List,
+  Copy,
+  TrendingUp,
+  Target,
+  CheckCircle,
+  Settings,
 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { Link } from "react-router-dom"; // Added for navigation
-import {
-  HARDCODED_CANDIDATES,
-  type CandidateData,
-} from "@/data/hardcoded-data";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { GripVertical, Trash } from "lucide-react";
 
-// Extended types remain the same
-interface FollowUpCandidate extends CandidateData {
-  lastInteraction: string;
-  nextFollowUp: string;
-  daysInStage: number;
-  emailsSent: number;
-  lastEmailSent?: string;
-  responseRate: number;
-  urgencyLevel: "low" | "medium" | "high" | "critical";
-  upcomingActions: FollowUpAction[];
-  interactions: Interaction[];
-  emailHistory: EmailRecord[];
-}
+// Define initial job form state
+const initialJobState = {
+  emailAlias: "",
+  department: "",
+  location: "",
+  position: "",
+  type: "Full-time" as "Full-time" | "Part-time" | "Contract",
+  expectedSkills: [] as string[],
+  salaryMin: "",
+  salaryMax: "",
+  domain: "",
+  headcount: 1,
+  recruiter: "",
+  requester: "",
+  description: "",
+  priority: "Medium" as "High" | "Medium" | "Low",
+  deadline: "",
+  estimatedCost: "",
+};
 
-interface FollowUpAction {
+// These will be moved inside the AddJobForm component where they belong
+
+function StageItem({
+  id,
+  index,
+  stage,
+  updateStage,
+  removeStage,
+}: {
   id: string;
-  type: "email" | "call" | "meeting" | "review";
-  title: string;
-  dueDate: string;
-  priority: "low" | "medium" | "high";
-  template?: string;
-  completed: boolean;
+  index: number;
+  stage: any;
+  updateStage: (index: number, stage: any) => void;
+  removeStage: (index: number) => void;
+}) {
+  return (
+    <div className="flex flex-col gap-2 border border-slate-200 rounded-xl p-3 bg-slate-50">
+      <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+        <span className="text-slate-400">
+          <GripVertical className="w-4 h-4 mt-1" />
+        </span>
+        <Input
+          value={stage.name}
+          onChange={(e) =>
+            updateStage(index, {
+              ...stage,
+              name: e.target.value,
+            })
+          }
+          className="flex-1"
+          placeholder="Stage name"
+        />
+        <Input
+          type="number"
+          min={1}
+          value={stage.durationHours || ""}
+          onChange={(e) =>
+            updateStage(index, {
+              ...stage,
+              durationHours: e.target.value,
+            })
+          }
+          className="w-36"
+          placeholder="Duration (h)"
+        />
+        {!["Applied", "Screening", "Interview", "Offer", "Hired"].includes(
+          stage.name,
+        ) && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => removeStage(index)}
+            className="text-red-500"
+          >
+            <Trash className="w-4 h-4" />
+          </Button>
+        )}
+      </div>
+    </div>
+  );
 }
 
-interface Interaction {
-  id: string;
-  type: "call" | "email" | "meeting" | "note";
-  date: string;
-  duration?: number;
-  summary: string;
-  outcome: "positive" | "neutral" | "negative";
-  nextAction?: string;
-}
-
-interface EmailRecord {
-  id: string;
-  subject: string;
-  template: string;
-  sentDate: string;
-  opened: boolean;
-  responded: boolean;
-  responseDate?: string;
-}
-
-interface EmailTemplate {
-  id: string;
-  name: string;
-  subject: string;
-  body: string;
-  stage: string;
-  variables: string[];
-}
-
-// Mock job data for the apply-to-job dialog
-interface Job {
-  id: string;
-  position: string;
-}
-
-export default function FollowUpDashboard() {
-  const { toast } = useToast();
-
-  // Mock job data
-  const jobs: Job[] = [
-    { id: "job1", position: "Software Engineer" },
-    { id: "job2", position: "Product Manager" },
-    { id: "job3", position: "Data Scientist" },
-  ];
-
-  // State for field visibility in list view
-  const [visibleFields, setVisibleFields] = useState({
-    name: true,
-    appliedDate: true,
-    email: true,
-    phone: true,
-    position: true,
-    recruiter: true,
-    stage: true,
-    source: true,
-    salary: true,
-    location: true,
-    department: true,
-  });
-
-  // State for job application dialog
-  const [applyCandidateId, setApplyCandidateId] = useState<string | null>(null);
-  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
-
-  // Mock candidate data transformation (same as original)
-  const [candidates] = useState<FollowUpCandidate[]>(
-    HARDCODED_CANDIDATES.map((candidate, index) => ({
-      ...candidate,
-      lastInteraction: new Date(
-        Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000,
-      ).toISOString(),
-      nextFollowUp: new Date(
-        Date.now() + Math.random() * 3 * 24 * 60 * 60 * 1000,
-      ).toISOString(),
-      daysInStage: Math.floor(Math.random() * 14) + 1,
-      emailsSent: Math.floor(Math.random() * 5) + 1,
-      lastEmailSent:
-        Math.random() > 0.3
-          ? new Date(
-              Date.now() - Math.random() * 3 * 24 * 60 * 60 * 1000,
-            ).toISOString()
-          : undefined,
-      responseRate: Math.floor(Math.random() * 100),
-      urgencyLevel: ["low", "medium", "high", "critical"][
-        Math.floor(Math.random() * 4)
-      ] as any,
-      upcomingActions: [
-        {
-          id: `action-${index}-1`,
-          type: "email",
-          title: "Send interview confirmation",
-          dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-          priority: "high",
-          template: "interview_confirmation",
-          completed: false,
-        },
-      ],
-      interactions: [
-        {
-          id: `int-${index}-1`,
-          type: "call",
-          date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-          duration: 15,
-          summary: "Discussed role requirements and candidate expectations",
-          outcome: "positive",
-          nextAction: "Send technical assessment",
-        },
-      ],
-      emailHistory: [
-        {
-          id: `email-${index}-1`,
-          subject: "Interview Invitation - " + candidate.position,
-          template: "interview_invitation",
-          sentDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-          opened: Math.random() > 0.3,
-          responded: Math.random() > 0.5,
-          responseDate:
-            Math.random() > 0.5
-              ? new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString()
-              : undefined,
-        },
-      ],
-    })),
-  );
-
-  const [selectedCandidates, setSelectedCandidates] = useState<string[]>([]);
-  const [viewMode, setViewMode] = useState<"pipeline" | "list" | "timeline">(
-    "pipeline",
-  );
-  const [filterStage, setFilterStage] = useState("all");
-  const [filterJob, setFilterJob] = useState("all");
-  const [filterUrgency, setFilterUrgency] = useState("all");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCandidate, setSelectedCandidate] =
-    useState<FollowUpCandidate | null>(null);
-  const [showEmailDialog, setShowEmailDialog] = useState(false);
-  const [showNoteDialog, setShowNoteDialog] = useState(false);
-  const [emailTemplate, setEmailTemplate] = useState("");
-  const [bulkAction, setBulkAction] = useState("");
-
-  // Email templates (same as original)
-  const emailTemplates: EmailTemplate[] = [
-    {
-      id: "interview_invitation",
-      name: "Interview Invitation",
-      subject: "Interview Invitation - {{position}}",
-      body: "Dear {{name}},\n\nWe would like to invite you for an interview for the {{position}} position.\n\nBest regards,\n{{recruiter}}",
-      stage: "Interview",
-      variables: ["name", "position", "recruiter"],
-    },
-    {
-      id: "follow_up",
-      name: "General Follow-up",
-      subject: "Following up on your application - {{position}}",
-      body: "Hi {{name}},\n\nI wanted to follow up on your application for the {{position}} role.\n\nLet me know if you have any questions.\n\nBest,\n{{recruiter}}",
-      stage: "Any",
-      variables: ["name", "position", "recruiter"],
-    },
-    {
-      id: "offer_letter",
-      name: "Offer Letter",
-      subject: "Job Offer - {{position}}",
-      body: "Dear {{name}},\n\nWe are pleased to offer you the position of {{position}}.\n\nPlease review the attached offer details.\n\nBest regards,\n{{recruiter}}",
-      stage: "Offer",
-      variables: ["name", "position", "recruiter"],
-    },
-  ];
-
-  // Filter and search logic (same as original)
-  const filteredCandidates = useMemo(() => {
-    return candidates.filter((candidate) => {
-      const matchesSearch =
-        candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        candidate.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        candidate.email.toLowerCase().includes(searchTerm.toLowerCase());
-
-      const matchesStage =
-        filterStage === "all" ||
-        candidate.stage.toLowerCase() === filterStage.toLowerCase();
-      const matchesJob =
-        filterJob === "all" ||
-        candidate.position.toLowerCase().includes(filterJob.toLowerCase());
-      const matchesUrgency =
-        filterUrgency === "all" || candidate.urgencyLevel === filterUrgency;
-
-      return matchesSearch && matchesStage && matchesJob && matchesUrgency;
-    });
-  }, [candidates, searchTerm, filterStage, filterJob, filterUrgency]);
-
-  // Statistics (same as original)
-  const stats = useMemo(() => {
-    const total = candidates.length;
-    const needingFollowUp = candidates.filter(
-      (c) =>
-        new Date(c.nextFollowUp) <= new Date(Date.now() + 24 * 60 * 60 * 1000),
-    ).length;
-    const overdue = candidates.filter((c) => c.daysInStage > 7).length;
-    const activeToday = candidates.filter((c) =>
-      c.upcomingActions.some((a) => !a.completed),
-    ).length;
-
-    return { total, needingFollowUp, overdue, activeToday };
-  }, [candidates]);
-
-  // Handlers (same as original)
-  const handleCandidateSelect = useCallback((candidateId: string) => {
-    setSelectedCandidates((prev) =>
-      prev.includes(candidateId)
-        ? prev.filter((id) => id !== candidateId)
-        : [...prev, candidateId],
-    );
-  }, []);
-
-  const handleSelectAll = useCallback(() => {
-    setSelectedCandidates(filteredCandidates.map((c) => c.id));
-  }, [filteredCandidates]);
-
-  const handleBulkAction = useCallback(
-    (action: string) => {
-      if (selectedCandidates.length === 0) {
-        toast({
-          title: "No candidates selected",
-          description: "Please select candidates to perform bulk actions.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      switch (action) {
-        case "email":
-          setShowEmailDialog(true);
-          break;
-        case "move_stage":
-          toast({
-            title: "Moving candidates",
-            description: `Moving ${selectedCandidates.length} candidates to next stage.`,
-          });
-          break;
-        case "add_note":
-          setShowNoteDialog(true);
-          break;
-        default:
-          break;
-      }
-    },
-    [selectedCandidates, toast],
-  );
-
-  const sendEmail = useCallback(
-    (templateId: string, candidateIds: string[]) => {
-      const template = emailTemplates.find((t) => t.id === templateId);
-      if (!template) return;
-
-      toast({
-        title: "Emails sent",
-        description: `Sent "${template.name}" to ${candidateIds.length} candidate(s).`,
-      });
-
-      setShowEmailDialog(false);
-      setSelectedCandidates([]);
-    },
-    [emailTemplates, toast],
-  );
-
-  const getUrgencyColor = (urgency: string) => {
-    switch (urgency) {
-      case "critical":
-        return "bg-red-100 text-red-800 border-red-300";
-      case "high":
-        return "bg-orange-100 text-orange-800 border-orange-300";
-      case "medium":
-        return "bg-yellow-100 text-yellow-800 border-yellow-300";
-      default:
-        return "bg-green-100 text-green-800 border-green-300";
-    }
-  };
-
-  const formatTimeAgo = (date: string) => {
-    const now = new Date();
-    const then = new Date(date);
-    const diffInHours = Math.floor(
-      (now.getTime() - then.getTime()) / (1000 * 60 * 60),
-    );
-
-    if (diffInHours < 24) return `${diffInHours}h ago`;
-    const diffInDays = Math.floor(diffInHours / 24);
-    return `${diffInDays}d ago`;
-  };
-
-  // Mock apply candidate to job function
-  const applyCandidateToJob = useCallback(
-    (candidateId: string, jobId: string) => {
-      const candidate = candidates.find((c) => c.id === candidateId);
-      const job = jobs.find((j) => j.id === jobId);
-      if (candidate && job) {
-        toast({
-          title: "Application Submitted",
-          description: `${candidate.name} applied to ${job.position}`,
-        });
-      }
-    },
-    [candidates, jobs, toast],
-  );
-
-  // Candidate Card Component (same as original)
-  const CandidateCard = ({ candidate }: { candidate: FollowUpCandidate }) => (
-    <Card
-      className={`hover:shadow-lg transition-all border-l-4 cursor-pointer rounded-lg ${
-        selectedCandidates.includes(candidate.id)
-          ? "ring-2 ring-blue-500 bg-blue-50"
-          : ""
-      } border-slate-200 hover:border-blue-300 group`}
-      style={{ minHeight: 80 }}
-    >
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center space-x-3 flex-1 min-w-0">
-            <Avatar className="w-10 h-10">
-              <AvatarImage src={candidate.avatar} />
-              <AvatarFallback>
-                {candidate.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-sm truncate group-hover:text-blue-700 transition-colors">
-                {candidate.name}
-              </h3>
-              <p className="text-xs text-gray-600 truncate">
-                {candidate.email}
-              </p>
-              <Badge variant="outline" className="text-xs mt-1">
-                {candidate.stage}
-              </Badge>
+// Memoized JobCard to prevent unnecessary re-renders
+const JobCard = memo(
+  ({
+    job,
+    onEdit,
+    onShare,
+    onDelete,
+    getStatusBadge,
+    getPriorityBadge,
+    getPerformanceColor,
+  }: {
+    job: JobData;
+    onEdit: (job: JobData) => void;
+    onShare: (jobId: string) => void;
+    onDelete: (jobId: string) => void;
+    getStatusBadge: (status: JobData["status"]) => JSX.Element;
+    getPriorityBadge: (priority: JobData["priority"]) => JSX.Element;
+    getPerformanceColor: (performance: number) => string;
+  }) => (
+    <Card className="hover:shadow-md transition-shadow card-responsive">
+      <CardHeader className="pb-3 card-mobile">
+        <div className="flex items-start justify-between min-w-0">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-2 min-w-0">
+              <Link
+                to={`/jobs/${job.id}`}
+                className="font-semibold text-slate-900 hover:text-blue-600 transition-colors text-wrap-safe min-w-0 flex-1 truncate"
+              >
+                {job.position}
+              </Link>
+              <div className="flex-shrink-0">
+                {getPriorityBadge(job.priority)}
+              </div>
+            </div>
+            <p className="text-responsive-sm text-slate-600 mb-2 text-wrap-safe truncate">
+              {job.department}
+            </p>
+            <div className="flex items-center gap-4 text-responsive-sm text-slate-500 min-w-0">
+              <span className="flex items-center gap-1 text-wrap-safe min-w-0 flex-1">
+                <MapPin className="icon-mobile flex-shrink-0" />
+                <span className="truncate">{job.location}</span>
+              </span>
+              <span className="flex items-center gap-1 text-wrap-safe min-w-0 flex-1">
+                <Calendar className="icon-mobile flex-shrink-0" />
+                <span className="truncate">{job.deadline}</span>
+              </span>
             </div>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="icon-mobile flex-shrink-0"
+              >
                 <MoreHorizontal className="w-4 h-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setSelectedCandidate(candidate)}>
-                <Eye className="w-4 h-4 mr-2" />
-                View Profile
+            <DropdownMenuContent align="end" className="dropdown-mobile">
+              <Link to={`/jobs/${job.id}`}>
+                <DropdownMenuItem className="text-wrap-safe">
+                  <Eye className="icon-mobile mr-2" />
+                  View Details
+                </DropdownMenuItem>
+              </Link>
+              <DropdownMenuItem
+                onClick={() => onEdit(job)}
+                className="text-wrap-safe"
+              >
+                <Edit className="icon-mobile mr-2" />
+                Edit Job
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Mail className="w-4 h-4 mr-2" />
-                Send Email
+              <DropdownMenuItem
+                onClick={() => onShare(job.id)}
+                className="text-wrap-safe"
+              >
+                <Share className="icon-mobile mr-2" />
+                Share
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Phone className="w-4 h-4 mr-2" />
-                Schedule Call
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Edit3 className="w-4 h-4 mr-2" />
-                Add Note
-              </DropdownMenuItem>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <DropdownMenuItem
+                    className="text-red-600 text-wrap-safe"
+                    onSelect={(e) => e.preventDefault()}
+                  >
+                    <Trash2 className="icon-mobile mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="modal-mobile">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-wrap-safe">
+                      Delete Job
+                    </AlertDialogTitle>
+                    <AlertDialogDescription className="text-wrap-safe">
+                      Are you sure you want to delete "{job.position}"? This
+                      action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel className="btn-mobile">
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => onDelete(job.id)}
+                      className="btn-mobile"
+                    >
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </CardHeader>
+      <CardContent className="space-y-3 card-mobile">
+        <div className="flex items-center justify-between">
+          <span className="text-responsive-sm text-slate-600 text-wrap-safe">
+            Applications
+          </span>
+          <Badge variant="outline" className="badge-mobile">
+            {job.applications}
+          </Badge>
+        </div>
+        <div className="space-y-2">
+          <div className="flex justify-between text-responsive-sm">
+            <span className="text-wrap-safe">Pipeline Summary</span>
+            <span className="text-wrap-safe">
+              {job.pipelineSummary.hired}/{job.target} hired
+            </span>
+          </div>
+          <div className="grid grid-cols-3 gap-1 text-responsive-sm">
+            <div className="text-center p-1 bg-blue-50 rounded">
+              <div className="font-medium text-wrap-safe">
+                {job.pipelineSummary.applied}
+              </div>
+              <div className="text-slate-600 text-wrap-safe">Applied</div>
+            </div>
+            <div className="text-center p-1 bg-yellow-50 rounded">
+              <div className="font-medium text-wrap-safe">
+                {job.pipelineSummary.interview}
+              </div>
+              <div className="text-slate-600 text-wrap-safe">Interview</div>
+            </div>
+            <div className="text-center p-1 bg-green-50 rounded">
+              <div className="font-medium text-wrap-safe">
+                {job.pipelineSummary.hired}
+              </div>
+              <div className="text-slate-600 text-wrap-safe">Hired</div>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <div className="flex-shrink-0">{getStatusBadge(job.status)}</div>
+            <span className="text-responsive-sm text-slate-500 text-wrap-safe truncate">
+              by {job.recruiter}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <TrendingUp
+              className={`icon-mobile ${getPerformanceColor(job.performance)}`}
+            />
+            <span
+              className={`text-responsive-sm ${getPerformanceColor(job.performance)} text-wrap-safe`}
+            >
+              {job.performance}%
+            </span>
+          </div>
+        </div>
+      </CardContent>
     </Card>
+  ),
+);
+
+// Memoized AddJobForm to prevent re-renders when parent state changes
+const AddJobForm = memo(
+  ({
+    open,
+    onOpenChange,
+    onAddJob,
+    onUpdateJob,
+    editingJob,
+  }: {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    onAddJob: (job: any) => void;
+    onUpdateJob: (job: any) => void;
+    editingJob: JobData | null;
+  }) => {
+    const [newJob, setNewJob] = useState(initialJobState);
+    const [jobStages, setJobStages] = useState(
+      ["Applied", "Screening", "Interview", "Offer", "Hired"].map(
+        (name, index) => ({
+          id: `stage-${index}`,
+          name,
+          durationHours: "",
+        }),
+      ),
+    );
+
+    // Reset form when editingJob changes
+    useEffect(() => {
+      if (editingJob) {
+        setNewJob({
+          emailAlias: editingJob.emailAlias,
+          department: editingJob.department,
+          location: editingJob.location,
+          position: editingJob.position,
+          type: editingJob.type as "Full-time" | "Part-time" | "Contract",
+          expectedSkills: editingJob.expectedSkills,
+          salaryMin: editingJob.salaryMin,
+          salaryMax: editingJob.salaryMax,
+          domain: editingJob.domain,
+          headcount: editingJob.headcount,
+          recruiter: editingJob.recruiter,
+          requester: editingJob.requester,
+          description: editingJob.description,
+          priority: editingJob.priority as "High" | "Medium" | "Low",
+          deadline: editingJob.deadline,
+          estimatedCost: editingJob.estimatedCost,
+        });
+      } else {
+        setNewJob(initialJobState);
+      }
+    }, [editingJob]);
+
+    const updateStage = useCallback(
+      (index: number, newStage: {id: string; name: string; durationHours: string }) => {
+        setJobStages((prev) => {
+          const updated = [...prev];
+          updated[index] = newStage;
+          return updated;
+        });
+      },
+      [],
+    );
+
+    const addNewStage = useCallback(() => {
+      setJobStages((prev) => [
+        ...prev,
+        { id: `stage-${Date.now()}`, name: "", durationHours: "" },
+      ]);
+    }, []);
+
+    const removeStage = useCallback((index: number) => {
+      setJobStages((prev) => prev.filter((_, i) => i !== index));
+    }, []);
+
+    const handleSubmit = useCallback(() => {
+      const jobData = {
+        ...newJob,
+        applications: 0,
+        target: newJob.headcount,
+        hired: 0,
+        openDate: new Date().toISOString().split("T")[0],
+        actualCost: "0",
+        performance: 0,
+        status: "Open" as const,
+        pipelineSummary: {
+          applied: 0,
+          screening: 0,
+          interview: 0,
+          technical: 0,
+          offer: 0,
+          hired: 0,
+          rejected: 0,
+        },
+      };
+
+      if (editingJob) {
+        onUpdateJob(jobData);
+      } else {
+        onAddJob(jobData);
+      }
+
+      setNewJob(initialJobState);
+      setJobStages(
+        ["Applied", "Screening", "Interview", "Offer", "Hired"].map(
+          (name, index) => ({
+            id: `stage-${index}`,
+            name,
+            durationHours: "",
+          }),
+        ),
+      );
+      onOpenChange(false);
+    }, [newJob, editingJob, onAddJob, onUpdateJob, onOpenChange]);
+
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="modal-mobile max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-wrap-safe">
+              {editingJob ? "Edit Job" : "Add New Job"}
+            </DialogTitle>
+            <DialogDescription className="text-wrap-safe">
+              {editingJob
+                ? "Update the job details below."
+                : "Create a new job posting with all the necessary details."}
+            </DialogDescription>
+          </DialogHeader>
+          <Tabs defaultValue="basic" className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="basic" className="text-wrap-safe">
+                Basic Info
+              </TabsTrigger>
+              <TabsTrigger value="details" className="text-wrap-safe">
+                Job Details
+              </TabsTrigger>
+              <TabsTrigger value="team" className="text-wrap-safe">
+                Team & Budget
+              </TabsTrigger>
+              <TabsTrigger value="pipeline" className="text-wrap-safe">
+                Stages
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="basic" className="form-responsive">
+              <div className="form-grid-responsive">
+                <div>
+                  <label className="text-responsive-sm font-medium text-slate-700 flex items-center gap-2 text-wrap-safe">
+                    Email Alias
+                    <HelpTooltip content={helpContent.emailAlias} />
+                  </label>
+                  <Input
+                    placeholder="jobs@company.com"
+                    value={newJob.emailAlias}
+                    onChange={(e) =>
+                      setNewJob({ ...newJob, emailAlias: e.target.value })
+                    }
+                    className="mt-1 text-wrap-safe"
+                  />
+                </div>
+                <div>
+                  <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
+                    Department
+                  </label>
+                  <Select
+                    value={newJob.department}
+                    onValueChange={(value) =>
+                      setNewJob({ ...newJob, department: value })
+                    }
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Select department" />
+                    </SelectTrigger>
+                    <SelectContent className="dropdown-mobile">
+                      <SelectItem
+                        value="Engineering"
+                        className="text-wrap-safe"
+                      >
+                        Engineering
+                      </SelectItem>
+                      <SelectItem value="Product" className="text-wrap-safe">
+                        Product
+                      </SelectItem>
+                      <SelectItem value="Design" className="text-wrap-safe">
+                        Design
+                      </SelectItem>
+                      <SelectItem value="Marketing" className="text-wrap-safe">
+                        Marketing
+                      </SelectItem>
+                      <SelectItem value="Data" className="text-wrap-safe">
+                        Data
+                      </SelectItem>
+                      <SelectItem value="Sales" className="text-wrap-safe">
+                        Sales
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
+                    Job Location
+                  </label>
+                  <Input
+                    placeholder="San Francisco, CA or Remote"
+                    value={newJob.location}
+                    onChange={(e) =>
+                      setNewJob({ ...newJob, location: e.target.value })
+                    }
+                    className="mt-1 text-wrap-safe"
+                  />
+                </div>
+                <div>
+                  <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
+                    Job Position
+                  </label>
+                  <Input
+                    placeholder="Senior Software Engineer"
+                    value={newJob.position}
+                    onChange={(e) =>
+                      setNewJob({ ...newJob, position: e.target.value })
+                    }
+                    className="mt-1 text-wrap-safe"
+                  />
+                </div>
+                <div>
+                  <label className="text-responsive-sm font-medium text-slate-700 flex items-center gap-2 text-wrap-safe">
+                    Employment Type
+                    <HelpTooltip content={helpContent.employmentType} />
+                  </label>
+                  <Select
+                    value={newJob.type}
+                    onValueChange={(value: any) =>
+                      setNewJob({ ...newJob, type: value })
+                    }
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Select employment type" />
+                    </SelectTrigger>
+                    <SelectContent className="dropdown-mobile">
+                      <SelectItem value="Full-time" className="text-wrap-safe">
+                        Full-time
+                      </SelectItem>
+                      <SelectItem value="Part-time" className="text-wrap-safe">
+                        Part-time
+                      </SelectItem>
+                      <SelectItem value="Contract" className="text-wrap-safe">
+                        Contract
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-responsive-sm font-medium text-slate-700 flex items-center gap-2 text-wrap-safe">
+                    Domain/Industry
+                    <HelpTooltip content={helpContent.domain} />
+                  </label>
+                  <Input
+                    placeholder="Technology, Finance, Healthcare"
+                    value={newJob.domain}
+                    onChange={(e) =>
+                      setNewJob({ ...newJob, domain: e.target.value })
+                    }
+                    className="mt-1 text-wrap-safe"
+                  />
+                </div>
+                <div>
+                  <label className="text-responsive-sm font-medium text-slate-700 flex items-center gap-2 text-wrap-safe">
+                    Priority
+                    <HelpTooltip content={helpContent.priority} />
+                  </label>
+                  <Select
+                    value={newJob.priority}
+                    onValueChange={(value: any) =>
+                      setNewJob({ ...newJob, priority: value })
+                    }
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Select priority" />
+                    </SelectTrigger>
+                    <SelectContent className="dropdown-mobile">
+                      <SelectItem value="High" className="text-wrap-safe">
+                        High
+                      </SelectItem>
+                      <SelectItem value="Medium" className="text-wrap-safe">
+                        Medium
+                      </SelectItem>
+                      <SelectItem value="Low" className="text-wrap-safe">
+                        Low
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
+                    Deadline
+                  </label>
+                  <Input
+                    type="date"
+                    value={newJob.deadline}
+                    onChange={(e) =>
+                      setNewJob({ ...newJob, deadline: e.target.value })
+                    }
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+            </TabsContent>
+            <TabsContent value="details" className="form-responsive">
+              <div className="space-y-4">
+                <div>
+                  <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
+                    Expected Skills
+                  </label>
+                  <Input
+                    placeholder="React, TypeScript, Node.js (comma separated)"
+                    onChange={(e) =>
+                      setNewJob({
+                        ...newJob,
+                        expectedSkills: e.target.value
+                          .split(",")
+                          .map((s) => s.trim())
+                          .filter(Boolean),
+                      })
+                    }
+                    className="mt-1 text-wrap-safe"
+                  />
+                </div>
+                <div className="form-grid-responsive">
+                  <div>
+                    <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
+                      Salary Min
+                    </label>
+                    <Input
+                      placeholder="80000"
+                      type="number"
+                      value={newJob.salaryMin}
+                      onChange={(e) =>
+                        setNewJob({ ...newJob, salaryMin: e.target.value })
+                      }
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
+                      Salary Max
+                    </label>
+                    <Input
+                      placeholder="120000"
+                      type="number"
+                      value={newJob.salaryMax}
+                      onChange={(e) =>
+                        setNewJob({ ...newJob, salaryMax: e.target.value })
+                      }
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
+                    Job Description
+                  </label>
+                  <Textarea
+                    placeholder="Describe the role, responsibilities, and requirements..."
+                    value={newJob.description}
+                    onChange={(e) =>
+                      setNewJob({ ...newJob, description: e.target.value })
+                    }
+                    className="mt-1 text-wrap-safe"
+                    rows={6}
+                  />
+                </div>
+              </div>
+            </TabsContent>
+            <TabsContent value="team" className="form-responsive">
+              <div className="form-grid-responsive">
+                <div>
+                  <label className="text-responsive-sm font-medium text-slate-700 flex items-center gap-2 text-wrap-safe">
+                    Headcount
+                    <HelpTooltip content={helpContent.headcount} />
+                  </label>
+                  <Input
+                    placeholder="2"
+                    type="number"
+                    value={newJob.headcount}
+                    onChange={(e) =>
+                      setNewJob({
+                        ...newJob,
+                        headcount: parseInt(e.target.value) || 1,
+                      })
+                    }
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
+                    Recruiter
+                  </label>
+                  <Select
+                    value={newJob.recruiter}
+                    onValueChange={(value) =>
+                      setNewJob({ ...newJob, recruiter: value })
+                    }
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Select recruiter" />
+                    </SelectTrigger>
+                    <SelectContent className="dropdown-mobile">
+                      <SelectItem value="Alex Chen" className="text-wrap-safe">
+                        Alex Chen
+                      </SelectItem>
+                      <SelectItem value="Sarah Kim" className="text-wrap-safe">
+                        Sarah Kim
+                      </SelectItem>
+                      <SelectItem
+                        value="Mike Wilson"
+                        className="text-wrap-safe"
+                      >
+                        Mike Wilson
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div>
+                <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
+                  Requester
+                </label>
+                <Input
+                  placeholder="Select requester who requested this job"
+                  className="mt-1 text-wrap-safe"
+                />
+              </div>
+              <div>
+                <label className="text-responsive-sm font-medium text-slate-700 flex items-center gap-2 text-wrap-safe">
+                  Estimated Budget
+                  <HelpTooltip content={helpContent.estimatedBudget} />
+                </label>
+                <Input
+                  placeholder="15000"
+                  type="number"
+                  value={newJob.estimatedCost}
+                  onChange={(e) =>
+                    setNewJob({ ...newJob, estimatedCost: e.target.value })
+                  }
+                  className="mt-1"
+                />
+              </div>
+              <div className="flex justify-end space-x-2 pt-4 btn-group-mobile">
+                <Button
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                  className="btn-mobile"
+                >
+                  Cancel
+                </Button>
+                <Button onClick={handleSubmit} className="btn-mobile">
+                  {editingJob ? "Update Job" : "Create Job"}
+                </Button>
+              </div>
+            </TabsContent>
+            <TabsContent value="pipeline" className="form-responsive">
+              <div className="space-y-3">
+                <label className="text-responsive-sm font-medium text-slate-700">
+                  Recruitment Stages
+                </label>
+
+                <div className="space-y-2">
+                  {jobStages.map((stage, index) => (
+                    <StageItem
+                      key={stage.id}
+                      id={stage.id}
+                      index={index}
+                      stage={stage}
+                      updateStage={updateStage}
+                      removeStage={removeStage}
+                    />
+                  ))}
+                </div>
+
+                <Button
+                  variant="outline"
+                  onClick={addNewStage}
+                  className="text-sm"
+                >
+                  + Add Stage
+                </Button>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </DialogContent>
+      </Dialog>
+    );
+  },
+);
+
+export default function Jobs() {
+  const { t } = useLanguage();
+  const [jobs] = useState<JobData[]>(HARDCODED_JOBS);
+  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [departmentFilter, setDepartmentFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [priorityFilter, setPriorityFilter] = useState("all");
+  const [recruiterFilter, setRecruiterFilter] = useState("all");
+  const [showAddJobDialog, setShowAddJobDialog] = useState(false);
+  const [editingJob, setEditingJob] = useState<JobData | null>(null);
+  const [shareJobId, setShareJobId] = useState<string | null>(null);
+  const [applyJobId, setApplyJobId] = useState<string | null>(null);
+  const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(
+    null,
+  );
+  const { toast } = useToast();
+
+  // Mock candidates data for the apply functionality
+  const candidates = [
+    { id: "1", name: "John Doe" },
+    { id: "2", name: "Jane Smith" },
+    { id: "3", name: "Mike Johnson" },
+  ];
+
+  // Handle applying candidate to job
+  const handleApplyCandidate = () => {
+    if (applyJobId && selectedCandidateId) {
+      const selectedCandidate = candidates.find(
+        (c) => c.id === selectedCandidateId,
+      );
+      const selectedJob = jobs.find((j) => j.id === applyJobId);
+
+      toast({
+        title: "Candidate Applied",
+        description: `${selectedCandidate?.name} has been applied to ${selectedJob?.position}`,
+      });
+
+      setApplyJobId(null);
+      setSelectedCandidateId(null);
+    }
+  };
+
+  const [visibleFields, setVisibleFields] = useState({
+    position: true,
+    department: true,
+    recruiter: true,
+    applications: true,
+    target: true,
+    hired: true,
+    process: true,
+    openDate: true,
+    deadline: true,
+    estimatedCost: false,
+    actualCost: false,
+    performance: true,
+    priority: true,
+    pipelineSummary: true,
+  });
+
+  const filteredJobs = jobs.filter((job) => {
+    const matchesSearch =
+      job.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      job.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      job.recruiter.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesDepartment =
+      departmentFilter === "all" ||
+      job.department.toLowerCase() === departmentFilter.toLowerCase();
+
+    const matchesStatus =
+      statusFilter === "all" ||
+      job.status.toLowerCase() === statusFilter.toLowerCase();
+
+    const matchesPriority =
+      priorityFilter === "all" ||
+      job.priority.toLowerCase() === priorityFilter.toLowerCase();
+
+    const matchesRecruiter =
+      recruiterFilter === "all" ||
+      job.recruiter.toLowerCase().includes(recruiterFilter.toLowerCase());
+
+    return (
+      matchesSearch &&
+      matchesDepartment &&
+      matchesStatus &&
+      matchesPriority &&
+      matchesRecruiter
+    );
+  });
+  const applyJob = filteredJobs.find((job) => job.id === applyJobId);
+
+  const stats = [
+    {
+      title: "Active Jobs",
+      value: jobs.filter((j) => j.status === "Open").length.toString(),
+      change: "+3",
+      color: "blue",
+    },
+    {
+      title: "Total Applications",
+      value: jobs.reduce((acc, job) => acc + job.applications, 0).toString(),
+      change: "+45",
+      color: "green",
+    },
+    {
+      title: "Positions Filled",
+      value: jobs.reduce((acc, job) => acc + job.hired, 0).toString(),
+      change: "+2",
+      color: "purple",
+    },
+    // {
+    //   title: "Avg. Time to Fill",
+    //   value: "28 days",
+    //   change: "-5",
+    //   color: "orange",
+    // },
+  ];
+
+  const handleAddJob = useCallback(
+    (jobData: any) => {
+      try {
+        // In a real app, this would create the job
+        toast({
+          title: "Job Created",
+          description: `"${jobData.position}" has been successfully created.`,
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to create job. Please try again.",
+          variant: "destructive",
+        });
+      }
+    },
+    [toast],
   );
 
-  // Pipeline View Component (same as original)
-  const PipelineView = () => {
-    const stages = [
-      "Applied",
-      "Screening",
-      "Interview",
-      "Technical",
-      "Offer",
-      "Hired",
-    ];
-
-    const getStageColor = (stage: string) => {
-      switch (stage) {
-        case "Applied":
-          return "bg-blue-50 border-blue-200";
-        case "Screening":
-          return "bg-yellow-50 border-yellow-200";
-        case "Interview":
-          return "bg-purple-50 border-purple-200";
-        case "Technical":
-          return "bg-orange-50 border-orange-200";
-        case "Offer":
-          return "bg-green-50 border-green-200";
-        case "Hired":
-          return "bg-emerald-50 border-emerald-200";
-        default:
-          return "bg-slate-50 border-slate-200";
+  const handleUpdateJob = useCallback(
+    (jobData: any) => {
+      try {
+        // In a real app, this would update the job
+        toast({
+          title: "Job Updated",
+          description: `"${jobData.position}" has been successfully updated.`,
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to update job. Please try again.",
+          variant: "destructive",
+        });
       }
-    };
+    },
+    [toast],
+  );
 
-    return (
-      <div className="flex gap-4 overflow-x-auto pb-2">
-        {stages.map((stage) => {
-          const stageCandidates = filteredCandidates.filter(
-            (c) => c.stage === stage,
-          );
-          return (
-            <div
-              key={stage}
-              className={`rounded-xl border shadow-sm min-w-[260px] flex-1 flex flex-col transition-all ${getStageColor(stage)}`}
-              style={{ maxWidth: 340 }}
-            >
-              <div className="flex items-center justify-between mb-4 p-4 pb-2 border-b border-slate-100">
-                <h3 className="font-semibold text-base text-slate-900 truncate flex-1">
-                  {stage}
-                </h3>
-                <Badge variant="outline" className="text-xs flex-shrink-0 ml-2">
-                  {stageCandidates.length}
-                </Badge>
-              </div>
-              <div className="space-y-3 px-4 pb-4 pt-2 min-h-[180px] relative flex-1">
-                {stageCandidates.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-full text-slate-400 text-xs py-8">
-                    <svg
-                      className="w-8 h-8 mb-2 opacity-30"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M12 8v4l3 3m6 0a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
-                    No candidates
-                  </div>
-                ) : (
-                  stageCandidates.map((candidate) => (
-                    <CandidateCard key={candidate.id} candidate={candidate} />
-                  ))
+  const handleEditJob = useCallback((job: JobData) => {
+    setEditingJob(job);
+    setShowAddJobDialog(true);
+  }, []);
+
+  const handleDeleteJob = useCallback(
+    (jobId: string) => {
+      try {
+        // In a real app, this would delete the job
+        toast({
+          title: "Job Deleted",
+          description: "The job has been successfully deleted.",
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to delete job. Please try again.",
+          variant: "destructive",
+        });
+      }
+    },
+    [toast],
+  );
+
+  const handleShareJob = useCallback(
+    (jobId: string) => {
+      const shareUrl = `${window.location.origin}/jobs/${jobId}/public`;
+      navigator.clipboard.writeText(shareUrl);
+      setShareJobId(null);
+      toast({
+        title: "Link Copied",
+        description: "Job sharing link has been copied to clipboard.",
+      });
+    },
+    [toast],
+  );
+
+  const getPerformanceColor = (performance: number) => {
+    if (performance >= 80) return "text-green-600";
+    if (performance >= 60) return "text-yellow-600";
+    return "text-red-600";
+  };
+
+  const getStatusBadge = (status: JobData["status"]) => {
+    switch (status) {
+      case "Open":
+        return <Badge variant="default">Open</Badge>;
+      case "Closed":
+        return <Badge variant="outline">Closed</Badge>;
+      case "In Progress":
+        return <Badge variant="secondary">In Progress</Badge>;
+      case "Paused":
+        return <Badge variant="destructive">Paused</Badge>;
+      default:
+        return <Badge>{status}</Badge>;
+    }
+  };
+
+  const getPriorityBadge = (priority: JobData["priority"]) => {
+    switch (priority) {
+      case "High":
+        return (
+          <Badge variant="destructive" className="text-xs">
+            High
+          </Badge>
+        );
+      case "Medium":
+        return (
+          <Badge variant="secondary" className="text-xs">
+            Medium
+          </Badge>
+        );
+      case "Low":
+        return (
+          <Badge variant="outline" className="text-xs">
+            Low
+          </Badge>
+        );
+      default:
+        return <Badge className="text-xs">{priority}</Badge>;
+    }
+  };
+
+  const ListView = memo(() => (
+    <Card>
+      <CardContent className="p-0">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {visibleFields.position && <TableHead>Job Position</TableHead>}
+                {visibleFields.department && <TableHead>Department</TableHead>}
+                {visibleFields.recruiter && <TableHead>Recruiter</TableHead>}
+                {visibleFields.priority && <TableHead>Priority</TableHead>}
+                {visibleFields.applications && (
+                  <TableHead>Applications</TableHead>
                 )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
-
-  // Updated Pipeline List View Component
-  const PipelineListView = () => {
-    const applyCandidate = candidates.find((c) => c.id === applyCandidateId);
-
-    return (
-      <Card>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  {visibleFields.name && <TableHead>Name</TableHead>}
-                  {visibleFields.appliedDate && (
-                    <TableHead>Applied On</TableHead>
-                  )}
-                  {visibleFields.email && <TableHead>Email</TableHead>}
-                  {visibleFields.phone && <TableHead>Phone</TableHead>}
+                {visibleFields.target && <TableHead>Target</TableHead>}
+                {visibleFields.hired && <TableHead>Hired</TableHead>}
+                {visibleFields.process && <TableHead>Process</TableHead>}
+                {visibleFields.pipelineSummary && (
+                  <TableHead>Pipeline Summary</TableHead>
+                )}
+                {visibleFields.openDate && <TableHead>Open Date</TableHead>}
+                {visibleFields.deadline && <TableHead>Deadline</TableHead>}
+                {visibleFields.estimatedCost && (
+                  <TableHead>Est. Cost</TableHead>
+                )}
+                {visibleFields.actualCost && <TableHead>Actual Cost</TableHead>}
+                {visibleFields.performance && (
+                  <TableHead>Performance</TableHead>
+                )}
+                <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredJobs.map((job) => (
+                <TableRow key={job.id} className="hover:bg-slate-50">
                   {visibleFields.position && (
-                    <TableHead>Job Position</TableHead>
-                  )}
-                  {visibleFields.recruiter && <TableHead>Recruiter</TableHead>}
-                  {visibleFields.stage && <TableHead>Current Stage</TableHead>}
-                  {visibleFields.source && <TableHead>Source</TableHead>}
-                  {visibleFields.salary && <TableHead>Salary</TableHead>}
-                  {visibleFields.location && <TableHead>Location</TableHead>}
-                  {visibleFields.department && (
-                    <TableHead>Department</TableHead>
-                  )}
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredCandidates.map((candidate) => (
-                  <TableRow key={candidate.id} className="hover:bg-slate-50">
-                    {visibleFields.name && (
-                      <TableCell>
-                        <Link
-                          to={`/candidates/${candidate.id}`}
-                          className="flex items-center space-x-3 hover:text-blue-600 min-w-0"
-                        >
-                          <Avatar className="w-8 h-8 flex-shrink-0">
-                            <AvatarImage src={candidate.avatar} />
-                            <AvatarFallback className="text-xs">
-                              {candidate.name
-                                .split(" ")
-                                .map((n) => n[0])
-                                .join("")}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="min-w-0 flex-1">
-                            <div className="font-medium truncate">
-                              {candidate.name}
-                            </div>
-                            <div className="flex items-center space-x-1 mt-1">
-                              {[...Array(5)].map((_, i) => (
-                                <Star
-                                  key={i}
-                                  className={`w-3 h-3 ${
-                                    i < candidate.rating
-                                      ? "text-yellow-400 fill-current"
-                                      : "text-slate-300"
-                                  }`}
-                                />
-                              ))}
-                            </div>
-                          </div>
-                        </Link>
-                      </TableCell>
-                    )}
-                    {visibleFields.appliedDate && (
-                      <TableCell className="truncate max-w-32">
-                        {new Date(candidate.appliedDate).toLocaleDateString()}
-                      </TableCell>
-                    )}
-                    {visibleFields.email && (
-                      <TableCell className="truncate max-w-48">
-                        {candidate.email}
-                      </TableCell>
-                    )}
-                    {visibleFields.phone && (
-                      <TableCell className="truncate max-w-32">
-                        {candidate.phone}
-                      </TableCell>
-                    )}
-                    {visibleFields.position && (
-                      <TableCell className="truncate max-w-40">
-                        {candidate.position}
-                      </TableCell>
-                    )}
-                    {visibleFields.recruiter && (
-                      <TableCell className="truncate max-w-32">
-                        {candidate.recruiter}
-                      </TableCell>
-                    )}
-                    {visibleFields.stage && (
-                      <TableCell>
-                        <Badge
-                          variant={
-                            candidate.stage === "Offer"
-                              ? "default"
-                              : candidate.stage === "Hired"
-                                ? "default"
-                                : candidate.stage === "Technical"
-                                  ? "secondary"
-                                  : candidate.stage === "Interview"
-                                    ? "outline"
-                                    : candidate.stage === "Screening"
-                                      ? "secondary"
-                                      : candidate.stage === "Applied"
-                                        ? "outline"
-                                        : "destructive"
-                          }
-                          className="truncate max-w-24"
-                        >
-                          {candidate.stage}
-                        </Badge>
-                      </TableCell>
-                    )}
-                    {visibleFields.source && (
-                      <TableCell className="truncate max-w-32">
-                        {candidate.source}
-                      </TableCell>
-                    )}
-                    {visibleFields.salary && (
-                      <TableCell className="truncate max-w-32">
-                        {candidate.salary}
-                      </TableCell>
-                    )}
-                    {visibleFields.location && (
-                      <TableCell className="truncate max-w-40">
-                        {candidate.location}
-                      </TableCell>
-                    )}
-                    {visibleFields.department && (
-                      <TableCell className="truncate max-w-40">
-                        {candidate.department}
-                      </TableCell>
-                    )}
                     <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="flex-shrink-0"
-                          >
-                            <MoreHorizontal className="w-4 h-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
-                            onClick={() => setApplyCandidateId(candidate.id)}
-                          >
-                            <UserPlus className="w-4 h-4 mr-2" />
-                            Apply to Job
-                          </DropdownMenuItem>
-                          <Link to={`/candidates/${candidate.id}`}>
-                            <DropdownMenuItem>
-                              <Eye className="w-4 h-4 mr-2" />
-                              View Details
-                            </DropdownMenuItem>
-                          </Link>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              toast({
-                                title: "Edit Candidate",
-                                description: `Editing ${candidate.name}`,
-                              });
-                            }}
-                          >
-                            <Edit className="w-4 h-4 mr-2" />
-                            Edit Candidate
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              toast({
-                                title: "Downloading CV",
-                                description: `Downloading CV for ${candidate.name}`,
-                              });
-                            }}
-                          >
-                            <Download className="w-4 h-4 mr-2" />
-                            Download CV
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            <Dialog
-              open={!!applyCandidateId}
-              onOpenChange={(open) => !open && setApplyCandidateId(null)}
-            >
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Apply to Job</DialogTitle>
-                  <DialogDescription>
-                    Select a job to apply candidate:{" "}
-                    <strong>{applyCandidate?.name}</strong>
-                  </DialogDescription>
-                </DialogHeader>
-                <Select onValueChange={(value) => setSelectedJobId(value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select Job" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {jobs.map((job) => (
-                      <SelectItem key={job.id} value={job.id}>
+                      <Link
+                        to={`/jobs/${job.id}`}
+                        className="font-medium hover:text-blue-600 truncate max-w-48 block"
+                      >
                         {job.position}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <DialogFooter>
-                  <Button
-                    variant="outline"
-                    onClick={() => setApplyCandidateId(null)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      if (applyCandidateId && selectedJobId) {
-                        applyCandidateToJob(applyCandidateId, selectedJobId);
-                        setApplyCandidateId(null);
-                        setSelectedJobId(null);
-                      }
-                    }}
-                    disabled={!selectedJobId}
-                  >
-                    Apply
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  };
+                      </Link>
+                    </TableCell>
+                  )}
+                  {visibleFields.department && (
+                    <TableCell className="truncate max-w-32">
+                      {job.department}
+                    </TableCell>
+                  )}
+                  {visibleFields.recruiter && (
+                    <TableCell className="truncate max-w-32">
+                      {job.recruiter}
+                    </TableCell>
+                  )}
+                  {visibleFields.priority && (
+                    <TableCell>
+                      <div className="flex-shrink-0">
+                        {getPriorityBadge(job.priority)}
+                      </div>
+                    </TableCell>
+                  )}
+                  {visibleFields.applications && (
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        <Users className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                        <span>{job.applications}</span>
+                      </div>
+                    </TableCell>
+                  )}
+                  {visibleFields.target && (
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        <Target className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                        <span>{job.target}</span>
+                      </div>
+                    </TableCell>
+                  )}
+                  {visibleFields.hired && (
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                        <span>{job.hired}</span>
+                      </div>
+                    </TableCell>
+                  )}
+                  {visibleFields.process && (
+                    <TableCell>
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-xs">
+                          <span>
+                            {job.hired}/{job.target}
+                          </span>
+                          <span>
+                            {Math.round((job.hired / job.target) * 100)}%
+                          </span>
+                        </div>
+                        <Progress
+                          value={(job.hired / job.target) * 100}
+                          className="h-2"
+                        />
+                      </div>
+                    </TableCell>
+                  )}
+                  {visibleFields.pipelineSummary && (
+                    <TableCell>
+                      <div className="text-xs space-y-1">
+                        <div>{job.pipelineSummary.applied} Applied</div>
+                        <div>{job.pipelineSummary.interview} Interviewing</div>
+                        <div className="font-medium text-green-600">
+                          {job.pipelineSummary.hired} Hired
+                        </div>
+                      </div>
+                    </TableCell>
+                  )}
+                  {visibleFields.openDate && (
+                    <TableCell className="truncate max-w-32">
+                      {job.openDate}
+                    </TableCell>
+                  )}
+                  {visibleFields.deadline && (
+                    <TableCell className="truncate max-w-32">
+                      {job.deadline}
+                    </TableCell>
+                  )}
+                  {visibleFields.estimatedCost && (
+                    <TableCell className="truncate max-w-32">
+                      {job.estimatedCost}
+                    </TableCell>
+                  )}
+                  {visibleFields.actualCost && (
+                    <TableCell className="truncate max-w-32">
+                      {job.actualCost}
+                    </TableCell>
+                  )}
+                  {visibleFields.performance && (
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        <TrendingUp
+                          className={`w-4 h-4 ${getPerformanceColor(job.performance)} flex-shrink-0`}
+                        />
+                        <span className={getPerformanceColor(job.performance)}>
+                          {job.performance}%
+                        </span>
+                      </div>
+                    </TableCell>
+                  )}
+                  <TableCell>
+                    <div className="flex-shrink-0">
+                      {getStatusBadge(job.status)}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="flex-shrink-0"
+                        >
+                          <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        {/* Action add to apply specific candidate on this job */}
+                        <DropdownMenuItem onClick={() => setApplyJobId(job.id)}>
+                          <UserPlus className="w-4 h-4 mr-2" />
+                          Apply Candidate
+                        </DropdownMenuItem>
 
-  // Rest of the component remains unchanged
+                        <Link to={`/jobs/${job.id}`}>
+                          <DropdownMenuItem>
+                            <Eye className="w-4 h-4 mr-2" />
+                            View Details
+                          </DropdownMenuItem>
+                        </Link>
+
+                        <DropdownMenuItem onClick={() => handleEditJob(job)}>
+                          <Edit className="w-4 h-4 mr-2" />
+                          Edit Job
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setShareJobId(job.id)}>
+                          <Share className="w-4 h-4 mr-2" />
+                          Share
+                        </DropdownMenuItem>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <DropdownMenuItem
+                              className="text-red-600"
+                              onSelect={(e) => e.preventDefault()}
+                            >
+                              <Trash2 className="w-4 h-4 mr-2" />
+                              Delete
+                            </DropdownMenuItem>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete Job</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to delete "{job.position}
+                                "? This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDeleteJob(job.id)}
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <Dialog
+            open={!!applyJobId}
+            onOpenChange={(open) => !open && setApplyJobId(null)}
+          >
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Apply Candidate</DialogTitle>
+                <DialogDescription>
+                  Select a candidate to apply to job:{" "}
+                  <strong>{applyJob?.position}</strong>
+                </DialogDescription>
+              </DialogHeader>
+
+              <Select onValueChange={(value) => setSelectedCandidateId(value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Candidate" />
+                </SelectTrigger>
+                <SelectContent>
+                  {candidates.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setApplyJobId(null)}>
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleApplyCandidate}
+                  disabled={!selectedCandidateId}
+                >
+                  Apply
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </CardContent>
+    </Card>
+  ));
+
+  const GridView = memo(() => (
+    <div className="grid-responsive">
+      {filteredJobs.map((job) => (
+        <JobCard
+          key={job.id}
+          job={job}
+          onEdit={handleEditJob}
+          onShare={setShareJobId}
+          onDelete={handleDeleteJob}
+          getPerformanceColor={getPerformanceColor}
+          getStatusBadge={getStatusBadge}
+          getPriorityBadge={getPriorityBadge}
+        />
+      ))}
+    </div>
+  ));
+
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto">
+    <div className="padding-responsive space-mobile">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            Follow-Up Dashboard
+      <div className="flex-responsive justify-responsive items-responsive space-y-4 sm:space-y-0">
+        <div className="min-w-0 flex-1">
+          <h1 className="heading-responsive text-wrap-safe">
+            {t("jobs.title")}
           </h1>
-          <p className="text-gray-600 mt-1">
-            Track and manage candidate progress across the hiring pipeline
+          <p className="text-responsive-base text-slate-600 mt-1 text-wrap-safe">
+            {t("jobs.subtitle")}
           </p>
         </div>
-        <div className="flex flex-wrap gap-3">
-          <Button variant="outline" size="sm">
-            <Calendar className="w-4 h-4 mr-2" />
-            Sync Calendar
-          </Button>
-          <Button variant="outline" size="sm">
-            <Mail className="w-4 h-4 mr-2" />
-            Email Settings
-          </Button>
-          <Button size="sm">
-            <Plus className="w-4 h-4 mr-2" />
-            Add Follow-up
+        <div className="btn-group-mobile">
+          <Button
+            size="sm"
+            onClick={() => setShowAddJobDialog(true)}
+            className="btn-mobile"
+          >
+            <Plus className="icon-mobile mr-2" />
+            Add New Job
           </Button>
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Total Candidates</p>
-                <p className="text-2xl font-bold">{stats.total}</p>
+      {/* Stats */}
+      <div className="stats-mobile grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
+        {stats.map((stat) => (
+          <Card key={stat.title}>
+            <CardContent className="pt-6 card-mobile">
+              <div className="flex items-center justify-between">
+                <div className="min-w-0 flex-1">
+                  <p className="text-responsive-sm text-slate-600 text-wrap-safe">
+                    {stat.title}
+                  </p>
+                  <p className="text-responsive-xl font-bold text-slate-900 text-wrap-safe">
+                    {stat.value}
+                  </p>
+                  <p className="text-responsive-sm text-green-600 text-wrap-safe">
+                    {stat.change} vs last month
+                  </p>
+                </div>
+                <div
+                  className={`p-3 rounded-full bg-${stat.color}-100 flex-shrink-0`}
+                >
+                  <Briefcase className={`icon-mobile text-${stat.color}-600`} />
+                </div>
               </div>
-              <Users className="w-8 h-8 text-blue-500" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Need Follow-up</p>
-                <p className="text-2xl font-bold text-orange-600">
-                  {stats.needingFollowUp}
-                </p>
-              </div>
-              <AlertTriangle className="w-8 h-8 text-orange-500" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Overdue</p>
-                <p className="text-2xl font-bold text-red-600">
-                  {stats.overdue}
-                </p>
-              </div>
-              <Timer className="w-8 h-8 text-red-500" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Active Today</p>
-                <p className="text-2xl font-bold text-green-600">
-                  {stats.activeToday}
-                </p>
-              </div>
-              <Zap className="w-8 h-8 text-green-500" />
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       {/* Filters and Controls */}
       <Card>
-        <CardContent className="p-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 flex-1">
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input
-                  placeholder="Search candidates..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              <Select value={filterStage} onValueChange={setFilterStage}>
-                <SelectTrigger className="w-40">
-                  <SelectValue placeholder="Stage" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Stages</SelectItem>
-                  <SelectItem value="applied">Applied</SelectItem>
-                  <SelectItem value="screening">Screening</SelectItem>
-                  <SelectItem value="interview">Interview</SelectItem>
-                  <SelectItem value="technical">Technical</SelectItem>
-                  <SelectItem value="offer">Offer</SelectItem>
-                  <SelectItem value="hired">Hired</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select value={filterUrgency} onValueChange={setFilterUrgency}>
-                <SelectTrigger className="w-32">
-                  <SelectValue placeholder="Urgency" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="critical">Critical</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="low">Low</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="flex border rounded-lg p-1">
-                <Button
-                  variant={viewMode === "pipeline" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("pipeline")}
-                >
-                  Pipeline
-                </Button>
+        <CardContent className="pt-6 card-mobile">
+          <div className="flex-responsive gap-4 justify-responsive">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2 border rounded-lg p-1">
                 <Button
                   variant={viewMode === "list" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setViewMode("list")}
+                  className="btn-mobile"
                 >
+                  <List className="icon-mobile mr-2" />
                   List
                 </Button>
                 <Button
-                  variant={viewMode === "timeline" ? "default" : "ghost"}
+                  variant={viewMode === "grid" ? "default" : "ghost"}
                   size="sm"
-                  onClick={() => setViewMode("timeline")}
+                  onClick={() => setViewMode("grid")}
+                  className="btn-mobile"
                 >
-                  Timeline
+                  <Grid3X3 className="icon-mobile mr-2" />
+                  Grid
                 </Button>
               </div>
               {viewMode === "list" && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <Settings className="w-4 h-4 mr-2" />
-                      Fields
+                    <Button variant="outline" size="sm" className="btn-mobile">
+                      <Settings className="icon-mobile mr-2" />
+                      Columns
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56">
+                  <DropdownMenuContent className="w-56 dropdown-mobile">
                     {Object.entries(visibleFields).map(([field, visible]) => (
                       <DropdownMenuCheckboxItem
                         key={field}
@@ -965,6 +1445,7 @@ export default function FollowUpDashboard() {
                             [field]: checked,
                           }))
                         }
+                        className="text-wrap-safe"
                       >
                         {field.charAt(0).toUpperCase() +
                           field.slice(1).replace(/([A-Z])/g, " $1")}
@@ -974,356 +1455,179 @@ export default function FollowUpDashboard() {
                 </DropdownMenu>
               )}
             </div>
-          </div>
-          {selectedCandidates.length > 0 && (
-            <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-blue-900">
-                  {selectedCandidates.length} candidate(s) selected
-                </span>
-                <div className="flex space-x-2">
-                  <Button size="sm" onClick={() => handleBulkAction("email")}>
-                    <Mail className="w-4 h-4 mr-2" />
-                    Send Email
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleBulkAction("move_stage")}
-                  >
-                    <ArrowRight className="w-4 h-4 mr-2" />
-                    Move Stage
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleBulkAction("add_note")}
-                  >
-                    <Edit3 className="w-4 h-4 mr-2" />
-                    Add Note
-                  </Button>
-                  <Button size="sm" variant="outline" onClick={handleSelectAll}>
-                    Select All
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setSelectedCandidates([])}
-                  >
-                    Clear
-                  </Button>
+            <div className="filters-mobile">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+                  <Input
+                    placeholder="Search jobs by position, department, recruiter..."
+                    className="pl-10 search-mobile text-wrap-safe"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
                 </div>
               </div>
+              <div className="filters-mobile">
+                <Select
+                  value={departmentFilter}
+                  onValueChange={setDepartmentFilter}
+                >
+                  <SelectTrigger className="w-32 btn-mobile">
+                    <SelectValue placeholder="Department" />
+                  </SelectTrigger>
+                  <SelectContent className="dropdown-mobile">
+                    <SelectItem value="all" className="text-wrap-safe">
+                      All Departments
+                    </SelectItem>
+                    <SelectItem value="engineering" className="text-wrap-safe">
+                      Engineering
+                    </SelectItem>
+                    <SelectItem value="product" className="text-wrap-safe">
+                      Product
+                    </SelectItem>
+                    <SelectItem value="design" className="text-wrap-safe">
+                      Design
+                    </SelectItem>
+                    <SelectItem value="marketing" className="text-wrap-safe">
+                      Marketing
+                    </SelectItem>
+                    <SelectItem value="data" className="text-wrap-safe">
+                      Data
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-32 btn-mobile">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent className="dropdown-mobile">
+                    <SelectItem value="all" className="text-wrap-safe">
+                      All Status
+                    </SelectItem>
+                    <SelectItem value="open" className="text-wrap-safe">
+                      Open
+                    </SelectItem>
+                    <SelectItem value="closed" className="text-wrap-safe">
+                      Closed
+                    </SelectItem>
+                    <SelectItem value="in progress" className="text-wrap-safe">
+                      In Progress
+                    </SelectItem>
+                    <SelectItem value="paused" className="text-wrap-safe">
+                      Paused
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select
+                  value={priorityFilter}
+                  onValueChange={setPriorityFilter}
+                >
+                  <SelectTrigger className="w-32 btn-mobile">
+                    <SelectValue placeholder="Priority" />
+                  </SelectTrigger>
+                  <SelectContent className="dropdown-mobile">
+                    <SelectItem value="all" className="text-wrap-safe">
+                      All Priority
+                    </SelectItem>
+                    <SelectItem value="high" className="text-wrap-safe">
+                      High
+                    </SelectItem>
+                    <SelectItem value="medium" className="text-wrap-safe">
+                      Medium
+                    </SelectItem>
+                    <SelectItem value="low" className="text-wrap-safe">
+                      Low
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button variant="outline" size="sm" className="btn-mobile">
+                  <Filter className="icon-mobile mr-2" />
+                  More Filters
+                </Button>
+              </div>
             </div>
-          )}
+          </div>
         </CardContent>
       </Card>
 
-      {/* Main Content */}
-      {viewMode === "pipeline" && <PipelineView />}
-      {viewMode === "list" && <PipelineListView />}
-      {viewMode === "timeline" && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Activity Timeline</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {filteredCandidates.slice(0, 10).map((candidate) => (
-                <div
-                  key={candidate.id}
-                  className="flex items-center space-x-4 p-3 border rounded-lg"
-                >
-                  <Avatar className="w-8 h-8">
-                    <AvatarFallback>
-                      {candidate.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2">
-                      <span className="font-medium text-sm">
-                        {candidate.name}
-                      </span>
-                      <Badge variant="outline" className="text-xs">
-                        {candidate.stage}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-gray-600">
-                      Last contact {formatTimeAgo(candidate.lastInteraction)} •
-                      Next follow-up {formatTimeAgo(candidate.nextFollowUp)}
-                    </p>
-                  </div>
-                  <Button size="sm" variant="outline">
-                    <Mail className="w-4 h-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Content based on view mode */}
+      {viewMode === "list" ? <ListView /> : <GridView />}
 
-      {/* Email Dialog */}
-      <Dialog open={showEmailDialog} onOpenChange={setShowEmailDialog}>
-        <DialogContent className="max-w-2xl">
+      {/* Pagination */}
+      <div className="flex justify-center">
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" disabled className="btn-mobile">
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="bg-blue-50 text-blue-600 btn-mobile"
+          >
+            1
+          </Button>
+          <Button variant="outline" size="sm" className="btn-mobile">
+            2
+          </Button>
+          <Button variant="outline" size="sm" className="btn-mobile">
+            3
+          </Button>
+          <Button variant="outline" size="sm" className="btn-mobile">
+            Next
+          </Button>
+        </div>
+      </div>
+
+      <AddJobForm
+        open={showAddJobDialog}
+        onOpenChange={(open) => {
+          setShowAddJobDialog(open);
+          if (!open) setEditingJob(null);
+        }}
+        onAddJob={handleAddJob}
+        onUpdateJob={handleUpdateJob}
+        editingJob={editingJob}
+      />
+
+      {/* Share Job Dialog */}
+      <Dialog open={!!shareJobId} onOpenChange={() => setShareJobId(null)}>
+        <DialogContent className="modal-mobile">
           <DialogHeader>
-            <DialogTitle>Send Bulk Email</DialogTitle>
-            <DialogDescription>
-              Send email to {selectedCandidates.length} selected candidate(s)
+            <DialogTitle className="text-wrap-safe">Share Job</DialogTitle>
+            <DialogDescription className="text-wrap-safe">
+              Generate a shareable link for this job posting.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <div>
-              <Label>Email Template</Label>
-              <Select value={emailTemplate} onValueChange={setEmailTemplate}>
-                <SelectTrigger className="mt-1">
-                  <SelectValue placeholder="Choose a template" />
-                </SelectTrigger>
-                <SelectContent>
-                  {emailTemplates.map((template) => (
-                    <SelectItem key={template.id} value={template.id}>
-                      {template.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="flex items-center gap-2 p-3 bg-slate-50 rounded">
+              <Input
+                value={
+                  shareJobId
+                    ? `${window.location.origin}/jobs/${shareJobId}/public`
+                    : ""
+                }
+                readOnly
+                className="flex-1 text-wrap-safe"
+              />
+              <Button
+                size="sm"
+                onClick={() => shareJobId && handleShareJob(shareJobId)}
+                className="btn-mobile"
+              >
+                <Copy className="icon-mobile mr-2" />
+                Copy
+              </Button>
             </div>
-            {emailTemplate && (
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <h4 className="font-medium mb-2">Preview:</h4>
-                <div className="text-sm space-y-2">
-                  <div>
-                    <strong>Subject:</strong>{" "}
-                    {
-                      emailTemplates.find((t) => t.id === emailTemplate)
-                        ?.subject
-                    }
-                  </div>
-                  <div>
-                    <strong>Body:</strong>
-                  </div>
-                  <pre className="text-xs whitespace-pre-wrap">
-                    {emailTemplates.find((t) => t.id === emailTemplate)?.body}
-                  </pre>
-                </div>
-              </div>
-            )}
+            <div className="flex justify-end">
+              <Button
+                variant="outline"
+                onClick={() => setShareJobId(null)}
+                className="btn-mobile"
+              >
+                Close
+              </Button>
+            </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowEmailDialog(false)}>
-              Cancel
-            </Button>
-            <Button
-              onClick={() => sendEmail(emailTemplate, selectedCandidates)}
-              disabled={!emailTemplate}
-            >
-              <Send className="w-4 h-4 mr-2" />
-              Send Emails
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Candidate Profile Dialog */}
-      <Dialog
-        open={!!selectedCandidate}
-        onOpenChange={() => setSelectedCandidate(null)}
-      >
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          {selectedCandidate && (
-            <>
-              <DialogHeader>
-                <DialogTitle className="flex items-center space-x-3">
-                  <Avatar>
-                    <AvatarFallback>
-                      {selectedCandidate.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div>{selectedCandidate.name}</div>
-                    <div className="text-sm text-gray-600">
-                      {selectedCandidate.position}
-                    </div>
-                  </div>
-                </DialogTitle>
-              </DialogHeader>
-              <Tabs defaultValue="overview" className="w-full">
-                <TabsList className="grid w-full grid-cols-4">
-                  <TabsTrigger value="overview">Overview</TabsTrigger>
-                  <TabsTrigger value="timeline">Timeline</TabsTrigger>
-                  <TabsTrigger value="emails">Emails</TabsTrigger>
-                  <TabsTrigger value="actions">Actions</TabsTrigger>
-                </TabsList>
-                <TabsContent value="overview" className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg">Quick Stats</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-3">
-                        <div className="flex justify-between">
-                          <span>Days in stage:</span>
-                          <span className="font-medium">
-                            {selectedCandidate.daysInStage}
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Emails sent:</span>
-                          <span className="font-medium">
-                            {selectedCandidate.emailsSent}
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Response rate:</span>
-                          <span className="font-medium">
-                            {selectedCandidate.responseRate}%
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Urgency level:</span>
-                          <Badge
-                            className={getUrgencyColor(
-                              selectedCandidate.urgencyLevel,
-                            )}
-                          >
-                            {selectedCandidate.urgencyLevel}
-                          </Badge>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg">Contact Info</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-3">
-                        <div className="flex items-center space-x-2">
-                          <Mail className="w-4 h-4 text-gray-500" />
-                          <span className="text-sm">
-                            {selectedCandidate.email}
-                          </span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Phone className="w-4 h-4 text-gray-500" />
-                          <span className="text-sm">
-                            {selectedCandidate.phone}
-                          </span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <User className="w-4 h-4 text-gray-500" />
-                          <span className="text-sm">
-                            {selectedCandidate.location}
-                          </span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </TabsContent>
-                <TabsContent value="timeline" className="space-y-4">
-                  <div className="space-y-3">
-                    {selectedCandidate.interactions.map((interaction) => (
-                      <div
-                        key={interaction.id}
-                        className="flex space-x-3 p-3 border rounded-lg"
-                      >
-                        <div className="flex-shrink-0">
-                          {interaction.type === "call" && (
-                            <Phone className="w-5 h-5 text-green-500" />
-                          )}
-                          {interaction.type === "email" && (
-                            <Mail className="w-5 h-5 text-blue-500" />
-                          )}
-                          {interaction.type === "meeting" && (
-                            <Calendar className="w-5 h-5 text-purple-500" />
-                          )}
-                          {interaction.type === "note" && (
-                            <FileText className="w-5 h-5 text-gray-500" />
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium capitalize">
-                              {interaction.type}
-                            </span>
-                            <span className="text-sm text-gray-500">
-                              {formatTimeAgo(interaction.date)}
-                            </span>
-                          </div>
-                          <p className="text-sm text-gray-700 mt-1">
-                            {interaction.summary}
-                          </p>
-                          {interaction.nextAction && (
-                            <p className="text-sm text-blue-600 mt-1">
-                              Next: {interaction.nextAction}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </TabsContent>
-                <TabsContent value="emails" className="space-y-4">
-                  <div className="space-y-3">
-                    {selectedCandidate.emailHistory.map((email) => (
-                      <div key={email.id} className="p-3 border rounded-lg">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium">{email.subject}</span>
-                          <div className="flex items-center space-x-2">
-                            {email.opened && (
-                              <CheckCircle className="w-4 h-4 text-green-500" />
-                            )}
-                            {email.responded && (
-                              <MessageSquare className="w-4 h-4 text-blue-500" />
-                            )}
-                            <span className="text-sm text-gray-500">
-                              {formatTimeAgo(email.sentDate)}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-4 text-sm">
-                          <span
-                            className={`px-2 py-1 rounded text-xs ${email.opened ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}
-                          >
-                            {email.opened ? "Opened" : "Not opened"}
-                          </span>
-                          <span
-                            className={`px-2 py-1 rounded text-xs ${email.responded ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"}`}
-                          >
-                            {email.responded ? "Responded" : "No response"}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </TabsContent>
-                <TabsContent value="actions" className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <Button className="h-20 flex-col">
-                      <Mail className="w-6 h-6 mb-2" />
-                      Send Email
-                    </Button>
-                    <Button variant="outline" className="h-20 flex-col">
-                      <Phone className="w-6 h-6 mb-2" />
-                      Schedule Call
-                    </Button>
-                    <Button variant="outline" className="h-20 flex-col">
-                      <Calendar className="w-6 h-6 mb-2" />
-                      Book Meeting
-                    </Button>
-                    <Button variant="outline" className="h-20 flex-col">
-                      <ArrowRight className="w-6 h-6 mb-2" />
-                      Move Stage
-                    </Button>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </>
-          )}
         </DialogContent>
       </Dialog>
     </div>
