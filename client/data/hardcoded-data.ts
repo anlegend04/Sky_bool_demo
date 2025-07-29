@@ -55,7 +55,14 @@ export interface CandidateData {
   experience: string;
   skills: string[];
   status: "Active" | "Inactive" | "Blacklisted";
-  stage: "Applied" | "Screening" | "Interview" | "Technical" | "Offer" | "Hired" | "Rejected";
+  stage:
+    | "Applied"
+    | "Screening"
+    | "Interview"
+    | "Technical"
+    | "Offer"
+    | "Hired"
+    | "Rejected";
   rating: number;
   appliedDate: string;
   resume: string;
@@ -220,11 +227,25 @@ export interface NotificationData {
   id: string;
   title: string;
   message: string;
-  type: "candidate_moved" | "interview_scheduled" | "application_received" | "budget_exceeded" | "deadline_approaching" | "system" | "reminder";
+  type:
+    | "candidate_moved"
+    | "interview_scheduled"
+    | "application_received"
+    | "budget_exceeded"
+    | "deadline_approaching"
+    | "system"
+    | "reminder";
   timestamp: string;
   read: boolean;
   actionUrl?: string;
-  entityType?: "job" | "candidate" | "interview" | "budget" | "deadline" | "other" | "schedule";
+  entityType?:
+    | "job"
+    | "candidate"
+    | "interview"
+    | "budget"
+    | "deadline"
+    | "other"
+    | "schedule";
   entityId?: string;
   recipientId: string;
   senderId?: string;
@@ -250,7 +271,14 @@ export interface ScheduleData {
 
 export interface ActivityData {
   id: string;
-  type: "stage_change" | "note_added" | "email_sent" | "interview_scheduled" | "application_received" | "file_uploaded" | "user_login";
+  type:
+    | "stage_change"
+    | "note_added"
+    | "email_sent"
+    | "interview_scheduled"
+    | "application_received"
+    | "file_uploaded"
+    | "user_login";
   description: string;
   entityType: "job" | "candidate" | "interview" | "user" | "system";
   entityId: string;
@@ -286,7 +314,7 @@ const generateId = () => Math.random().toString(36).substr(2, 9);
 const getRandomDate = (daysBack: number) => {
   const date = new Date();
   date.setDate(date.getDate() - Math.floor(Math.random() * daysBack));
-  return date.toISOString().split('T')[0];
+  return date.toISOString().split("T")[0];
 };
 const getRandomDateTime = (daysBack: number) => {
   const date = new Date();
@@ -303,7 +331,8 @@ export const HARDCODED_USERS: UserData[] = [
     email: "alex.chen@techcorp.com",
     role: "Recruiter",
     department: "HR",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
     phone: "+1 (555) 123-4567",
     timezone: "PST",
     status: "Active",
@@ -317,7 +346,8 @@ export const HARDCODED_USERS: UserData[] = [
     email: "sarah.kim@techcorp.com",
     role: "Hiring Manager",
     department: "Engineering",
-    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b077?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1494790108755-2616b612b077?w=150&h=150&fit=crop&crop=face",
     phone: "+1 (555) 234-5678",
     timezone: "PST",
     status: "Active",
@@ -331,7 +361,8 @@ export const HARDCODED_USERS: UserData[] = [
     email: "mike.wilson@techcorp.com",
     role: "Admin",
     department: "IT",
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
     phone: "+1 (555) 345-6789",
     timezone: "PST",
     status: "Active",
@@ -345,7 +376,8 @@ export const HARDCODED_USERS: UserData[] = [
     email: "emily.rodriguez@techcorp.com",
     role: "Interviewer",
     department: "Engineering",
-    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face",
     phone: "+1 (555) 456-7890",
     timezone: "PST",
     status: "Active",
@@ -359,14 +391,15 @@ export const HARDCODED_USERS: UserData[] = [
     email: "david.park@techcorp.com",
     role: "HR",
     department: "HR",
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
     phone: "+1 (555) 567-8901",
     timezone: "PST",
     status: "Active",
     permissions: ["view_candidates", "manage_offers", "onboard_candidates"],
     lastLogin: getRandomDateTime(1),
     createdAt: getRandomDate(365),
-  }
+  },
 ];
 
 // Job Data with realistic distributions
@@ -387,10 +420,20 @@ export const HARDCODED_JOBS: JobData[] = [
     status: "Open",
     location: "San Francisco, CA",
     type: "Full-time",
-    description: "We are looking for a Senior Frontend Developer to join our growing engineering team. You'll be working on cutting-edge web applications using React, TypeScript, and modern development tools. This role offers excellent growth opportunities and the chance to work with a world-class team.",
+    description:
+      "We are looking for a Senior Frontend Developer to join our growing engineering team. You'll be working on cutting-edge web applications using React, TypeScript, and modern development tools. This role offers excellent growth opportunities and the chance to work with a world-class team.",
     priority: "High",
     emailAlias: "frontend-jobs@techcorp.com",
-    expectedSkills: ["React", "TypeScript", "Node.js", "JavaScript", "CSS", "HTML", "Redux", "GraphQL"],
+    expectedSkills: [
+      "React",
+      "TypeScript",
+      "Node.js",
+      "JavaScript",
+      "CSS",
+      "HTML",
+      "Redux",
+      "GraphQL",
+    ],
     salaryMin: "120000",
     salaryMax: "150000",
     domain: "Technology",
@@ -440,7 +483,7 @@ export const HARDCODED_JOBS: JobData[] = [
     updatedAt: getRandomDateTime(5),
   },
   {
-    id: "job_2", 
+    id: "job_2",
     position: "Product Manager",
     department: "Product",
     recruiter: "David Park",
@@ -455,10 +498,18 @@ export const HARDCODED_JOBS: JobData[] = [
     status: "Open",
     location: "Remote",
     type: "Full-time",
-    description: "Join our product team to drive the strategy and execution of our core platform. You'll work closely with engineering, design, and business stakeholders to deliver exceptional user experiences.",
+    description:
+      "Join our product team to drive the strategy and execution of our core platform. You'll work closely with engineering, design, and business stakeholders to deliver exceptional user experiences.",
     priority: "High",
     emailAlias: "product-jobs@techcorp.com",
-    expectedSkills: ["Product Strategy", "User Research", "Data Analysis", "Agile", "Roadmapping", "Stakeholder Management"],
+    expectedSkills: [
+      "Product Strategy",
+      "User Research",
+      "Data Analysis",
+      "Agile",
+      "Roadmapping",
+      "Stakeholder Management",
+    ],
     salaryMin: "130000",
     salaryMax: "170000",
     domain: "Product",
@@ -493,10 +544,18 @@ export const HARDCODED_JOBS: JobData[] = [
     status: "Closed",
     location: "San Francisco, CA",
     type: "Full-time",
-    description: "We're seeking a talented UX Designer to create intuitive and beautiful user experiences. You'll collaborate with product managers and engineers to solve complex design challenges.",
+    description:
+      "We're seeking a talented UX Designer to create intuitive and beautiful user experiences. You'll collaborate with product managers and engineers to solve complex design challenges.",
     priority: "Medium",
     emailAlias: "design-jobs@techcorp.com",
-    expectedSkills: ["Figma", "User Research", "Prototyping", "Wireframing", "Design Systems", "Usability Testing"],
+    expectedSkills: [
+      "Figma",
+      "User Research",
+      "Prototyping",
+      "Wireframing",
+      "Design Systems",
+      "Usability Testing",
+    ],
     salaryMin: "110000",
     salaryMax: "140000",
     domain: "Design",
@@ -531,10 +590,20 @@ export const HARDCODED_JOBS: JobData[] = [
     status: "Open",
     location: "Remote",
     type: "Full-time",
-    description: "Build scalable backend systems that power our platform. Work with microservices, databases, and cloud infrastructure to deliver high-performance solutions.",
+    description:
+      "Build scalable backend systems that power our platform. Work with microservices, databases, and cloud infrastructure to deliver high-performance solutions.",
     priority: "High",
     emailAlias: "backend-jobs@techcorp.com",
-    expectedSkills: ["Python", "Go", "Kubernetes", "PostgreSQL", "Redis", "AWS", "Docker", "API Design"],
+    expectedSkills: [
+      "Python",
+      "Go",
+      "Kubernetes",
+      "PostgreSQL",
+      "Redis",
+      "AWS",
+      "Docker",
+      "API Design",
+    ],
     salaryMin: "125000",
     salaryMax: "160000",
     domain: "Technology",
@@ -569,10 +638,20 @@ export const HARDCODED_JOBS: JobData[] = [
     status: "In Progress",
     location: "New York, NY",
     type: "Full-time",
-    description: "Join our data team to extract insights from large datasets and build predictive models. You'll work on machine learning algorithms and data pipeline optimization.",
+    description:
+      "Join our data team to extract insights from large datasets and build predictive models. You'll work on machine learning algorithms and data pipeline optimization.",
     priority: "Medium",
     emailAlias: "data-jobs@techcorp.com",
-    expectedSkills: ["Python", "R", "SQL", "Machine Learning", "Statistics", "Tableau", "TensorFlow", "Spark"],
+    expectedSkills: [
+      "Python",
+      "R",
+      "SQL",
+      "Machine Learning",
+      "Statistics",
+      "Tableau",
+      "TensorFlow",
+      "Spark",
+    ],
     salaryMin: "135000",
     salaryMax: "175000",
     domain: "Data Science",
@@ -603,13 +682,23 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
     location: "San Francisco, CA",
     position: "Senior Frontend Developer",
     experience: "5 years",
-    skills: ["React", "TypeScript", "Node.js", "GraphQL", "Redux", "CSS3", "HTML5", "JavaScript"],
+    skills: [
+      "React",
+      "TypeScript",
+      "Node.js",
+      "GraphQL",
+      "Redux",
+      "CSS3",
+      "HTML5",
+      "JavaScript",
+    ],
     status: "Active",
     stage: "Interview",
     rating: 4,
     appliedDate: getRandomDate(15),
     resume: "marissa_torres_resume.pdf",
-    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b077?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1494790108755-2616b612b077?w=150&h=150&fit=crop&crop=face",
     salary: "$125,000 - $140,000",
     source: "LinkedIn",
     recruiter: "Alex Chen",
@@ -636,8 +725,12 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         position: "Frontend Developer",
         startDate: "2019-06",
         endDate: "2022-12",
-        description: "Developed responsive web applications using React and TypeScript",
-        achievements: ["Reduced page load time by 40%", "Led UI/UX redesign project"],
+        description:
+          "Developed responsive web applications using React and TypeScript",
+        achievements: [
+          "Reduced page load time by 40%",
+          "Led UI/UX redesign project",
+        ],
       },
       {
         id: "work_2",
@@ -645,7 +738,10 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         position: "Senior Frontend Developer",
         startDate: "2023-01",
         description: "Lead frontend development for enterprise applications",
-        achievements: ["Mentored 3 junior developers", "Implemented design system"],
+        achievements: [
+          "Mentored 3 junior developers",
+          "Implemented design system",
+        ],
       },
     ],
     lastActivity: getRandomDateTime(2),
@@ -695,7 +791,8 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
     notes: [
       {
         id: "note_1",
-        content: "Great candidate with strong React experience. Portfolio shows excellent work quality.",
+        content:
+          "Great candidate with strong React experience. Portfolio shows excellent work quality.",
         userId: "user_1",
         userName: "Alex Chen",
         timestamp: getRandomDateTime(10),
@@ -704,7 +801,8 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
       },
       {
         id: "note_2",
-        content: "Phone screening went well. Candidate asked thoughtful questions about the role and company culture.",
+        content:
+          "Phone screening went well. Candidate asked thoughtful questions about the role and company culture.",
         userId: "user_1",
         userName: "Alex Chen",
         timestamp: getRandomDateTime(8),
@@ -716,7 +814,8 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
       {
         id: "email_1",
         subject: "Thank you for your application - Senior Frontend Developer",
-        content: "Dear Marissa, Thank you for applying to our Senior Frontend Developer position...",
+        content:
+          "Dear Marissa, Thank you for applying to our Senior Frontend Developer position...",
         from: "alex.chen@techcorp.com",
         to: "marissa.torres@email.com",
         timestamp: getRandomDateTime(15),
@@ -728,7 +827,8 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
       {
         id: "email_2",
         subject: "Interview Invitation - Senior Frontend Developer",
-        content: "Hi Marissa, We were impressed with your application and would like to invite you for an interview...",
+        content:
+          "Hi Marissa, We were impressed with your application and would like to invite you for an interview...",
         from: "sarah.kim@techcorp.com",
         to: "marissa.torres@email.com",
         timestamp: getRandomDateTime(8),
@@ -768,13 +868,22 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
     location: "Seattle, WA",
     position: "Product Manager",
     experience: "7 years",
-    skills: ["Product Strategy", "User Research", "Data Analysis", "Agile", "Roadmapping", "SQL", "Figma"],
+    skills: [
+      "Product Strategy",
+      "User Research",
+      "Data Analysis",
+      "Agile",
+      "Roadmapping",
+      "SQL",
+      "Figma",
+    ],
     status: "Active",
     stage: "Technical",
     rating: 5,
     appliedDate: getRandomDate(22),
     resume: "james_chen_resume.pdf",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
     salary: "$140,000 - $160,000",
     source: "Company Website",
     recruiter: "David Park",
@@ -806,8 +915,13 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         company: "BigTech Inc",
         position: "Senior Product Manager",
         startDate: "2020-03",
-        description: "Led product development for mobile application serving 2M+ users",
-        achievements: ["Increased user engagement by 35%", "Launched 3 major features", "Led cross-functional team of 12"],
+        description:
+          "Led product development for mobile application serving 2M+ users",
+        achievements: [
+          "Increased user engagement by 35%",
+          "Launched 3 major features",
+          "Led cross-functional team of 12",
+        ],
       },
       {
         id: "work_4",
@@ -878,7 +992,8 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
     notes: [
       {
         id: "note_3",
-        content: "Exceptional product management experience at BigTech. Strong analytical skills and strategic thinking.",
+        content:
+          "Exceptional product management experience at BigTech. Strong analytical skills and strategic thinking.",
         userId: "user_5",
         userName: "David Park",
         timestamp: getRandomDateTime(20),
@@ -922,13 +1037,21 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
     location: "Austin, TX",
     position: "UX Designer",
     experience: "4 years",
-    skills: ["Figma", "User Research", "Prototyping", "Design Systems", "Usability Testing", "Adobe Creative Suite"],
+    skills: [
+      "Figma",
+      "User Research",
+      "Prototyping",
+      "Design Systems",
+      "Usability Testing",
+      "Adobe Creative Suite",
+    ],
     status: "Active",
     stage: "Hired",
     rating: 5,
     appliedDate: getRandomDate(35),
     resume: "lisa_wang_resume.pdf",
-    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face",
     salary: "$115,000",
     source: "Referral",
     recruiter: "Alex Chen",
@@ -953,8 +1076,12 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         company: "DesignStudio",
         position: "UX Designer",
         startDate: "2020-08",
-        description: "Designed user experiences for mobile and web applications",
-        achievements: ["Improved user satisfaction by 45%", "Created comprehensive design system"],
+        description:
+          "Designed user experiences for mobile and web applications",
+        achievements: [
+          "Improved user satisfaction by 45%",
+          "Created comprehensive design system",
+        ],
       },
     ],
     lastActivity: getRandomDateTime(1),
@@ -1029,7 +1156,8 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
     notes: [
       {
         id: "note_4",
-        content: "Outstanding design portfolio with excellent user research case studies. Perfect fit for our team.",
+        content:
+          "Outstanding design portfolio with excellent user research case studies. Perfect fit for our team.",
         userId: "user_1",
         userName: "Alex Chen",
         timestamp: getRandomDateTime(30),
@@ -1041,7 +1169,8 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
       {
         id: "email_4",
         subject: "Welcome to TechCorp - UX Designer",
-        content: "Dear Lisa, Welcome to the TechCorp team! We're excited to have you join us...",
+        content:
+          "Dear Lisa, Welcome to the TechCorp team! We're excited to have you join us...",
         from: "david.park@techcorp.com",
         to: "lisa.wang@email.com",
         timestamp: getRandomDateTime(14),
@@ -1079,7 +1208,8 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
     rating: 2,
     appliedDate: getRandomDate(28),
     resume: "robert_smith_resume.pdf",
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
     salary: "$95,000 - $110,000",
     source: "Indeed",
     recruiter: "Sarah Kim",
@@ -1103,7 +1233,10 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         position: "Junior Backend Developer",
         startDate: "2021-06",
         description: "Developed REST APIs and maintained database systems",
-        achievements: ["Implemented 5 new API endpoints", "Improved query performance"],
+        achievements: [
+          "Implemented 5 new API endpoints",
+          "Improved query performance",
+        ],
       },
     ],
     lastActivity: getRandomDateTime(5),
@@ -1153,7 +1286,8 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
     notes: [
       {
         id: "note_5",
-        content: "Candidate has potential but experience level doesn't match our senior requirements. Would be good for junior positions.",
+        content:
+          "Candidate has potential but experience level doesn't match our senior requirements. Would be good for junior positions.",
         userId: "user_2",
         userName: "Sarah Kim",
         timestamp: getRandomDateTime(18),
@@ -1165,7 +1299,8 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
       {
         id: "email_5",
         subject: "Update on your application - Backend Engineer",
-        content: "Dear Robert, Thank you for your interest in our Backend Engineer position...",
+        content:
+          "Dear Robert, Thank you for your interest in our Backend Engineer position...",
         from: "sarah.kim@techcorp.com",
         to: "robert.smith@email.com",
         timestamp: getRandomDateTime(18),
@@ -1193,55 +1328,128 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
 // Generate more candidates for comprehensive coverage
 const generateMoreCandidates = (): CandidateData[] => {
   const names = [
-    "Emily Johnson", "Michael Brown", "Sarah Davis", "David Wilson", "Amanda Taylor",
-    "Christopher Lee", "Jennifer Garcia", "Matthew Martinez", "Ashley Anderson", "Joshua Jackson",
-    "Jessica Thompson", "Andrew White", "Samantha Harris", "Daniel Clark", "Nicole Lewis",
-    "Ryan Walker", "Michelle Hall", "Kevin Allen", "Stephanie Young", "Brian King",
-    "Rebecca Wright", "Justin Lopez", "Lauren Hill", "Brandon Scott", "Megan Green",
-    "Tyler Adams", "Kayla Baker", "Jordan Gonzalez", "Taylor Nelson", "Cameron Carter"
+    "Emily Johnson",
+    "Michael Brown",
+    "Sarah Davis",
+    "David Wilson",
+    "Amanda Taylor",
+    "Christopher Lee",
+    "Jennifer Garcia",
+    "Matthew Martinez",
+    "Ashley Anderson",
+    "Joshua Jackson",
+    "Jessica Thompson",
+    "Andrew White",
+    "Samantha Harris",
+    "Daniel Clark",
+    "Nicole Lewis",
+    "Ryan Walker",
+    "Michelle Hall",
+    "Kevin Allen",
+    "Stephanie Young",
+    "Brian King",
+    "Rebecca Wright",
+    "Justin Lopez",
+    "Lauren Hill",
+    "Brandon Scott",
+    "Megan Green",
+    "Tyler Adams",
+    "Kayla Baker",
+    "Jordan Gonzalez",
+    "Taylor Nelson",
+    "Cameron Carter",
   ];
-  
-  const positions = ["Frontend Developer", "Backend Engineer", "Full Stack Developer", "Product Manager", "UX Designer", "Data Scientist", "DevOps Engineer"];
-  const stages = ["Applied", "Screening", "Interview", "Technical", "Offer", "Hired", "Rejected"];
-  const sources = ["LinkedIn", "Indeed", "Company Website", "Referral", "Glassdoor", "AngelList"];
-  const recruiters = ["Alex Chen", "Sarah Kim", "David Park", "Emily Rodriguez"];
-  
+
+  const positions = [
+    "Frontend Developer",
+    "Backend Engineer",
+    "Full Stack Developer",
+    "Product Manager",
+    "UX Designer",
+    "Data Scientist",
+    "DevOps Engineer",
+  ];
+  const stages = [
+    "Applied",
+    "Screening",
+    "Interview",
+    "Technical",
+    "Offer",
+    "Hired",
+    "Rejected",
+  ];
+  const sources = [
+    "LinkedIn",
+    "Indeed",
+    "Company Website",
+    "Referral",
+    "Glassdoor",
+    "AngelList",
+  ];
+  const recruiters = [
+    "Alex Chen",
+    "Sarah Kim",
+    "David Park",
+    "Emily Rodriguez",
+  ];
+
   const candidates: CandidateData[] = [];
-  
+
   for (let i = 5; i <= 100; i++) {
     const name = names[Math.floor(Math.random() * names.length)];
     const position = positions[Math.floor(Math.random() * positions.length)];
     const stage = stages[Math.floor(Math.random() * stages.length)];
     const source = sources[Math.floor(Math.random() * sources.length)];
     const recruiter = recruiters[Math.floor(Math.random() * recruiters.length)];
-    
+
     candidates.push({
       id: `candidate_${i}`,
       name: name,
-      email: `${name.toLowerCase().replace(' ', '.')}@email.com`,
+      email: `${name.toLowerCase().replace(" ", ".")}@email.com`,
       phone: `+1 (555) ${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 9000 + 1000)}`,
-      location: ["San Francisco, CA", "New York, NY", "Austin, TX", "Seattle, WA", "Remote"][Math.floor(Math.random() * 5)],
+      location: [
+        "San Francisco, CA",
+        "New York, NY",
+        "Austin, TX",
+        "Seattle, WA",
+        "Remote",
+      ][Math.floor(Math.random() * 5)],
       position: position,
       experience: `${Math.floor(Math.random() * 10 + 1)} years`,
-      skills: ["JavaScript", "Python", "React", "Node.js", "SQL"].slice(0, Math.floor(Math.random() * 5) + 3),
-      status: ["Active", "Inactive"][Math.floor(Math.random() * 2)] as "Active" | "Inactive",
+      skills: ["JavaScript", "Python", "React", "Node.js", "SQL"].slice(
+        0,
+        Math.floor(Math.random() * 5) + 3,
+      ),
+      status: ["Active", "Inactive"][Math.floor(Math.random() * 2)] as
+        | "Active"
+        | "Inactive",
       stage: stage as any,
       rating: Math.floor(Math.random() * 5) + 1,
       appliedDate: getRandomDate(Math.floor(Math.random() * 60) + 1),
-      resume: `${name.toLowerCase().replace(' ', '_')}_resume.pdf`,
+      resume: `${name.toLowerCase().replace(" ", "_")}_resume.pdf`,
       avatar: `https://images.unsplash.com/photo-${Math.floor(Math.random() * 1000000000000) + 1500000000000}?w=150&h=150&fit=crop&crop=face`,
       salary: `$${Math.floor(Math.random() * 50000) + 80000}`,
       source: source,
       recruiter: recruiter,
-      department: ["Engineering", "Product", "Design", "Data"][Math.floor(Math.random() * 4)],
+      department: ["Engineering", "Product", "Design", "Data"][
+        Math.floor(Math.random() * 4)
+      ],
       duration: Math.floor(Math.random() * 30) + 1,
-      tags: ["Strong Technical Skills", "Cultural Fit", "Leadership Potential"].slice(0, Math.floor(Math.random() * 3) + 1),
+      tags: [
+        "Strong Technical Skills",
+        "Cultural Fit",
+        "Leadership Potential",
+      ].slice(0, Math.floor(Math.random() * 3) + 1),
       education: [],
       workExperience: [],
       lastActivity: getRandomDateTime(Math.floor(Math.random() * 30) + 1),
-      communicationPreference: ["email", "phone", "video"][Math.floor(Math.random() * 3)] as any,
+      communicationPreference: ["email", "phone", "video"][
+        Math.floor(Math.random() * 3)
+      ] as any,
       timezone: "PST",
-      availability: ["Immediate", "2 weeks", "1 month"][Math.floor(Math.random() * 3)],
+      availability: ["Immediate", "2 weeks", "1 month"][
+        Math.floor(Math.random() * 3)
+      ],
       jobId: `job_${Math.floor(Math.random() * 5) + 1}`,
       stageHistory: [],
       notes: [],
@@ -1251,7 +1459,7 @@ const generateMoreCandidates = (): CandidateData[] => {
       updatedAt: getRandomDateTime(Math.floor(Math.random() * 5) + 1),
     });
   }
-  
+
   return candidates;
 };
 
@@ -1305,7 +1513,8 @@ export const HARDCODED_INTERVIEWS: InterviewData[] = [
         communicationSkills: 5,
         culturalFit: 4,
         problemSolving: 5,
-        comments: "Excellent analytical skills and strategic thinking. Strong product sense and leadership qualities.",
+        comments:
+          "Excellent analytical skills and strategic thinking. Strong product sense and leadership qualities.",
         recommendation: "Strong Hire",
         createdAt: getRandomDateTime(3),
       },
@@ -1340,7 +1549,8 @@ export const HARDCODED_INTERVIEWS: InterviewData[] = [
         communicationSkills: 5,
         culturalFit: 5,
         problemSolving: 4,
-        comments: "Outstanding portfolio with excellent user research. Great cultural fit and communication skills.",
+        comments:
+          "Outstanding portfolio with excellent user research. Great cultural fit and communication skills.",
         recommendation: "Strong Hire",
         createdAt: getRandomDateTime(20),
       },
@@ -1488,7 +1698,8 @@ export const HARDCODED_ACTIVITIES: ActivityData[] = [
   {
     id: "activity_1",
     type: "application_received",
-    description: "New application received from Marissa Torres for Senior Frontend Developer",
+    description:
+      "New application received from Marissa Torres for Senior Frontend Developer",
     entityType: "candidate",
     entityId: "candidate_1",
     userId: "system",
@@ -1505,7 +1716,11 @@ export const HARDCODED_ACTIVITIES: ActivityData[] = [
     userId: "user_2",
     userName: "Sarah Kim",
     timestamp: getRandomDateTime(6),
-    metadata: { fromStage: "Interview", toStage: "Technical", reason: "Completed interview successfully" },
+    metadata: {
+      fromStage: "Interview",
+      toStage: "Technical",
+      reason: "Completed interview successfully",
+    },
   },
   {
     id: "activity_3",
@@ -1545,16 +1760,24 @@ export const HARDCODED_ACTIVITIES: ActivityData[] = [
 // Dashboard Stats
 export const DASHBOARD_STATS: DashboardStatsData = {
   totalJobs: HARDCODED_JOBS.length,
-  activeJobs: HARDCODED_JOBS.filter(job => job.status === "Open").length,
+  activeJobs: HARDCODED_JOBS.filter((job) => job.status === "Open").length,
   totalCandidates: HARDCODED_CANDIDATES.length,
-  activeCandidates: HARDCODED_CANDIDATES.filter(candidate => candidate.status === "Active").length,
+  activeCandidates: HARDCODED_CANDIDATES.filter(
+    (candidate) => candidate.status === "Active",
+  ).length,
   interviewsThisWeek: 12,
-  offersExtended: HARDCODED_CANDIDATES.filter(candidate => candidate.stage === "Offer").length,
-  hiredThisMonth: HARDCODED_CANDIDATES.filter(candidate => candidate.stage === "Hired").length,
+  offersExtended: HARDCODED_CANDIDATES.filter(
+    (candidate) => candidate.stage === "Offer",
+  ).length,
+  hiredThisMonth: HARDCODED_CANDIDATES.filter(
+    (candidate) => candidate.stage === "Hired",
+  ).length,
   avgTimeToHire: 28,
   topPerformingJobs: ["job_1", "job_3", "job_2"],
   recentActivities: HARDCODED_ACTIVITIES.slice(0, 5),
-  upcomingInterviews: HARDCODED_INTERVIEWS.filter(interview => interview.status === "Scheduled"),
+  upcomingInterviews: HARDCODED_INTERVIEWS.filter(
+    (interview) => interview.status === "Scheduled",
+  ),
   pendingTasks: 8,
   conversionRates: {
     applicationToScreening: 38,
@@ -1566,10 +1789,14 @@ export const DASHBOARD_STATS: DashboardStatsData = {
 
 // Email Templates from the utility
 export const EMAIL_TEMPLATES = {
-  interview_invitation: "Dear {{name}},\n\nWe would like to invite you for an interview for the {{position}} position...",
-  offer_letter: "Dear {{name}},\n\nWe are pleased to offer you the position of {{position}}...",
-  rejection_notice: "Dear {{name}},\n\nThank you for your interest in the {{position}} position...",
-  technical_assessment: "Dear {{name}},\n\nFollowing our successful interview, we'd like to proceed with the technical assessment...",
+  interview_invitation:
+    "Dear {{name}},\n\nWe would like to invite you for an interview for the {{position}} position...",
+  offer_letter:
+    "Dear {{name}},\n\nWe are pleased to offer you the position of {{position}}...",
+  rejection_notice:
+    "Dear {{name}},\n\nThank you for your interest in the {{position}} position...",
+  technical_assessment:
+    "Dear {{name}},\n\nFollowing our successful interview, we'd like to proceed with the technical assessment...",
 };
 
 // Helper functions
@@ -1582,15 +1809,19 @@ export const getCandidate = (id: string): CandidateData | undefined => {
 };
 
 export const getJobCandidates = (jobId: string): CandidateData[] => {
-  return HARDCODED_CANDIDATES.filter(candidate => candidate.jobId === jobId);
+  return HARDCODED_CANDIDATES.filter((candidate) => candidate.jobId === jobId);
 };
 
 export const getInterview = (id: string): InterviewData | undefined => {
   return HARDCODED_INTERVIEWS.find((interview) => interview.id === id);
 };
 
-export const getCandidateInterviews = (candidateId: string): InterviewData[] => {
-  return HARDCODED_INTERVIEWS.filter(interview => interview.candidateId === candidateId);
+export const getCandidateInterviews = (
+  candidateId: string,
+): InterviewData[] => {
+  return HARDCODED_INTERVIEWS.filter(
+    (interview) => interview.candidateId === candidateId,
+  );
 };
 
 export const getUser = (id: string): UserData | undefined => {
@@ -1602,44 +1833,50 @@ export const getUnreadNotificationCount = (): number => {
 };
 
 export const getUserNotifications = (userId: string): NotificationData[] => {
-  return HARDCODED_NOTIFICATIONS.filter(notif => notif.recipientId === userId);
+  return HARDCODED_NOTIFICATIONS.filter(
+    (notif) => notif.recipientId === userId,
+  );
 };
 
 export const getUpcomingSchedule = (days: number = 7): ScheduleData[] => {
   const now = new Date();
   const future = new Date();
   future.setDate(now.getDate() + days);
-  
-  return HARDCODED_SCHEDULE.filter(schedule => {
+
+  return HARDCODED_SCHEDULE.filter((schedule) => {
     const scheduleDate = new Date(schedule.startDate);
-    return scheduleDate >= now && scheduleDate <= future && schedule.status === "Scheduled";
+    return (
+      scheduleDate >= now &&
+      scheduleDate <= future &&
+      schedule.status === "Scheduled"
+    );
   });
 };
 
 export const getRecentActivities = (limit: number = 10): ActivityData[] => {
-  return HARDCODED_ACTIVITIES
-    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-    .slice(0, limit);
+  return HARDCODED_ACTIVITIES.sort(
+    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+  ).slice(0, limit);
 };
 
 // Additional helper functions for comprehensive data relationships
 export const getJobStats = (jobId: string) => {
   const job = getJob(jobId);
   const candidates = getJobCandidates(jobId);
-  
+
   if (!job) return null;
-  
+
   return {
     ...job,
     candidates: candidates.length,
     stageDistribution: {
-      applied: candidates.filter(c => c.stage === "Applied").length,
-      screening: candidates.filter(c => c.stage === "Screening").length,
-      interview: candidates.filter(c => c.stage === "Interview").length,
-      technical: candidates.filter(c => c.stage === "Technical").length,
-      offer: candidates.filter(c => c.stage === "Offer").length,
-      hired: candidates.filter(c => c.stage === "Hired").length,
-      rejected: candidates.filter(c => c.stage === "Rejected").length,
+      applied: candidates.filter((c) => c.stage === "Applied").length,
+      screening: candidates.filter((c) => c.stage === "Screening").length,
+      interview: candidates.filter((c) => c.stage === "Interview").length,
+      technical: candidates.filter((c) => c.stage === "Technical").length,
+      offer: candidates.filter((c) => c.stage === "Offer").length,
+      hired: candidates.filter((c) => c.stage === "Hired").length,
+      rejected: candidates.filter((c) => c.stage === "Rejected").length,
     },
   };
 };
@@ -1647,27 +1884,27 @@ export const getJobStats = (jobId: string) => {
 export const getCandidateTimeline = (candidateId: string) => {
   const candidate = getCandidate(candidateId);
   if (!candidate) return [];
-  
+
   const timeline = [
-    ...candidate.stageHistory.map(stage => ({
+    ...candidate.stageHistory.map((stage) => ({
       type: "stage_change",
       date: stage.startDate,
       description: `Moved to ${stage.stage}`,
       details: stage.notes,
     })),
-    ...candidate.emails.map(email => ({
+    ...candidate.emails.map((email) => ({
       type: "email",
       date: email.timestamp,
       description: `Email: ${email.subject}`,
       details: email.status,
     })),
-    ...candidate.notes.map(note => ({
+    ...candidate.notes.map((note) => ({
       type: "note",
       date: note.timestamp,
       description: `Note added by ${note.userName}`,
       details: note.content,
     })),
   ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  
+
   return timeline;
 };

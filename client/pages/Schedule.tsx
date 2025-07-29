@@ -65,16 +65,16 @@ export default function Schedule() {
 
   // Combine schedule and interview data
   const allEvents = [
-    ...HARDCODED_SCHEDULE.map(schedule => ({
+    ...HARDCODED_SCHEDULE.map((schedule) => ({
       ...schedule,
       eventType: "schedule" as const,
     })),
-    ...HARDCODED_INTERVIEWS.map(interview => ({
+    ...HARDCODED_INTERVIEWS.map((interview) => ({
       id: interview.id,
       title: `Interview: ${interview.candidateName}`,
       description: `${interview.type} interview for ${interview.jobTitle}`,
       startDate: `${interview.scheduledDate}T${interview.scheduledTime}:00`,
-      endDate: `${interview.scheduledDate}T${String(parseInt(interview.scheduledTime.split(':')[0]) + Math.floor(interview.duration / 60)).padStart(2, '0')}:${String(interview.duration % 60).padStart(2, '0')}:00`,
+      endDate: `${interview.scheduledDate}T${String(parseInt(interview.scheduledTime.split(":")[0]) + Math.floor(interview.duration / 60)).padStart(2, "0")}:${String(interview.duration % 60).padStart(2, "0")}:00`,
       type: "Interview" as const,
       attendees: [interview.candidateId, ...interview.interviewerIds],
       location: interview.location,
@@ -87,9 +87,11 @@ export default function Schedule() {
       eventType: "interview" as const,
       interviewData: interview,
     })),
-  ].sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+  ].sort(
+    (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
+  );
 
-  const filteredEvents = allEvents.filter(event => {
+  const filteredEvents = allEvents.filter((event) => {
     if (filterType === "all") return true;
     if (filterType === "interviews") return event.eventType === "interview";
     if (filterType === "meetings") return event.type === "Meeting";
@@ -131,23 +133,25 @@ export default function Schedule() {
     const date = new Date(dateTimeString);
     return {
       date: date.toLocaleDateString(),
-      time: date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      time: date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
   };
 
   const getAttendeeNames = (attendeeIds: string[]) => {
-    return attendeeIds.map(id => {
-      const user = getUser(id);
-      const candidate = getCandidate(id);
-      return user?.name || candidate?.name || "Unknown";
-    }).join(", ");
+    return attendeeIds
+      .map((id) => {
+        const user = getUser(id);
+        const candidate = getCandidate(id);
+        return user?.name || candidate?.name || "Unknown";
+      })
+      .join(", ");
   };
 
-  const upcomingEvents = filteredEvents.filter(event => 
-    new Date(event.startDate) > new Date()
-  ).slice(0, 5);
+  const upcomingEvents = filteredEvents
+    .filter((event) => new Date(event.startDate) > new Date())
+    .slice(0, 5);
 
-  const todayEvents = filteredEvents.filter(event => {
+  const todayEvents = filteredEvents.filter((event) => {
     const eventDate = new Date(event.startDate).toDateString();
     const today = new Date().toDateString();
     return eventDate === today;
@@ -158,7 +162,9 @@ export default function Schedule() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Schedule & Interviews</h1>
+          <h1 className="text-3xl font-bold text-slate-900">
+            Schedule & Interviews
+          </h1>
           <p className="text-slate-600 mt-1">
             Manage interviews, meetings, and important deadlines
           </p>
@@ -175,7 +181,10 @@ export default function Schedule() {
               <SelectItem value="deadlines">Deadlines</SelectItem>
             </SelectContent>
           </Select>
-          <Dialog open={isNewEventDialogOpen} onOpenChange={setIsNewEventDialogOpen}>
+          <Dialog
+            open={isNewEventDialogOpen}
+            onOpenChange={setIsNewEventDialogOpen}
+          >
             <DialogTrigger asChild>
               <Button>
                 <Plus className="w-4 h-4 mr-2" />
@@ -239,16 +248,21 @@ export default function Schedule() {
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setIsNewEventDialogOpen(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsNewEventDialogOpen(false)}
+                >
                   Cancel
                 </Button>
-                <Button onClick={() => {
-                  toast({
-                    title: "Event Scheduled",
-                    description: "Your event has been added to the schedule",
-                  });
-                  setIsNewEventDialogOpen(false);
-                }}>
+                <Button
+                  onClick={() => {
+                    toast({
+                      title: "Event Scheduled",
+                      description: "Your event has been added to the schedule",
+                    });
+                    setIsNewEventDialogOpen(false);
+                  }}
+                >
                   Schedule Event
                 </Button>
               </DialogFooter>
@@ -276,7 +290,10 @@ export default function Schedule() {
               <div>
                 <p className="text-sm text-slate-600">Upcoming Interviews</p>
                 <p className="text-2xl font-bold">
-                  {HARDCODED_INTERVIEWS.filter(i => i.status === "Scheduled").length}
+                  {
+                    HARDCODED_INTERVIEWS.filter((i) => i.status === "Scheduled")
+                      .length
+                  }
                 </p>
               </div>
               <User className="w-8 h-8 text-green-500" />
@@ -289,12 +306,14 @@ export default function Schedule() {
               <div>
                 <p className="text-sm text-slate-600">This Week</p>
                 <p className="text-2xl font-bold">
-                  {filteredEvents.filter(event => {
-                    const eventDate = new Date(event.startDate);
-                    const weekFromNow = new Date();
-                    weekFromNow.setDate(weekFromNow.getDate() + 7);
-                    return eventDate <= weekFromNow;
-                  }).length}
+                  {
+                    filteredEvents.filter((event) => {
+                      const eventDate = new Date(event.startDate);
+                      const weekFromNow = new Date();
+                      weekFromNow.setDate(weekFromNow.getDate() + 7);
+                      return eventDate <= weekFromNow;
+                    }).length
+                  }
                 </p>
               </div>
               <Clock className="w-8 h-8 text-orange-500" />
@@ -307,7 +326,11 @@ export default function Schedule() {
               <div>
                 <p className="text-sm text-slate-600">Completed</p>
                 <p className="text-2xl font-bold">
-                  {filteredEvents.filter(event => event.status === "Completed").length}
+                  {
+                    filteredEvents.filter(
+                      (event) => event.status === "Completed",
+                    ).length
+                  }
                 </p>
               </div>
               <CheckCircle className="w-8 h-8 text-purple-500" />
@@ -328,9 +351,15 @@ export default function Schedule() {
               <div className="space-y-4">
                 {filteredEvents.map((event) => {
                   const { date, time } = formatDateTime(event.startDate);
-                  const candidate = event.eventType === "interview" ? getCandidate(event.relatedEntityId!) : null;
-                  const job = event.eventType === "interview" && candidate ? getJob(candidate.jobId!) : null;
-                  
+                  const candidate =
+                    event.eventType === "interview"
+                      ? getCandidate(event.relatedEntityId!)
+                      : null;
+                  const job =
+                    event.eventType === "interview" && candidate
+                      ? getJob(candidate.jobId!)
+                      : null;
+
                   return (
                     <div
                       key={event.id}
@@ -346,9 +375,7 @@ export default function Schedule() {
                             <h3 className="font-semibold text-slate-900 truncate">
                               {event.title}
                             </h3>
-                            <Badge variant="outline">
-                              {event.type}
-                            </Badge>
+                            <Badge variant="outline">{event.type}</Badge>
                             {event.eventType === "interview" && (
                               <Badge variant="secondary">
                                 {event.interviewData?.type}
@@ -386,13 +413,13 @@ export default function Schedule() {
                           </div>
                           {candidate && job && (
                             <div className="flex items-center space-x-2 mt-2">
-                              <Link 
+                              <Link
                                 to={`/candidates/${candidate.id}`}
                                 className="text-xs text-blue-600 hover:underline"
                               >
                                 View Candidate →
                               </Link>
-                              <Link 
+                              <Link
                                 to={`/jobs/${job.id}`}
                                 className="text-xs text-blue-600 hover:underline"
                               >
@@ -459,9 +486,14 @@ export default function Schedule() {
             <CardContent>
               <div className="space-y-3">
                 {["Technical", "Phone", "Video", "In-Person"].map((type) => {
-                  const count = HARDCODED_INTERVIEWS.filter(interview => interview.type === type).length;
+                  const count = HARDCODED_INTERVIEWS.filter(
+                    (interview) => interview.type === type,
+                  ).length;
                   return (
-                    <div key={type} className="flex items-center justify-between">
+                    <div
+                      key={type}
+                      className="flex items-center justify-between"
+                    >
                       <span className="text-sm text-slate-600">{type}</span>
                       <Badge variant="outline">{count}</Badge>
                     </div>
