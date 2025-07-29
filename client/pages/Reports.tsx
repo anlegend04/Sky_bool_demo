@@ -558,13 +558,38 @@ export default function Reports() {
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={chartData.recruiterPerformance}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Bar dataKey="applications" fill="#3b82f6" />
-                      <Bar dataKey="interviews" fill="#10b981" />
-                      <Bar dataKey="hires" fill="#f59e0b" />
+                      <XAxis
+                        dataKey="name"
+                        angle={-45}
+                        textAnchor="end"
+                        height={80}
+                        fontSize={12}
+                      />
+                      <YAxis fontSize={12} />
+                      <Tooltip
+                        formatter={(value, name) => {
+                          const labels = {
+                            applications: 'Applications',
+                            interviews: 'Interviews',
+                            hires: 'Hires'
+                          };
+                          return [value, labels[name] || name];
+                        }}
+                        labelFormatter={(label) => `Recruiter: ${label}`}
+                      />
+                      <Legend
+                        formatter={(value) => {
+                          const labels = {
+                            applications: 'Total Applications',
+                            interviews: 'Reached Interview',
+                            hires: 'Successfully Hired'
+                          };
+                          return labels[value] || value;
+                        }}
+                      />
+                      <Bar dataKey="applications" fill="#3b82f6" name="applications" />
+                      <Bar dataKey="interviews" fill="#10b981" name="interviews" />
+                      <Bar dataKey="hires" fill="#f59e0b" name="hires" />
                     </BarChart>
                   </ResponsiveContainer>
                 )}
