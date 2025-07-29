@@ -23,16 +23,6 @@ import { Mail, Send, AlertCircle, FileText, X } from "lucide-react";
 import { CandidateData } from "@/data/hardcoded-data";
 import { getTemplatesForStage, generateEmailContent, EmailTemplate } from "@/lib/email-utils";
 
-interface EmailTemplate {
-  id: number;
-  name: string;
-  subject: string;
-  content: string;
-  type: string;
-  stage?: string;
-  variables: string[];
-}
-
 interface EmailTriggerProps {
   isOpen: boolean;
   onClose: () => void;
@@ -41,54 +31,6 @@ interface EmailTriggerProps {
   jobTitle?: string;
   onEmailSent?: (emailData: any) => void;
 }
-
-const emailTemplates: EmailTemplate[] = [
-  {
-    id: 1,
-    name: "Application Received",
-    subject: "Thank you for your application - {{job_title}}",
-    content: "Dear {{candidate_name}},\n\nThank you for applying to the {{job_title}} position at {{company_name}}. We have received your application and will review it shortly.\n\nWe will contact you within the next 5-7 business days to update you on the status of your application.\n\nBest regards,\n{{company_name}} Recruitment Team",
-    type: "auto-response",
-    stage: "application",
-    variables: ["{{candidate_name}}", "{{job_title}}", "{{company_name}}"],
-  },
-  {
-    id: 2,
-    name: "Screening Invitation",
-    subject: "Next Steps - {{job_title}} at {{company_name}}",
-    content: "Dear {{candidate_name}},\n\nWe are pleased to inform you that your application for the {{job_title}} position has passed our initial review. We would like to invite you for a screening call.\n\nOur recruiter will be conducting this call. Please reply with your availability for the next week.\n\nBest regards,\n{{company_name}} Team",
-    type: "screening",
-    stage: "screening",
-    variables: ["{{candidate_name}}", "{{job_title}}", "{{company_name}}"],
-  },
-  {
-    id: 3,
-    name: "Interview Invitation",
-    subject: "Interview Invitation - {{job_title}} at {{company_name}}",
-    content: "Dear {{candidate_name}},\n\nWe are impressed with your qualifications and would like to invite you for an interview for the {{job_title}} position.\n\nInterview Details:\nDate: [To be scheduled]\nTime: [To be scheduled]\nInterviewer: [To be assigned]\n\nPlease confirm your attendance by replying to this email.\n\nBest regards,\n{{company_name}} Team",
-    type: "interview",
-    stage: "interview",
-    variables: ["{{candidate_name}}", "{{job_title}}", "{{company_name}}", "{{interview_date}}", "{{interview_time}}", "{{interviewer_name}}"],
-  },
-  {
-    id: 4,
-    name: "Job Offer",
-    subject: "Job Offer - {{job_title}} at {{company_name}}",
-    content: "Dear {{candidate_name}},\n\nWe are delighted to offer you the position of {{job_title}} at {{company_name}}.\n\nPlease review the attached offer letter and let us know your decision within 5 business days.\n\nWe look forward to welcoming you to our team!\n\nBest regards,\n{{company_name}} HR Team",
-    type: "offer",
-    stage: "offer",
-    variables: ["{{candidate_name}}", "{{job_title}}", "{{company_name}}", "{{salary_range}}"],
-  },
-  {
-    id: 5,
-    name: "Application Rejected",
-    subject: "Update on your application - {{job_title}}",
-    content: "Dear {{candidate_name}},\n\nThank you for your interest in the {{job_title}} position at {{company_name}}. After careful consideration, we have decided to move forward with other candidates whose qualifications more closely match our current needs.\n\nWe appreciate the time you invested in the application process and encourage you to apply for future opportunities that match your skills and experience.\n\nBest regards,\n{{company_name}} Team",
-    type: "rejection",
-    stage: "rejected",
-    variables: ["{{candidate_name}}", "{{job_title}}", "{{company_name}}"],
-  },
-];
 
 const stages = [
   { value: "application", label: "Application" },
