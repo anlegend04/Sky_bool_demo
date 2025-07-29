@@ -435,15 +435,20 @@ export default function FollowUpDashboard() {
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-sm truncate group-hover:text-blue-700 transition-colors">
+              <h3 className="font-semibold text-sm group-hover:text-blue-700 transition-colors line-clamp-1" title={candidate.name}>
                 {candidate.name}
               </h3>
-              <p className="text-xs text-gray-600 truncate">
+              <p className="text-xs text-gray-600 line-clamp-1" title={candidate.email}>
                 {candidate.email}
               </p>
-              <Badge variant="outline" className="text-xs mt-1">
-                {candidate.stage}
-              </Badge>
+              <div className="flex items-center space-x-2 mt-1">
+                <Badge variant="outline" className="text-xs">
+                  {candidate.stage}
+                </Badge>
+                <Badge variant="secondary" className="text-xs">
+                  {candidate.urgencyLevel}
+                </Badge>
+              </div>
             </div>
           </div>
           <DropdownMenu>
