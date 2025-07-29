@@ -30,7 +30,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -77,7 +77,7 @@ import {
   AlertTriangle,
   GraduationCap,
   Trophy,
-  Zap
+  Zap,
 } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
@@ -110,7 +110,7 @@ interface ParsedCandidate {
   isConfirmed: boolean;
   hasMissingInfo: boolean;
   isPotentialDuplicate: boolean;
-  parseStatus: 'parsing' | 'success' | 'error';
+  parseStatus: "parsing" | "success" | "error";
   fileSize: number;
   uploadedAt: string;
 }
@@ -118,7 +118,7 @@ interface ParsedCandidate {
 interface UploadProgress {
   fileName: string;
   progress: number;
-  status: 'uploading' | 'parsing' | 'complete' | 'error';
+  status: "uploading" | "parsing" | "complete" | "error";
 }
 
 export default function Candidates() {
@@ -136,15 +136,19 @@ export default function Candidates() {
 
   // CV Upload States
   const [showCVUpload, setShowCVUpload] = useState(false);
-  const [uploadMode, setUploadMode] = useState<'single' | 'bulk'>('single');
-  const [parsedCandidates, setParsedCandidates] = useState<ParsedCandidate[]>([]);
+  const [uploadMode, setUploadMode] = useState<"single" | "bulk">("single");
+  const [parsedCandidates, setParsedCandidates] = useState<ParsedCandidate[]>(
+    [],
+  );
   const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
   const [bulkJobPosition, setBulkJobPosition] = useState("");
   const [bulkSource, setBulkSource] = useState("");
   const [selectedCandidates, setSelectedCandidates] = useState<string[]>([]);
   const [showParseFilters, setShowParseFilters] = useState(false);
-  const [parseFilter, setParseFilter] = useState<'all' | 'incomplete' | 'duplicates'>('all');
+  const [parseFilter, setParseFilter] = useState<
+    "all" | "incomplete" | "duplicates"
+  >("all");
 
   // Apply candidate to job states (for ListView component)
   const [applyCandidateId, setApplyCandidateId] = useState<string | null>(null);
@@ -153,7 +157,7 @@ export default function Candidates() {
   // Manual entry form states
   const [source, setSource] = useState<string | undefined>();
   const [customSource, setCustomSource] = useState("");
-  
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bulkFileInputRef = useRef<HTMLInputElement>(null);
 
@@ -183,10 +187,10 @@ export default function Candidates() {
   ];
 
   const jobs = [
-    { id: '1', position: 'Frontend Developer' },
-    { id: '2', position: 'Backend Engineer' },
-    { id: '3', position: 'Product Manager' },
-    { id: '4', position: 'UX Designer' },
+    { id: "1", position: "Frontend Developer" },
+    { id: "2", position: "Backend Engineer" },
+    { id: "3", position: "Product Manager" },
+    { id: "4", position: "UX Designer" },
   ];
 
   const applyCandidateToJob = (candidateId: string, jobId: string) => {
@@ -229,116 +233,162 @@ export default function Candidates() {
   ];
 
   // Mock CV parsing function
-  const mockParseCV = useCallback(async (file: File): Promise<ParsedCandidate> => {
-    const fileName = file.name;
-    const id = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
-    // Simulate parsing delay
-    await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 3000));
-    
-    // Mock parsed data - in real app this would come from CV parsing service
-    const mockNames = ['John Smith', 'Sarah Wilson', 'Michael Chen', 'Emily Davis', 'David Brown', 'Lisa Garcia'];
-    const mockEmails = ['john.smith@email.com', 'sarah.wilson@email.com', 'michael.chen@email.com'];
-    const mockPhones = ['+1 (555) 123-4567', '+1 (555) 987-6543', '+1 (555) 456-7890'];
-    const mockLocations = ['San Francisco, CA', 'New York, NY', 'Austin, TX', 'Seattle, WA'];
-    const mockSkills = [
-      ['React', 'JavaScript', 'TypeScript', 'Node.js'],
-      ['Python', 'Django', 'PostgreSQL', 'AWS'],
-      ['Figma', 'Sketch', 'User Research', 'Prototyping'],
-      ['Product Strategy', 'Agile', 'Data Analysis']
-    ];
-    
-    const randomName = mockNames[Math.floor(Math.random() * mockNames.length)];
-    const randomEmail = mockEmails[Math.floor(Math.random() * mockEmails.length)];
-    const randomSkillSet = mockSkills[Math.floor(Math.random() * mockSkills.length)];
-    
-    // Simulate missing information randomly
-    const hasMissingInfo = Math.random() > 0.7;
-    const isPotentialDuplicate = Math.random() > 0.8;
-    
-    return {
-      id,
-      fileName,
-      name: hasMissingInfo ? '' : randomName,
-      email: hasMissingInfo ? '' : randomEmail,
-      phone: hasMissingInfo ? '' : mockPhones[Math.floor(Math.random() * mockPhones.length)],
-      location: mockLocations[Math.floor(Math.random() * mockLocations.length)],
-      summary: `Experienced professional with ${3 + Math.floor(Math.random() * 7)} years in the industry. Strong background in ${randomSkillSet.slice(0, 2).join(' and ')} with proven track record of delivering high-quality results.`,
-      skills: randomSkillSet,
-      experience: [
-        {
-          company: 'Tech Corp Inc.',
-          title: 'Senior Developer',
-          duration: '2021 - Present',
-          description: 'Led development of key features and mentored junior developers.'
-        },
-        {
-          company: 'StartupXYZ',
-          title: 'Developer',
-          duration: '2019 - 2021',
-          description: 'Built and maintained core application features.'
-        }
-      ],
-      education: [
-        {
-          institution: 'University of Technology',
-          degree: 'Bachelor of Computer Science',
-          year: '2019'
-        }
-      ],
-      isEditing: false,
-      isConfirmed: false,
-      hasMissingInfo,
-      isPotentialDuplicate,
-      parseStatus: 'success',
-      fileSize: file.size,
-      uploadedAt: new Date().toISOString()
-    };
-  }, []);
+  const mockParseCV = useCallback(
+    async (file: File): Promise<ParsedCandidate> => {
+      const fileName = file.name;
+      const id = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+      // Simulate parsing delay
+      await new Promise((resolve) =>
+        setTimeout(resolve, 2000 + Math.random() * 3000),
+      );
+
+      // Mock parsed data - in real app this would come from CV parsing service
+      const mockNames = [
+        "John Smith",
+        "Sarah Wilson",
+        "Michael Chen",
+        "Emily Davis",
+        "David Brown",
+        "Lisa Garcia",
+      ];
+      const mockEmails = [
+        "john.smith@email.com",
+        "sarah.wilson@email.com",
+        "michael.chen@email.com",
+      ];
+      const mockPhones = [
+        "+1 (555) 123-4567",
+        "+1 (555) 987-6543",
+        "+1 (555) 456-7890",
+      ];
+      const mockLocations = [
+        "San Francisco, CA",
+        "New York, NY",
+        "Austin, TX",
+        "Seattle, WA",
+      ];
+      const mockSkills = [
+        ["React", "JavaScript", "TypeScript", "Node.js"],
+        ["Python", "Django", "PostgreSQL", "AWS"],
+        ["Figma", "Sketch", "User Research", "Prototyping"],
+        ["Product Strategy", "Agile", "Data Analysis"],
+      ];
+
+      const randomName =
+        mockNames[Math.floor(Math.random() * mockNames.length)];
+      const randomEmail =
+        mockEmails[Math.floor(Math.random() * mockEmails.length)];
+      const randomSkillSet =
+        mockSkills[Math.floor(Math.random() * mockSkills.length)];
+
+      // Simulate missing information randomly
+      const hasMissingInfo = Math.random() > 0.7;
+      const isPotentialDuplicate = Math.random() > 0.8;
+
+      return {
+        id,
+        fileName,
+        name: hasMissingInfo ? "" : randomName,
+        email: hasMissingInfo ? "" : randomEmail,
+        phone: hasMissingInfo
+          ? ""
+          : mockPhones[Math.floor(Math.random() * mockPhones.length)],
+        location:
+          mockLocations[Math.floor(Math.random() * mockLocations.length)],
+        summary: `Experienced professional with ${3 + Math.floor(Math.random() * 7)} years in the industry. Strong background in ${randomSkillSet.slice(0, 2).join(" and ")} with proven track record of delivering high-quality results.`,
+        skills: randomSkillSet,
+        experience: [
+          {
+            company: "Tech Corp Inc.",
+            title: "Senior Developer",
+            duration: "2021 - Present",
+            description:
+              "Led development of key features and mentored junior developers.",
+          },
+          {
+            company: "StartupXYZ",
+            title: "Developer",
+            duration: "2019 - 2021",
+            description: "Built and maintained core application features.",
+          },
+        ],
+        education: [
+          {
+            institution: "University of Technology",
+            degree: "Bachelor of Computer Science",
+            year: "2019",
+          },
+        ],
+        isEditing: false,
+        isConfirmed: false,
+        hasMissingInfo,
+        isPotentialDuplicate,
+        parseStatus: "success",
+        fileSize: file.size,
+        uploadedAt: new Date().toISOString(),
+      };
+    },
+    [],
+  );
 
   // Handle single file upload
   const handleSingleFileUpload = async (file: File) => {
     if (!file) return;
-    
+
     // Validate file type
-    const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    const allowedTypes = [
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ];
     if (!allowedTypes.includes(file.type)) {
       toast({
         title: "Invalid file type",
         description: "Please upload PDF, DOC, or DOCX files only.",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
 
     // Start upload progress
     const progressId = file.name;
-    setUploadProgress([{ fileName: file.name, progress: 0, status: 'uploading' }]);
-    
+    setUploadProgress([
+      { fileName: file.name, progress: 0, status: "uploading" },
+    ]);
+
     // Simulate upload progress
     for (let i = 0; i <= 100; i += 10) {
-      await new Promise(resolve => setTimeout(resolve, 100));
-      setUploadProgress([{ fileName: file.name, progress: i, status: 'uploading' }]);
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      setUploadProgress([
+        { fileName: file.name, progress: i, status: "uploading" },
+      ]);
     }
-    
+
     // Start parsing
-    setUploadProgress([{ fileName: file.name, progress: 100, status: 'parsing' }]);
-    
+    setUploadProgress([
+      { fileName: file.name, progress: 100, status: "parsing" },
+    ]);
+
     try {
       const parsed = await mockParseCV(file);
       setParsedCandidates([parsed]);
-      setUploadProgress([{ fileName: file.name, progress: 100, status: 'complete' }]);
-      
+      setUploadProgress([
+        { fileName: file.name, progress: 100, status: "complete" },
+      ]);
+
       toast({
         title: "CV parsed successfully",
         description: `Extracted information from ${file.name}`,
       });
     } catch (error) {
-      setUploadProgress([{ fileName: file.name, progress: 0, status: 'error' }]);
+      setUploadProgress([
+        { fileName: file.name, progress: 0, status: "error" },
+      ]);
       toast({
         title: "Parsing failed",
         description: "Unable to parse the CV. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
@@ -346,8 +396,12 @@ export default function Candidates() {
   // Handle bulk file upload
   const handleBulkFileUpload = async (files: FileList) => {
     const fileArray = Array.from(files);
-    const validFiles = fileArray.filter(file => {
-      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    const validFiles = fileArray.filter((file) => {
+      const allowedTypes = [
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      ];
       return allowedTypes.includes(file.type);
     });
 
@@ -355,15 +409,15 @@ export default function Candidates() {
       toast({
         title: "Some files skipped",
         description: "Only PDF, DOC, and DOCX files are supported.",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
 
     // Initialize upload progress for all files
-    const initialProgress = validFiles.map(file => ({
+    const initialProgress = validFiles.map((file) => ({
       fileName: file.name,
       progress: 0,
-      status: 'uploading' as const
+      status: "uploading" as const,
     }));
     setUploadProgress(initialProgress);
 
@@ -371,30 +425,36 @@ export default function Candidates() {
     const newParsedCandidates: ParsedCandidate[] = [];
     for (let i = 0; i < validFiles.length; i++) {
       const file = validFiles[i];
-      
+
       // Simulate upload progress
       for (let progress = 0; progress <= 100; progress += 20) {
-        await new Promise(resolve => setTimeout(resolve, 50));
-        setUploadProgress(prev => prev.map(p => 
-          p.fileName === file.name ? { ...p, progress } : p
-        ));
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        setUploadProgress((prev) =>
+          prev.map((p) => (p.fileName === file.name ? { ...p, progress } : p)),
+        );
       }
-      
+
       // Start parsing
-      setUploadProgress(prev => prev.map(p => 
-        p.fileName === file.name ? { ...p, status: 'parsing' } : p
-      ));
-      
+      setUploadProgress((prev) =>
+        prev.map((p) =>
+          p.fileName === file.name ? { ...p, status: "parsing" } : p,
+        ),
+      );
+
       try {
         const parsed = await mockParseCV(file);
         newParsedCandidates.push(parsed);
-        setUploadProgress(prev => prev.map(p => 
-          p.fileName === file.name ? { ...p, status: 'complete' } : p
-        ));
+        setUploadProgress((prev) =>
+          prev.map((p) =>
+            p.fileName === file.name ? { ...p, status: "complete" } : p,
+          ),
+        );
       } catch (error) {
-        setUploadProgress(prev => prev.map(p => 
-          p.fileName === file.name ? { ...p, status: 'error' } : p
-        ));
+        setUploadProgress((prev) =>
+          prev.map((p) =>
+            p.fileName === file.name ? { ...p, status: "error" } : p,
+          ),
+        );
       }
     }
 
@@ -419,38 +479,48 @@ export default function Candidates() {
     e.preventDefault();
     setIsDragOver(false);
     const files = e.dataTransfer.files;
-    if (uploadMode === 'single' && files.length === 1) {
+    if (uploadMode === "single" && files.length === 1) {
       handleSingleFileUpload(files[0]);
-    } else if (uploadMode === 'bulk') {
+    } else if (uploadMode === "bulk") {
       handleBulkFileUpload(files);
     }
   };
 
   // Edit candidate inline
   const toggleEdit = (candidateId: string) => {
-    setParsedCandidates(prev => prev.map(c => 
-      c.id === candidateId ? { ...c, isEditing: !c.isEditing } : c
-    ));
+    setParsedCandidates((prev) =>
+      prev.map((c) =>
+        c.id === candidateId ? { ...c, isEditing: !c.isEditing } : c,
+      ),
+    );
   };
 
   // Update candidate field
-  const updateCandidateField = (candidateId: string, field: string, value: string) => {
-    setParsedCandidates(prev => prev.map(c => 
-      c.id === candidateId ? { ...c, [field]: value } : c
-    ));
+  const updateCandidateField = (
+    candidateId: string,
+    field: string,
+    value: string,
+  ) => {
+    setParsedCandidates((prev) =>
+      prev.map((c) => (c.id === candidateId ? { ...c, [field]: value } : c)),
+    );
   };
 
   // Save candidate
   const saveCandidate = (candidateId: string) => {
-    setParsedCandidates(prev => prev.map(c => 
-      c.id === candidateId ? { 
-        ...c, 
-        isEditing: false, 
-        isConfirmed: true,
-        hasMissingInfo: !c.name || !c.email || !c.phone
-      } : c
-    ));
-    
+    setParsedCandidates((prev) =>
+      prev.map((c) =>
+        c.id === candidateId
+          ? {
+              ...c,
+              isEditing: false,
+              isConfirmed: true,
+              hasMissingInfo: !c.name || !c.email || !c.phone,
+            }
+          : c,
+      ),
+    );
+
     toast({
       title: "Candidate saved",
       description: "Candidate information has been updated.",
@@ -459,21 +529,21 @@ export default function Candidates() {
 
   // Remove candidate from parsed list
   const removeCandidate = (candidateId: string) => {
-    setParsedCandidates(prev => prev.filter(c => c.id !== candidateId));
+    setParsedCandidates((prev) => prev.filter((c) => c.id !== candidateId));
   };
 
   // Select/deselect candidates for bulk operations
   const toggleCandidateSelection = (candidateId: string) => {
-    setSelectedCandidates(prev => 
-      prev.includes(candidateId) 
-        ? prev.filter(id => id !== candidateId)
-        : [...prev, candidateId]
+    setSelectedCandidates((prev) =>
+      prev.includes(candidateId)
+        ? prev.filter((id) => id !== candidateId)
+        : [...prev, candidateId],
     );
   };
 
   // Select all candidates
   const selectAllCandidates = () => {
-    setSelectedCandidates(parsedCandidates.map(c => c.id));
+    setSelectedCandidates(parsedCandidates.map((c) => c.id));
   };
 
   // Clear selection
@@ -483,18 +553,19 @@ export default function Candidates() {
 
   // Create all candidates
   const createAllCandidates = () => {
-    const candidatesToCreate = selectedCandidates.length > 0 
-      ? parsedCandidates.filter(c => selectedCandidates.includes(c.id))
-      : parsedCandidates;
-    
+    const candidatesToCreate =
+      selectedCandidates.length > 0
+        ? parsedCandidates.filter((c) => selectedCandidates.includes(c.id))
+        : parsedCandidates;
+
     // In real app, this would save to database
-    console.log('Creating candidates:', candidatesToCreate);
-    
+    console.log("Creating candidates:", candidatesToCreate);
+
     toast({
       title: "Candidates created",
       description: `Successfully created ${candidatesToCreate.length} candidate profiles.`,
     });
-    
+
     // Reset state
     setParsedCandidates([]);
     setSelectedCandidates([]);
@@ -503,11 +574,11 @@ export default function Candidates() {
   };
 
   // Filter parsed candidates
-  const filteredParsedCandidates = parsedCandidates.filter(candidate => {
+  const filteredParsedCandidates = parsedCandidates.filter((candidate) => {
     switch (parseFilter) {
-      case 'incomplete':
+      case "incomplete":
         return candidate.hasMissingInfo;
-      case 'duplicates':
+      case "duplicates":
         return candidate.isPotentialDuplicate;
       default:
         return true;
@@ -569,12 +640,22 @@ export default function Candidates() {
   );
 
   // Candidate preview card component
-  const CandidatePreviewCard = ({ candidate }: { candidate: ParsedCandidate }) => (
-    <Card className={`relative transition-all duration-200 ${
-      candidate.isPotentialDuplicate ? 'border-yellow-300 bg-yellow-50' : 
-      candidate.hasMissingInfo ? 'border-red-300 bg-red-50' : 
-      candidate.isConfirmed ? 'border-green-300 bg-green-50' : 'border-gray-200'
-    }`}>
+  const CandidatePreviewCard = ({
+    candidate,
+  }: {
+    candidate: ParsedCandidate;
+  }) => (
+    <Card
+      className={`relative transition-all duration-200 ${
+        candidate.isPotentialDuplicate
+          ? "border-yellow-300 bg-yellow-50"
+          : candidate.hasMissingInfo
+            ? "border-red-300 bg-red-50"
+            : candidate.isConfirmed
+              ? "border-green-300 bg-green-50"
+              : "border-gray-200"
+      }`}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
@@ -612,7 +693,7 @@ export default function Candidates() {
           </div>
         </div>
       </CardHeader>
-      
+
       <CardContent className="space-y-4">
         {/* Basic Information */}
         <div className="grid grid-cols-2 gap-4">
@@ -621,35 +702,43 @@ export default function Candidates() {
             {candidate.isEditing ? (
               <Input
                 value={candidate.name}
-                onChange={(e) => updateCandidateField(candidate.id, 'name', e.target.value)}
+                onChange={(e) =>
+                  updateCandidateField(candidate.id, "name", e.target.value)
+                }
                 placeholder="Full name"
                 className="mt-1"
               />
             ) : (
               <div className="flex items-center mt-1">
                 <User className="w-4 h-4 text-gray-400 mr-2" />
-                <span className={`${!candidate.name ? 'text-red-500 italic' : ''}`}>
-                  {candidate.name || 'Missing name'}
+                <span
+                  className={`${!candidate.name ? "text-red-500 italic" : ""}`}
+                >
+                  {candidate.name || "Missing name"}
                 </span>
               </div>
             )}
           </div>
-          
+
           <div>
             <Label className="text-xs text-gray-500">Email</Label>
             {candidate.isEditing ? (
               <Input
                 type="email"
                 value={candidate.email}
-                onChange={(e) => updateCandidateField(candidate.id, 'email', e.target.value)}
+                onChange={(e) =>
+                  updateCandidateField(candidate.id, "email", e.target.value)
+                }
                 placeholder="Email address"
                 className="mt-1"
               />
             ) : (
               <div className="flex items-center mt-1">
                 <Mail className="w-4 h-4 text-gray-400 mr-2" />
-                <span className={`${!candidate.email ? 'text-red-500 italic' : ''}`}>
-                  {candidate.email || 'Missing email'}
+                <span
+                  className={`${!candidate.email ? "text-red-500 italic" : ""}`}
+                >
+                  {candidate.email || "Missing email"}
                 </span>
               </div>
             )}
@@ -662,26 +751,32 @@ export default function Candidates() {
             {candidate.isEditing ? (
               <Input
                 value={candidate.phone}
-                onChange={(e) => updateCandidateField(candidate.id, 'phone', e.target.value)}
+                onChange={(e) =>
+                  updateCandidateField(candidate.id, "phone", e.target.value)
+                }
                 placeholder="Phone number"
                 className="mt-1"
               />
             ) : (
               <div className="flex items-center mt-1">
                 <Phone className="w-4 h-4 text-gray-400 mr-2" />
-                <span className={`${!candidate.phone ? 'text-red-500 italic' : ''}`}>
-                  {candidate.phone || 'Missing phone'}
+                <span
+                  className={`${!candidate.phone ? "text-red-500 italic" : ""}`}
+                >
+                  {candidate.phone || "Missing phone"}
                 </span>
               </div>
             )}
           </div>
-          
+
           <div>
             <Label className="text-xs text-gray-500">Location</Label>
             {candidate.isEditing ? (
               <Input
                 value={candidate.location}
-                onChange={(e) => updateCandidateField(candidate.id, 'location', e.target.value)}
+                onChange={(e) =>
+                  updateCandidateField(candidate.id, "location", e.target.value)
+                }
                 placeholder="Location"
                 className="mt-1"
               />
@@ -700,13 +795,17 @@ export default function Candidates() {
           {candidate.isEditing ? (
             <Textarea
               value={candidate.summary}
-              onChange={(e) => updateCandidateField(candidate.id, 'summary', e.target.value)}
+              onChange={(e) =>
+                updateCandidateField(candidate.id, "summary", e.target.value)
+              }
               placeholder="Professional summary"
               className="mt-1"
               rows={3}
             />
           ) : (
-            <p className="text-sm mt-1 text-gray-700 line-clamp-3">{candidate.summary}</p>
+            <p className="text-sm mt-1 text-gray-700 line-clamp-3">
+              {candidate.summary}
+            </p>
           )}
         </div>
 
@@ -731,7 +830,9 @@ export default function Candidates() {
                 <Briefcase className="w-4 h-4 text-gray-400 mt-0.5" />
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium">{exp.title}</div>
-                  <div className="text-xs text-gray-500">{exp.company} • {exp.duration}</div>
+                  <div className="text-xs text-gray-500">
+                    {exp.company} • {exp.duration}
+                  </div>
                 </div>
               </div>
             ))}
@@ -747,7 +848,9 @@ export default function Candidates() {
                 <GraduationCap className="w-4 h-4 text-gray-400 mt-0.5" />
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium">{edu.degree}</div>
-                  <div className="text-xs text-gray-500">{edu.institution} • {edu.year}</div>
+                  <div className="text-xs text-gray-500">
+                    {edu.institution} • {edu.year}
+                  </div>
                 </div>
               </div>
             ))}
@@ -779,10 +882,7 @@ export default function Candidates() {
             >
               Cancel
             </Button>
-            <Button
-              size="sm"
-              onClick={() => saveCandidate(candidate.id)}
-            >
+            <Button size="sm" onClick={() => saveCandidate(candidate.id)}>
               <Save className="w-4 h-4 mr-2" />
               Save
             </Button>
@@ -874,7 +974,7 @@ export default function Candidates() {
     </Card>
   );
 
-    const ListView = () => (
+  const ListView = () => (
     <Card>
       <CardContent className="p-0">
         <div className="overflow-x-auto">
@@ -1145,7 +1245,7 @@ export default function Candidates() {
           </p>
         </div>
         <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
-          <Button 
+          <Button
             size="sm"
             onClick={() => setShowCVUpload(true)}
             className="bg-blue-600 hover:bg-blue-700"
@@ -1160,8 +1260,6 @@ export default function Candidates() {
         </div>
       </div>
 
-
-
       {/* CV Upload Dialog */}
       <Dialog open={showCVUpload} onOpenChange={setShowCVUpload}>
         <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
@@ -1171,11 +1269,15 @@ export default function Candidates() {
               CV Upload & Management
             </DialogTitle>
             <DialogDescription>
-              Upload single or multiple CVs to automatically extract candidate information
+              Upload single or multiple CVs to automatically extract candidate
+              information
             </DialogDescription>
           </DialogHeader>
 
-          <Tabs value={uploadMode} onValueChange={(value) => setUploadMode(value as 'single' | 'bulk')}>
+          <Tabs
+            value={uploadMode}
+            onValueChange={(value) => setUploadMode(value as "single" | "bulk")}
+          >
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="single">
                 <FileText className="w-4 h-4 mr-2" />
@@ -1191,12 +1293,16 @@ export default function Candidates() {
             <TabsContent value="single" className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Add Candidate via CV</CardTitle>
+                  <CardTitle className="text-lg">
+                    Add Candidate via CV
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div
                     className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-                      isDragOver ? 'border-blue-400 bg-blue-50' : 'border-gray-300'
+                      isDragOver
+                        ? "border-blue-400 bg-blue-50"
+                        : "border-gray-300"
                     }`}
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
@@ -1217,7 +1323,10 @@ export default function Candidates() {
                       ref={fileInputRef}
                       type="file"
                       accept=".pdf,.doc,.docx"
-                      onChange={(e) => e.target.files?.[0] && handleSingleFileUpload(e.target.files[0])}
+                      onChange={(e) =>
+                        e.target.files?.[0] &&
+                        handleSingleFileUpload(e.target.files[0])
+                      }
                       className="hidden"
                     />
                   </div>
@@ -1228,16 +1337,23 @@ export default function Candidates() {
                       {uploadProgress.map((progress) => (
                         <div key={progress.fileName} className="space-y-2">
                           <div className="flex items-center justify-between text-sm">
-                            <span className="font-medium">{progress.fileName}</span>
+                            <span className="font-medium">
+                              {progress.fileName}
+                            </span>
                             <span className="text-gray-500">
-                              {progress.status === 'uploading' && `${progress.progress}%`}
-                              {progress.status === 'parsing' && 'Parsing...'}
-                              {progress.status === 'complete' && 'Complete'}
-                              {progress.status === 'error' && 'Error'}
+                              {progress.status === "uploading" &&
+                                `${progress.progress}%`}
+                              {progress.status === "parsing" && "Parsing..."}
+                              {progress.status === "complete" && "Complete"}
+                              {progress.status === "error" && "Error"}
                             </span>
                           </div>
-                          <Progress 
-                            value={progress.status === 'parsing' ? 100 : progress.progress}
+                          <Progress
+                            value={
+                              progress.status === "parsing"
+                                ? 100
+                                : progress.progress
+                            }
                             className="h-2"
                           />
                         </div>
@@ -1259,11 +1375,17 @@ export default function Candidates() {
                   <CardContent>
                     <div className="grid gap-4">
                       {parsedCandidates.map((candidate) => (
-                        <CandidatePreviewCard key={candidate.id} candidate={candidate} />
+                        <CandidatePreviewCard
+                          key={candidate.id}
+                          candidate={candidate}
+                        />
                       ))}
                     </div>
                     <div className="flex justify-end space-x-3 mt-6">
-                      <Button variant="outline" onClick={() => setParsedCandidates([])}>
+                      <Button
+                        variant="outline"
+                        onClick={() => setParsedCandidates([])}
+                      >
                         Clear
                       </Button>
                       <Button onClick={createAllCandidates}>
@@ -1285,7 +1407,9 @@ export default function Candidates() {
                 <CardContent className="space-y-6">
                   <div
                     className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-                      isDragOver ? 'border-blue-400 bg-blue-50' : 'border-gray-300'
+                      isDragOver
+                        ? "border-blue-400 bg-blue-50"
+                        : "border-gray-300"
                     }`}
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
@@ -1307,7 +1431,9 @@ export default function Candidates() {
                       type="file"
                       accept=".pdf,.doc,.docx"
                       multiple
-                      onChange={(e) => e.target.files && handleBulkFileUpload(e.target.files)}
+                      onChange={(e) =>
+                        e.target.files && handleBulkFileUpload(e.target.files)
+                      }
                       className="hidden"
                     />
                   </div>
@@ -1316,15 +1442,26 @@ export default function Candidates() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label>Default Job Position</Label>
-                      <Select value={bulkJobPosition} onValueChange={setBulkJobPosition}>
+                      <Select
+                        value={bulkJobPosition}
+                        onValueChange={setBulkJobPosition}
+                      >
                         <SelectTrigger className="mt-1">
                           <SelectValue placeholder="Select position for all CVs" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="software-engineer">Software Engineer</SelectItem>
-                          <SelectItem value="product-manager">Product Manager</SelectItem>
-                          <SelectItem value="ux-designer">UX Designer</SelectItem>
-                          <SelectItem value="data-analyst">Data Analyst</SelectItem>
+                          <SelectItem value="software-engineer">
+                            Software Engineer
+                          </SelectItem>
+                          <SelectItem value="product-manager">
+                            Product Manager
+                          </SelectItem>
+                          <SelectItem value="ux-designer">
+                            UX Designer
+                          </SelectItem>
+                          <SelectItem value="data-analyst">
+                            Data Analyst
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -1348,33 +1485,43 @@ export default function Candidates() {
                   {uploadProgress.length > 0 && (
                     <Card>
                       <CardHeader>
-                        <CardTitle className="text-base">Upload Progress</CardTitle>
+                        <CardTitle className="text-base">
+                          Upload Progress
+                        </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-3">
                         {uploadProgress.map((progress) => (
                           <div key={progress.fileName} className="space-y-2">
                             <div className="flex items-center justify-between text-sm">
-                              <span className="font-medium truncate">{progress.fileName}</span>
+                              <span className="font-medium truncate">
+                                {progress.fileName}
+                              </span>
                               <div className="flex items-center space-x-2">
-                                {progress.status === 'parsing' && (
+                                {progress.status === "parsing" && (
                                   <RefreshCw className="w-4 h-4 animate-spin text-blue-500" />
                                 )}
-                                {progress.status === 'complete' && (
+                                {progress.status === "complete" && (
                                   <CheckCircle className="w-4 h-4 text-green-500" />
                                 )}
-                                {progress.status === 'error' && (
+                                {progress.status === "error" && (
                                   <AlertCircle className="w-4 h-4 text-red-500" />
                                 )}
                                 <span className="text-gray-500 text-xs">
-                                  {progress.status === 'uploading' && `${progress.progress}%`}
-                                  {progress.status === 'parsing' && 'Parsing...'}
-                                  {progress.status === 'complete' && 'Complete'}
-                                  {progress.status === 'error' && 'Error'}
+                                  {progress.status === "uploading" &&
+                                    `${progress.progress}%`}
+                                  {progress.status === "parsing" &&
+                                    "Parsing..."}
+                                  {progress.status === "complete" && "Complete"}
+                                  {progress.status === "error" && "Error"}
                                 </span>
                               </div>
                             </div>
-                            <Progress 
-                              value={progress.status === 'parsing' ? 100 : progress.progress}
+                            <Progress
+                              value={
+                                progress.status === "parsing"
+                                  ? 100
+                                  : progress.progress
+                              }
                               className="h-2"
                             />
                           </div>
@@ -1391,35 +1538,53 @@ export default function Candidates() {
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div>
-                        <CardTitle className="text-lg">Parsed Candidates</CardTitle>
+                        <CardTitle className="text-lg">
+                          Parsed Candidates
+                        </CardTitle>
                         <p className="text-sm text-gray-600 mt-1">
                           Review and edit candidates before creating profiles
                         </p>
                       </div>
                       <div className="flex items-center space-x-3">
                         {/* Filter dropdown */}
-                        <Select value={parseFilter} onValueChange={(value) => setParseFilter(value as any)}>
+                        <Select
+                          value={parseFilter}
+                          onValueChange={(value) =>
+                            setParseFilter(value as any)
+                          }
+                        >
                           <SelectTrigger className="w-40">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="all">All Candidates</SelectItem>
-                            <SelectItem value="incomplete">Missing Info</SelectItem>
-                            <SelectItem value="duplicates">Potential Duplicates</SelectItem>
+                            <SelectItem value="incomplete">
+                              Missing Info
+                            </SelectItem>
+                            <SelectItem value="duplicates">
+                              Potential Duplicates
+                            </SelectItem>
                           </SelectContent>
                         </Select>
-                        
+
                         {/* Bulk actions */}
                         <div className="flex items-center space-x-2">
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={selectedCandidates.length > 0 ? clearSelection : selectAllCandidates}
+                            onClick={
+                              selectedCandidates.length > 0
+                                ? clearSelection
+                                : selectAllCandidates
+                            }
                           >
-                            {selectedCandidates.length > 0 ? 'Clear All' : 'Select All'}
+                            {selectedCandidates.length > 0
+                              ? "Clear All"
+                              : "Select All"}
                           </Button>
                           <span className="text-sm text-gray-500">
-                            {selectedCandidates.length} of {filteredParsedCandidates.length} selected
+                            {selectedCandidates.length} of{" "}
+                            {filteredParsedCandidates.length} selected
                           </span>
                         </div>
                       </div>
@@ -1430,38 +1595,66 @@ export default function Candidates() {
                     <div className="flex items-center space-x-6 mb-4 text-sm">
                       <div className="flex items-center space-x-2">
                         <CheckCircle className="w-4 h-4 text-green-600" />
-                        <span>Confirmed ({parsedCandidates.filter(c => c.isConfirmed).length})</span>
+                        <span>
+                          Confirmed (
+                          {parsedCandidates.filter((c) => c.isConfirmed).length}
+                          )
+                        </span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <AlertTriangle className="w-4 h-4 text-red-600" />
-                        <span>Missing Info ({parsedCandidates.filter(c => c.hasMissingInfo).length})</span>
+                        <span>
+                          Missing Info (
+                          {
+                            parsedCandidates.filter((c) => c.hasMissingInfo)
+                              .length
+                          }
+                          )
+                        </span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <AlertCircle className="w-4 h-4 text-yellow-600" />
-                        <span>Potential Duplicates ({parsedCandidates.filter(c => c.isPotentialDuplicate).length})</span>
+                        <span>
+                          Potential Duplicates (
+                          {
+                            parsedCandidates.filter(
+                              (c) => c.isPotentialDuplicate,
+                            ).length
+                          }
+                          )
+                        </span>
                       </div>
                     </div>
 
                     <div className="grid gap-4 max-h-96 overflow-y-auto">
                       {filteredParsedCandidates.map((candidate) => (
-                        <CandidatePreviewCard key={candidate.id} candidate={candidate} />
+                        <CandidatePreviewCard
+                          key={candidate.id}
+                          candidate={candidate}
+                        />
                       ))}
                     </div>
 
                     <div className="flex justify-between items-center mt-6 pt-4 border-t">
                       <div className="text-sm text-gray-600">
-                        {selectedCandidates.length > 0 
+                        {selectedCandidates.length > 0
                           ? `${selectedCandidates.length} candidates selected for creation`
-                          : `${parsedCandidates.length} candidates ready for creation`
-                        }
+                          : `${parsedCandidates.length} candidates ready for creation`}
                       </div>
                       <div className="flex space-x-3">
-                        <Button variant="outline" onClick={() => setParsedCandidates([])}>
+                        <Button
+                          variant="outline"
+                          onClick={() => setParsedCandidates([])}
+                        >
                           Clear All
                         </Button>
                         <Button onClick={createAllCandidates}>
                           <Save className="w-4 h-4 mr-2" />
-                          Create {selectedCandidates.length > 0 ? selectedCandidates.length : parsedCandidates.length} Candidates
+                          Create{" "}
+                          {selectedCandidates.length > 0
+                            ? selectedCandidates.length
+                            : parsedCandidates.length}{" "}
+                          Candidates
                         </Button>
                       </div>
                     </div>
