@@ -50,7 +50,7 @@ export default function Dashboard() {
   const stats = [
     {
       titleKey: "dashboard.activeJobs",
-      value: "24",
+      value: DASHBOARD_STATS.activeJobs.toString(),
       change: "+12%",
       changeType: "positive" as const,
       icon: Briefcase,
@@ -58,7 +58,7 @@ export default function Dashboard() {
     },
     {
       titleKey: "dashboard.totalCandidates",
-      value: "1,847",
+      value: DASHBOARD_STATS.totalCandidates.toString(),
       change: "+8%",
       changeType: "positive" as const,
       icon: Users,
@@ -66,20 +66,20 @@ export default function Dashboard() {
     },
     {
       titleKey: "dashboard.interviewsThisWeek",
-      value: "67",
+      value: DASHBOARD_STATS.interviewsThisWeek.toString(),
       change: "-5%",
       changeType: "negative" as const,
       icon: Clock,
       color: "orange",
     },
-    // {
-    //   titleKey: "dashboard.avgTimeToHire",
-    //   value: "18 days",
-    //   change: "-2 days",
-    //   changeType: "positive" as const,
-    //   icon: Target,
-    //   color: "purple",
-    // },
+    {
+      titleKey: "dashboard.avgTimeToHire",
+      value: `${DASHBOARD_STATS.avgTimeToHire} days`,
+      change: "-2 days",
+      changeType: "positive" as const,
+      icon: Target,
+      color: "purple",
+    },
   ];
 
   const recentJobs = [
