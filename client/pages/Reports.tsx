@@ -106,17 +106,7 @@ export default function Reports() {
     setCandidates(filtered);
   }, [selectedJob, selectedRecruiter, dateRange]);
 
-  const hardcodedData = [
-    { name: "Alice", job: "Developer", status: "Hired" },
-    { name: "Bob", job: "Designer", status: "Interview" },
-    { name: "Charlie", job: "Manager", status: "Screening" },
-  ];
 
-  const headers = [
-    { label: "Name", key: "name" },
-    { label: "Job", key: "job" },
-    { label: "Status", key: "status" },
-  ];
 
   // Conversion Funnel Data
   const funnelData = [
