@@ -660,8 +660,6 @@ export default function FollowUpDashboard() {
                   Timeline
                 </Button>
               </div>
-
-
             </div>
           </div>
 
