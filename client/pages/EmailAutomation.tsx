@@ -19,6 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -38,122 +39,139 @@ import {
   Calendar,
   CheckCircle,
   AlertCircle,
+  Eye,
+  FileText,
 } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+
+interface EmailTemplate {
+  id: number;
+  name: string;
+  subject: string;
+  type: string;
+  stage?: string;
+  status: "active" | "inactive";
+  usage: number;
+  openRate: number;
+  content: string;
+  lastModified: string;
+  variables: string[];
+}
+
+interface EmailPreviewData {
+  template: EmailTemplate;
+  candidateName: string;
+  jobTitle: string;
+  companyName: string;
+  stage: string;
+  interviewerName?: string;
+  interviewDate?: string;
+  interviewTime?: string;
+}
 
 export default function EmailAutomation() {
   const { t } = useLanguage();
-  const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null);
   const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
-  const [isWorkflowDialogOpen, setIsWorkflowDialogOpen] = useState(false);
+  const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false);
+  const [isEditingTemplate, setIsEditingTemplate] = useState(false);
+  const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null);
+  const [previewData, setPreviewData] = useState<EmailPreviewData | null>(null);
+  const [isManualSendOpen, setIsManualSendOpen] = useState(false);
+  const [newTemplate, setNewTemplate] = useState({
+    name: "",
+    subject: "",
+    content: "",
+    type: "",
+    stage: "",
+  });
 
-  const emailTemplates = [
+  const emailTemplates: EmailTemplate[] = [
     {
       id: 1,
       name: "Application Received",
       subject: "Thank you for your application - {{job_title}}",
       type: "auto-response",
-      trigger: "application_received",
+      stage: "application",
       status: "active",
       usage: 156,
       openRate: 85,
-      content:
-        "Dear {{candidate_name}},\n\nThank you for applying to the {{job_title}} position at {{company_name}}. We have received your application and will review it shortly...",
+      lastModified: "2024-01-15",
+      variables: ["{{candidate_name}}", "{{job_title}}", "{{company_name}}"],
+      content: "Dear {{candidate_name}},\n\nThank you for applying to the {{job_title}} position at {{company_name}}. We have received your application and will review it shortly.\n\nWe will contact you within the next 5-7 business days to update you on the status of your application.\n\nBest regards,\n{{company_name}} Recruitment Team",
     },
     {
       id: 2,
-      name: "Interview Invitation",
-      subject: "Interview Invitation - {{job_title}} at {{company_name}}",
-      type: "interview",
-      trigger: "manual",
+      name: "Screening Invitation", 
+      subject: "Next Steps - {{job_title}} at {{company_name}}",
+      type: "screening",
+      stage: "screening",
       status: "active",
       usage: 89,
       openRate: 92,
-      content:
-        "Dear {{candidate_name}},\n\nWe are impressed with your application for the {{job_title}} position and would like to invite you for an interview...",
+      lastModified: "2024-01-12",
+      variables: ["{{candidate_name}}", "{{job_title}}", "{{company_name}}", "{{interviewer_name}}"],
+      content: "Dear {{candidate_name}},\n\nWe are pleased to inform you that your application for the {{job_title}} position has passed our initial review. We would like to invite you for a screening call.\n\nOur recruiter {{interviewer_name}} will be conducting this call. Please reply with your availability for the next week.\n\nBest regards,\n{{company_name}} Team",
     },
     {
       id: 3,
-      name: "Application Rejected",
-      subject: "Update on your application - {{job_title}}",
-      type: "rejection",
-      trigger: "status_change",
+      name: "Interview Invitation",
+      subject: "Interview Invitation - {{job_title}} at {{company_name}}",
+      type: "interview",
+      stage: "interview",
       status: "active",
-      usage: 234,
-      openRate: 78,
-      content:
-        "Dear {{candidate_name}},\n\nThank you for your interest in the {{job_title}} position. After careful consideration...",
+      usage: 67,
+      openRate: 94,
+      lastModified: "2024-01-10",
+      variables: ["{{candidate_name}}", "{{job_title}}", "{{company_name}}", "{{interviewer_name}}", "{{interview_date}}", "{{interview_time}}"],
+      content: "Dear {{candidate_name}},\n\nWe are impressed with your qualifications and would like to invite you for an interview for the {{job_title}} position.\n\nInterview Details:\nDate: {{interview_date}}\nTime: {{interview_time}}\nInterviewer: {{interviewer_name}}\n\nPlease confirm your attendance by replying to this email.\n\nBest regards,\n{{company_name}} Team",
     },
     {
       id: 4,
-      name: "Offer Extended",
+      name: "Job Offer",
       subject: "Job Offer - {{job_title}} at {{company_name}}",
       type: "offer",
-      trigger: "manual",
+      stage: "offer",
       status: "active",
       usage: 23,
-      openRate: 95,
-      content:
-        "Dear {{candidate_name}},\n\nWe are pleased to extend an offer for the {{job_title}} position at {{company_name}}...",
+      openRate: 98,
+      lastModified: "2024-01-08",
+      variables: ["{{candidate_name}}", "{{job_title}}", "{{company_name}}", "{{salary_range}}"],
+      content: "Dear {{candidate_name}},\n\nWe are delighted to offer you the position of {{job_title}} at {{company_name}}.\n\nSalary: {{salary_range}}\n\nPlease review the attached offer letter and let us know your decision within 5 business days.\n\nWe look forward to welcoming you to our team!\n\nBest regards,\n{{company_name}} HR Team",
     },
     {
       id: 5,
-      name: "Interview Reminder",
-      subject: "Reminder: Interview Tomorrow - {{job_title}}",
-      type: "reminder",
-      trigger: "scheduled",
+      name: "Application Rejected",
+      subject: "Update on your application - {{job_title}}",
+      type: "rejection",
+      stage: "rejected",
       status: "active",
-      usage: 67,
-      openRate: 88,
-      content:
-        "Dear {{candidate_name}},\n\nThis is a friendly reminder about your interview scheduled for tomorrow...",
+      usage: 134,
+      openRate: 76,
+      lastModified: "2024-01-05",
+      variables: ["{{candidate_name}}", "{{job_title}}", "{{company_name}}"],
+      content: "Dear {{candidate_name}},\n\nThank you for your interest in the {{job_title}} position at {{company_name}}. After careful consideration, we have decided to move forward with other candidates whose qualifications more closely match our current needs.\n\nWe appreciate the time you invested in the application process and encourage you to apply for future opportunities that match your skills and experience.\n\nBest regards,\n{{company_name}} Team",
     },
   ];
 
-  const workflows = [
-    {
-      id: 1,
-      name: "New Application Workflow",
-      description: "Automated sequence for new applications",
-      trigger: "Application Received",
-      steps: 3,
-      active: true,
-      candidates: 45,
-      openRate: 87,
-    },
-    {
-      id: 2,
-      name: "Interview Process",
-      description: "Follow-up sequence for interview candidates",
-      trigger: "Interview Scheduled",
-      steps: 4,
-      active: true,
-      candidates: 23,
-      openRate: 92,
-    },
-    {
-      id: 3,
-      name: "Rejection Follow-up",
-      description: "Nurture rejected candidates for future opportunities",
-      trigger: "Application Rejected",
-      steps: 2,
-      active: false,
-      candidates: 0,
-      openRate: 0,
-    },
+  const stages = [
+    { value: "application", label: "Application" },
+    { value: "screening", label: "Screening" }, 
+    { value: "interview", label: "Interview" },
+    { value: "offer", label: "Offer" },
+    { value: "hired", label: "Hired" },
+    { value: "rejected", label: "Rejected" },
   ];
 
-  const stats = [
-    { title: "Active Templates", value: "12", change: "+2", color: "blue" },
-    {
-      title: "Emails Sent (30d)",
-      value: "2,847",
-      change: "+18%",
-      color: "green",
-    },
-    // { title: "Avg. Open Rate", value: "87%", change: "+5%", color: "orange" },
-    { title: "Active Workflows", value: "6", change: "+1", color: "purple" },
+  const templateTypes = [
+    { value: "auto-response", label: "Auto Response" },
+    { value: "screening", label: "Screening" },
+    { value: "interview", label: "Interview" },
+    { value: "offer", label: "Job Offer" },
+    { value: "rejection", label: "Rejection" },
+    { value: "follow-up", label: "Follow-up" },
+    { value: "reminder", label: "Reminder" },
   ];
 
   const variables = [
@@ -165,7 +183,119 @@ export default function EmailAutomation() {
     "{{interview_time}}",
     "{{position_department}}",
     "{{salary_range}}",
+    "{{stage}}",
+    "{{application_date}}",
   ];
+
+  const stats = [
+    { title: "Active Templates", value: emailTemplates.filter(t => t.status === "active").length.toString(), change: "+2", color: "blue" },
+    { title: "Templates Used (30d)", value: emailTemplates.reduce((sum, t) => sum + t.usage, 0).toString(), change: "+18%", color: "green" },
+    { title: "Avg. Open Rate", value: `${Math.round(emailTemplates.reduce((sum, t) => sum + t.openRate, 0) / emailTemplates.length)}%`, change: "+5%", color: "orange" },
+  ];
+
+  const generateEmailPreview = (template: EmailTemplate, candidateData?: Partial<EmailPreviewData>) => {
+    const data = {
+      candidateName: candidateData?.candidateName || "John Doe",
+      jobTitle: candidateData?.jobTitle || "Software Engineer",
+      companyName: candidateData?.companyName || "TechCorp Inc.",
+      stage: candidateData?.stage || template.stage || "application",
+      interviewerName: candidateData?.interviewerName || "Sarah Johnson",
+      interviewDate: candidateData?.interviewDate || "March 15, 2024",
+      interviewTime: candidateData?.interviewTime || "2:00 PM EST",
+    };
+
+    let subject = template.subject;
+    let content = template.content;
+
+    // Replace placeholders
+    Object.entries(data).forEach(([key, value]) => {
+      const placeholder = `{{${key.replace(/([A-Z])/g, '_$1').toLowerCase()}}}`;
+      subject = subject.replace(new RegExp(placeholder, 'g'), value);
+      content = content.replace(new RegExp(placeholder, 'g'), value);
+    });
+
+    // Additional common replacements
+    subject = subject.replace(/{{salary_range}}/g, "$80,000 - $120,000");
+    content = content.replace(/{{salary_range}}/g, "$80,000 - $120,000");
+    content = content.replace(/{{application_date}}/g, "March 1, 2024");
+
+    return { subject, content, data };
+  };
+
+  const handlePreviewTemplate = (template: EmailTemplate) => {
+    const preview = generateEmailPreview(template);
+    setPreviewData({
+      template,
+      ...preview.data
+    });
+    setIsPreviewDialogOpen(true);
+  };
+
+  const handleEditTemplate = (template: EmailTemplate) => {
+    setEditingTemplate(template);
+    setNewTemplate({
+      name: template.name,
+      subject: template.subject,
+      content: template.content,
+      type: template.type,
+      stage: template.stage || "",
+    });
+    setIsEditingTemplate(true);
+    setIsTemplateDialogOpen(true);
+  };
+
+  const handleCreateTemplate = () => {
+    setEditingTemplate(null);
+    setNewTemplate({
+      name: "",
+      subject: "",
+      content: "",
+      type: "",
+      stage: "",
+    });
+    setIsEditingTemplate(false);
+    setIsTemplateDialogOpen(true);
+  };
+
+  const handleSaveTemplate = () => {
+    // In a real app, this would save to backend
+    console.log("Saving template:", newTemplate);
+    setIsTemplateDialogOpen(false);
+    setEditingTemplate(null);
+  };
+
+  const handleManualSend = (template: EmailTemplate) => {
+    const preview = generateEmailPreview(template);
+    setPreviewData({
+      template,
+      ...preview.data
+    });
+    setIsManualSendOpen(true);
+  };
+
+  const handleSendEmail = () => {
+    // In a real app, this would send the email
+    console.log("Sending email:", previewData);
+    setIsManualSendOpen(false);
+    setPreviewData(null);
+  };
+
+  const insertVariable = (variable: string) => {
+    const textarea = document.getElementById('email-content') as HTMLTextAreaElement;
+    if (textarea) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const current = newTemplate.content;
+      const newContent = current.substring(0, start) + variable + current.substring(end);
+      setNewTemplate(prev => ({ ...prev, content: newContent }));
+      
+      // Set cursor position after inserted variable
+      setTimeout(() => {
+        textarea.focus();
+        textarea.setSelectionRange(start + variable.length, start + variable.length);
+      }, 0);
+    }
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -173,158 +303,17 @@ export default function EmailAutomation() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">
-            {t("email.title")}
+            Email Templates & Manual Triggers
           </h1>
-          <p className="text-slate-600 mt-1">{t("email.subtitle")}</p>
+          <p className="text-slate-600 mt-1">
+            Create and manage email templates with manual sending controls
+          </p>
         </div>
         <div className="flex space-x-3">
-          <Dialog
-            open={isWorkflowDialogOpen}
-            onOpenChange={setIsWorkflowDialogOpen}
-          >
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Settings className="w-4 h-4 mr-2" />
-                New Workflow
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>Create Email Workflow</DialogTitle>
-                <DialogDescription>
-                  Set up an automated email sequence for candidates.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>Workflow Name</Label>
-                    <Input
-                      placeholder="e.g. Interview Follow-up"
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label>Trigger Event</Label>
-                    <Select>
-                      <SelectTrigger className="mt-1">
-                        <SelectValue placeholder="Select trigger" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="application">
-                          Application Received
-                        </SelectItem>
-                        <SelectItem value="screening">
-                          Screening Completed
-                        </SelectItem>
-                        <SelectItem value="interview">
-                          Interview Scheduled
-                        </SelectItem>
-                        <SelectItem value="offer">Offer Extended</SelectItem>
-                        <SelectItem value="rejection">
-                          Application Rejected
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div>
-                  <Label>Description</Label>
-                  <Textarea
-                    placeholder="Brief description of this workflow..."
-                    className="mt-1"
-                  />
-                </div>
-                <div className="flex justify-end space-x-2">
-                  <Button variant="outline">Cancel</Button>
-                  <Button>Create Workflow</Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-
-          <Dialog
-            open={isTemplateDialogOpen}
-            onOpenChange={setIsTemplateDialogOpen}
-          >
-            <DialogTrigger asChild>
-              <Button size="sm">
-                <Plus className="w-4 h-4 mr-2" />
-                New Template
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-3xl">
-              <DialogHeader>
-                <DialogTitle>Create Email Template</DialogTitle>
-                <DialogDescription>
-                  Create a new email template for candidate communication.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>Template Name</Label>
-                    <Input
-                      placeholder="e.g. Interview Confirmation"
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label>Template Type</Label>
-                    <Select>
-                      <SelectTrigger className="mt-1">
-                        <SelectValue placeholder="Select type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="auto-response">
-                          Auto Response
-                        </SelectItem>
-                        <SelectItem value="interview">
-                          Interview Related
-                        </SelectItem>
-                        <SelectItem value="offer">Job Offer</SelectItem>
-                        <SelectItem value="rejection">Rejection</SelectItem>
-                        <SelectItem value="reminder">Reminder</SelectItem>
-                        <SelectItem value="follow-up">Follow-up</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div>
-                  <Label>Subject Line</Label>
-                  <Input
-                    placeholder="e.g. Interview scheduled for {{job_title}} position"
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <Label>Email Content</Label>
-                  <Textarea
-                    placeholder="Dear {{candidate_name}},&#10;&#10;Your email content here...&#10;&#10;Best regards,&#10;{{company_name}} Team"
-                    className="mt-1 min-h-[200px]"
-                  />
-                </div>
-                <div>
-                  <Label>Available Variables</Label>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {variables.map((variable) => (
-                      <Badge
-                        key={variable}
-                        variant="outline"
-                        className="cursor-pointer hover:bg-slate-100"
-                      >
-                        {variable}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-                <div className="flex justify-end space-x-2">
-                  <Button variant="outline">Cancel</Button>
-                  <Button>Create Template</Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <Button onClick={handleCreateTemplate} size="sm">
+            <Plus className="w-4 h-4 mr-2" />
+            New Template
+          </Button>
         </div>
       </div>
 
@@ -353,10 +342,9 @@ export default function EmailAutomation() {
       </div>
 
       {/* Main Content */}
-      <Tabs defaultValue="templates" className=" space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+      <Tabs defaultValue="templates" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="templates">Email Templates</TabsTrigger>
-          <TabsTrigger value="workflows">Automation Workflows</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
@@ -371,11 +359,16 @@ export default function EmailAutomation() {
               >
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
-                    <div>
+                    <div className="flex-1">
                       <CardTitle className="text-lg">{template.name}</CardTitle>
-                      <p className="text-sm text-slate-600 mt-1">
+                      <p className="text-sm text-slate-600 mt-1 line-clamp-1">
                         {template.subject}
                       </p>
+                      {template.stage && (
+                        <Badge variant="outline" className="mt-2">
+                          {stages.find(s => s.value === template.stage)?.label}
+                        </Badge>
+                      )}
                     </div>
                     <Button variant="ghost" size="sm">
                       <MoreHorizontal className="w-4 h-4" />
@@ -385,14 +378,12 @@ export default function EmailAutomation() {
                 <CardContent className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Badge
-                      variant={
-                        template.status === "active" ? "default" : "secondary"
-                      }
+                      variant={template.status === "active" ? "default" : "secondary"}
                     >
                       {template.status}
                     </Badge>
                     <Badge variant="outline">
-                      {template.type.replace("-", " ")}
+                      {templateTypes.find(t => t.value === template.type)?.label}
                     </Badge>
                   </div>
 
@@ -406,166 +397,34 @@ export default function EmailAutomation() {
                       <span className="font-medium">{template.openRate}%</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-600">Trigger:</span>
-                      <span className="font-medium capitalize">
-                        {template.trigger.replace("_", " ")}
-                      </span>
+                      <span className="text-slate-600">Last Modified:</span>
+                      <span className="font-medium">{template.lastModified}</span>
                     </div>
                   </div>
 
                   <div className="flex space-x-2 pt-3 border-t border-slate-100">
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button size="sm" variant="outline" className="flex-1">
-                          <Edit className="w-4 h-4 mr-2" />
-                          Edit
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-3xl">
-                        <DialogHeader>
-                          <DialogTitle>Edit Email Template</DialogTitle>
-                          <DialogDescription>
-                            Update your email template content and settings.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-4">
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <Label>Template Name</Label>
-                              <Input
-                                defaultValue={template.name}
-                                className="mt-1"
-                              />
-                            </div>
-                            <div>
-                              <Label>Template Type</Label>
-                              <Select defaultValue={template.type}>
-                                <SelectTrigger className="mt-1">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="auto-response">
-                                    Auto Response
-                                  </SelectItem>
-                                  <SelectItem value="interview">
-                                    Interview Related
-                                  </SelectItem>
-                                  <SelectItem value="offer">
-                                    Job Offer
-                                  </SelectItem>
-                                  <SelectItem value="rejection">
-                                    Rejection
-                                  </SelectItem>
-                                  <SelectItem value="reminder">
-                                    Reminder
-                                  </SelectItem>
-                                  <SelectItem value="follow-up">
-                                    Follow-up
-                                  </SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          </div>
-                          <div>
-                            <Label>Subject Line</Label>
-                            <Input
-                              defaultValue={template.subject}
-                              className="mt-1"
-                            />
-                          </div>
-                          <div>
-                            <Label>Email Content</Label>
-                            <Textarea
-                              defaultValue={template.content}
-                              className="mt-1 min-h-[200px]"
-                            />
-                          </div>
-                          <div>
-                            <Label>Available Variables</Label>
-                            <div className="flex flex-wrap gap-2 mt-2">
-                              {variables.map((variable) => (
-                                <Badge
-                                  key={variable}
-                                  variant="outline"
-                                  className="cursor-pointer hover:bg-slate-100"
-                                >
-                                  {variable}
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-                          <div className="flex justify-end space-x-2">
-                            <Button variant="outline">Cancel</Button>
-                            <Button>Save Changes</Button>
-                          </div>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                    <Button size="sm" variant="outline">
-                      <Copy className="w-4 h-4" />
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="flex-1"
+                      onClick={() => handlePreviewTemplate(template)}
+                    >
+                      <Eye className="w-4 h-4 mr-1" />
+                      Preview
                     </Button>
-                    <Button size="sm" variant="outline">
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => handleEditTemplate(template)}
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      onClick={() => handleManualSend(template)}
+                    >
                       <Send className="w-4 h-4" />
                     </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="workflows" className="space-y-6">
-          {/* Automation Workflows */}
-          <div className="space-y-4">
-            {workflows.map((workflow) => (
-              <Card key={workflow.id}>
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div
-                        className={`p-2 rounded-lg ${workflow.active ? "bg-green-100" : "bg-slate-100"}`}
-                      >
-                        {workflow.active ? (
-                          <Play
-                            className={`w-5 h-5 ${workflow.active ? "text-green-600" : "text-slate-400"}`}
-                          />
-                        ) : (
-                          <Pause className="w-5 h-5 text-slate-400" />
-                        )}
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-slate-900">
-                          {workflow.name}
-                        </h3>
-                        <p className="text-sm text-slate-600">
-                          {workflow.description}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center space-x-6">
-                      <div className="text-center">
-                        <p className="text-sm text-slate-600">Steps</p>
-                        <p className="font-semibold">{workflow.steps}</p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-sm text-slate-600">
-                          Active Candidates
-                        </p>
-                        <p className="font-semibold">{workflow.candidates}</p>
-                      </div>
-                      <div className="text-center">
-                        <p className="text-sm text-slate-600">Open Rate</p>
-                        <p className="font-semibold">{workflow.openRate}%</p>
-                      </div>
-
-                      <div className="flex items-center space-x-2">
-                        <Switch checked={workflow.active} />
-                        <Button variant="ghost" size="sm">
-                          <MoreHorizontal className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -577,52 +436,42 @@ export default function EmailAutomation() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
-                <CardTitle>Email Performance</CardTitle>
+                <CardTitle>Template Performance</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-600">Total Emails Sent</span>
-                    <span className="font-semibold">2,847</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-600">Average Open Rate</span>
-                    <span className="font-semibold text-green-600">87%</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-600">Average Click Rate</span>
-                    <span className="font-semibold text-blue-600">34%</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-600">Bounce Rate</span>
-                    <span className="font-semibold text-red-600">2.1%</span>
-                  </div>
+                  {emailTemplates.slice(0, 5).map((template) => (
+                    <div key={template.id} className="flex justify-between items-center">
+                      <div>
+                        <p className="font-medium text-slate-900">{template.name}</p>
+                        <p className="text-sm text-slate-600">{template.usage} sent</p>
+                      </div>
+                      <Badge variant="outline">{template.openRate}% open</Badge>
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle>Top Performing Templates</CardTitle>
+                <CardTitle>Usage by Stage</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {emailTemplates.slice(0, 4).map((template) => (
-                    <div
-                      key={template.id}
-                      className="flex justify-between items-center"
-                    >
-                      <div>
-                        <p className="font-medium text-slate-900">
-                          {template.name}
-                        </p>
-                        <p className="text-sm text-slate-600">
-                          {template.usage} sent
-                        </p>
+                  {stages.map((stage) => {
+                    const stageTemplates = emailTemplates.filter(t => t.stage === stage.value);
+                    const totalUsage = stageTemplates.reduce((sum, t) => sum + t.usage, 0);
+                    return (
+                      <div key={stage.value} className="flex justify-between items-center">
+                        <span className="font-medium">{stage.label}</span>
+                        <div className="text-right">
+                          <div className="font-semibold">{totalUsage}</div>
+                          <div className="text-sm text-slate-600">{stageTemplates.length} templates</div>
+                        </div>
                       </div>
-                      <Badge variant="outline">{template.openRate}% open</Badge>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>
@@ -631,44 +480,6 @@ export default function EmailAutomation() {
 
         <TabsContent value="settings" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* <Card>
-              <CardHeader>
-                <CardTitle>Email Settings</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>Auto-send acknowledgments</Label>
-                    <p className="text-sm text-slate-600">
-                      Automatically send confirmation emails when candidates
-                      apply
-                    </p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>Interview reminders</Label>
-                    <p className="text-sm text-slate-600">
-                      Send reminder emails 24 hours before interviews
-                    </p>
-                  </div>
-                  <Switch defaultChecked />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <Label>Status change notifications</Label>
-                    <p className="text-sm text-slate-600">
-                      Notify candidates when their application status changes
-                    </p>
-                  </div>
-                  <Switch />
-                </div>
-              </CardContent>
-            </Card> */}
-
             <Card>
               <CardHeader>
                 <CardTitle>Sender Information</CardTitle>
@@ -680,10 +491,7 @@ export default function EmailAutomation() {
                 </div>
                 <div>
                   <Label>From Email</Label>
-                  <Input
-                    defaultValue="noreply@talentflow.com"
-                    className="mt-1"
-                  />
+                  <Input defaultValue="noreply@talentflow.com" className="mt-1" />
                 </div>
                 <div>
                   <Label>Reply-to Email</Label>
@@ -692,9 +500,260 @@ export default function EmailAutomation() {
                 <Button>Save Settings</Button>
               </CardContent>
             </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Email Preferences</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label>Require confirmation before sending</Label>
+                    <p className="text-sm text-slate-600">
+                      Always show preview modal before sending emails
+                    </p>
+                  </div>
+                  <Switch defaultChecked />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label>Auto-populate candidate data</Label>
+                    <p className="text-sm text-slate-600">
+                      Automatically fill template variables from candidate profile
+                    </p>
+                  </div>
+                  <Switch defaultChecked />
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Template Creation/Edit Dialog */}
+      <Dialog open={isTemplateDialogOpen} onOpenChange={setIsTemplateDialogOpen}>
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {isEditingTemplate ? "Edit Email Template" : "Create Email Template"}
+            </DialogTitle>
+            <DialogDescription>
+              {isEditingTemplate ? 
+                "Update your email template content and settings." :
+                "Create a new email template for candidate communication."
+              }
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Template Name</Label>
+                  <Input
+                    placeholder="e.g. Interview Confirmation"
+                    value={newTemplate.name}
+                    onChange={(e) => setNewTemplate(prev => ({ ...prev, name: e.target.value }))}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label>Template Type</Label>
+                  <Select value={newTemplate.type} onValueChange={(value) => setNewTemplate(prev => ({ ...prev, type: value }))}>
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {templateTypes.map(type => (
+                        <SelectItem key={type.value} value={type.value}>
+                          {type.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <div>
+                <Label>Associated Stage (Optional)</Label>
+                <Select value={newTemplate.stage} onValueChange={(value) => setNewTemplate(prev => ({ ...prev, stage: value }))}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Select stage" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {stages.map(stage => (
+                      <SelectItem key={stage.value} value={stage.value}>
+                        {stage.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <Label>Subject Line</Label>
+                <Input
+                  placeholder="e.g. Interview scheduled for {{job_title}} position"
+                  value={newTemplate.subject}
+                  onChange={(e) => setNewTemplate(prev => ({ ...prev, subject: e.target.value }))}
+                  className="mt-1"
+                />
+              </div>
+              
+              <div>
+                <Label>Email Content</Label>
+                <Textarea
+                  id="email-content"
+                  placeholder="Dear {{candidate_name}},&#10;&#10;Your email content here...&#10;&#10;Best regards,&#10;{{company_name}} Team"
+                  value={newTemplate.content}
+                  onChange={(e) => setNewTemplate(prev => ({ ...prev, content: e.target.value }))}
+                  className="mt-1 min-h-[300px]"
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <Label>Available Variables</Label>
+                <p className="text-sm text-slate-600 mb-2">Click to insert into content</p>
+                <div className="space-y-1 max-h-[400px] overflow-y-auto">
+                  {variables.map((variable) => (
+                    <Button
+                      key={variable}
+                      variant="outline"
+                      size="sm"
+                      className="w-full justify-start text-left h-auto py-2"
+                      onClick={() => insertVariable(variable)}
+                    >
+                      {variable}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsTemplateDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveTemplate}>
+              {isEditingTemplate ? "Save Changes" : "Create Template"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Email Preview Dialog */}
+      <Dialog open={isPreviewDialogOpen} onOpenChange={setIsPreviewDialogOpen}>
+        <DialogContent className="sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Email Preview - {previewData?.template.name}</DialogTitle>
+            <DialogDescription>
+              Preview of how the email will appear to candidates
+            </DialogDescription>
+          </DialogHeader>
+          
+          {previewData && (
+            <div className="space-y-4">
+              <div className="bg-slate-50 p-4 rounded-lg border">
+                <div className="space-y-3">
+                  <div>
+                    <Label className="text-sm font-medium">To:</Label>
+                    <p className="text-sm">{previewData.candidateName} &lt;candidate@email.com&gt;</p>
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium">Subject:</Label>
+                    <p className="text-sm font-medium">
+                      {generateEmailPreview(previewData.template, previewData).subject}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-white border rounded-lg p-6">
+                <div className="prose prose-sm max-w-none">
+                  <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed">
+                    {generateEmailPreview(previewData.template, previewData).content}
+                  </pre>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsPreviewDialogOpen(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Manual Send Confirmation Dialog */}
+      <Dialog open={isManualSendOpen} onOpenChange={setIsManualSendOpen}>
+        <DialogContent className="sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Send Email - {previewData?.template.name}</DialogTitle>
+            <DialogDescription>
+              Review and edit the email before sending
+            </DialogDescription>
+          </DialogHeader>
+          
+          {previewData && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Recipient</Label>
+                  <Input defaultValue={previewData.candidateName} className="mt-1" />
+                </div>
+                <div>
+                  <Label>Email Address</Label>
+                  <Input defaultValue="candidate@email.com" className="mt-1" />
+                </div>
+              </div>
+              
+              <div>
+                <Label>Subject</Label>
+                <Input 
+                  defaultValue={generateEmailPreview(previewData.template, previewData).subject}
+                  className="mt-1" 
+                />
+              </div>
+              
+              <div>
+                <Label>Email Content</Label>
+                <Textarea
+                  defaultValue={generateEmailPreview(previewData.template, previewData).content}
+                  className="mt-1 min-h-[300px]"
+                />
+              </div>
+              
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <div className="flex items-start space-x-3">
+                  <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-amber-800">Manual Sending Required</p>
+                    <p className="text-sm text-amber-700">
+                      This email will only be sent after you click the "Send Email" button. 
+                      You can make any final edits before sending.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsManualSendOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSendEmail} className="bg-green-600 hover:bg-green-700">
+              <Send className="w-4 h-4 mr-2" />
+              Send Email
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
