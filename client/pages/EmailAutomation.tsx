@@ -248,7 +248,7 @@ export default function EmailAutomation() {
   ];
 
   const generateEmailPreview = (
-    template: EmailTemplate,
+    template: EmailTemplateExtended,
     candidateData?: Partial<EmailPreviewData>,
   ) => {
     const data = {
