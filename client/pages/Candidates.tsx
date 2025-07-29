@@ -40,6 +40,7 @@ import {
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
+import { EmailTrigger } from "@/components/EmailTrigger";
 import {
   Plus,
   Search,
