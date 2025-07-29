@@ -806,6 +806,8 @@ export default function Jobs() {
   const [showAddJobDialog, setShowAddJobDialog] = useState(false);
   const [editingJob, setEditingJob] = useState<JobData | null>(null);
   const [shareJobId, setShareJobId] = useState<string | null>(null);
+  const [applyJobId, setApplyJobId] = useState<string | null>(null);
+  const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const [visibleFields, setVisibleFields] = useState({
