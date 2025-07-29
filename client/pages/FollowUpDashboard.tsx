@@ -62,8 +62,13 @@ import {
   Calendar as CalendarIcon,
   Archive,
   Edit3,
+  Settings,
+  Edit,
+  Download,
+  UserPlus,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom"; // Added for navigation
 import {
   HARDCODED_CANDIDATES,
   type CandidateData,
@@ -77,7 +82,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-// Extended types for follow-up dashboard
+// Extended types remain the same
 interface FollowUpCandidate extends CandidateData {
   lastInteraction: string;
   nextFollowUp: string;
@@ -130,10 +135,42 @@ interface EmailTemplate {
   variables: string[];
 }
 
+// Mock job data for the apply-to-job dialog
+interface Job {
+  id: string;
+  position: string;
+}
+
 export default function FollowUpDashboard() {
   const { toast } = useToast();
 
-  // Mock data transformation
+  // Mock job data
+  const jobs: Job[] = [
+    { id: "job1", position: "Software Engineer" },
+    { id: "job2", position: "Product Manager" },
+    { id: "job3", position: "Data Scientist" },
+  ];
+
+  // State for field visibility in list view
+  const [visibleFields, setVisibleFields] = useState({
+    name: true,
+    appliedDate: true,
+    email: true,
+    phone: true,
+    position: true,
+    recruiter: true,
+    stage: true,
+    source: true,
+    salary: true,
+    location: true,
+    department: true,
+  });
+
+  // State for job application dialog
+  const [applyCandidateId, setApplyCandidateId] = useState<string | null>(null);
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+
+  // Mock candidate data transformation (same as original)
   const [candidates] = useState<FollowUpCandidate[]>(
     HARDCODED_CANDIDATES.map((candidate, index) => ({
       ...candidate,
@@ -148,8 +185,8 @@ export default function FollowUpDashboard() {
       lastEmailSent:
         Math.random() > 0.3
           ? new Date(
-              Date.now() - Math.random() * 3 * 24 * 60 * 60 * 1000,
-            ).toISOString()
+            Date.now() - Math.random() * 3 * 24 * 60 * 60 * 1000,
+          ).toISOString()
           : undefined,
       responseRate: Math.floor(Math.random() * 100),
       urgencyLevel: ["low", "medium", "high", "critical"][
@@ -209,7 +246,7 @@ export default function FollowUpDashboard() {
   const [emailTemplate, setEmailTemplate] = useState("");
   const [bulkAction, setBulkAction] = useState("");
 
-  // Email templates
+  // Email templates (same as original)
   const emailTemplates: EmailTemplate[] = [
     {
       id: "interview_invitation",
@@ -237,7 +274,7 @@ export default function FollowUpDashboard() {
     },
   ];
 
-  // Filter and search logic
+  // Filter and search logic (same as original)
   const filteredCandidates = useMemo(() => {
     return candidates.filter((candidate) => {
       const matchesSearch =
@@ -258,7 +295,7 @@ export default function FollowUpDashboard() {
     });
   }, [candidates, searchTerm, filterStage, filterJob, filterUrgency]);
 
-  // Statistics
+  // Statistics (same as original)
   const stats = useMemo(() => {
     const total = candidates.length;
     const needingFollowUp = candidates.filter(
@@ -273,7 +310,7 @@ export default function FollowUpDashboard() {
     return { total, needingFollowUp, overdue, activeToday };
   }, [candidates]);
 
-  // Handlers
+  // Handlers (same as original)
   const handleCandidateSelect = useCallback((candidateId: string) => {
     setSelectedCandidates((prev) =>
       prev.includes(candidateId)
@@ -358,14 +395,28 @@ export default function FollowUpDashboard() {
     return `${diffInDays}d ago`;
   };
 
-  // Candidate Card Component
+  // Mock apply candidate to job function
+  const applyCandidateToJob = useCallback(
+    (candidateId: string, jobId: string) => {
+      const candidate = candidates.find((c) => c.id === candidateId);
+      const job = jobs.find((j) => j.id === jobId);
+      if (candidate && job) {
+        toast({
+          title: "Application Submitted",
+          description: `${candidate.name} applied to ${job.position}`,
+        });
+      }
+    },
+    [candidates, jobs, toast],
+  );
+
+  // Candidate Card Component (same as original)
   const CandidateCard = ({ candidate }: { candidate: FollowUpCandidate }) => (
     <Card
-      className={`hover:shadow-lg transition-all border-l-4 cursor-pointer rounded-lg ${
-        selectedCandidates.includes(candidate.id)
+      className={`hover:shadow-lg transition-all border-l-4 cursor-pointer rounded-lg ${selectedCandidates.includes(candidate.id)
           ? "ring-2 ring-blue-500 bg-blue-50"
           : ""
-      } border-slate-200 hover:border-blue-300 group`}
+        } border-slate-200 hover:border-blue-300 group`}
       style={{ minHeight: 80 }}
     >
       <CardHeader className="pb-3">
@@ -422,7 +473,7 @@ export default function FollowUpDashboard() {
     </Card>
   );
 
-  // Pipeline View Component
+  // Pipeline View Component (same as original)
   const PipelineView = () => {
     const stages = [
       "Applied",
@@ -433,7 +484,6 @@ export default function FollowUpDashboard() {
       "Hired",
     ];
 
-    // Use JobDetail's getStageColor for column backgrounds
     const getStageColor = (stage: string) => {
       switch (stage) {
         case "Applied":
@@ -504,6 +554,245 @@ export default function FollowUpDashboard() {
     );
   };
 
+  // Updated Pipeline List View Component
+  const PipelineListView = () => {
+    const applyCandidate = candidates.find((c) => c.id === applyCandidateId);
+
+    return (
+      <Card>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  {visibleFields.name && <TableHead>Name</TableHead>}
+                  {visibleFields.appliedDate && (
+                    <TableHead>Applied On</TableHead>
+                  )}
+                  {visibleFields.email && <TableHead>Email</TableHead>}
+                  {visibleFields.phone && <TableHead>Phone</TableHead>}
+                  {visibleFields.position && <TableHead>Job Position</TableHead>}
+                  {visibleFields.recruiter && <TableHead>Recruiter</TableHead>}
+                  {visibleFields.stage && <TableHead>Current Stage</TableHead>}
+                  {visibleFields.source && <TableHead>Source</TableHead>}
+                  {visibleFields.salary && <TableHead>Salary</TableHead>}
+                  {visibleFields.location && <TableHead>Location</TableHead>}
+                  {visibleFields.department && <TableHead>Department</TableHead>}
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredCandidates.map((candidate) => (
+                  <TableRow key={candidate.id} className="hover:bg-slate-50">
+                    {visibleFields.name && (
+                      <TableCell>
+                        <Link
+                          to={`/candidates/${candidate.id}`}
+                          className="flex items-center space-x-3 hover:text-blue-600 min-w-0"
+                        >
+                          <Avatar className="w-8 h-8 flex-shrink-0">
+                            <AvatarImage src={candidate.avatar} />
+                            <AvatarFallback className="text-xs">
+                              {candidate.name
+                                .split(" ")
+                                .map((n) => n[0])
+                                .join("")}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="min-w-0 flex-1">
+                            <div className="font-medium truncate">
+                              {candidate.name}
+                            </div>
+                            <div className="flex items-center space-x-1 mt-1">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`w-3 h-3 ${i < candidate.rating
+                                      ? "text-yellow-400 fill-current"
+                                      : "text-slate-300"
+                                    }`}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        </Link>
+                      </TableCell>
+                    )}
+                    {visibleFields.appliedDate && (
+                      <TableCell className="truncate max-w-32">
+                        {new Date(candidate.appliedDate).toLocaleDateString()}
+                      </TableCell>
+                    )}
+                    {visibleFields.email && (
+                      <TableCell className="truncate max-w-48">
+                        {candidate.email}
+                      </TableCell>
+                    )}
+                    {visibleFields.phone && (
+                      <TableCell className="truncate max-w-32">
+                        {candidate.phone}
+                      </TableCell>
+                    )}
+                    {visibleFields.position && (
+                      <TableCell className="truncate max-w-40">
+                        {candidate.position}
+                      </TableCell>
+                    )}
+                    {visibleFields.recruiter && (
+                      <TableCell className="truncate max-w-32">
+                        {candidate.recruiter}
+                      </TableCell>
+                    )}
+                    {visibleFields.stage && (
+                      <TableCell>
+                        <Badge
+                          variant={
+                            candidate.stage === "Offer"
+                              ? "default"
+                              : candidate.stage === "Hired"
+                                ? "default"
+                                : candidate.stage === "Technical"
+                                  ? "secondary"
+                                  : candidate.stage === "Interview"
+                                    ? "outline"
+                                    : candidate.stage === "Screening"
+                                      ? "secondary"
+                                      : candidate.stage === "Applied"
+                                        ? "outline"
+                                        : "destructive"
+                          }
+                          className="truncate max-w-24"
+                        >
+                          {candidate.stage}
+                        </Badge>
+                      </TableCell>
+                    )}
+                    {visibleFields.source && (
+                      <TableCell className="truncate max-w-32">
+                        {candidate.source}
+                      </TableCell>
+                    )}
+                    {visibleFields.salary && (
+                      <TableCell className="truncate max-w-32">
+                        {candidate.salary}
+                      </TableCell>
+                    )}
+                    {visibleFields.location && (
+                      <TableCell className="truncate max-w-40">
+                        {candidate.location}
+                      </TableCell>
+                    )}
+                    {visibleFields.department && (
+                      <TableCell className="truncate max-w-40">
+                        {candidate.department}
+                      </TableCell>
+                    )}
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="flex-shrink-0"
+                          >
+                            <MoreHorizontal className="w-4 h-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => setApplyCandidateId(candidate.id)}
+                          >
+                            <UserPlus className="w-4 h-4 mr-2" />
+                            Apply to Job
+                          </DropdownMenuItem>
+                          <Link to={`/candidates/${candidate.id}`}>
+                            <DropdownMenuItem>
+                              <Eye className="w-4 h-4 mr-2" />
+                              View Details
+                            </DropdownMenuItem>
+                          </Link>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              toast({
+                                title: "Edit Candidate",
+                                description: `Editing ${candidate.name}`,
+                              });
+                            }}
+                          >
+                            <Edit className="w-4 h-4 mr-2" />
+                            Edit Candidate
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              toast({
+                                title: "Downloading CV",
+                                description: `Downloading CV for ${candidate.name}`,
+                              });
+                            }}
+                          >
+                            <Download className="w-4 h-4 mr-2" />
+                            Download CV
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            <Dialog
+              open={!!applyCandidateId}
+              onOpenChange={(open) => !open && setApplyCandidateId(null)}
+            >
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Apply to Job</DialogTitle>
+                  <DialogDescription>
+                    Select a job to apply candidate:{" "}
+                    <strong>{applyCandidate?.name}</strong>
+                  </DialogDescription>
+                </DialogHeader>
+                <Select onValueChange={(value) => setSelectedJobId(value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Job" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {jobs.map((job) => (
+                      <SelectItem key={job.id} value={job.id}>
+                        {job.position}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => setApplyCandidateId(null)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      if (applyCandidateId && selectedJobId) {
+                        applyCandidateToJob(applyCandidateId, selectedJobId);
+                        setApplyCandidateId(null);
+                        setSelectedJobId(null);
+                      }
+                    }}
+                    disabled={!selectedJobId}
+                  >
+                    Apply
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  // Rest of the component remains unchanged
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
       {/* Header */}
@@ -516,7 +805,6 @@ export default function FollowUpDashboard() {
             Track and manage candidate progress across the hiring pipeline
           </p>
         </div>
-
         <div className="flex flex-wrap gap-3">
           <Button variant="outline" size="sm">
             <Calendar className="w-4 h-4 mr-2" />
@@ -546,7 +834,6 @@ export default function FollowUpDashboard() {
             </div>
           </CardContent>
         </Card>
-
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -560,7 +847,6 @@ export default function FollowUpDashboard() {
             </div>
           </CardContent>
         </Card>
-
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -574,7 +860,6 @@ export default function FollowUpDashboard() {
             </div>
           </CardContent>
         </Card>
-
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -594,7 +879,6 @@ export default function FollowUpDashboard() {
       <Card>
         <CardContent className="p-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-            {/* Search and Filters */}
             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 flex-1">
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -605,7 +889,6 @@ export default function FollowUpDashboard() {
                   className="pl-10"
                 />
               </div>
-
               <Select value={filterStage} onValueChange={setFilterStage}>
                 <SelectTrigger className="w-40">
                   <SelectValue placeholder="Stage" />
@@ -620,7 +903,6 @@ export default function FollowUpDashboard() {
                   <SelectItem value="hired">Hired</SelectItem>
                 </SelectContent>
               </Select>
-
               <Select value={filterUrgency} onValueChange={setFilterUrgency}>
                 <SelectTrigger className="w-32">
                   <SelectValue placeholder="Urgency" />
@@ -634,8 +916,6 @@ export default function FollowUpDashboard() {
                 </SelectContent>
               </Select>
             </div>
-
-            {/* View Mode Toggle */}
             <div className="flex items-center space-x-2">
               <div className="flex border rounded-lg p-1">
                 <Button
@@ -660,10 +940,35 @@ export default function FollowUpDashboard() {
                   Timeline
                 </Button>
               </div>
+              {viewMode === "list" && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Settings className="w-4 h-4 mr-2" />
+                      Fields
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56">
+                    {Object.entries(visibleFields).map(([field, visible]) => (
+                      <DropdownMenuCheckboxItem
+                        key={field}
+                        checked={visible}
+                        onCheckedChange={(checked) =>
+                          setVisibleFields((prev) => ({
+                            ...prev,
+                            [field]: checked,
+                          }))
+                        }
+                      >
+                        {field.charAt(0).toUpperCase() +
+                          field.slice(1).replace(/([A-Z])/g, " $1")}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           </div>
-
-          {/* Bulk Actions */}
           {selectedCandidates.length > 0 && (
             <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
               <div className="flex items-center justify-between">
@@ -710,15 +1015,7 @@ export default function FollowUpDashboard() {
 
       {/* Main Content */}
       {viewMode === "pipeline" && <PipelineView />}
-
-      {viewMode === "list" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredCandidates.map((candidate) => (
-            <CandidateCard key={candidate.id} candidate={candidate} />
-          ))}
-        </div>
-      )}
-
+      {viewMode === "list" && <PipelineListView />}
       {viewMode === "timeline" && (
         <Card>
           <CardHeader>
@@ -772,7 +1069,6 @@ export default function FollowUpDashboard() {
               Send email to {selectedCandidates.length} selected candidate(s)
             </DialogDescription>
           </DialogHeader>
-
           <div className="space-y-4">
             <div>
               <Label>Email Template</Label>
@@ -789,17 +1085,13 @@ export default function FollowUpDashboard() {
                 </SelectContent>
               </Select>
             </div>
-
             {emailTemplate && (
               <div className="p-4 bg-gray-50 rounded-lg">
                 <h4 className="font-medium mb-2">Preview:</h4>
                 <div className="text-sm space-y-2">
                   <div>
                     <strong>Subject:</strong>{" "}
-                    {
-                      emailTemplates.find((t) => t.id === emailTemplate)
-                        ?.subject
-                    }
+                    {emailTemplates.find((t) => t.id === emailTemplate)?.subject}
                   </div>
                   <div>
                     <strong>Body:</strong>
@@ -811,7 +1103,6 @@ export default function FollowUpDashboard() {
               </div>
             )}
           </div>
-
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowEmailDialog(false)}>
               Cancel
@@ -853,7 +1144,6 @@ export default function FollowUpDashboard() {
                   </div>
                 </DialogTitle>
               </DialogHeader>
-
               <Tabs defaultValue="overview" className="w-full">
                 <TabsList className="grid w-full grid-cols-4">
                   <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -861,7 +1151,6 @@ export default function FollowUpDashboard() {
                   <TabsTrigger value="emails">Emails</TabsTrigger>
                   <TabsTrigger value="actions">Actions</TabsTrigger>
                 </TabsList>
-
                 <TabsContent value="overview" className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <Card>
@@ -899,7 +1188,6 @@ export default function FollowUpDashboard() {
                         </div>
                       </CardContent>
                     </Card>
-
                     <Card>
                       <CardHeader>
                         <CardTitle className="text-lg">Contact Info</CardTitle>
@@ -927,7 +1215,6 @@ export default function FollowUpDashboard() {
                     </Card>
                   </div>
                 </TabsContent>
-
                 <TabsContent value="timeline" className="space-y-4">
                   <div className="space-y-3">
                     {selectedCandidate.interactions.map((interaction) => (
@@ -971,7 +1258,6 @@ export default function FollowUpDashboard() {
                     ))}
                   </div>
                 </TabsContent>
-
                 <TabsContent value="emails" className="space-y-4">
                   <div className="space-y-3">
                     {selectedCandidate.emailHistory.map((email) => (
@@ -1006,7 +1292,6 @@ export default function FollowUpDashboard() {
                     ))}
                   </div>
                 </TabsContent>
-
                 <TabsContent value="actions" className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <Button className="h-20 flex-col">
