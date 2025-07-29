@@ -212,6 +212,7 @@ export default function CVEvaluation() {
     setEvaluation(mockEvaluation);
     setIsAnalyzing(false);
   }, [selectedCandidate, selectedJob, uploadedFile]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Handle file upload
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -294,6 +295,11 @@ export default function CVEvaluation() {
         return "text-gray-600 bg-gray-50 border-gray-200";
     }
   };
+  const filteredJobs = HARDCODED_JOBS.filter((job) =>
+    `${job.position} ${job.department} ${job.location} ${job.recruiter}`
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase()),
+  );
 
   return (
     <TooltipProvider>
@@ -332,7 +338,16 @@ export default function CVEvaluation() {
                   Select Job Position
                 </CardTitle>
               </CardHeader>
+
               <CardContent className="space-y-4">
+                <Input
+                  type="text"
+                  placeholder="Search by title, department, location, recruiter..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full"
+                />
+
                 <Select
                   onValueChange={(value) => {
                     const job = HARDCODED_JOBS.find((j) => j.id === value);
@@ -342,17 +357,24 @@ export default function CVEvaluation() {
                   <SelectTrigger>
                     <SelectValue placeholder="Choose a job to evaluate against" />
                   </SelectTrigger>
-                  <SelectContent>
-                    {HARDCODED_JOBS.map((job) => (
-                      <SelectItem key={job.id} value={job.id}>
-                        <div className="flex flex-col">
-                          <span className="font-medium">{job.position}</span>
-                           {/* <span className="text-sm text-gray-500">
-                            {job.department}
-                          </span> */}
-                        </div>
-                      </SelectItem>
-                    ))}
+                  <SelectContent className="max-h-60 overflow-y-auto">
+                    {filteredJobs.length > 0 ? (
+                      filteredJobs.map((job) => (
+                        <SelectItem key={job.id} value={job.id}>
+                          <div className="flex flex-col">
+                            <span className="font-medium">{job.position}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {job.department} • {job.location} •{" "}
+                              {job.recruiter}
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <div className="px-4 py-2 text-sm text-muted-foreground">
+                        No matching jobs found.
+                      </div>
+                    )}
                   </SelectContent>
                 </Select>
 
@@ -368,6 +390,8 @@ export default function CVEvaluation() {
                       <div>Department: {selectedJob.department}</div>
                       <div>Location: {selectedJob.location}</div>
                       <div>Type: {selectedJob.type}</div>
+                      <div>Recruiter: {selectedJob.recruiter}</div>
+                      <div>Status: {selectedJob.status}</div>
                     </div>
                   </div>
                 )}

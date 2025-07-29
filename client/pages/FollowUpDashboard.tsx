@@ -856,10 +856,10 @@ export default function FollowUpDashboard() {
             <Mail className="w-4 h-4 mr-2" />
             Email Settings
           </Button>
-          <Button size="sm">
+          {/* <Button size="sm">
             <Plus className="w-4 h-4 mr-2" />
             Add Follow-up
-          </Button>
+          </Button> */}
         </div>
       </div>
 
