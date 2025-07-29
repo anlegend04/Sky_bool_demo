@@ -619,7 +619,10 @@ export default function Reports() {
                         position="center"
                         fill="#fff"
                         stroke="none"
-                        formatter={(value, entry) => `${entry.name}\n${value} candidates`}
+                        formatter={(value, entry) => {
+                          if (!entry || !entry.name) return `${value || 0}`;
+                          return `${entry.name}\n${value} candidates`;
+                        }}
                       />
                     </Funnel>
                     <Tooltip
