@@ -187,9 +187,10 @@ export default function EmailAutomation() {
   ];
 
   const stages = [
-    { value: "application", label: "Application" },
+    { value: "applied", label: "Applied" },
     { value: "screening", label: "Screening" },
     { value: "interview", label: "Interview" },
+    { value: "technical", label: "Technical" },
     { value: "offer", label: "Offer" },
     { value: "hired", label: "Hired" },
     { value: "rejected", label: "Rejected" },
