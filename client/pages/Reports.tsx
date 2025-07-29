@@ -12,6 +12,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  SearchableSelect,
+  SelectOption,
+} from "@/components/ui/searchable-select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   BarChart,
@@ -75,15 +79,66 @@ export default function Reports() {
   const [selectedStage, setSelectedStage] = useState("all");
   const [isLoading, setIsLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(new Date());
+  const [customSources, setCustomSources] = useState<string[]>([]);
+  const [customStages, setCustomStages] = useState<string[]>([]);
 
   // Get unique values for filters
   const recruiters = Array.from(
     new Set(HARDCODED_CANDIDATES.map((c) => c.recruiter)),
   );
   const sources = Array.from(
-    new Set(HARDCODED_CANDIDATES.map((c) => c.source)),
+    new Set([...HARDCODED_CANDIDATES.map((c) => c.source), ...customSources]),
   );
-  const stages = Array.from(new Set(HARDCODED_CANDIDATES.map((c) => c.stage)));
+  const stages = Array.from(
+    new Set([...HARDCODED_CANDIDATES.map((c) => c.stage), ...customStages]),
+  );
+
+  // Prepare options for enhanced dropdowns
+  const sourceOptions: SelectOption[] = [
+    {
+      value: "all",
+      label: "All Sources",
+      description: "Show data from all sources",
+    },
+    ...sources.map((source) => ({
+      value: source,
+      label: source,
+      badge: customSources.includes(source) ? "Custom" : undefined,
+      custom: customSources.includes(source),
+      description: `Candidates from ${source}`,
+    })),
+  ];
+
+  const stageOptions: SelectOption[] = [
+    {
+      value: "all",
+      label: "All Stages",
+      description: "Show candidates in all stages",
+    },
+    ...stages.map((stage) => ({
+      value: stage,
+      label: stage,
+      badge: customStages.includes(stage) ? "Custom" : undefined,
+      custom: customStages.includes(stage),
+      description: `Candidates in ${stage} stage`,
+    })),
+  ];
+
+  const handleAddCustomSource = (newSource: string) => {
+    setCustomSources((prev) => [...prev, newSource]);
+    toast({
+      title: "Custom Source Added",
+      description: `Added "${newSource}" as a custom source option.`,
+    });
+  };
+
+  const handleAddCustomStage = (newStage: string) => {
+    setCustomStages((prev) => [...prev, newStage]);
+    toast({
+      title: "Custom Stage Added",
+      description: `Added "${newStage}" as a custom stage option.`,
+    });
+  };
 
   // Enhanced filtering function with loading simulation
   const applyFilters = async () => {
@@ -98,6 +153,17 @@ export default function Reports() {
         "Charts and data have been updated with your selected filters.",
     });
   };
+
+  // Auto-apply filters when filter values change
+  useEffect(() => {
+    applyFilters();
+  }, [
+    selectedJob,
+    selectedRecruiter,
+    selectedSource,
+    selectedStage,
+    dateRange,
+  ]);
 
   // Filtered data based on current filters
   const filteredData = useMemo(() => {
@@ -367,7 +433,13 @@ export default function Reports() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
             <div>
               <Label>Date Range</Label>
-              <Select value={dateRange} onValueChange={setDateRange}>
+              <Select
+                value={dateRange}
+                onValueChange={(value) => {
+                  setDateRange(value);
+                  // Auto-apply filters will be triggered by useEffect
+                }}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -382,7 +454,13 @@ export default function Reports() {
 
             <div>
               <Label>Job Position</Label>
-              <Select value={selectedJob} onValueChange={setSelectedJob}>
+              <Select
+                value={selectedJob}
+                onValueChange={(value) => {
+                  setSelectedJob(value);
+                  // Auto-apply filters will be triggered by useEffect
+                }}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -401,7 +479,10 @@ export default function Reports() {
               <Label>Recruiter</Label>
               <Select
                 value={selectedRecruiter}
-                onValueChange={setSelectedRecruiter}
+                onValueChange={(value) => {
+                  setSelectedRecruiter(value);
+                  // Auto-apply filters will be triggered by useEffect
+                }}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -419,50 +500,63 @@ export default function Reports() {
 
             <div>
               <Label>Source</Label>
-              <Select value={selectedSource} onValueChange={setSelectedSource}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Sources</SelectItem>
-                  {sources.map((source) => (
-                    <SelectItem key={source} value={source}>
-                      {source}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SearchableSelect
+                value={selectedSource}
+                onValueChange={(value) => {
+                  setSelectedSource(value as string);
+                  // Auto-apply filters will be triggered by useEffect
+                }}
+                options={sourceOptions}
+                placeholder="Select source..."
+                searchPlaceholder="Search sources..."
+                emptyMessage="No sources found."
+                allowCustom={true}
+                onAddCustom={handleAddCustomSource}
+                clearable={true}
+                className="mt-1"
+              />
             </div>
 
             <div>
               <Label>Stage</Label>
-              <Select value={selectedStage} onValueChange={setSelectedStage}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Stages</SelectItem>
-                  {stages.map((stage) => (
-                    <SelectItem key={stage} value={stage}>
-                      {stage}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <SearchableSelect
+                value={selectedStage}
+                onValueChange={(value) => {
+                  setSelectedStage(value as string);
+                  // Auto-apply filters will be triggered by useEffect
+                }}
+                options={stageOptions}
+                placeholder="Select stage..."
+                searchPlaceholder="Search stages..."
+                emptyMessage="No stages found."
+                allowCustom={true}
+                onAddCustom={handleAddCustomStage}
+                clearable={true}
+                className="mt-1"
+              />
             </div>
 
             <div className="flex items-end">
               <Button
-                onClick={applyFilters}
+                onClick={() => {
+                  // Reset all filters
+                  setDateRange("last30");
+                  setSelectedJob("all");
+                  setSelectedRecruiter("all");
+                  setSelectedSource("all");
+                  setSelectedStage("all");
+                  toast({
+                    title: "Filters Reset",
+                    description:
+                      "All filters have been reset to default values.",
+                  });
+                }}
+                variant="outline"
                 className="w-full"
                 disabled={isLoading}
               >
-                {isLoading ? (
-                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                ) : (
-                  <Filter className="w-4 h-4 mr-2" />
-                )}
-                Apply Filters
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Reset Filters
               </Button>
             </div>
           </div>
@@ -569,10 +663,11 @@ export default function Reports() {
                         dataKey="value"
                         label={({ name, value, percent }) =>
                           value > 0
-                            ? `${name}: ${value} (${(percent * 100).toFixed(0)}%)`
+                            ? `${name}\n${value} (${(percent * 100).toFixed(0)}%)`
                             : ""
                         }
                         labelLine={false}
+                        fontSize={12}
                       >
                         {chartData.stageDistribution.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.fill} />
@@ -581,8 +676,15 @@ export default function Reports() {
                       <Tooltip
                         formatter={(value, name) => [
                           `${value} candidates`,
-                          name,
+                          "Count",
                         ]}
+                        labelFormatter={(label) => `Stage: ${label}`}
+                        contentStyle={{
+                          backgroundColor: "white",
+                          border: "1px solid #e5e7eb",
+                          borderRadius: "6px",
+                          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                        }}
                       />
                       <Legend
                         formatter={(value, entry) =>
@@ -626,13 +728,19 @@ export default function Reports() {
                       <Tooltip
                         formatter={(value, name) => {
                           const labels = {
-                            applications: "Applications",
-                            interviews: "Interviews",
-                            hires: "Hires",
+                            applications: "Total Applications",
+                            interviews: "Reached Interview",
+                            hires: "Successfully Hired",
                           };
                           return [value, labels[name] || name];
                         }}
                         labelFormatter={(label) => `Recruiter: ${label}`}
+                        contentStyle={{
+                          backgroundColor: "white",
+                          border: "1px solid #e5e7eb",
+                          borderRadius: "6px",
+                          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                        }}
                       />
                       <Legend
                         formatter={(value) => {
@@ -723,33 +831,67 @@ export default function Reports() {
                     data={[
                       {
                         month: "Jan",
-                        applications: Math.round(filteredData.length * 0.3),
-                        hires: Math.round(
-                          filteredData.filter((c) => c.stage === "Hired")
-                            .length * 0.2,
+                        applications: Math.max(
+                          1,
+                          Math.round(filteredData.length * 0.3),
+                        ),
+                        hires: Math.max(
+                          0,
+                          Math.round(
+                            filteredData.filter((c) => c.stage === "Hired")
+                              .length * 0.2,
+                          ),
+                        ),
+                        interviews: Math.max(
+                          0,
+                          Math.round(filteredData.length * 0.15),
                         ),
                       },
                       {
                         month: "Feb",
-                        applications: Math.round(filteredData.length * 0.5),
-                        hires: Math.round(
-                          filteredData.filter((c) => c.stage === "Hired")
-                            .length * 0.4,
+                        applications: Math.max(
+                          1,
+                          Math.round(filteredData.length * 0.5),
+                        ),
+                        hires: Math.max(
+                          0,
+                          Math.round(
+                            filteredData.filter((c) => c.stage === "Hired")
+                              .length * 0.4,
+                          ),
+                        ),
+                        interviews: Math.max(
+                          0,
+                          Math.round(filteredData.length * 0.25),
                         ),
                       },
                       {
                         month: "Mar",
-                        applications: Math.round(filteredData.length * 0.8),
-                        hires: Math.round(
-                          filteredData.filter((c) => c.stage === "Hired")
-                            .length * 0.7,
+                        applications: Math.max(
+                          1,
+                          Math.round(filteredData.length * 0.8),
+                        ),
+                        hires: Math.max(
+                          0,
+                          Math.round(
+                            filteredData.filter((c) => c.stage === "Hired")
+                              .length * 0.7,
+                          ),
+                        ),
+                        interviews: Math.max(
+                          0,
+                          Math.round(filteredData.length * 0.4),
                         ),
                       },
                       {
                         month: "Apr",
-                        applications: filteredData.length,
+                        applications: Math.max(1, filteredData.length),
                         hires: filteredData.filter((c) => c.stage === "Hired")
                           .length,
+                        interviews: Math.max(
+                          0,
+                          Math.round(filteredData.length * 0.5),
+                        ),
                       },
                     ]}
                   >
@@ -761,16 +903,24 @@ export default function Reports() {
                         const labels = {
                           applications: "Applications Received",
                           hires: "Candidates Hired",
+                          interviews: "Candidates Interviewed",
                         };
                         return [value, labels[name] || name];
                       }}
                       labelFormatter={(label) => `Month: ${label}`}
+                      contentStyle={{
+                        backgroundColor: "white",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: "6px",
+                        boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                      }}
                     />
                     <Legend
                       formatter={(value) => {
                         const labels = {
                           applications: "Total Applications",
                           hires: "Successful Hires",
+                          interviews: "Candidates Interviewed",
                         };
                         return labels[value] || value;
                       }}
@@ -782,6 +932,15 @@ export default function Reports() {
                       strokeWidth={3}
                       dot={{ fill: "#3b82f6", strokeWidth: 2, r: 6 }}
                       activeDot={{ r: 8, stroke: "#3b82f6", strokeWidth: 2 }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="interviews"
+                      stroke="#8b5cf6"
+                      strokeWidth={2}
+                      dot={{ fill: "#8b5cf6", strokeWidth: 2, r: 4 }}
+                      activeDot={{ r: 6, stroke: "#8b5cf6", strokeWidth: 2 }}
+                      strokeDasharray="5 5"
                     />
                     <Line
                       type="monotone"
@@ -831,19 +990,38 @@ export default function Reports() {
                     />
                     <YAxis fontSize={12} />
                     <Tooltip
-                      formatter={(value, name) => [
-                        `${value} candidates`,
-                        "Applications",
-                      ]}
-                      labelFormatter={(label) => `Source: ${label}`}
                       content={({ active, payload, label }) => {
                         if (active && payload && payload.length) {
                           const data = payload[0].payload;
                           return (
-                            <div className="bg-white p-3 border border-gray-200 rounded shadow-lg">
-                              <p className="font-medium">{`Source: ${label}`}</p>
-                              <p className="text-blue-600">{`Applications: ${data.value}`}</p>
-                              <p className="text-green-600">{`Success Rate: ${data.effectiveness}%`}</p>
+                            <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-lg">
+                              <p className="font-semibold text-gray-900 mb-2">{`Source: ${label}`}</p>
+                              <div className="space-y-1">
+                                <p className="text-blue-600 flex justify-between">
+                                  <span>Applications:</span>
+                                  <span className="font-medium">
+                                    {data.value}
+                                  </span>
+                                </p>
+                                <p className="text-green-600 flex justify-between">
+                                  <span>Success Rate:</span>
+                                  <span className="font-medium">
+                                    {data.effectiveness}%
+                                  </span>
+                                </p>
+                                <p className="text-purple-600 flex justify-between">
+                                  <span>Hired:</span>
+                                  <span className="font-medium">
+                                    {
+                                      filteredData.filter(
+                                        (c) =>
+                                          c.source === label &&
+                                          c.stage === "Hired",
+                                      ).length
+                                    }
+                                  </span>
+                                </p>
+                              </div>
                             </div>
                           );
                         }
