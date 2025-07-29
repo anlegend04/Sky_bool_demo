@@ -163,6 +163,19 @@ export default function Candidates() {
   const [source, setSource] = useState<string | undefined>();
   const [customSource, setCustomSource] = useState("");
   const [showManualEntry, setShowManualEntry] = useState(false);
+  const [isSubmittingForm, setIsSubmittingForm] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    location: "",
+    position: "",
+    department: "",
+    source: "",
+    experience: "",
+    salary: "",
+    skills: "",
+  });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bulkFileInputRef = useRef<HTMLInputElement>(null);
