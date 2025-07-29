@@ -161,7 +161,7 @@ export default function JobDetail() {
       // Update candidate stage in storage
       const updatedCandidate: CandidateData = {
         ...draggedCandidate,
-        stage: newStage as CandidateData['stage'],
+        stage: newStage as CandidateData["stage"],
         duration: 0, // Reset duration for new stage
       };
 
@@ -260,7 +260,9 @@ export default function JobDetail() {
               >
                 {candidate.name}
               </Link>
-              <p className="text-xs text-slate-600 truncate">{candidate.experience}</p>
+              <p className="text-xs text-slate-600 truncate">
+                {candidate.experience}
+              </p>
             </div>
           </div>
           <DropdownMenu>
@@ -299,7 +301,9 @@ export default function JobDetail() {
           </div>
           <div className="flex items-center gap-2 min-w-0">
             <Clock className="w-3 h-3 flex-shrink-0" />
-            <span className="text-xs truncate">{candidate.duration} days in stage</span>
+            <span className="text-xs truncate">
+              {candidate.duration} days in stage
+            </span>
           </div>
         </div>
 
@@ -316,7 +320,10 @@ export default function JobDetail() {
               />
             ))}
           </div>
-          <Badge variant="outline" className="text-xs flex-shrink-0 truncate max-w-20">
+          <Badge
+            variant="outline"
+            className="text-xs flex-shrink-0 truncate max-w-20"
+          >
             {candidate.source}
           </Badge>
         </div>
@@ -343,7 +350,9 @@ export default function JobDetail() {
             onDrop={(e) => handleDrop(e, stage)}
           >
             <div className="flex items-center justify-between mb-4 min-w-0">
-              <h3 className="font-semibold text-sm text-slate-900 truncate flex-1">{stage}</h3>
+              <h3 className="font-semibold text-sm text-slate-900 truncate flex-1">
+                {stage}
+              </h3>
               <Badge variant="outline" className="text-xs flex-shrink-0 ml-2">
                 {stageCandidates.length}
               </Badge>
@@ -569,6 +578,69 @@ export default function JobDetail() {
       </div>
 
       <div className="p-4 sm:p-6 space-y-6">
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-slate-600">Total Applications</p>
+                  <p className="text-xl sm:text-2xl font-bold text-slate-900">
+                    {job.applications}
+                  </p>
+                </div>
+                <Users className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-slate-600">In Interview</p>
+                  <p className="text-xl sm:text-2xl font-bold text-slate-900">
+                    {
+                      candidates.filter((c) =>
+                        ["Interview", "Technical"].includes(c.stage),
+                      ).length
+                    }
+                  </p>
+                </div>
+                <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-slate-600">Hired / Target</p>
+                  <p className="text-xl sm:text-2xl font-bold text-slate-900">
+                    {job.hired} / {job.target}
+                  </p>
+                </div>
+                <Target className="w-6 h-6 sm:w-8 sm:h-8 text-purple-600" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-slate-600">Budget Used</p>
+                  <p className="text-xl sm:text-2xl font-bold text-slate-900">
+                    {Math.round(
+                      (parseInt(job.actualCost) / parseInt(job.estimatedCost)) *
+                        100,
+                    )}
+                    %
+                  </p>
+                </div>
+                <DollarSign className="w-6 h-6 sm:w-8 sm:h-8 text-orange-600" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
         {/* Job Details Panel */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Job Summary */}
@@ -634,9 +706,7 @@ export default function JobDetail() {
                   <label className="text-sm font-medium text-slate-700">
                     Interviewers
                   </label>
-                  <p className="text-sm text-slate-600">
-                    {job.requester}
-                  </p>
+                  <p className="text-sm text-slate-600">{job.requester}</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -804,70 +874,6 @@ export default function JobDetail() {
 
         {/* Budget Panel */}
         <BudgetPanel job={job} onJobUpdate={setJob} />
-
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-slate-600">Total Applications</p>
-                  <p className="text-xl sm:text-2xl font-bold text-slate-900">
-                    {job.applications}
-                  </p>
-                </div>
-                <Users className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-slate-600">In Interview</p>
-                  <p className="text-xl sm:text-2xl font-bold text-slate-900">
-                    {
-                      candidates.filter((c) =>
-                        ["Interview", "Technical"].includes(c.stage),
-                      ).length
-                    }
-                  </p>
-                </div>
-                <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-slate-600">Hired / Target</p>
-                  <p className="text-xl sm:text-2xl font-bold text-slate-900">
-                    {job.hired} / {job.target}
-                  </p>
-                </div>
-                <Target className="w-6 h-6 sm:w-8 sm:h-8 text-purple-600" />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-slate-600">Budget Used</p>
-                  <p className="text-xl sm:text-2xl font-bold text-slate-900">
-                    {Math.round(
-                      (parseInt(job.actualCost) / parseInt(job.estimatedCost)) *
-                        100,
-                    )}
-                    %
-                  </p>
-                </div>
-                <DollarSign className="w-6 h-6 sm:w-8 sm:h-8 text-orange-600" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
       </div>
 
       {/* Add Custom Stage Dialog */}

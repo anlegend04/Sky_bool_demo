@@ -91,14 +91,14 @@ export default function Settings() {
           <p className="text-slate-600 mt-1">{t("settings.subtitle")}</p>
         </div>
         <div className="flex space-x-3">
-          <Button variant="outline" size="sm">
+          {/* <Button variant="outline" size="sm">
             <Download className="w-4 h-4 mr-2" />
             {t("settings.exportSettings")}
-          </Button>
-          <Button variant="outline" size="sm">
+          </Button> */}
+          {/* <Button variant="outline" size="sm">
             <Upload className="w-4 h-4 mr-2" />
             {t("settings.importSettings")}
-          </Button>
+          </Button> */}
         </div>
       </div>
 
