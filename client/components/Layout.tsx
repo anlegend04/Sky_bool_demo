@@ -29,6 +29,7 @@ import {
   Languages,
   FileText,
   Timer,
+  Clock,
 } from "lucide-react";
 import { useLanguage, SUPPORTED_LANGUAGES } from "@/hooks/use-language";
 
