@@ -2187,6 +2187,22 @@ export default function Candidates() {
 
       {/* Content based on view mode */}
       {viewMode === "list" ? <ListView /> : <GridView />}
+
+      {/* Email Trigger Modal */}
+      {selectedCandidateForEmail && (
+        <EmailTrigger
+          isOpen={emailTriggerOpen}
+          onClose={() => {
+            setEmailTriggerOpen(false);
+            setSelectedCandidateForEmail(null);
+            setNewStageForEmail("");
+          }}
+          candidate={selectedCandidateForEmail}
+          newStage={newStageForEmail}
+          jobTitle={selectedCandidateForEmail.position}
+          onEmailSent={handleEmailSent}
+        />
+      )}
     </div>
   );
 }
