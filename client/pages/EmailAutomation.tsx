@@ -321,7 +321,7 @@ export default function EmailAutomation() {
     setEditingTemplate(null);
   };
 
-  const handleManualSend = (template: EmailTemplate) => {
+  const handleManualSend = (template: EmailTemplateExtended) => {
     const preview = generateEmailPreview(template);
     setPreviewData({
       template,
