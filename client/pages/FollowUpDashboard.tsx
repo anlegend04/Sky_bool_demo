@@ -436,17 +436,17 @@ export default function FollowUpDashboard() {
             </Avatar>
             <div className="flex-1 min-w-0">
               <h3
-                className="font-semibold text-sm group-hover:text-blue-700 transition-colors line-clamp-1"
+                className="font-semibold text-sm group-hover:text-blue-700 transition-colors "
                 title={candidate.name}
               >
                 {candidate.name}
               </h3>
-              <p
+              {/* <p
                 className="text-xs text-gray-600 line-clamp-1"
                 title={candidate.email}
               >
                 {candidate.email}
-              </p>
+              </p> */}
               <div className="flex items-center space-x-2 mt-1">
                 <Badge variant="outline" className="text-xs">
                   {candidate.stage}
