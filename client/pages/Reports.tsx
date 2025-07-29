@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SearchableSelect, SelectOption } from "@/components/ui/searchable-select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   BarChart,
@@ -75,15 +76,58 @@ export default function Reports() {
   const [selectedStage, setSelectedStage] = useState("all");
   const [isLoading, setIsLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(new Date());
+  const [customSources, setCustomSources] = useState<string[]>([]);
+  const [customStages, setCustomStages] = useState<string[]>([]);
 
   // Get unique values for filters
   const recruiters = Array.from(
     new Set(HARDCODED_CANDIDATES.map((c) => c.recruiter)),
   );
   const sources = Array.from(
-    new Set(HARDCODED_CANDIDATES.map((c) => c.source)),
+    new Set([...HARDCODED_CANDIDATES.map((c) => c.source), ...customSources]),
   );
-  const stages = Array.from(new Set(HARDCODED_CANDIDATES.map((c) => c.stage)));
+  const stages = Array.from(
+    new Set([...HARDCODED_CANDIDATES.map((c) => c.stage), ...customStages]),
+  );
+
+  // Prepare options for enhanced dropdowns
+  const sourceOptions: SelectOption[] = [
+    { value: "all", label: "All Sources", description: "Show data from all sources" },
+    ...sources.map((source) => ({
+      value: source,
+      label: source,
+      badge: customSources.includes(source) ? "Custom" : undefined,
+      custom: customSources.includes(source),
+      description: `Candidates from ${source}`,
+    })),
+  ];
+
+  const stageOptions: SelectOption[] = [
+    { value: "all", label: "All Stages", description: "Show candidates in all stages" },
+    ...stages.map((stage) => ({
+      value: stage,
+      label: stage,
+      badge: customStages.includes(stage) ? "Custom" : undefined,
+      custom: customStages.includes(stage),
+      description: `Candidates in ${stage} stage`,
+    })),
+  ];
+
+  const handleAddCustomSource = (newSource: string) => {
+    setCustomSources((prev) => [...prev, newSource]);
+    toast({
+      title: "Custom Source Added",
+      description: `Added "${newSource}" as a custom source option.`,
+    });
+  };
+
+  const handleAddCustomStage = (newStage: string) => {
+    setCustomStages((prev) => [...prev, newStage]);
+    toast({
+      title: "Custom Stage Added",
+      description: `Added "${newStage}" as a custom stage option.`,
+    });
+  };
 
   // Enhanced filtering function with loading simulation
   const applyFilters = async () => {
@@ -439,48 +483,40 @@ export default function Reports() {
 
             <div>
               <Label>Source</Label>
-              <Select
+              <SearchableSelect
                 value={selectedSource}
                 onValueChange={(value) => {
-                  setSelectedSource(value);
+                  setSelectedSource(value as string);
                   // Auto-apply filters will be triggered by useEffect
                 }}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Sources</SelectItem>
-                  {sources.map((source) => (
-                    <SelectItem key={source} value={source}>
-                      {source}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                options={sourceOptions}
+                placeholder="Select source..."
+                searchPlaceholder="Search sources..."
+                emptyMessage="No sources found."
+                allowCustom={true}
+                onAddCustom={handleAddCustomSource}
+                clearable={true}
+                className="mt-1"
+              />
             </div>
 
             <div>
               <Label>Stage</Label>
-              <Select
+              <SearchableSelect
                 value={selectedStage}
                 onValueChange={(value) => {
-                  setSelectedStage(value);
+                  setSelectedStage(value as string);
                   // Auto-apply filters will be triggered by useEffect
                 }}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Stages</SelectItem>
-                  {stages.map((stage) => (
-                    <SelectItem key={stage} value={stage}>
-                      {stage}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                options={stageOptions}
+                placeholder="Select stage..."
+                searchPlaceholder="Search stages..."
+                emptyMessage="No stages found."
+                allowCustom={true}
+                onAddCustom={handleAddCustomStage}
+                clearable={true}
+                className="mt-1"
+              />
             </div>
 
             <div className="flex items-end">
