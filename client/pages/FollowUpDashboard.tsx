@@ -476,7 +476,19 @@ export default function FollowUpDashboard() {
               <div className="space-y-3 px-4 pb-4 pt-2 min-h-[180px] relative flex-1">
                 {stageCandidates.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-slate-400 text-xs py-8">
-                    <svg className="w-8 h-8 mb-2 opacity-30" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <svg
+                      className="w-8 h-8 mb-2 opacity-30"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 8v4l3 3m6 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
                     No candidates
                   </div>
                 ) : (
@@ -491,8 +503,6 @@ export default function FollowUpDashboard() {
       </div>
     );
   };
-
-
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
@@ -651,8 +661,8 @@ export default function FollowUpDashboard() {
                 </Button>
               </div>
 
-                            {/* Field Visibility Settings (only for list view) */}
-                            {viewMode === "list" && (
+              {/* Field Visibility Settings (only for list view) */}
+              {viewMode === "list" && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm">
@@ -761,7 +771,7 @@ export default function FollowUpDashboard() {
 
       {viewMode === "list" && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredCandidates.map(candidate => (
+          {filteredCandidates.map((candidate) => (
             <CandidateCard key={candidate.id} candidate={candidate} />
           ))}
         </div>
