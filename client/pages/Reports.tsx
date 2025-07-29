@@ -750,6 +750,42 @@ export default function Reports() {
               )}
             </CardContent>
           </Card>
+
+          {/* Add Source Effectiveness Details */}
+          {!isLoading && filteredData.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Source Performance Details</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {chartData.sourceDistribution.filter(source => source.value > 0).map((source) => (
+                    <div key={source.name} className="p-4 border border-gray-200 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-medium text-gray-900">{source.name}</h4>
+                        <div className="text-2xl font-bold" style={{ color: source.color }}>
+                          {source.effectiveness}%
+                        </div>
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        <div>Applications: {source.value}</div>
+                        <div>Hired: {filteredData.filter(c => c.source === source.name && c.stage === "Hired").length}</div>
+                      </div>
+                      <div className="mt-2 bg-gray-200 rounded-full h-2">
+                        <div
+                          className="h-2 rounded-full transition-all duration-300"
+                          style={{
+                            width: `${source.effectiveness}%`,
+                            backgroundColor: source.color
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
       </Tabs>
     </div>
