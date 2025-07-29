@@ -1425,6 +1425,8 @@ export default function Candidates() {
                   type="email"
                   placeholder="john@example.com"
                   className="mt-1"
+                  value={formData.email}
+                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                 />
               </div>
               <div>
