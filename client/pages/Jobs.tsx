@@ -330,6 +330,20 @@ const AddJobForm = memo(
       [],
     );
 
+    const [applyJobId, setApplyJobId] = useState<string | null>(null);
+    const [selectedCandidateId, setSelectedCandidateId] = useState<
+      string | null
+    >(null);
+
+    // Call apply action
+    const handleApplyCandidate = () => {
+      if (applyJobId && selectedCandidateId) {
+        applyCandidateToJob(applyJobId, selectedCandidateId); // API or action
+        setApplyJobId(null);
+        setSelectedCandidateId(null);
+      }
+    };
+
     const addNewStage = useCallback(() => {
       setJobStages((prev) => [...prev, { name: "", durationHours: "" }]);
     }, []);
@@ -1166,12 +1180,66 @@ export default function Jobs() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
+                        {/* Action add to apply specific candidate on this job */}
+                        <DropdownMenuItem onClick={() => setApplyJobId(job.id)}>
+                          <UserPlus className="w-4 h-4 mr-2" />
+                          Apply Candidate
+                        </DropdownMenuItem>
+
+                        <Dialog
+                          open={!!applyJobId}
+                          onOpenChange={(open) => !open && setApplyJobId(null)}
+                        >
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Apply Candidate</DialogTitle>
+                              <DialogDescription>
+                                Select a candidate to apply to job:{" "}
+                                <strong>{job?.position}</strong>
+                              </DialogDescription>
+                            </DialogHeader>
+
+                            <Select
+                              onValueChange={(value) =>
+                                setSelectedCandidateId(value)
+                              }
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select Candidate" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {candidates.map((c) => (
+                                  <SelectItem key={c.id} value={c.id}>
+                                    {c.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+
+                            <DialogFooter>
+                              <Button
+                                variant="outline"
+                                onClick={() => setApplyJobId(null)}
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                onClick={handleApplyCandidate}
+                                disabled={!selectedCandidateId}
+                              >
+                                Apply
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+
                         <Link to={`/jobs/${job.id}`}>
                           <DropdownMenuItem>
                             <Eye className="w-4 h-4 mr-2" />
                             View Details
                           </DropdownMenuItem>
                         </Link>
+
                         <DropdownMenuItem onClick={() => handleEditJob(job)}>
                           <Edit className="w-4 h-4 mr-2" />
                           Edit Job
