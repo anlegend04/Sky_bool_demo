@@ -76,12 +76,8 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import {
-  storage,
-  CandidateData,
-  EmailData,
-  StageHistoryData,
-} from "@/lib/storage";
+import { storage, EmailData, StageHistoryData } from "@/lib/storage";
+import { CandidateData } from "@/data/hardcoded-data";
 import { useToast } from "@/hooks/use-toast";
 import { HARDCODED_CANDIDATES, EMAIL_TEMPLATES } from "@/data/hardcoded-data";
 import { EmailTrigger } from "@/components/EmailTrigger";
@@ -97,6 +93,19 @@ type StageData = {
   mailSent?: boolean;
   mailConfirmed?: boolean;
 };
+
+// Utility function to convert status
+function convertCandidateStatus(candidate: any): CandidateData {
+  return {
+    ...candidate,
+    status: 
+      candidate.status === "Active" ||
+      candidate.status === "Inactive" ||
+      candidate.status === "Blacklisted"
+        ? candidate.status
+        : "Active", // fallback/default
+  };
+}
 
 export default function CandidateDetail() {
   const { id } = useParams();
@@ -123,13 +132,13 @@ export default function CandidateDetail() {
         // Convert hardcoded data to storage format
         const convertedCandidate: CandidateData = {
           ...hardcodedCandidate,
-          status: hardcodedCandidate.status as string,
+          status: hardcodedCandidate.status,
           emails: hardcodedCandidate.emails.map((email) => ({
             ...email,
             status:
-              email.status === "pending"
-                ? "sent"
-                : (email.status as "sent" | "draft" | "failed"),
+              (email.status as any) === "draft"
+                ? "pending"
+                : email.status,
           })),
         };
 
@@ -139,7 +148,7 @@ export default function CandidateDetail() {
         // Try localStorage
         const storageCandidate = storage.getCandidate(id);
         if (storageCandidate) {
-          setCandidate(storageCandidate);
+          setCandidate(convertCandidateStatus(storageCandidate));
           setCurrentStage(storageCandidate.stage);
         }
       }
@@ -334,7 +343,7 @@ export default function CandidateDetail() {
     });
 
     if (updatedCandidate) {
-      setCandidate(updatedCandidate);
+      setCandidate(convertCandidateStatus(updatedCandidate));
       setCurrentStage(newStage);
       setShowStageChangeDialog(false);
       setStageChangeReason("");
@@ -1124,7 +1133,7 @@ export default function CandidateDetail() {
       stage: pendingStage,
     });
     if (updatedCandidate) {
-      setCandidate(updatedCandidate);
+      setCandidate(convertCandidateStatus(updatedCandidate));
       setCurrentStage(pendingStage);
       setPendingStage("");
       setPendingReason("");
@@ -1247,7 +1256,7 @@ export default function CandidateDetail() {
       {candidate && (
         <EmailTrigger
           isOpen={showEmailTrigger}
-          onClose={handleEmailSentOrSkipped}
+          onClose={() => setShowEmailTrigger(false)}
           candidate={candidate}
           newStage={pendingStage}
           jobTitle={candidate.position}
