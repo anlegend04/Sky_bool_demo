@@ -347,9 +347,9 @@ export default function CVEvaluation() {
                       <SelectItem key={job.id} value={job.id}>
                         <div className="flex flex-col">
                           <span className="font-medium">{job.position}</span>
-                          // <span className="text-sm text-gray-500">
-                          //   {job.department}
-                          // </span>
+                           {/* <span className="text-sm text-gray-500">
+                            {job.department}
+                          </span> */}
                         </div>
                       </SelectItem>
                     ))}
