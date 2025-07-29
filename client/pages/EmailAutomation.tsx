@@ -84,7 +84,19 @@ export default function EmailAutomation() {
     stage: "",
   });
 
-  const emailTemplates: EmailTemplate[] = [
+  // Generate extended templates with usage statistics
+  const emailTemplates: EmailTemplateExtended[] = useMemo(() => {
+    const baseTemplates = getAllEmailTemplates();
+    return baseTemplates.map((template, index) => ({
+      ...template,
+      status: "active" as const,
+      usage: Math.floor(Math.random() * 200) + 20, // Random usage for demo
+      openRate: Math.floor(Math.random() * 30) + 70, // Random open rate 70-100%
+      lastModified: new Date(Date.now() - index * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Staggered dates
+    }));
+  }, []);
+
+  const emailTemplatesOld: EmailTemplateExtended[] = [
     {
       id: 1,
       name: "Application Received",
