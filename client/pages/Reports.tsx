@@ -144,21 +144,33 @@ export default function Reports() {
       fill: getStageColor(stage),
     }));
 
-    const sourceDistribution = sources.map(source => ({
-      name: source,
-      value: filteredData.filter(c => c.source === source).length,
-      effectiveness: Math.round(Math.random() * 30 + 70), // Mock effectiveness
-      color: getSourceColor(source),
-    }));
+    const sourceDistribution = sources.map(source => {
+      const sourceCandidates = filteredData.filter(c => c.source === source);
+      const sourceHired = sourceCandidates.filter(c => c.stage === "Hired").length;
+      const effectiveness = sourceCandidates.length > 0 ? Math.round((sourceHired / sourceCandidates.length) * 100) : 0;
 
-    const recruiterPerformance = recruiters.map(recruiter => ({
-      name: recruiter,
-      applications: filteredData.filter(c => c.recruiter === recruiter).length,
-      interviews: filteredData.filter(c => c.recruiter === recruiter && 
-        ["Interview", "Technical", "Offer", "Hired"].includes(c.stage)).length,
-      hires: filteredData.filter(c => c.recruiter === recruiter && c.stage === "Hired").length,
-      effectiveness: Math.round(Math.random() * 30 + 70),
-    }));
+      return {
+        name: source,
+        value: sourceCandidates.length,
+        effectiveness,
+        color: getSourceColor(source),
+      };
+    });
+
+    const recruiterPerformance = recruiters.map(recruiter => {
+      const recruiterCandidates = filteredData.filter(c => c.recruiter === recruiter);
+      const interviews = recruiterCandidates.filter(c => ["Interview", "Technical", "Offer", "Hired"].includes(c.stage)).length;
+      const hires = recruiterCandidates.filter(c => c.stage === "Hired").length;
+      const effectiveness = recruiterCandidates.length > 0 ? Math.round((hires / recruiterCandidates.length) * 100) : 0;
+
+      return {
+        name: recruiter,
+        applications: recruiterCandidates.length,
+        interviews,
+        hires,
+        effectiveness,
+      };
+    });
 
     return {
       stageDistribution,
