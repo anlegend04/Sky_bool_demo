@@ -157,6 +157,7 @@ export default function Candidates() {
   // Manual entry form states
   const [source, setSource] = useState<string | undefined>();
   const [customSource, setCustomSource] = useState("");
+  const [showManualEntry, setShowManualEntry] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bulkFileInputRef = useRef<HTMLInputElement>(null);
@@ -1253,12 +1254,162 @@ export default function Candidates() {
             <Upload className="w-4 h-4 mr-2" />
             Upload CVs
           </Button>
-          <Button variant="outline" size="sm">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowManualEntry(true)} // Trigger the new dialog
+          >
             <Plus className="w-4 h-4 mr-2" />
             Add Manually
           </Button>
         </div>
       </div>
+
+      {/* Fill manual entry dialog */}
+      <Dialog open={showManualEntry} onOpenChange={setShowManualEntry}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <UserPlus className="w-5 h-5" />
+              Add Candidate Manually
+            </DialogTitle>
+            <DialogDescription>
+              Enter candidate details to create a new candidate profile.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-slate-700">
+                  Full Name
+                </label>
+                <Input placeholder="John Doe" className="mt-1" />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-slate-700">
+                  Email
+                </label>
+                <Input
+                  type="email"
+                  placeholder="john@example.com"
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-slate-700">
+                  Phone
+                </label>
+                <Input placeholder="+1 (555) 123-4567" className="mt-1" />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-slate-700">
+                  Location
+                </label>
+                <Input placeholder="City, State" className="mt-1" />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-slate-700">
+                  Job Position
+                </label>
+                <Select>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Select position" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="software-engineer">
+                      Software Engineer
+                    </SelectItem>
+                    <SelectItem value="product-manager">
+                      Product Manager
+                    </SelectItem>
+                    <SelectItem value="ux-designer">UX Designer</SelectItem>
+                    <SelectItem value="data-analyst">Data Analyst</SelectItem>
+                    <SelectItem value="marketing-specialist">
+                      Marketing Specialist
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-slate-700">
+                  Department
+                </label>
+                <Select>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Select department" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="engineering">Engineering</SelectItem>
+                    <SelectItem value="product">Product</SelectItem>
+                    <SelectItem value="design">Design</SelectItem>
+                    <SelectItem value="marketing">Marketing</SelectItem>
+                    <SelectItem value="data">Data</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-slate-700">
+                  Source
+                </label>
+                <Select onValueChange={setSource}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Select source" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="linkedin">LinkedIn</SelectItem>
+                    <SelectItem value="topcv">TopCV</SelectItem>
+                    <SelectItem value="facebook">Facebook</SelectItem>
+                    <SelectItem value="third-party">Third Party</SelectItem>
+                    <SelectItem
+                      value="customize"
+                      className="text-blue-600 font-semibold hover:bg-blue-50"
+                    >
+                      <div className="flex items-center gap-2 pl-1">
+                        <Plus className="w-4 h-4 stroke-[3]" />
+                        <span>Customize</span>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                {source === "customize" && (
+                  <Input
+                    className="mt-2"
+                    placeholder="Enter custom source"
+                    value={customSource}
+                    onChange={(e) => setCustomSource(e.target.value)}
+                  />
+                )}
+              </div>
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowManualEntry(false);
+                  setSource(undefined);
+                  setCustomSource("");
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  // In a real app, you would collect form data and save to database
+                  toast({
+                    title: "Candidate Created",
+                    description: "New candidate has been added successfully.",
+                  });
+                  setShowManualEntry(false);
+                  setSource(undefined);
+                  setCustomSource("");
+                }}
+              >
+                Create Candidate
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* CV Upload Dialog */}
       <Dialog open={showCVUpload} onOpenChange={setShowCVUpload}>
