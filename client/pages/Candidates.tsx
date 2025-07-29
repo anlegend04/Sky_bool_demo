@@ -905,6 +905,25 @@ export default function Candidates() {
     </Card>
   );
 
+  // Handle stage change with email trigger
+  const handleStageChange = (candidate: CandidateData, newStage: string) => {
+    setSelectedCandidateForEmail(candidate);
+    setNewStageForEmail(newStage);
+    setEmailTriggerOpen(true);
+  };
+
+  // Handle email sent callback
+  const handleEmailSent = (emailData: any) => {
+    toast({
+      title: "Email sent successfully",
+      description: `Email sent to ${emailData.recipientName}`,
+    });
+
+    // Update candidate stage in the data
+    // In a real app, this would be an API call
+    console.log("Updating candidate stage and logging email:", emailData);
+  };
+
   // Existing candidate components (simplified for space)
   const CandidateCard = ({ candidate }: { candidate: CandidateData }) => (
     <Card className="hover:shadow-md transition-shadow cursor-pointer">
