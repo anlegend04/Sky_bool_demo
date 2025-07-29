@@ -27,6 +27,7 @@ import {
   Menu,
   X,
   Languages,
+  FileText,
 } from "lucide-react";
 import { useLanguage, SUPPORTED_LANGUAGES } from "@/hooks/use-language";
 
