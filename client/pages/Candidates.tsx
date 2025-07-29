@@ -114,9 +114,9 @@ export default function Candidates() {
     "Rejected",
   ];
   const jobs = [
-    { id: '1', position: 'Frontend Developer' },
-    { id: '2', position: 'Backend Engineer' },
-  ];
+  { id: '1', position: 'Frontend Developer' },
+  { id: '2', position: 'Backend Engineer' },
+];
 
 
   const stats = [
@@ -152,8 +152,8 @@ export default function Candidates() {
   const [applyCandidateId, setApplyCandidateId] = useState<string | null>(null);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const applyCandidateToJob = (candidateId: string, jobId: string) => {
-    console.log(`Applying candidate ${candidateId} to job ${jobId}`);
-  };
+  console.log(`Applying candidate ${candidateId} to job ${jobId}`);
+};
 
 
   // Filter candidates based on search and filters
@@ -265,10 +265,11 @@ export default function Candidates() {
             {[...Array(5)].map((_, i) => (
               <Star
                 key={i}
-                className={`w-3 h-3 ${i < candidate.rating
+                className={`w-3 h-3 ${
+                  i < candidate.rating
                     ? "text-yellow-400 fill-current"
                     : "text-slate-300"
-                  }`}
+                }`}
               />
             ))}
           </div>
@@ -330,10 +331,11 @@ export default function Candidates() {
                             {[...Array(5)].map((_, i) => (
                               <Star
                                 key={i}
-                                className={`w-3 h-3 ${i < candidate.rating
+                                className={`w-3 h-3 ${
+                                  i < candidate.rating
                                     ? "text-yellow-400 fill-current"
                                     : "text-slate-300"
-                                  }`}
+                                }`}
                               />
                             ))}
                           </div>
