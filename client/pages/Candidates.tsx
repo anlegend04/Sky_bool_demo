@@ -1538,25 +1538,38 @@ export default function Candidates() {
                 variant="outline"
                 onClick={() => {
                   setShowManualEntry(false);
-                  setSource(undefined);
-                  setCustomSource("");
+                  setFormData({
+                    name: "",
+                    email: "",
+                    phone: "",
+                    location: "",
+                    position: "",
+                    department: "",
+                    source: "",
+                    experience: "",
+                    salary: "",
+                    skills: "",
+                  });
                 }}
+                disabled={isSubmittingForm}
               >
                 Cancel
               </Button>
               <Button
-                onClick={() => {
-                  // In a real app, you would collect form data and save to database
-                  toast({
-                    title: "Candidate Created",
-                    description: "New candidate has been added successfully.",
-                  });
-                  setShowManualEntry(false);
-                  setSource(undefined);
-                  setCustomSource("");
-                }}
+                onClick={handleFormSubmit}
+                disabled={isSubmittingForm || !formData.name || !formData.email}
               >
-                Create Candidate
+                {isSubmittingForm ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Create Candidate
+                  </>
+                )}
               </Button>
             </div>
           </div>
