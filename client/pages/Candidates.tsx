@@ -138,7 +138,7 @@ export default function Candidates() {
   const [showCVUpload, setShowCVUpload] = useState(false);
   const [uploadMode, setUploadMode] = useState<"single" | "bulk">("single");
   const [parsedCandidates, setParsedCandidates] = useState<ParsedCandidate[]>(
-    [],
+    []
   );
   const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -237,11 +237,13 @@ export default function Candidates() {
   const mockParseCV = useCallback(
     async (file: File): Promise<ParsedCandidate> => {
       const fileName = file.name;
-      const id = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const id = `temp_${Date.now()}_${Math.random()
+        .toString(36)
+        .substr(2, 9)}`;
 
       // Simulate parsing delay
       await new Promise((resolve) =>
-        setTimeout(resolve, 2000 + Math.random() * 3000),
+        setTimeout(resolve, 2000 + Math.random() * 3000)
       );
 
       // Mock parsed data - in real app this would come from CV parsing service
@@ -297,7 +299,13 @@ export default function Candidates() {
           : mockPhones[Math.floor(Math.random() * mockPhones.length)],
         location:
           mockLocations[Math.floor(Math.random() * mockLocations.length)],
-        summary: `Experienced professional with ${3 + Math.floor(Math.random() * 7)} years in the industry. Strong background in ${randomSkillSet.slice(0, 2).join(" and ")} with proven track record of delivering high-quality results.`,
+        summary: `Experienced professional with ${
+          3 + Math.floor(Math.random() * 7)
+        } years in the industry. Strong background in ${randomSkillSet
+          .slice(0, 2)
+          .join(
+            " and "
+          )} with proven track record of delivering high-quality results.`,
         skills: randomSkillSet,
         experience: [
           {
@@ -330,7 +338,7 @@ export default function Candidates() {
         uploadedAt: new Date().toISOString(),
       };
     },
-    [],
+    []
   );
 
   // Handle single file upload
@@ -431,15 +439,15 @@ export default function Candidates() {
       for (let progress = 0; progress <= 100; progress += 20) {
         await new Promise((resolve) => setTimeout(resolve, 50));
         setUploadProgress((prev) =>
-          prev.map((p) => (p.fileName === file.name ? { ...p, progress } : p)),
+          prev.map((p) => (p.fileName === file.name ? { ...p, progress } : p))
         );
       }
 
       // Start parsing
       setUploadProgress((prev) =>
         prev.map((p) =>
-          p.fileName === file.name ? { ...p, status: "parsing" } : p,
-        ),
+          p.fileName === file.name ? { ...p, status: "parsing" } : p
+        )
       );
 
       try {
@@ -447,14 +455,14 @@ export default function Candidates() {
         newParsedCandidates.push(parsed);
         setUploadProgress((prev) =>
           prev.map((p) =>
-            p.fileName === file.name ? { ...p, status: "complete" } : p,
-          ),
+            p.fileName === file.name ? { ...p, status: "complete" } : p
+          )
         );
       } catch (error) {
         setUploadProgress((prev) =>
           prev.map((p) =>
-            p.fileName === file.name ? { ...p, status: "error" } : p,
-          ),
+            p.fileName === file.name ? { ...p, status: "error" } : p
+          )
         );
       }
     }
@@ -491,8 +499,8 @@ export default function Candidates() {
   const toggleEdit = (candidateId: string) => {
     setParsedCandidates((prev) =>
       prev.map((c) =>
-        c.id === candidateId ? { ...c, isEditing: !c.isEditing } : c,
-      ),
+        c.id === candidateId ? { ...c, isEditing: !c.isEditing } : c
+      )
     );
   };
 
@@ -500,10 +508,10 @@ export default function Candidates() {
   const updateCandidateField = (
     candidateId: string,
     field: string,
-    value: string,
+    value: string
   ) => {
     setParsedCandidates((prev) =>
-      prev.map((c) => (c.id === candidateId ? { ...c, [field]: value } : c)),
+      prev.map((c) => (c.id === candidateId ? { ...c, [field]: value } : c))
     );
   };
 
@@ -518,8 +526,8 @@ export default function Candidates() {
               isConfirmed: true,
               hasMissingInfo: !c.name || !c.email || !c.phone,
             }
-          : c,
-      ),
+          : c
+      )
     );
 
     toast({
@@ -538,7 +546,7 @@ export default function Candidates() {
     setSelectedCandidates((prev) =>
       prev.includes(candidateId)
         ? prev.filter((id) => id !== candidateId)
-        : [...prev, candidateId],
+        : [...prev, candidateId]
     );
   };
 
@@ -592,7 +600,7 @@ export default function Candidates() {
       candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       candidate.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
       candidate.skills.some((skill) =>
-        skill.toLowerCase().includes(searchTerm.toLowerCase()),
+        skill.toLowerCase().includes(searchTerm.toLowerCase())
       );
 
     const matchesPosition =
@@ -651,10 +659,10 @@ export default function Candidates() {
         candidate.isPotentialDuplicate
           ? "border-yellow-300 bg-yellow-50"
           : candidate.hasMissingInfo
-            ? "border-red-300 bg-red-50"
-            : candidate.isConfirmed
-              ? "border-green-300 bg-green-50"
-              : "border-gray-200"
+          ? "border-red-300 bg-red-50"
+          : candidate.isConfirmed
+          ? "border-green-300 bg-green-50"
+          : "border-gray-200"
       }`}
     >
       <CardHeader className="pb-3">
@@ -1069,16 +1077,16 @@ export default function Candidates() {
                           candidate.stage === "Offer"
                             ? "default"
                             : candidate.stage === "Hired"
-                              ? "default"
-                              : candidate.stage === "Technical"
-                                ? "secondary"
-                                : candidate.stage === "Interview"
-                                  ? "outline"
-                                  : candidate.stage === "Screening"
-                                    ? "secondary"
-                                    : candidate.stage === "Applied"
-                                      ? "outline"
-                                      : "destructive"
+                            ? "default"
+                            : candidate.stage === "Technical"
+                            ? "secondary"
+                            : candidate.stage === "Interview"
+                            ? "outline"
+                            : candidate.stage === "Screening"
+                            ? "secondary"
+                            : candidate.stage === "Applied"
+                            ? "outline"
+                            : "destructive"
                         }
                         className="truncate max-w-24"
                       >
@@ -1204,7 +1212,7 @@ export default function Candidates() {
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
       {stages.map((stage) => {
         const stageCandidates = filteredCandidates.filter(
-          (candidate) => candidate.stage === stage,
+          (candidate) => candidate.stage === stage
         );
         return (
           <div
@@ -1769,7 +1777,7 @@ export default function Candidates() {
                           Potential Duplicates (
                           {
                             parsedCandidates.filter(
-                              (c) => c.isPotentialDuplicate,
+                              (c) => c.isPotentialDuplicate
                             ).length
                           }
                           )
