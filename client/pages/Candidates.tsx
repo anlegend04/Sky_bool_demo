@@ -178,6 +178,23 @@ export default function Candidates() {
     "Rejected",
   ];
 
+  const jobs = [
+    { id: '1', position: 'Frontend Developer' },
+    { id: '2', position: 'Backend Engineer' },
+    { id: '3', position: 'Product Manager' },
+    { id: '4', position: 'UX Designer' },
+  ];
+
+  const applyCandidateToJob = (candidateId: string, jobId: string) => {
+    console.log(`Applying candidate ${candidateId} to job ${jobId}`);
+    toast({
+      title: "Candidate Applied",
+      description: `Candidate has been applied to the selected job.`,
+    });
+  };
+
+  const applyCandidate = candidates.find((c) => c.id === applyCandidateId);
+
   const stats = [
     {
       title: t("candidates.title"),
