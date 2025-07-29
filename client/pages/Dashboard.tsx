@@ -17,6 +17,15 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/hooks/use-language";
+import {
+  DASHBOARD_STATS,
+  HARDCODED_JOBS,
+  HARDCODED_CANDIDATES,
+  HARDCODED_ACTIVITIES,
+  HARDCODED_INTERVIEWS,
+  getUpcomingSchedule,
+  getRecentActivities
+} from "@/data/hardcoded-data";
 
 export default function Dashboard() {
   // Add error boundary for useLanguage hook
