@@ -198,12 +198,17 @@ export default function EmailAutomation() {
 
   const templateTypes = [
     { value: "auto-response", label: "Auto Response" },
+    { value: "confirmation", label: "Confirmation" },
     { value: "screening", label: "Screening" },
     { value: "interview", label: "Interview" },
+    { value: "technical", label: "Technical" },
     { value: "offer", label: "Job Offer" },
+    { value: "welcome", label: "Welcome" },
+    { value: "onboarding", label: "Onboarding" },
     { value: "rejection", label: "Rejection" },
     { value: "follow-up", label: "Follow-up" },
     { value: "reminder", label: "Reminder" },
+    { value: "future-opportunity", label: "Future Opportunity" },
   ];
 
   const variables = [
