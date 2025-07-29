@@ -110,24 +110,11 @@ const addNewStage = () => {
   setJobStages([...jobStages, newStage]);
 };
 
-function SortableStageItem({ id, index, stage, updateStage, removeStage }) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
+function StageItem({ id, index, stage, updateStage, removeStage }) {
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      className="flex flex-col gap-2 border border-slate-200 rounded-xl p-3 bg-slate-50"
-    >
+    <div className="flex flex-col gap-2 border border-slate-200 rounded-xl p-3 bg-slate-50">
       <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
-        <span {...listeners} className="cursor-move text-slate-400">
+        <span className="text-slate-400">
           <GripVertical className="w-4 h-4 mt-1" />
         </span>
         <Input
