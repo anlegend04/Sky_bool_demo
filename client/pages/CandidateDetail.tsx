@@ -979,7 +979,6 @@ export default function CandidateDetail() {
   const RightPanel = () => (
     <div className="space-y-4 sm:space-y-6">
       {/* Send Email Section */}
-      
 
       {/* Email History */}
       <Card>
@@ -1212,7 +1211,8 @@ export default function CandidateDetail() {
           <DialogHeader>
             <DialogTitle>Change Candidate Stage</DialogTitle>
             <DialogDescription>
-              {newStage && `Moving candidate to ${newStage} stage. Please provide a reason for this change.`}
+              {newStage &&
+                `Moving candidate to ${newStage} stage. Please provide a reason for this change.`}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
