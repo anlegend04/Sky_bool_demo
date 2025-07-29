@@ -1397,8 +1397,11 @@ export default function Candidates() {
               <UserPlus className="w-5 h-5" />
               Add Candidate Manually
             </DialogTitle>
-            <DialogDescription>
-              Enter candidate details to create a new candidate profile.
+            <DialogDescription className="flex items-center justify-between">
+              <span>Enter candidate details to create a new candidate profile.</span>
+              <Button variant="outline" size="sm" onClick={preFillSampleData}>
+                Fill Sample Data
+              </Button>
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
