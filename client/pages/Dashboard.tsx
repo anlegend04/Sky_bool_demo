@@ -287,7 +287,7 @@ export default function Dashboard() {
                 {t("dashboard.costPerHire")}
               </span>
               <span className="font-semibold text-responsive-base text-wrap-safe">
-                $3,200
+                ${Math.round(HARDCODED_JOBS.reduce((sum, job) => sum + (job.budget?.actual || 0), 0) / Math.max(hiredCount, 1)).toLocaleString()}
               </span>
             </div>
             <div className="flex justify-between items-center">
@@ -295,7 +295,7 @@ export default function Dashboard() {
                 {t("dashboard.hiringSuccessRate")}
               </span>
               <span className="font-semibold text-green-600 text-responsive-base text-wrap-safe">
-                85%
+                {Math.round((hiredCount / totalCandidates) * 100)}%
               </span>
             </div>
             <div className="flex justify-between items-center">
@@ -303,7 +303,7 @@ export default function Dashboard() {
                 {t("dashboard.sourceEffectiveness")}
               </span>
               <span className="font-semibold text-responsive-base text-wrap-safe">
-                LinkedIn: 45%
+                LinkedIn: {Math.round((HARDCODED_CANDIDATES.filter(c => c.source === "LinkedIn" && c.stage === "Hired").length / Math.max(HARDCODED_CANDIDATES.filter(c => c.source === "LinkedIn").length, 1)) * 100)}%
               </span>
             </div>
             <div className="flex justify-between items-center">
@@ -311,7 +311,7 @@ export default function Dashboard() {
                 {t("dashboard.pendingInterviews")}
               </span>
               <span className="font-semibold text-orange-600 text-responsive-base text-wrap-safe">
-                12
+                {HARDCODED_INTERVIEWS.filter(i => i.status === "Scheduled").length}
               </span>
             </div>
           </CardContent>
