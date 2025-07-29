@@ -309,7 +309,7 @@ export default function CVEvaluation() {
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          {/*<div className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm">
               <Filter className="w-4 h-4 mr-2" />
               Filters
@@ -318,7 +318,7 @@ export default function CVEvaluation() {
               <Download className="w-4 h-4 mr-2" />
               Export Report
             </Button>
-          </div>
+          </div> */}
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6">
