@@ -390,7 +390,7 @@ const AddJobForm = memo(
     );
 
     const addNewStage = useCallback(() => {
-      setJobStages((prev) => [...prev, { name: "", durationHours: "" }]);
+      setJobStages((prev) => [...prev, { id: `stage-${Date.now()}`, name: "", durationHours: "" }]);
     }, []);
 
     const removeStage = useCallback((index: number) => {
