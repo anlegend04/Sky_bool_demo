@@ -62,6 +62,9 @@ import {
   Trash2,
   Plus,
   Star,
+  Copy,
+  ExternalLink,
+  NotebookPen,
 } from "lucide-react";
 import {
   HARDCODED_CANDIDATES,
@@ -118,6 +121,11 @@ export default function CVEvaluation() {
   const [isDragOver, setIsDragOver] = useState(false);
   const [analysisProgress, setAnalysisProgress] = useState(0);
   const [showFilePreview, setShowFilePreview] = useState(false);
+  const [analysisNotes, setAnalysisNotes] = useState("");
+  const [isSaved, setIsSaved] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
+  const [shareUrl, setShareUrl] = useState("");
+  const [isExporting, setIsExporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Mock file upload simulation
@@ -304,6 +312,7 @@ export default function CVEvaluation() {
 
     setEvaluation(mockEvaluation);
     setIsAnalyzing(false);
+    setIsSaved(false); // Reset save status when new analysis is done
 
     toast({
       title: "Analysis Complete!",
@@ -357,6 +366,96 @@ export default function CVEvaluation() {
     }
   };
 
+  const handleSaveAnalysis = () => {
+    if (!evaluation) {
+      toast({
+        title: "No Analysis to Save",
+        description: "Please run an analysis first before saving.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // In a real app, this would save to backend
+    const analysisData = {
+      ...evaluation,
+      notes: analysisNotes,
+      savedAt: new Date().toISOString(),
+      candidateName: selectedCandidate?.name,
+      jobTitle: selectedJob?.position,
+      fileName: selectedFile?.name,
+    };
+
+    localStorage.setItem(`cv-analysis-${Date.now()}`, JSON.stringify(analysisData));
+    setIsSaved(true);
+
+    toast({
+      title: "Analysis Saved",
+      description: "Your CV analysis has been saved successfully.",
+    });
+  };
+
+  const handleShareAnalysis = () => {
+    if (!evaluation) {
+      toast({
+        title: "No Analysis to Share",
+        description: "Please run an analysis first before sharing.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Generate a shareable URL (in a real app, this would create a shared link)
+    const shareId = Math.random().toString(36).substring(2, 15);
+    const generatedUrl = `${window.location.origin}/cv-analysis/shared/${shareId}`;
+    setShareUrl(generatedUrl);
+    setShowShareDialog(true);
+  };
+
+  const handleCopyShareLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast({
+        title: "Link Copied",
+        description: "Share link has been copied to clipboard.",
+      });
+    } catch (err) {
+      toast({
+        title: "Copy Failed",
+        description: "Failed to copy link. Please copy manually.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleExportToPDF = async () => {
+    if (!evaluation) {
+      toast({
+        title: "No Analysis to Export",
+        description: "Please run an analysis first before exporting.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsExporting(true);
+
+    // Simulate PDF generation delay
+    setTimeout(() => {
+      // In a real app, this would generate a PDF
+      const candidateName = selectedCandidate?.name || "Candidate";
+      const jobTitle = selectedJob?.position || "Position";
+      const fileName = `CV_Analysis_${candidateName}_${jobTitle}_${new Date().toISOString().split('T')[0]}.pdf`;
+
+      toast({
+        title: "PDF Export Complete",
+        description: `Downloaded ${fileName}`,
+      });
+
+      setIsExporting(false);
+    }, 2000);
+  };
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -370,7 +469,7 @@ export default function CVEvaluation() {
             insights
           </p>
         </div>
-        <div className="flex space-x-3">
+        <div className="flex flex-wrap gap-3">
           <Button variant="outline" onClick={quickAnalysis}>
             <Lightbulb className="w-4 h-4 mr-2" />
             Demo Analysis
@@ -382,6 +481,38 @@ export default function CVEvaluation() {
             <Upload className="w-4 h-4 mr-2" />
             Upload CV
           </Button>
+          {evaluation && (
+            <>
+              <Button
+                onClick={handleSaveAnalysis}
+                variant="outline"
+                disabled={isAnalyzing}
+              >
+                <Save className="w-4 h-4 mr-2" />
+                {isSaved ? "Saved" : "Save"}
+              </Button>
+              <Button
+                onClick={handleShareAnalysis}
+                variant="outline"
+                disabled={isAnalyzing}
+              >
+                <Share2 className="w-4 h-4 mr-2" />
+                Share
+              </Button>
+              <Button
+                onClick={handleExportToPDF}
+                variant="outline"
+                disabled={isAnalyzing || isExporting}
+              >
+                {isExporting ? (
+                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Download className="w-4 h-4 mr-2" />
+                )}
+                {isExporting ? "Exporting..." : "Export PDF"}
+              </Button>
+            </>
+          )}
           <input
             ref={fileInputRef}
             type="file"
@@ -641,6 +772,38 @@ export default function CVEvaluation() {
               </TabsList>
 
               <TabsContent value="overview" className="space-y-6">
+                {/* Analysis Notes Section */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2">
+                      <NotebookPen className="w-5 h-5" />
+                      <span>Analysis Notes</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Textarea
+                      placeholder="Add your notes about this analysis..."
+                      value={analysisNotes}
+                      onChange={(e) => setAnalysisNotes(e.target.value)}
+                      className="min-h-[100px]"
+                      maxLength={500}
+                    />
+                    <div className="flex justify-between items-center mt-3">
+                      <p className="text-sm text-gray-500">
+                        {analysisNotes.length}/500 characters
+                      </p>
+                      <Button
+                        size="sm"
+                        onClick={handleSaveAnalysis}
+                        disabled={!analysisNotes.trim()}
+                      >
+                        <Save className="w-4 h-4 mr-2" />
+                        Save Notes
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
                 {/* Overview Summary */}
                 <Card>
                   <CardHeader>
@@ -976,6 +1139,61 @@ export default function CVEvaluation() {
               Download
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Share Dialog */}
+      <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2">
+              <Share2 className="w-5 h-5" />
+              <span>Share Analysis</span>
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-sm font-medium">Shareable Link</Label>
+              <div className="flex items-center space-x-2 mt-1">
+                <Input
+                  value={shareUrl}
+                  readOnly
+                  className="flex-1"
+                />
+                <Button
+                  size="sm"
+                  onClick={handleCopyShareLink}
+                  variant="outline"
+                >
+                  <Copy className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+            <div className="bg-blue-50 p-3 rounded-lg">
+              <p className="text-sm text-blue-800">
+                <strong>Note:</strong> This link allows view-only access to the analysis results.
+                The shared analysis will be available for 30 days.
+              </p>
+            </div>
+            <div className="flex space-x-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowShareDialog(false)}
+                className="flex-1"
+              >
+                Close
+              </Button>
+              <Button
+                onClick={() => {
+                  window.open(shareUrl, '_blank');
+                }}
+                className="flex-1"
+              >
+                <ExternalLink className="w-4 h-4 mr-2" />
+                Open Link
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
