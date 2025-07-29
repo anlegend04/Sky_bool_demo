@@ -21,7 +21,11 @@ import {
 } from "@/components/ui/select";
 import { Mail, Send, AlertCircle, FileText, X } from "lucide-react";
 import { CandidateData } from "@/data/hardcoded-data";
-import { getTemplatesForStage, generateEmailContent, EmailTemplate } from "@/lib/email-utils";
+import {
+  getTemplatesForStage,
+  generateEmailContent,
+  EmailTemplate,
+} from "@/lib/email-utils";
 
 interface EmailTriggerProps {
   isOpen: boolean;
@@ -41,15 +45,17 @@ const stages = [
   { value: "rejected", label: "Rejected" },
 ];
 
-export function EmailTrigger({ 
-  isOpen, 
-  onClose, 
-  candidate, 
-  newStage, 
+export function EmailTrigger({
+  isOpen,
+  onClose,
+  candidate,
+  newStage,
   jobTitle,
-  onEmailSent 
+  onEmailSent,
 }: EmailTriggerProps) {
-  const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(null);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(
+    null,
+  );
   const [emailSubject, setEmailSubject] = useState("");
   const [emailContent, setEmailContent] = useState("");
   const [recipientEmail, setRecipientEmail] = useState("");
@@ -58,7 +64,9 @@ export function EmailTrigger({
 
   // Get templates for the new stage
   const stageTemplates = getTemplatesForStage(newStage);
-  const selectedTemplate = stageTemplates.find(t => t.id === selectedTemplateId);
+  const selectedTemplate = stageTemplates.find(
+    (t) => t.id === selectedTemplateId,
+  );
 
   // Auto-select template if only one is available for the stage
   useEffect(() => {
@@ -72,7 +80,9 @@ export function EmailTrigger({
   // Generate email content when template is selected
   useEffect(() => {
     if (selectedTemplate && candidate) {
-      const generatedEmail = generateEmailContent(selectedTemplate, candidate, { jobTitle });
+      const generatedEmail = generateEmailContent(selectedTemplate, candidate, {
+        jobTitle,
+      });
       setEmailSubject(generatedEmail.subject);
       setEmailContent(generatedEmail.content);
       setRecipientEmail(candidate.email || "");
@@ -94,11 +104,11 @@ export function EmailTrigger({
 
     // In a real app, this would send the email via API
     console.log("Sending email:", emailData);
-    
+
     if (onEmailSent) {
       onEmailSent(emailData);
     }
-    
+
     onClose();
   };
 
@@ -106,7 +116,7 @@ export function EmailTrigger({
     onClose();
   };
 
-  const stageName = stages.find(s => s.value === newStage)?.label || newStage;
+  const stageName = stages.find((s) => s.value === newStage)?.label || newStage;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -117,11 +127,9 @@ export function EmailTrigger({
             <span>Stage Update Email - {stageName}</span>
           </DialogTitle>
           <DialogDescription>
-            {stageTemplates.length > 0 ? (
-              `A template is available for the ${stageName} stage. Review and send the email to ${candidate.name}.`
-            ) : (
-              `No template available for the ${stageName} stage. You can skip sending an email or manually compose one.`
-            )}
+            {stageTemplates.length > 0
+              ? `A template is available for the ${stageName} stage. Review and send the email to ${candidate.name}.`
+              : `No template available for the ${stageName} stage. You can skip sending an email or manually compose one.`}
           </DialogDescription>
         </DialogHeader>
 
@@ -130,16 +138,21 @@ export function EmailTrigger({
           {stageTemplates.length > 1 && (
             <div>
               <Label>Select Email Template</Label>
-              <Select 
-                value={selectedTemplateId?.toString() || ""} 
-                onValueChange={(value) => setSelectedTemplateId(parseInt(value))}
+              <Select
+                value={selectedTemplateId?.toString() || ""}
+                onValueChange={(value) =>
+                  setSelectedTemplateId(parseInt(value))
+                }
               >
                 <SelectTrigger className="mt-1">
                   <SelectValue placeholder="Choose a template" />
                 </SelectTrigger>
                 <SelectContent>
-                  {stageTemplates.map(template => (
-                    <SelectItem key={template.id} value={template.id.toString()}>
+                  {stageTemplates.map((template) => (
+                    <SelectItem
+                      key={template.id}
+                      value={template.id.toString()}
+                    >
                       <div className="flex items-center space-x-2">
                         <FileText className="w-4 h-4" />
                         <span>{template.name}</span>
@@ -156,7 +169,9 @@ export function EmailTrigger({
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <div className="flex items-start justify-between">
                 <div>
-                  <h4 className="font-medium text-blue-900">{selectedTemplate.name}</h4>
+                  <h4 className="font-medium text-blue-900">
+                    {selectedTemplate.name}
+                  </h4>
                   <p className="text-sm text-blue-700 mt-1">
                     Template for {stageName} stage communications
                   </p>
@@ -172,10 +187,13 @@ export function EmailTrigger({
               <div className="flex items-start space-x-3">
                 <AlertCircle className="w-5 h-5 text-amber-600 mt-0.5" />
                 <div>
-                  <p className="font-medium text-amber-800">No Template Available</p>
+                  <p className="font-medium text-amber-800">
+                    No Template Available
+                  </p>
                   <p className="text-sm text-amber-700">
-                    No email template is configured for the {stageName} stage. 
-                    You can skip sending an email or create a custom message below.
+                    No email template is configured for the {stageName} stage.
+                    You can skip sending an email or create a custom message
+                    below.
                   </p>
                 </div>
               </div>
@@ -188,15 +206,11 @@ export function EmailTrigger({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label>Recipient</Label>
-                  <Input 
-                    value={candidate.name}
-                    disabled
-                    className="mt-1"
-                  />
+                  <Input value={candidate.name} disabled className="mt-1" />
                 </div>
                 <div>
                   <Label>Email Address</Label>
-                  <Input 
+                  <Input
                     value={recipientEmail}
                     onChange={(e) => setRecipientEmail(e.target.value)}
                     placeholder="candidate@email.com"
@@ -207,7 +221,7 @@ export function EmailTrigger({
 
               <div>
                 <Label>Subject Line</Label>
-                <Input 
+                <Input
                   value={emailSubject}
                   onChange={(e) => setEmailSubject(e.target.value)}
                   placeholder="Email subject"
@@ -217,7 +231,7 @@ export function EmailTrigger({
 
               <div>
                 <Label>Email Content</Label>
-                <Textarea 
+                <Textarea
                   value={emailContent}
                   onChange={(e) => setEmailContent(e.target.value)}
                   placeholder="Email content..."
@@ -229,8 +243,8 @@ export function EmailTrigger({
                 <div className="bg-slate-50 border rounded-lg p-4">
                   <div className="flex items-center justify-between mb-3">
                     <Label className="font-medium">Email Preview</Label>
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       size="sm"
                       onClick={() => setIsPreviewMode(false)}
                     >
@@ -239,10 +253,12 @@ export function EmailTrigger({
                   </div>
                   <div className="space-y-2 text-sm">
                     <div>
-                      <span className="font-medium">To:</span> {candidate.name} &lt;{recipientEmail}&gt;
+                      <span className="font-medium">To:</span> {candidate.name}{" "}
+                      &lt;{recipientEmail}&gt;
                     </div>
                     <div>
-                      <span className="font-medium">Subject:</span> {emailSubject}
+                      <span className="font-medium">Subject:</span>{" "}
+                      {emailSubject}
                     </div>
                     <div className="border-t pt-2 mt-2">
                       <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed">
@@ -260,10 +276,13 @@ export function EmailTrigger({
             <div className="flex items-start space-x-3">
               <AlertCircle className="w-5 h-5 text-green-600 mt-0.5" />
               <div>
-                <p className="font-medium text-green-800">Manual Sending Required</p>
+                <p className="font-medium text-green-800">
+                  Manual Sending Required
+                </p>
                 <p className="text-sm text-green-700">
-                  The email will only be sent when you click "Send Email". 
-                  The candidate's stage will be updated regardless of your email decision.
+                  The email will only be sent when you click "Send Email". The
+                  candidate's stage will be updated regardless of your email
+                  decision.
                 </p>
               </div>
             </div>
@@ -275,9 +294,13 @@ export function EmailTrigger({
             Skip Email
           </Button>
           {(selectedTemplate || emailContent.trim()) && (
-            <Button 
+            <Button
               onClick={handleSendEmail}
-              disabled={!recipientEmail.trim() || !emailSubject.trim() || !emailContent.trim()}
+              disabled={
+                !recipientEmail.trim() ||
+                !emailSubject.trim() ||
+                !emailContent.trim()
+              }
               className="bg-green-600 hover:bg-green-700"
             >
               <Send className="w-4 h-4 mr-2" />

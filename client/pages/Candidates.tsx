@@ -143,7 +143,8 @@ export default function Candidates() {
   );
   const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
   const [emailTriggerOpen, setEmailTriggerOpen] = useState(false);
-  const [selectedCandidateForEmail, setSelectedCandidateForEmail] = useState<CandidateData | null>(null);
+  const [selectedCandidateForEmail, setSelectedCandidateForEmail] =
+    useState<CandidateData | null>(null);
   const [newStageForEmail, setNewStageForEmail] = useState<string>("");
   const [isDragOver, setIsDragOver] = useState(false);
   const [bulkJobPosition, setBulkJobPosition] = useState("");
@@ -974,12 +975,16 @@ export default function Candidates() {
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
-                  const nextStageIndex = stages.findIndex(s => s === candidate.stage) + 1;
+                  const nextStageIndex =
+                    stages.findIndex((s) => s === candidate.stage) + 1;
                   if (nextStageIndex < stages.length) {
                     handleStageChange(candidate, stages[nextStageIndex]);
                   }
                 }}
-                disabled={stages.findIndex(s => s === candidate.stage) === stages.length - 1}
+                disabled={
+                  stages.findIndex((s) => s === candidate.stage) ===
+                  stages.length - 1
+                }
               >
                 <Mail className="w-4 h-4 mr-2" />
                 Move to Next Stage
