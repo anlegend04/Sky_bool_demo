@@ -612,12 +612,20 @@ export default function Reports() {
                   <FunnelChart>
                     <Funnel
                       dataKey="value"
-                      data={chartData.stageDistribution}
+                      data={chartData.stageDistribution.filter(d => d.value > 0)}
                       isAnimationActive
                     >
-                      <LabelList position="center" fill="#fff" stroke="none" />
+                      <LabelList
+                        position="center"
+                        fill="#fff"
+                        stroke="none"
+                        formatter={(value, entry) => `${entry.name}\n${value} candidates`}
+                      />
                     </Funnel>
-                    <Tooltip />
+                    <Tooltip
+                      formatter={(value, name) => [`${value} candidates`, 'Stage']}
+                      labelFormatter={(label, payload) => payload?.[0]?.payload?.name || label}
+                    />
                   </FunnelChart>
                 </ResponsiveContainer>
               )}
