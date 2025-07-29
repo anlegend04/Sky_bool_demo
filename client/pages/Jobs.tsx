@@ -96,19 +96,7 @@ const initialJobState = {
   estimatedCost: "",
 };
 
-const [jobStages, setJobStages] = useState([
-  { id: "1", name: "Applied", durationHours: 2 },
-  { id: "2", name: "Interview", durationHours: 4 },
-]);
-
-const addNewStage = () => {
-  const newStage = {
-    id: crypto.randomUUID(),
-    name: "",
-    durationHours: 1,
-  };
-  setJobStages([...jobStages, newStage]);
-};
+// These will be moved inside the AddJobForm component where they belong
 
 function StageItem({ id, index, stage, updateStage, removeStage }: {
   id: string;
