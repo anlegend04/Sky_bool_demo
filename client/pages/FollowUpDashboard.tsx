@@ -68,6 +68,14 @@ import {
   HARDCODED_CANDIDATES,
   type CandidateData,
 } from "@/data/hardcoded-data";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 // Extended types for follow-up dashboard
 interface FollowUpCandidate extends CandidateData {
@@ -353,20 +361,16 @@ export default function FollowUpDashboard() {
   // Candidate Card Component
   const CandidateCard = ({ candidate }: { candidate: FollowUpCandidate }) => (
     <Card
-      className={`hover:shadow-lg transition-all cursor-pointer ${
+      className={`hover:shadow-lg transition-all border-l-4 cursor-pointer rounded-lg ${
         selectedCandidates.includes(candidate.id)
           ? "ring-2 ring-blue-500 bg-blue-50"
           : ""
-      }`}
+      } border-slate-200 hover:border-blue-300 group`}
+      style={{ minHeight: 80 }}
     >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
-          <div className="flex items-start space-x-3 flex-1 min-w-0">
-            <Checkbox
-              checked={selectedCandidates.includes(candidate.id)}
-              onCheckedChange={() => handleCandidateSelect(candidate.id)}
-              className="mt-1"
-            />
+          <div className="flex items-center space-x-3 flex-1 min-w-0">
             <Avatar className="w-10 h-10">
               <AvatarImage src={candidate.avatar} />
               <AvatarFallback>
@@ -377,27 +381,15 @@ export default function FollowUpDashboard() {
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center space-x-2 mb-1">
-                <h3 className="font-semibold text-sm truncate">
-                  {candidate.name}
-                </h3>
-                <Badge
-                  className={`text-xs ${getUrgencyColor(candidate.urgencyLevel)}`}
-                >
-                  {candidate.urgencyLevel}
-                </Badge>
-              </div>
+              <h3 className="font-semibold text-sm truncate group-hover:text-blue-700 transition-colors">
+                {candidate.name}
+              </h3>
               <p className="text-xs text-gray-600 truncate">
-                {candidate.position}
+                {candidate.email}
               </p>
-              <div className="flex items-center space-x-2 mt-1">
-                <Badge variant="outline" className="text-xs">
-                  {candidate.stage}
-                </Badge>
-                <span className="text-xs text-gray-500">
-                  {candidate.daysInStage}d in stage
-                </span>
-              </div>
+              <Badge variant="outline" className="text-xs mt-1">
+                {candidate.stage}
+              </Badge>
             </div>
           </div>
           <DropdownMenu>
@@ -427,77 +419,6 @@ export default function FollowUpDashboard() {
           </DropdownMenu>
         </div>
       </CardHeader>
-      <CardContent className="space-y-3">
-        {/* Last Interaction */}
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-gray-500">Last contact:</span>
-          <span className="font-medium">
-            {formatTimeAgo(candidate.lastInteraction)}
-          </span>
-        </div>
-
-        {/* Next Follow-up */}
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-gray-500">Next follow-up:</span>
-          <span
-            className={`font-medium ${
-              new Date(candidate.nextFollowUp) <= new Date()
-                ? "text-red-600"
-                : "text-green-600"
-            }`}
-          >
-            {new Date(candidate.nextFollowUp) <= new Date()
-              ? "Overdue"
-              : formatTimeAgo(candidate.nextFollowUp)}
-          </span>
-        </div>
-
-        {/* Response Rate */}
-        <div className="space-y-1">
-          <div className="flex justify-between text-xs">
-            <span className="text-gray-500">Response rate</span>
-            <span className="font-medium">{candidate.responseRate}%</span>
-          </div>
-          <Progress value={candidate.responseRate} className="h-2" />
-        </div>
-
-        {/* Upcoming Actions */}
-        {candidate.upcomingActions.length > 0 && (
-          <div className="space-y-1">
-            <span className="text-xs text-gray-500">Next action:</span>
-            <div className="flex items-center space-x-2">
-              {candidate.upcomingActions[0].type === "email" && (
-                <Mail className="w-3 h-3 text-blue-500" />
-              )}
-              {candidate.upcomingActions[0].type === "call" && (
-                <Phone className="w-3 h-3 text-green-500" />
-              )}
-              {candidate.upcomingActions[0].type === "meeting" && (
-                <Calendar className="w-3 h-3 text-purple-500" />
-              )}
-              <span className="text-xs font-medium truncate">
-                {candidate.upcomingActions[0].title}
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* Quick Actions */}
-        <div className="flex space-x-2 pt-2 border-t">
-          <Button size="sm" variant="outline" className="flex-1 text-xs">
-            <Mail className="w-3 h-3 mr-1" />
-            Email
-          </Button>
-          <Button size="sm" variant="outline" className="flex-1 text-xs">
-            <Phone className="w-3 h-3 mr-1" />
-            Call
-          </Button>
-          <Button size="sm" variant="outline" className="flex-1 text-xs">
-            <ArrowRight className="w-3 h-3 mr-1" />
-            Move
-          </Button>
-        </div>
-      </CardContent>
     </Card>
   );
 
@@ -512,23 +433,57 @@ export default function FollowUpDashboard() {
       "Hired",
     ];
 
+    // Use JobDetail's getStageColor for column backgrounds
+    const getStageColor = (stage: string) => {
+      switch (stage) {
+        case "Applied":
+          return "bg-blue-50 border-blue-200";
+        case "Screening":
+          return "bg-yellow-50 border-yellow-200";
+        case "Interview":
+          return "bg-purple-50 border-purple-200";
+        case "Technical":
+          return "bg-orange-50 border-orange-200";
+        case "Offer":
+          return "bg-green-50 border-green-200";
+        case "Hired":
+          return "bg-emerald-50 border-emerald-200";
+        default:
+          return "bg-slate-50 border-slate-200";
+      }
+    };
+
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      <div className="flex gap-4 overflow-x-auto pb-2">
         {stages.map((stage) => {
           const stageCandidates = filteredCandidates.filter(
             (c) => c.stage === stage,
           );
-
           return (
-            <div key={stage} className="bg-gray-50 rounded-lg p-4">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-sm">{stage}</h3>
-                <Badge variant="outline">{stageCandidates.length}</Badge>
+            <div
+              key={stage}
+              className={`rounded-xl border shadow-sm min-w-[260px] flex-1 flex flex-col transition-all ${getStageColor(stage)}`}
+              style={{ maxWidth: 340 }}
+            >
+              <div className="flex items-center justify-between mb-4 p-4 pb-2 border-b border-slate-100">
+                <h3 className="font-semibold text-base text-slate-900 truncate flex-1">
+                  {stage}
+                </h3>
+                <Badge variant="outline" className="text-xs flex-shrink-0 ml-2">
+                  {stageCandidates.length}
+                </Badge>
               </div>
-              <div className="space-y-3 max-h-96 overflow-y-auto">
-                {stageCandidates.map((candidate) => (
-                  <CandidateCard key={candidate.id} candidate={candidate} />
-                ))}
+              <div className="space-y-3 px-4 pb-4 pt-2 min-h-[180px] relative flex-1">
+                {stageCandidates.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-slate-400 text-xs py-8">
+                    <svg className="w-8 h-8 mb-2 opacity-30" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    No candidates
+                  </div>
+                ) : (
+                  stageCandidates.map((candidate) => (
+                    <CandidateCard key={candidate.id} candidate={candidate} />
+                  ))
+                )}
               </div>
             </div>
           );
@@ -536,6 +491,232 @@ export default function FollowUpDashboard() {
       </div>
     );
   };
+
+  // Pipeline List View (matches Candidates page list style)
+  const PipelineListView = () => (
+    <Card>
+      <CardContent className="p-0">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {/* FIxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx */}
+                {visibleFields.name && (
+                  <TableHead>{t("candidates.name")}</TableHead>
+                )}
+                {visibleFields.appliedDate && <TableHead>Applied On</TableHead>}
+                {visibleFields.email && <TableHead>Email</TableHead>}
+                {visibleFields.phone && <TableHead>Phone</TableHead>}
+                {visibleFields.position && <TableHead>Job Position</TableHead>}
+                {visibleFields.recruiter && <TableHead>Recruiter</TableHead>}
+                {visibleFields.stage && <TableHead>Current Stage</TableHead>}
+                {visibleFields.source && <TableHead>Source</TableHead>}
+                {visibleFields.salary && <TableHead>Salary</TableHead>}
+                {visibleFields.location && <TableHead>Location</TableHead>}
+                {visibleFields.department && <TableHead>Department</TableHead>}
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredCandidates.map((candidate) => (
+                <TableRow key={candidate.id} className="hover:bg-slate-50">
+                  {visibleFields.name && (
+                    <TableCell>
+                      <Link
+                        to={`/candidates/${candidate.id}`}
+                        className="flex items-center space-x-3 hover:text-blue-600 min-w-0"
+                      >
+                        <Avatar className="w-8 h-8 flex-shrink-0">
+                          <AvatarImage src={candidate.avatar} />
+                          <AvatarFallback className="text-xs">
+                            {candidate.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0 flex-1">
+                          <div className="font-medium truncate">
+                            {candidate.name}
+                          </div>
+                          <div className="flex items-center space-x-1 mt-1">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`w-3 h-3 ${
+                                  i < candidate.rating
+                                    ? "text-yellow-400 fill-current"
+                                    : "text-slate-300"
+                                }`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      </Link>
+                    </TableCell>
+                  )}
+                  {visibleFields.appliedDate && (
+                    <TableCell className="truncate max-w-32">
+                      {candidate.appliedDate}
+                    </TableCell>
+                  )}
+                  {visibleFields.email && (
+                    <TableCell className="truncate max-w-48">
+                      {candidate.email}
+                    </TableCell>
+                  )}
+                  {visibleFields.phone && (
+                    <TableCell className="truncate max-w-32">
+                      {candidate.phone}
+                    </TableCell>
+                  )}
+                  {visibleFields.position && (
+                    <TableCell className="truncate max-w-40">
+                      {candidate.position}
+                    </TableCell>
+                  )}
+                  {visibleFields.recruiter && (
+                    <TableCell className="truncate max-w-32">
+                      {candidate.recruiter}
+                    </TableCell>
+                  )}
+                  {visibleFields.stage && (
+                    <TableCell>
+                      <Badge
+                        variant={
+                          candidate.stage === "Offer"
+                            ? "default"
+                            : candidate.stage === "Hired"
+                            ? "default"
+                            : candidate.stage === "Technical"
+                            ? "secondary"
+                            : candidate.stage === "Interview"
+                            ? "outline"
+                            : candidate.stage === "Screening"
+                            ? "secondary"
+                            : candidate.stage === "Applied"
+                            ? "outline"
+                            : "destructive"
+                        }
+                        className="truncate max-w-24"
+                      >
+                        {candidate.stage}
+                      </Badge>
+                    </TableCell>
+                  )}
+                  {visibleFields.source && (
+                    <TableCell className="truncate max-w-32">
+                      {candidate.source}
+                    </TableCell>
+                  )}
+                  {visibleFields.salary && (
+                    <TableCell className="truncate max-w-32">
+                      {candidate.salary}
+                    </TableCell>
+                  )}
+                  {visibleFields.location && (
+                    <TableCell className="truncate max-w-40">
+                      {candidate.location}
+                    </TableCell>
+                  )}
+                  {visibleFields.department && (
+                    <TableCell className="truncate max-w-40">
+                      {candidate.department}
+                    </TableCell>
+                  )}
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="flex-shrink-0"
+                        >
+                          <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        {/* Action apply Job for specific candidate */}
+                        <DropdownMenuItem
+                          onClick={() => setApplyCandidateId(candidate.id)}
+                        >
+                          <UserPlus className="w-4 h-4 mr-2" />
+                          Apply to Job
+                        </DropdownMenuItem>
+
+                        <Link to={`/candidates/${candidate.id}`}>
+                          <DropdownMenuItem>
+                            <Eye className="w-4 h-4 mr-2" />
+                            View Details
+                          </DropdownMenuItem>
+                        </Link>
+                        <DropdownMenuItem>
+                          <Edit className="w-4 h-4 mr-2" />
+                          Edit Candidate
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Download className="w-4 h-4 mr-2" />
+                          Download CV
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <Dialog
+            open={!!applyCandidateId}
+            onOpenChange={(open) => !open && setApplyCandidateId(null)}
+          >
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Apply to Job</DialogTitle>
+                <DialogDescription>
+                  Select a job to apply candidate:{" "}
+                  <strong>{applyCandidate?.name}</strong>
+                </DialogDescription>
+              </DialogHeader>
+
+              <Select onValueChange={(value) => setSelectedJobId(value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Job" />
+                </SelectTrigger>
+                <SelectContent>
+                  {jobs.map((job) => (
+                    <SelectItem key={job.id} value={job.id}>
+                      {job.position}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setApplyCandidateId(null)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => {
+                    if (applyCandidateId && selectedJobId) {
+                      applyCandidateToJob(applyCandidateId, selectedJobId);
+                      setApplyCandidateId(null);
+                      setSelectedJobId(null);
+                    }
+                  }}
+                  disabled={!selectedJobId}
+                >
+                  Apply
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </CardContent>
+    </Card>
+  );
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
@@ -744,13 +925,7 @@ export default function FollowUpDashboard() {
       {/* Main Content */}
       {viewMode === "pipeline" && <PipelineView />}
 
-      {viewMode === "list" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredCandidates.map((candidate) => (
-            <CandidateCard key={candidate.id} candidate={candidate} />
-          ))}
-        </div>
-      )}
+      {viewMode === "list" && <PipelineListView />}
 
       {viewMode === "timeline" && (
         <Card>
