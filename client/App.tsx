@@ -38,6 +38,7 @@ import CandidateDetail from "./pages/CandidateDetail";
 import CVEvaluation from "./pages/CVEvaluation";
 import FollowUpDashboard from "./pages/FollowUpDashboard";
 import Calendar from "./pages/Calendar";
+import Schedule from "./pages/Schedule";
 import EmailAutomation from "./pages/EmailAutomation";
 import Reports from "./pages/Reports";
 import Notifications from "./pages/Notifications";
