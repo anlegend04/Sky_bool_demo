@@ -789,47 +789,18 @@ const AddJobForm = memo(
                   Recruitment Stages
                 </label>
 
-                <DndContext
-                  sensors={useSensors(
-                    useSensor(PointerSensor),
-                    useSensor(KeyboardSensor, {
-                      coordinateGetter: sortableKeyboardCoordinates,
-                    }),
-                  )}
-                  collisionDetection={closestCenter}
-                  onDragEnd={(event) => {
-                    const { active, over } = event;
-                    if (active.id !== over?.id) {
-                      const oldIndex = jobStages.findIndex(
-                        (s) => s.id === active.id,
-                      );
-                      const newIndex = jobStages.findIndex(
-                        (s) => s.id === over?.id,
-                      );
-                      setJobStages((items) =>
-                        arrayMove(items, oldIndex, newIndex),
-                      );
-                    }
-                  }}
-                >
-                  <SortableContext
-                    items={jobStages.map((s) => s.id)}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    <div className="space-y-2">
-                      {jobStages.map((stage, index) => (
-                        <SortableStageItem
-                          key={stage.id}
-                          id={stage.id}
-                          index={index}
-                          stage={stage}
-                          updateStage={updateStage}
-                          removeStage={removeStage}
-                        />
-                      ))}
-                    </div>
-                  </SortableContext>
-                </DndContext>
+                <div className="space-y-2">
+                  {jobStages.map((stage, index) => (
+                    <StageItem
+                      key={stage.id}
+                      id={stage.id}
+                      index={index}
+                      stage={stage}
+                      updateStage={updateStage}
+                      removeStage={removeStage}
+                    />
+                  ))}
+                </div>
 
                 <Button
                   variant="outline"
