@@ -810,6 +810,29 @@ export default function Jobs() {
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null);
   const { toast } = useToast();
 
+  // Mock candidates data for the apply functionality
+  const candidates = [
+    { id: "1", name: "John Doe" },
+    { id: "2", name: "Jane Smith" },
+    { id: "3", name: "Mike Johnson" },
+  ];
+
+  // Handle applying candidate to job
+  const handleApplyCandidate = () => {
+    if (applyJobId && selectedCandidateId) {
+      const selectedCandidate = candidates.find(c => c.id === selectedCandidateId);
+      const selectedJob = jobs.find(j => j.id === applyJobId);
+
+      toast({
+        title: "Candidate Applied",
+        description: `${selectedCandidate?.name} has been applied to ${selectedJob?.position}`,
+      });
+
+      setApplyJobId(null);
+      setSelectedCandidateId(null);
+    }
+  };
+
   const [visibleFields, setVisibleFields] = useState({
     position: true,
     department: true,
