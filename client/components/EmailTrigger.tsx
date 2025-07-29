@@ -72,36 +72,12 @@ export function EmailTrigger({
   // Generate email content when template is selected
   useEffect(() => {
     if (selectedTemplate && candidate) {
-      const generatedEmail = generateEmailContent(selectedTemplate, candidate, jobTitle);
+      const generatedEmail = generateEmailContent(selectedTemplate, candidate, { jobTitle });
       setEmailSubject(generatedEmail.subject);
       setEmailContent(generatedEmail.content);
       setRecipientEmail(candidate.email || "");
     }
   }, [selectedTemplate, candidate, jobTitle]);
-
-  const generateEmailContent = (template: EmailTemplate, candidateData: CandidateData, job?: string) => {
-    const replacements = {
-      "{{candidate_name}}": candidateData.name,
-      "{{job_title}}": job || "the position",
-      "{{company_name}}": "TechCorp Inc.",
-      "{{stage}}": stages.find(s => s.value === newStage)?.label || newStage,
-      "{{interviewer_name}}": "Sarah Johnson",
-      "{{interview_date}}": "March 15, 2024",
-      "{{interview_time}}": "2:00 PM EST",
-      "{{salary_range}}": "$80,000 - $120,000",
-      "{{application_date}}": new Date().toLocaleDateString(),
-    };
-
-    let subject = template.subject;
-    let content = template.content;
-
-    Object.entries(replacements).forEach(([placeholder, value]) => {
-      subject = subject.replace(new RegExp(placeholder, 'g'), value);
-      content = content.replace(new RegExp(placeholder, 'g'), value);
-    });
-
-    return { subject, content };
-  };
 
   const handleSendEmail = () => {
     const emailData = {
