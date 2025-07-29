@@ -849,6 +849,264 @@ export default function Candidates() {
     </Card>
   );
 
+    const ListView = () => (
+    <Card>
+      <CardContent className="p-0">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {/* FIxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx */}
+                {visibleFields.name && (
+                  <TableHead>{t("candidates.name")}</TableHead>
+                )}
+                {visibleFields.appliedDate && <TableHead>Applied On</TableHead>}
+                {visibleFields.email && <TableHead>Email</TableHead>}
+                {visibleFields.phone && <TableHead>Phone</TableHead>}
+                {visibleFields.position && <TableHead>Job Position</TableHead>}
+                {visibleFields.recruiter && <TableHead>Recruiter</TableHead>}
+                {visibleFields.stage && <TableHead>Current Stage</TableHead>}
+                {visibleFields.source && <TableHead>Source</TableHead>}
+                {visibleFields.salary && <TableHead>Salary</TableHead>}
+                {visibleFields.location && <TableHead>Location</TableHead>}
+                {visibleFields.department && <TableHead>Department</TableHead>}
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredCandidates.map((candidate) => (
+                <TableRow key={candidate.id} className="hover:bg-slate-50">
+                  {visibleFields.name && (
+                    <TableCell>
+                      <Link
+                        to={`/candidates/${candidate.id}`}
+                        className="flex items-center space-x-3 hover:text-blue-600 min-w-0"
+                      >
+                        <Avatar className="w-8 h-8 flex-shrink-0">
+                          <AvatarImage src={candidate.avatar} />
+                          <AvatarFallback className="text-xs">
+                            {candidate.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0 flex-1">
+                          <div className="font-medium truncate">
+                            {candidate.name}
+                          </div>
+                          <div className="flex items-center space-x-1 mt-1">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`w-3 h-3 ${
+                                  i < candidate.rating
+                                    ? "text-yellow-400 fill-current"
+                                    : "text-slate-300"
+                                }`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      </Link>
+                    </TableCell>
+                  )}
+                  {visibleFields.appliedDate && (
+                    <TableCell className="truncate max-w-32">
+                      {candidate.appliedDate}
+                    </TableCell>
+                  )}
+                  {visibleFields.email && (
+                    <TableCell className="truncate max-w-48">
+                      {candidate.email}
+                    </TableCell>
+                  )}
+                  {visibleFields.phone && (
+                    <TableCell className="truncate max-w-32">
+                      {candidate.phone}
+                    </TableCell>
+                  )}
+                  {visibleFields.position && (
+                    <TableCell className="truncate max-w-40">
+                      {candidate.position}
+                    </TableCell>
+                  )}
+                  {visibleFields.recruiter && (
+                    <TableCell className="truncate max-w-32">
+                      {candidate.recruiter}
+                    </TableCell>
+                  )}
+                  {visibleFields.stage && (
+                    <TableCell>
+                      <Badge
+                        variant={
+                          candidate.stage === "Offer"
+                            ? "default"
+                            : candidate.stage === "Hired"
+                              ? "default"
+                              : candidate.stage === "Technical"
+                                ? "secondary"
+                                : candidate.stage === "Interview"
+                                  ? "outline"
+                                  : candidate.stage === "Screening"
+                                    ? "secondary"
+                                    : candidate.stage === "Applied"
+                                      ? "outline"
+                                      : "destructive"
+                        }
+                        className="truncate max-w-24"
+                      >
+                        {candidate.stage}
+                      </Badge>
+                    </TableCell>
+                  )}
+                  {visibleFields.source && (
+                    <TableCell className="truncate max-w-32">
+                      {candidate.source}
+                    </TableCell>
+                  )}
+                  {visibleFields.salary && (
+                    <TableCell className="truncate max-w-32">
+                      {candidate.salary}
+                    </TableCell>
+                  )}
+                  {visibleFields.location && (
+                    <TableCell className="truncate max-w-40">
+                      {candidate.location}
+                    </TableCell>
+                  )}
+                  {visibleFields.department && (
+                    <TableCell className="truncate max-w-40">
+                      {candidate.department}
+                    </TableCell>
+                  )}
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="flex-shrink-0"
+                        >
+                          <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        {/* Action apply Job for specific candidate */}
+                        <DropdownMenuItem
+                          onClick={() => setApplyCandidateId(candidate.id)}
+                        >
+                          <UserPlus className="w-4 h-4 mr-2" />
+                          Apply to Job
+                        </DropdownMenuItem>
+
+                        <Link to={`/candidates/${candidate.id}`}>
+                          <DropdownMenuItem>
+                            <Eye className="w-4 h-4 mr-2" />
+                            View Details
+                          </DropdownMenuItem>
+                        </Link>
+                        <DropdownMenuItem>
+                          <Edit className="w-4 h-4 mr-2" />
+                          Edit Candidate
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Download className="w-4 h-4 mr-2" />
+                          Download CV
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <Dialog
+            open={!!applyCandidateId}
+            onOpenChange={(open) => !open && setApplyCandidateId(null)}
+          >
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Apply to Job</DialogTitle>
+                <DialogDescription>
+                  Select a job to apply candidate:{" "}
+                  <strong>{applyCandidate?.name}</strong>
+                </DialogDescription>
+              </DialogHeader>
+
+              <Select onValueChange={(value) => setSelectedJobId(value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Job" />
+                </SelectTrigger>
+                <SelectContent>
+                  {jobs.map((job) => (
+                    <SelectItem key={job.id} value={job.id}>
+                      {job.position}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setApplyCandidateId(null)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => {
+                    if (applyCandidateId && selectedJobId) {
+                      applyCandidateToJob(applyCandidateId, selectedJobId);
+                      setApplyCandidateId(null);
+                      setSelectedJobId(null);
+                    }
+                  }}
+                  disabled={!selectedJobId}
+                >
+                  Apply
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  const GridView = () => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+      {stages.map((stage) => {
+        const stageCandidates = filteredCandidates.filter(
+          (candidate) => candidate.stage === stage,
+        );
+        return (
+          <div
+            key={stage}
+            className="border border-slate-300 bg-slate-50 rounded-lg shadow-sm"
+          >
+            <div className="flex items-center justify-between p-3 border-b border-slate-200 bg-slate-100 rounded-t-lg">
+              <h3 className="font-semibold text-sm text-slate-900">{stage}</h3>
+              <Badge variant="outline" className="text-xs">
+                {stageCandidates.length}
+              </Badge>
+            </div>
+            <div className="space-y-3 p-3 min-h-[250px]">
+              {stageCandidates.map((candidate) => (
+                <CandidateCard key={candidate.id} candidate={candidate} />
+              ))}
+              {stageCandidates.length === 0 && (
+                <div className="text-center text-slate-400 text-xs py-8">
+                  No candidates
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
   return (
     <div className="p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
       {/* Header */}
@@ -1212,11 +1470,12 @@ export default function Candidates() {
         ))}
       </div>
 
-      {/* Existing candidates view and filters... */}
+      {/* View Toggle and Filters */}
       <Card>
         <CardContent className="pt-6">
           <div className="flex flex-col lg:flex-row gap-4 justify-between">
             <div className="flex items-center space-x-4">
+              {/* View Mode Toggle */}
               <div className="flex items-center space-x-2 border rounded-lg p-1">
                 <Button
                   variant={viewMode === "list" ? "default" : "ghost"}
@@ -1235,8 +1494,38 @@ export default function Candidates() {
                   Grid
                 </Button>
               </div>
+
+              {/* Field Visibility Settings (only for list view) */}
+              {viewMode === "list" && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Settings className="w-4 h-4 mr-2" />
+                      Fields
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56">
+                    {Object.entries(visibleFields).map(([field, visible]) => (
+                      <DropdownMenuCheckboxItem
+                        key={field}
+                        checked={visible}
+                        onCheckedChange={(checked) =>
+                          setVisibleFields((prev) => ({
+                            ...prev,
+                            [field]: checked,
+                          }))
+                        }
+                      >
+                        {field.charAt(0).toUpperCase() +
+                          field.slice(1).replace(/([A-Z])/g, " $1")}
+                      </DropdownMenuCheckboxItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
 
+            {/* Search and Filters */}
             <div className="flex flex-col lg:flex-row gap-4">
               <div className="flex-1">
                 <div className="relative">
@@ -1250,6 +1539,22 @@ export default function Candidates() {
                 </div>
               </div>
               <div className="flex gap-3">
+                <Select
+                  value={departmentFilter}
+                  onValueChange={setDepartmentFilter}
+                >
+                  <SelectTrigger className="w-32">
+                    <SelectValue placeholder="Department" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Departments</SelectItem>
+                    <SelectItem value="engineering">Engineering</SelectItem>
+                    <SelectItem value="product">Product</SelectItem>
+                    <SelectItem value="design">Design</SelectItem>
+                    <SelectItem value="marketing">Marketing</SelectItem>
+                    <SelectItem value="data">Data</SelectItem>
+                  </SelectContent>
+                </Select>
                 <Select value={stageFilter} onValueChange={setStageFilter}>
                   <SelectTrigger className="w-32">
                     <SelectValue placeholder="Stage" />
@@ -1263,79 +1568,158 @@ export default function Candidates() {
                     ))}
                   </SelectContent>
                 </Select>
+                <Select
+                  value={recruiterFilter}
+                  onValueChange={setRecruiterFilter}
+                >
+                  <SelectTrigger className="w-32">
+                    <SelectValue placeholder="Recruiter" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Recruiters</SelectItem>
+                    <SelectItem value="alex chen">Alex Chen</SelectItem>
+                    <SelectItem value="sarah kim">Sarah Kim</SelectItem>
+                    <SelectItem value="mike wilson">Mike Wilson</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Dialog
+                  open={showMoreFilters}
+                  onOpenChange={setShowMoreFilters}
+                >
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Filter className="w-4 h-4 mr-2" />
+                      More Filters
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Advanced Filters</DialogTitle>
+                      <DialogDescription>
+                        Apply additional filters to refine your candidate
+                        search.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium text-slate-700">
+                            Experience Level
+                          </label>
+                          <Select>
+                            <SelectTrigger className="mt-1">
+                              <SelectValue placeholder="Any experience" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="entry">
+                                Entry Level (0-2 years)
+                              </SelectItem>
+                              <SelectItem value="mid">
+                                Mid Level (3-5 years)
+                              </SelectItem>
+                              <SelectItem value="senior">
+                                Senior Level (5+ years)
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-700">
+                            Salary Range
+                          </label>
+                          <Select>
+                            <SelectTrigger className="mt-1">
+                              <SelectValue placeholder="Any salary" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="50-75">$50k - $75k</SelectItem>
+                              <SelectItem value="75-100">
+                                $75k - $100k
+                              </SelectItem>
+                              <SelectItem value="100-150">
+                                $100k - $150k
+                              </SelectItem>
+                              <SelectItem value="150+">$150k+</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-700">
+                            Rating
+                          </label>
+                          <Select>
+                            <SelectTrigger className="mt-1">
+                              <SelectValue placeholder="Any rating" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="5">5 Stars</SelectItem>
+                              <SelectItem value="4+">4+ Stars</SelectItem>
+                              <SelectItem value="3+">3+ Stars</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-slate-700">
+                            Application Date
+                          </label>
+                          <Select>
+                            <SelectTrigger className="mt-1">
+                              <SelectValue placeholder="Any date" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="last-week">
+                                Last Week
+                              </SelectItem>
+                              <SelectItem value="last-month">
+                                Last Month
+                              </SelectItem>
+                              <SelectItem value="last-quarter">
+                                Last Quarter
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-slate-700">
+                          Skills
+                        </label>
+                        <Input
+                          placeholder="Search by specific skills..."
+                          className="mt-1"
+                        />
+                      </div>
+                      <div className="flex justify-end space-x-2">
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowMoreFilters(false)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setShowMoreFilters(false);
+                            toast({
+                              title: "Filters Applied",
+                              description:
+                                "Advanced filters have been applied to the candidate list.",
+                            });
+                          }}
+                        >
+                          Apply Filters
+                        </Button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Existing candidates display */}
-      {viewMode === "grid" ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-          {filteredCandidates.map((candidate) => (
-            <CandidateCard key={candidate.id} candidate={candidate} />
-          ))}
-        </div>
-      ) : (
-        <Card>
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Position</TableHead>
-                    <TableHead>Stage</TableHead>
-                    <TableHead>Applied</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredCandidates.map((candidate) => (
-                    <TableRow key={candidate.id}>
-                      <TableCell>
-                        <Link to={`/candidates/${candidate.id}`} className="flex items-center space-x-3">
-                          <Avatar className="w-8 h-8">
-                            <AvatarImage src={candidate.avatar} />
-                            <AvatarFallback>
-                              {candidate.name.split(" ").map((n) => n[0]).join("")}
-                            </AvatarFallback>
-                          </Avatar>
-                          <span className="font-medium">{candidate.name}</span>
-                        </Link>
-                      </TableCell>
-                      <TableCell>{candidate.position}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{candidate.stage}</Badge>
-                      </TableCell>
-                      <TableCell>{candidate.appliedDate}</TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <MoreHorizontal className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <DropdownMenuItem>
-                              <Eye className="w-4 h-4 mr-2" />
-                              View
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <Edit className="w-4 h-4 mr-2" />
-                              Edit
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Content based on view mode */}
+      {viewMode === "list" ? <ListView /> : <GridView />}
     </div>
   );
 }
