@@ -44,7 +44,11 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
 import { useState, useMemo } from "react";
-import { getAllEmailTemplates, EmailTemplate, generateEmailContent } from "@/lib/email-utils";
+import {
+  getAllEmailTemplates,
+  EmailTemplate,
+  generateEmailContent,
+} from "@/lib/email-utils";
 
 interface EmailTemplateExtended extends EmailTemplate {
   status: "active" | "inactive";
@@ -92,7 +96,9 @@ export default function EmailAutomation() {
       status: "active" as const,
       usage: Math.floor(Math.random() * 200) + 20, // Random usage for demo
       openRate: Math.floor(Math.random() * 30) + 70, // Random open rate 70-100%
-      lastModified: new Date(Date.now() - index * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Staggered dates
+      lastModified: new Date(Date.now() - index * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split("T")[0], // Staggered dates
     }));
   }, []);
 

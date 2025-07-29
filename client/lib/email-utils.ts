@@ -96,7 +96,13 @@ export function getAllEmailTemplates(): EmailTemplate[] {
         "Dear {{candidate_name}},\n\nYour application for the {{job_title}} position has been successfully submitted to {{company_name}}.\n\nApplication Details:\n- Position: {{job_title}}\n- Department: {{position_department}}\n- Submitted: {{application_date}}\n\nOur recruiting team will review your application and contact you if your qualifications match our requirements.\n\nThank you for your interest in joining our team!\n\nBest regards,\n{{company_name}} HR Team",
       type: "confirmation",
       stage: "applied",
-      variables: ["{{candidate_name}}", "{{job_title}}", "{{company_name}}", "{{position_department}}", "{{application_date}}"],
+      variables: [
+        "{{candidate_name}}",
+        "{{job_title}}",
+        "{{company_name}}",
+        "{{position_department}}",
+        "{{application_date}}",
+      ],
     },
 
     // Screening Stage Templates
