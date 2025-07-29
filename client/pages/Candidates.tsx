@@ -1410,7 +1410,12 @@ export default function Candidates() {
                 <label className="text-sm font-medium text-slate-700">
                   Full Name
                 </label>
-                <Input placeholder="John Doe" className="mt-1" />
+                <Input
+                  placeholder="John Doe"
+                  className="mt-1"
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                />
               </div>
               <div>
                 <label className="text-sm font-medium text-slate-700">
