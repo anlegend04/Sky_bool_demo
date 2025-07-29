@@ -82,7 +82,11 @@ import {
 } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { HARDCODED_CANDIDATES, HARDCODED_JOBS, CandidateData } from "@/data/hardcoded-data";
+import {
+  HARDCODED_CANDIDATES,
+  HARDCODED_JOBS,
+  CandidateData,
+} from "@/data/hardcoded-data";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/hooks/use-language";
 
@@ -205,7 +209,7 @@ export default function Candidates() {
     "Rejected",
   ];
 
-  const jobs = HARDCODED_JOBS.map(job => ({
+  const jobs = HARDCODED_JOBS.map((job) => ({
     id: job.id,
     position: job.position,
   }));
@@ -423,7 +427,7 @@ export default function Candidates() {
     setIsSubmittingForm(true);
 
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     toast({
       title: "Candidate Added Successfully",
@@ -1057,7 +1061,9 @@ export default function Candidates() {
         </div>
         <div className="flex items-center text-xs text-slate-600 min-w-0">
           <Clock className="w-3 h-3 mr-1 flex-shrink-0" />
-          <span className="line-clamp-1">{candidate.duration} days in stage</span>
+          <span className="line-clamp-1">
+            {candidate.duration} days in stage
+          </span>
         </div>
         <div className="flex items-center justify-between pt-2 border-t border-slate-100">
           <div className="flex items-center space-x-1">
@@ -1072,7 +1078,11 @@ export default function Candidates() {
               />
             ))}
           </div>
-          <Badge variant="outline" className="text-xs line-clamp-1 max-w-20" title={candidate.recruiter}>
+          <Badge
+            variant="outline"
+            className="text-xs line-clamp-1 max-w-20"
+            title={candidate.recruiter}
+          >
             {candidate.recruiter}
           </Badge>
         </div>
@@ -1140,7 +1150,10 @@ export default function Candidates() {
                           </AvatarFallback>
                         </Avatar>
                         <div className="min-w-0 flex-1">
-                          <div className="font-medium line-clamp-1" title={candidate.name}>
+                          <div
+                            className="font-medium line-clamp-1"
+                            title={candidate.name}
+                          >
                             {candidate.name}
                           </div>
                           <div className="flex items-center space-x-1 mt-1">
@@ -1396,7 +1409,9 @@ export default function Candidates() {
               Add Candidate Manually
             </DialogTitle>
             <DialogDescription className="flex items-center justify-between">
-              <span>Enter candidate details to create a new candidate profile.</span>
+              <span>
+                Enter candidate details to create a new candidate profile.
+              </span>
               <Button variant="outline" size="sm" onClick={preFillSampleData}>
                 Fill Sample Data
               </Button>
@@ -1412,7 +1427,9 @@ export default function Candidates() {
                   placeholder="John Doe"
                   className="mt-1"
                   value={formData.name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, name: e.target.value }))
+                  }
                 />
               </div>
               <div>
@@ -1424,7 +1441,9 @@ export default function Candidates() {
                   placeholder="john@example.com"
                   className="mt-1"
                   value={formData.email}
-                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, email: e.target.value }))
+                  }
                 />
               </div>
               <div>

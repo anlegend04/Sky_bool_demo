@@ -1080,7 +1080,8 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
       {
         id: "email_6",
         subject: "Technical Assessment Invitation - Product Manager",
-        content: "Hi James, We'd like to invite you to complete our technical assessment...",
+        content:
+          "Hi James, We'd like to invite you to complete our technical assessment...",
         from: "sarah.kim@techcorp.com",
         to: "james.chen@email.com",
         timestamp: getRandomDateTime(10),
@@ -1092,7 +1093,8 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
       {
         id: "email_7",
         subject: "Job Offer - Product Manager Position",
-        content: "Dear James, We are pleased to extend an offer for the Product Manager position...",
+        content:
+          "Dear James, We are pleased to extend an offer for the Product Manager position...",
         from: "sarah.kim@techcorp.com",
         to: "james.chen@email.com",
         timestamp: getRandomDateTime(6),
@@ -1489,13 +1491,19 @@ const generateMoreCandidates = (): CandidateData[] => {
     // Realistic stage distribution: more candidates in early stages
     let stage;
     const stageRand = Math.random();
-    if (stageRand < 0.4) stage = "Applied";  // 40%
-    else if (stageRand < 0.65) stage = "Screening";  // 25%
-    else if (stageRand < 0.8) stage = "Interview";  // 15%
-    else if (stageRand < 0.9) stage = "Technical";  // 10%
-    else if (stageRand < 0.95) stage = "Offer";  // 5%
-    else if (stageRand < 0.98) stage = "Hired";  // 3%
-    else stage = "Rejected";  // 2%
+    if (stageRand < 0.4)
+      stage = "Applied"; // 40%
+    else if (stageRand < 0.65)
+      stage = "Screening"; // 25%
+    else if (stageRand < 0.8)
+      stage = "Interview"; // 15%
+    else if (stageRand < 0.9)
+      stage = "Technical"; // 10%
+    else if (stageRand < 0.95)
+      stage = "Offer"; // 5%
+    else if (stageRand < 0.98)
+      stage = "Hired"; // 3%
+    else stage = "Rejected"; // 2%
 
     const source = sources[Math.floor(Math.random() * sources.length)];
     const recruiter = recruiters[Math.floor(Math.random() * recruiters.length)];
@@ -1580,7 +1588,8 @@ export const HARDCODED_INTERVIEWS: InterviewData[] = [
     type: "Technical",
     status: "Completed",
     meetingLink: "https://meet.google.com/abc-defg-hij",
-    notes: "Technical interview focusing on React and TypeScript skills - Excellent performance",
+    notes:
+      "Technical interview focusing on React and TypeScript skills - Excellent performance",
     feedback: [
       {
         id: "feedback_3",
@@ -1592,7 +1601,8 @@ export const HARDCODED_INTERVIEWS: InterviewData[] = [
         communicationSkills: 4,
         culturalFit: 5,
         problemSolving: 5,
-        comments: "Outstanding technical skills with React and TypeScript. Great problem-solving approach and clear communication.",
+        comments:
+          "Outstanding technical skills with React and TypeScript. Great problem-solving approach and clear communication.",
         recommendation: "Strong Hire",
         createdAt: getRandomDateTime(25),
       },
@@ -1726,7 +1736,8 @@ export const HARDCODED_NOTIFICATIONS: NotificationData[] = [
   {
     id: "notif_3",
     title: "Candidate Hired!",
-    message: "Marissa Torres has been successfully hired for Senior Frontend Developer",
+    message:
+      "Marissa Torres has been successfully hired for Senior Frontend Developer",
     type: "candidate_moved",
     timestamp: getRandomDateTime(2),
     read: true,
@@ -1949,17 +1960,33 @@ export const HARDCODED_ACTIVITIES: ActivityData[] = [
 // Helper function to calculate dashboard stats from actual data
 const calculateDashboardStats = (): DashboardStatsData => {
   const totalCandidates = HARDCODED_CANDIDATES.length;
-  const activeCandidates = HARDCODED_CANDIDATES.filter(c => c.status === "Active").length;
-  const appliedCount = HARDCODED_CANDIDATES.filter(c => c.stage === "Applied").length;
-  const screeningCount = HARDCODED_CANDIDATES.filter(c => c.stage === "Screening").length;
-  const interviewCount = HARDCODED_CANDIDATES.filter(c => c.stage === "Interview").length;
-  const technicalCount = HARDCODED_CANDIDATES.filter(c => c.stage === "Technical").length;
-  const offerCount = HARDCODED_CANDIDATES.filter(c => c.stage === "Offer").length;
-  const hiredCount = HARDCODED_CANDIDATES.filter(c => c.stage === "Hired").length;
+  const activeCandidates = HARDCODED_CANDIDATES.filter(
+    (c) => c.status === "Active",
+  ).length;
+  const appliedCount = HARDCODED_CANDIDATES.filter(
+    (c) => c.stage === "Applied",
+  ).length;
+  const screeningCount = HARDCODED_CANDIDATES.filter(
+    (c) => c.stage === "Screening",
+  ).length;
+  const interviewCount = HARDCODED_CANDIDATES.filter(
+    (c) => c.stage === "Interview",
+  ).length;
+  const technicalCount = HARDCODED_CANDIDATES.filter(
+    (c) => c.stage === "Technical",
+  ).length;
+  const offerCount = HARDCODED_CANDIDATES.filter(
+    (c) => c.stage === "Offer",
+  ).length;
+  const hiredCount = HARDCODED_CANDIDATES.filter(
+    (c) => c.stage === "Hired",
+  ).length;
 
   // Calculate realistic conversion rates
-  const passedScreening = screeningCount + interviewCount + technicalCount + offerCount + hiredCount;
-  const passedInterview = interviewCount + technicalCount + offerCount + hiredCount;
+  const passedScreening =
+    screeningCount + interviewCount + technicalCount + offerCount + hiredCount;
+  const passedInterview =
+    interviewCount + technicalCount + offerCount + hiredCount;
   const gotOffer = offerCount + hiredCount;
 
   return {
@@ -1967,18 +1994,33 @@ const calculateDashboardStats = (): DashboardStatsData => {
     activeJobs: HARDCODED_JOBS.filter((job) => job.status === "Open").length,
     totalCandidates,
     activeCandidates,
-    interviewsThisWeek: HARDCODED_INTERVIEWS.filter(i => i.status === "Scheduled").length,
+    interviewsThisWeek: HARDCODED_INTERVIEWS.filter(
+      (i) => i.status === "Scheduled",
+    ).length,
     offersExtended: offerCount,
     hiredThisMonth: hiredCount,
-    avgTimeToHire: Math.round(HARDCODED_CANDIDATES.filter(c => c.stage === "Hired").reduce((sum, c) => sum + c.duration, 0) / Math.max(hiredCount, 1)),
+    avgTimeToHire: Math.round(
+      HARDCODED_CANDIDATES.filter((c) => c.stage === "Hired").reduce(
+        (sum, c) => sum + c.duration,
+        0,
+      ) / Math.max(hiredCount, 1),
+    ),
     topPerformingJobs: ["job_3", "job_1", "job_2"], // Order by success rate
     recentActivities: HARDCODED_ACTIVITIES.slice(0, 5),
-    upcomingInterviews: HARDCODED_INTERVIEWS.filter((interview) => interview.status === "Scheduled"),
-    pendingTasks: HARDCODED_NOTIFICATIONS.filter(n => !n.read).length,
+    upcomingInterviews: HARDCODED_INTERVIEWS.filter(
+      (interview) => interview.status === "Scheduled",
+    ),
+    pendingTasks: HARDCODED_NOTIFICATIONS.filter((n) => !n.read).length,
     conversionRates: {
-      applicationToScreening: Math.round((passedScreening / totalCandidates) * 100),
-      screeningToInterview: Math.round((passedInterview / Math.max(passedScreening, 1)) * 100),
-      interviewToOffer: Math.round((gotOffer / Math.max(passedInterview, 1)) * 100),
+      applicationToScreening: Math.round(
+        (passedScreening / totalCandidates) * 100,
+      ),
+      screeningToInterview: Math.round(
+        (passedInterview / Math.max(passedScreening, 1)) * 100,
+      ),
+      interviewToOffer: Math.round(
+        (gotOffer / Math.max(passedInterview, 1)) * 100,
+      ),
       offerToHire: Math.round((hiredCount / Math.max(gotOffer, 1)) * 100),
     },
   };

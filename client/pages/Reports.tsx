@@ -56,7 +56,11 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
-import { HARDCODED_JOBS, HARDCODED_CANDIDATES, DASHBOARD_STATS } from "@/data/hardcoded-data";
+import {
+  HARDCODED_JOBS,
+  HARDCODED_CANDIDATES,
+  DASHBOARD_STATS,
+} from "@/data/hardcoded-data";
 import { useLanguage } from "@/hooks/use-language";
 import { useToast } from "@/hooks/use-toast";
 import { RechartsWarningSuppress } from "@/components/RechartsWarningSuppress";
@@ -73,20 +77,25 @@ export default function Reports() {
   const [lastUpdated, setLastUpdated] = useState(new Date());
 
   // Get unique values for filters
-  const recruiters = Array.from(new Set(HARDCODED_CANDIDATES.map(c => c.recruiter)));
-  const sources = Array.from(new Set(HARDCODED_CANDIDATES.map(c => c.source)));
-  const stages = Array.from(new Set(HARDCODED_CANDIDATES.map(c => c.stage)));
+  const recruiters = Array.from(
+    new Set(HARDCODED_CANDIDATES.map((c) => c.recruiter)),
+  );
+  const sources = Array.from(
+    new Set(HARDCODED_CANDIDATES.map((c) => c.source)),
+  );
+  const stages = Array.from(new Set(HARDCODED_CANDIDATES.map((c) => c.stage)));
 
   // Enhanced filtering function with loading simulation
   const applyFilters = async () => {
     setIsLoading(true);
     // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
     setLastUpdated(new Date());
     setIsLoading(false);
     toast({
       title: "Filters Applied",
-      description: "Charts and data have been updated with your selected filters.",
+      description:
+        "Charts and data have been updated with your selected filters.",
     });
   };
 
@@ -95,22 +104,22 @@ export default function Reports() {
     let filtered = HARDCODED_CANDIDATES;
 
     if (selectedJob !== "all") {
-      const job = HARDCODED_JOBS.find(j => j.id === selectedJob);
+      const job = HARDCODED_JOBS.find((j) => j.id === selectedJob);
       if (job) {
-        filtered = filtered.filter(c => c.position === job.position);
+        filtered = filtered.filter((c) => c.position === job.position);
       }
     }
 
     if (selectedRecruiter !== "all") {
-      filtered = filtered.filter(c => c.recruiter === selectedRecruiter);
+      filtered = filtered.filter((c) => c.recruiter === selectedRecruiter);
     }
 
     if (selectedSource !== "all") {
-      filtered = filtered.filter(c => c.source === selectedSource);
+      filtered = filtered.filter((c) => c.source === selectedSource);
     }
 
     if (selectedStage !== "all") {
-      filtered = filtered.filter(c => c.stage === selectedStage);
+      filtered = filtered.filter((c) => c.stage === selectedStage);
     }
 
     // Date filtering
@@ -131,23 +140,34 @@ export default function Reports() {
         break;
     }
 
-    filtered = filtered.filter(c => new Date(c.appliedDate) >= startDate);
+    filtered = filtered.filter((c) => new Date(c.appliedDate) >= startDate);
 
     return filtered;
-  }, [selectedJob, selectedRecruiter, selectedSource, selectedStage, dateRange]);
+  }, [
+    selectedJob,
+    selectedRecruiter,
+    selectedSource,
+    selectedStage,
+    dateRange,
+  ]);
 
   // Dynamic chart data based on filtered results
   const chartData = useMemo(() => {
-    const stageDistribution = stages.map(stage => ({
+    const stageDistribution = stages.map((stage) => ({
       name: stage,
-      value: filteredData.filter(c => c.stage === stage).length,
+      value: filteredData.filter((c) => c.stage === stage).length,
       fill: getStageColor(stage),
     }));
 
-    const sourceDistribution = sources.map(source => {
-      const sourceCandidates = filteredData.filter(c => c.source === source);
-      const sourceHired = sourceCandidates.filter(c => c.stage === "Hired").length;
-      const effectiveness = sourceCandidates.length > 0 ? Math.round((sourceHired / sourceCandidates.length) * 100) : 0;
+    const sourceDistribution = sources.map((source) => {
+      const sourceCandidates = filteredData.filter((c) => c.source === source);
+      const sourceHired = sourceCandidates.filter(
+        (c) => c.stage === "Hired",
+      ).length;
+      const effectiveness =
+        sourceCandidates.length > 0
+          ? Math.round((sourceHired / sourceCandidates.length) * 100)
+          : 0;
 
       return {
         name: source,
@@ -157,11 +177,20 @@ export default function Reports() {
       };
     });
 
-    const recruiterPerformance = recruiters.map(recruiter => {
-      const recruiterCandidates = filteredData.filter(c => c.recruiter === recruiter);
-      const interviews = recruiterCandidates.filter(c => ["Interview", "Technical", "Offer", "Hired"].includes(c.stage)).length;
-      const hires = recruiterCandidates.filter(c => c.stage === "Hired").length;
-      const effectiveness = recruiterCandidates.length > 0 ? Math.round((hires / recruiterCandidates.length) * 100) : 0;
+    const recruiterPerformance = recruiters.map((recruiter) => {
+      const recruiterCandidates = filteredData.filter(
+        (c) => c.recruiter === recruiter,
+      );
+      const interviews = recruiterCandidates.filter((c) =>
+        ["Interview", "Technical", "Offer", "Hired"].includes(c.stage),
+      ).length;
+      const hires = recruiterCandidates.filter(
+        (c) => c.stage === "Hired",
+      ).length;
+      const effectiveness =
+        recruiterCandidates.length > 0
+          ? Math.round((hires / recruiterCandidates.length) * 100)
+          : 0;
 
       return {
         name: recruiter,
@@ -181,25 +210,25 @@ export default function Reports() {
 
   function getStageColor(stage: string) {
     const colors = {
-      "Applied": "#3b82f6",
-      "Screening": "#f59e0b", 
-      "Interview": "#8b5cf6",
-      "Technical": "#f97316",
-      "Offer": "#10b981",
-      "Hired": "#059669",
-      "Rejected": "#ef4444",
+      Applied: "#3b82f6",
+      Screening: "#f59e0b",
+      Interview: "#8b5cf6",
+      Technical: "#f97316",
+      Offer: "#10b981",
+      Hired: "#059669",
+      Rejected: "#ef4444",
     };
     return colors[stage] || "#6b7280";
   }
 
   function getSourceColor(source: string) {
     const colors = {
-      "LinkedIn": "#0077B5",
-      "Indeed": "#2557a7",
+      LinkedIn: "#0077B5",
+      Indeed: "#2557a7",
       "Company Website": "#00a652",
-      "Referral": "#ff6b35",
-      "Glassdoor": "#0caa41",
-      "AngelList": "#000000",
+      Referral: "#ff6b35",
+      Glassdoor: "#0caa41",
+      AngelList: "#000000",
     };
     return colors[source] || "#8884d8";
   }
@@ -208,8 +237,16 @@ export default function Reports() {
   const downloadCSV = () => {
     setIsLoading(true);
     setTimeout(() => {
-      const headers = ["Name", "Position", "Stage", "Recruiter", "Source", "Applied Date", "Rating"];
-      const csvData = filteredData.map(candidate => [
+      const headers = [
+        "Name",
+        "Position",
+        "Stage",
+        "Recruiter",
+        "Source",
+        "Applied Date",
+        "Rating",
+      ];
+      const csvData = filteredData.map((candidate) => [
         candidate.name,
         candidate.position,
         candidate.stage,
@@ -221,19 +258,22 @@ export default function Reports() {
 
       const csvContent = [
         headers.join(","),
-        ...csvData.map(row => row.map(cell => `"${cell}"`).join(",")),
+        ...csvData.map((row) => row.map((cell) => `"${cell}"`).join(",")),
       ].join("\n");
 
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
       const link = document.createElement("a");
       const url = URL.createObjectURL(blob);
       link.setAttribute("href", url);
-      link.setAttribute("download", `recruitment-report-${new Date().toISOString().split('T')[0]}.csv`);
+      link.setAttribute(
+        "download",
+        `recruitment-report-${new Date().toISOString().split("T")[0]}.csv`,
+      );
       link.style.visibility = "hidden";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
       setIsLoading(false);
       toast({
         title: "Export Complete",
@@ -247,14 +287,14 @@ export default function Reports() {
     {
       title: "Total Candidates",
       value: filteredData.length.toString(),
-      change: `${filteredData.length > 50 ? '+' : ''}${Math.round((filteredData.length / HARDCODED_CANDIDATES.length - 1) * 100)}%`,
+      change: `${filteredData.length > 50 ? "+" : ""}${Math.round((filteredData.length / HARDCODED_CANDIDATES.length - 1) * 100)}%`,
       trend: filteredData.length > 50 ? "up" : "down",
       icon: Users,
       color: "blue",
     },
     {
       title: "Conversion Rate",
-      value: `${Math.round((filteredData.filter(c => c.stage === "Hired").length / filteredData.length) * 100) || 0}%`,
+      value: `${Math.round((filteredData.filter((c) => c.stage === "Hired").length / filteredData.length) * 100) || 0}%`,
       change: "+0.8%",
       trend: "up",
       icon: Target,
@@ -281,11 +321,13 @@ export default function Reports() {
   return (
     <div className="p-6 space-y-6">
       <RechartsWarningSuppress />
-      
+
       {/* Header */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Analytics & Reports</h1>
+          <h1 className="text-3xl font-bold text-slate-900">
+            Analytics & Reports
+          </h1>
           <p className="text-slate-600 mt-1">
             Comprehensive insights into your recruitment performance
           </p>
@@ -294,11 +336,7 @@ export default function Reports() {
           </p>
         </div>
         <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
-          <Button 
-            variant="outline" 
-            onClick={applyFilters}
-            disabled={isLoading}
-          >
+          <Button variant="outline" onClick={applyFilters} disabled={isLoading}>
             {isLoading ? (
               <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
             ) : (
@@ -350,7 +388,7 @@ export default function Reports() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Jobs</SelectItem>
-                  {HARDCODED_JOBS.map(job => (
+                  {HARDCODED_JOBS.map((job) => (
                     <SelectItem key={job.id} value={job.id}>
                       {job.position}
                     </SelectItem>
@@ -361,13 +399,16 @@ export default function Reports() {
 
             <div>
               <Label>Recruiter</Label>
-              <Select value={selectedRecruiter} onValueChange={setSelectedRecruiter}>
+              <Select
+                value={selectedRecruiter}
+                onValueChange={setSelectedRecruiter}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Recruiters</SelectItem>
-                  {recruiters.map(recruiter => (
+                  {recruiters.map((recruiter) => (
                     <SelectItem key={recruiter} value={recruiter}>
                       {recruiter}
                     </SelectItem>
@@ -384,7 +425,7 @@ export default function Reports() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Sources</SelectItem>
-                  {sources.map(source => (
+                  {sources.map((source) => (
                     <SelectItem key={source} value={source}>
                       {source}
                     </SelectItem>
@@ -401,7 +442,7 @@ export default function Reports() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Stages</SelectItem>
-                  {stages.map(stage => (
+                  {stages.map((stage) => (
                     <SelectItem key={stage} value={stage}>
                       {stage}
                     </SelectItem>
@@ -411,8 +452,8 @@ export default function Reports() {
             </div>
 
             <div className="flex items-end">
-              <Button 
-                onClick={applyFilters} 
+              <Button
+                onClick={applyFilters}
                 className="w-full"
                 disabled={isLoading}
               >
@@ -425,7 +466,7 @@ export default function Reports() {
               </Button>
             </div>
           </div>
-          
+
           {/* Filter Summary */}
           <div className="mt-4 flex flex-wrap gap-2">
             <Badge variant="outline">
@@ -433,7 +474,8 @@ export default function Reports() {
             </Badge>
             {selectedJob !== "all" && (
               <Badge variant="secondary">
-                Job: {HARDCODED_JOBS.find(j => j.id === selectedJob)?.position}
+                Job:{" "}
+                {HARDCODED_JOBS.find((j) => j.id === selectedJob)?.position}
               </Badge>
             )}
             {selectedRecruiter !== "all" && (
@@ -464,10 +506,14 @@ export default function Reports() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-slate-600">{stat.title}</p>
-                    <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
-                    <p className={`text-sm flex items-center space-x-1 ${
-                      stat.trend === "up" ? "text-green-600" : "text-red-600"
-                    }`}>
+                    <p className="text-2xl font-bold text-slate-900">
+                      {stat.value}
+                    </p>
+                    <p
+                      className={`text-sm flex items-center space-x-1 ${
+                        stat.trend === "up" ? "text-green-600" : "text-red-600"
+                      }`}
+                    >
                       {stat.trend === "up" ? (
                         <TrendingUp className="w-4 h-4" />
                       ) : (
@@ -521,17 +567,28 @@ export default function Reports() {
                         cy="50%"
                         outerRadius={100}
                         dataKey="value"
-                        label={({name, value, percent}) => value > 0 ? `${name}: ${value} (${(percent * 100).toFixed(0)}%)` : ''}
+                        label={({ name, value, percent }) =>
+                          value > 0
+                            ? `${name}: ${value} (${(percent * 100).toFixed(0)}%)`
+                            : ""
+                        }
                         labelLine={false}
                       >
                         {chartData.stageDistribution.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.fill} />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(value, name) => [`${value} candidates`, name]} />
+                      <Tooltip
+                        formatter={(value, name) => [
+                          `${value} candidates`,
+                          name,
+                        ]}
+                      />
                       <Legend
-                        formatter={(value, entry) => `${value} (${entry.payload.value})`}
-                        wrapperStyle={{ paddingTop: '20px' }}
+                        formatter={(value, entry) =>
+                          `${value} (${entry.payload.value})`
+                        }
+                        wrapperStyle={{ paddingTop: "20px" }}
                       />
                     </PieChart>
                   </ResponsiveContainer>
@@ -569,9 +626,9 @@ export default function Reports() {
                       <Tooltip
                         formatter={(value, name) => {
                           const labels = {
-                            applications: 'Applications',
-                            interviews: 'Interviews',
-                            hires: 'Hires'
+                            applications: "Applications",
+                            interviews: "Interviews",
+                            hires: "Hires",
                           };
                           return [value, labels[name] || name];
                         }}
@@ -580,15 +637,23 @@ export default function Reports() {
                       <Legend
                         formatter={(value) => {
                           const labels = {
-                            applications: 'Total Applications',
-                            interviews: 'Reached Interview',
-                            hires: 'Successfully Hired'
+                            applications: "Total Applications",
+                            interviews: "Reached Interview",
+                            hires: "Successfully Hired",
                           };
                           return labels[value] || value;
                         }}
                       />
-                      <Bar dataKey="applications" fill="#3b82f6" name="applications" />
-                      <Bar dataKey="interviews" fill="#10b981" name="interviews" />
+                      <Bar
+                        dataKey="applications"
+                        fill="#3b82f6"
+                        name="applications"
+                      />
+                      <Bar
+                        dataKey="interviews"
+                        fill="#10b981"
+                        name="interviews"
+                      />
                       <Bar dataKey="hires" fill="#f59e0b" name="hires" />
                     </BarChart>
                   </ResponsiveContainer>
@@ -612,7 +677,9 @@ export default function Reports() {
                   <FunnelChart>
                     <Funnel
                       dataKey="value"
-                      data={chartData.stageDistribution.filter(d => d.value > 0)}
+                      data={chartData.stageDistribution.filter(
+                        (d) => d.value > 0,
+                      )}
                       isAnimationActive
                     >
                       <LabelList
@@ -626,8 +693,13 @@ export default function Reports() {
                       />
                     </Funnel>
                     <Tooltip
-                      formatter={(value, name) => [`${value} candidates`, 'Stage']}
-                      labelFormatter={(label, payload) => payload?.[0]?.payload?.name || label}
+                      formatter={(value, name) => [
+                        `${value} candidates`,
+                        "Stage",
+                      ]}
+                      labelFormatter={(label, payload) =>
+                        payload?.[0]?.payload?.name || label
+                      }
                     />
                   </FunnelChart>
                 </ResponsiveContainer>
@@ -647,20 +719,48 @@ export default function Reports() {
                 <Skeleton className="h-64 w-full" />
               ) : (
                 <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={[
-                    { month: "Jan", applications: Math.round(filteredData.length * 0.3), hires: Math.round(filteredData.filter(c => c.stage === "Hired").length * 0.2) },
-                    { month: "Feb", applications: Math.round(filteredData.length * 0.5), hires: Math.round(filteredData.filter(c => c.stage === "Hired").length * 0.4) },
-                    { month: "Mar", applications: Math.round(filteredData.length * 0.8), hires: Math.round(filteredData.filter(c => c.stage === "Hired").length * 0.7) },
-                    { month: "Apr", applications: filteredData.length, hires: filteredData.filter(c => c.stage === "Hired").length },
-                  ]}>
+                  <LineChart
+                    data={[
+                      {
+                        month: "Jan",
+                        applications: Math.round(filteredData.length * 0.3),
+                        hires: Math.round(
+                          filteredData.filter((c) => c.stage === "Hired")
+                            .length * 0.2,
+                        ),
+                      },
+                      {
+                        month: "Feb",
+                        applications: Math.round(filteredData.length * 0.5),
+                        hires: Math.round(
+                          filteredData.filter((c) => c.stage === "Hired")
+                            .length * 0.4,
+                        ),
+                      },
+                      {
+                        month: "Mar",
+                        applications: Math.round(filteredData.length * 0.8),
+                        hires: Math.round(
+                          filteredData.filter((c) => c.stage === "Hired")
+                            .length * 0.7,
+                        ),
+                      },
+                      {
+                        month: "Apr",
+                        applications: filteredData.length,
+                        hires: filteredData.filter((c) => c.stage === "Hired")
+                          .length,
+                      },
+                    ]}
+                  >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="month" fontSize={12} />
                     <YAxis fontSize={12} />
                     <Tooltip
                       formatter={(value, name) => {
                         const labels = {
-                          applications: 'Applications Received',
-                          hires: 'Candidates Hired'
+                          applications: "Applications Received",
+                          hires: "Candidates Hired",
                         };
                         return [value, labels[name] || name];
                       }}
@@ -669,8 +769,8 @@ export default function Reports() {
                     <Legend
                       formatter={(value) => {
                         const labels = {
-                          applications: 'Total Applications',
-                          hires: 'Successful Hires'
+                          applications: "Total Applications",
+                          hires: "Successful Hires",
                         };
                         return labels[value] || value;
                       }}
@@ -680,16 +780,16 @@ export default function Reports() {
                       dataKey="applications"
                       stroke="#3b82f6"
                       strokeWidth={3}
-                      dot={{ fill: '#3b82f6', strokeWidth: 2, r: 6 }}
-                      activeDot={{ r: 8, stroke: '#3b82f6', strokeWidth: 2 }}
+                      dot={{ fill: "#3b82f6", strokeWidth: 2, r: 6 }}
+                      activeDot={{ r: 8, stroke: "#3b82f6", strokeWidth: 2 }}
                     />
                     <Line
                       type="monotone"
                       dataKey="hires"
                       stroke="#10b981"
                       strokeWidth={3}
-                      dot={{ fill: '#10b981', strokeWidth: 2, r: 6 }}
-                      activeDot={{ r: 8, stroke: '#10b981', strokeWidth: 2 }}
+                      dot={{ fill: "#10b981", strokeWidth: 2, r: 6 }}
+                      activeDot={{ r: 8, stroke: "#10b981", strokeWidth: 2 }}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -716,7 +816,11 @@ export default function Reports() {
                 </div>
               ) : (
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={chartData.sourceDistribution.filter(d => d.value > 0)}>
+                  <BarChart
+                    data={chartData.sourceDistribution.filter(
+                      (d) => d.value > 0,
+                    )}
+                  >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis
                       dataKey="name"
@@ -727,9 +831,12 @@ export default function Reports() {
                     />
                     <YAxis fontSize={12} />
                     <Tooltip
-                      formatter={(value, name) => [`${value} candidates`, 'Applications']}
+                      formatter={(value, name) => [
+                        `${value} candidates`,
+                        "Applications",
+                      ]}
                       labelFormatter={(label) => `Source: ${label}`}
-                      content={({active, payload, label}) => {
+                      content={({ active, payload, label }) => {
                         if (active && payload && payload.length) {
                           const data = payload[0].payload;
                           return (
@@ -743,11 +850,7 @@ export default function Reports() {
                         return null;
                       }}
                     />
-                    <Bar
-                      dataKey="value"
-                      fill="#3b82f6"
-                      radius={[4, 4, 0, 0]}
-                    />
+                    <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               )}
@@ -762,29 +865,48 @@ export default function Reports() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {chartData.sourceDistribution.filter(source => source.value > 0).map((source) => (
-                    <div key={source.name} className="p-4 border border-gray-200 rounded-lg">
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-medium text-gray-900">{source.name}</h4>
-                        <div className="text-2xl font-bold" style={{ color: source.color }}>
-                          {source.effectiveness}%
+                  {chartData.sourceDistribution
+                    .filter((source) => source.value > 0)
+                    .map((source) => (
+                      <div
+                        key={source.name}
+                        className="p-4 border border-gray-200 rounded-lg"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-medium text-gray-900">
+                            {source.name}
+                          </h4>
+                          <div
+                            className="text-2xl font-bold"
+                            style={{ color: source.color }}
+                          >
+                            {source.effectiveness}%
+                          </div>
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          <div>Applications: {source.value}</div>
+                          <div>
+                            Hired:{" "}
+                            {
+                              filteredData.filter(
+                                (c) =>
+                                  c.source === source.name &&
+                                  c.stage === "Hired",
+                              ).length
+                            }
+                          </div>
+                        </div>
+                        <div className="mt-2 bg-gray-200 rounded-full h-2">
+                          <div
+                            className="h-2 rounded-full transition-all duration-300"
+                            style={{
+                              width: `${source.effectiveness}%`,
+                              backgroundColor: source.color,
+                            }}
+                          />
                         </div>
                       </div>
-                      <div className="text-sm text-gray-600">
-                        <div>Applications: {source.value}</div>
-                        <div>Hired: {filteredData.filter(c => c.source === source.name && c.stage === "Hired").length}</div>
-                      </div>
-                      <div className="mt-2 bg-gray-200 rounded-full h-2">
-                        <div
-                          className="h-2 rounded-full transition-all duration-300"
-                          style={{
-                            width: `${source.effectiveness}%`,
-                            backgroundColor: source.color
-                          }}
-                        />
-                      </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               </CardContent>
             </Card>

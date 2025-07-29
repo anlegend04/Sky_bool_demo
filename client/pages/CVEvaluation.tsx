@@ -108,7 +108,8 @@ interface UploadedFile {
 
 export default function CVEvaluation() {
   const { toast } = useToast();
-  const [selectedCandidate, setSelectedCandidate] = useState<CandidateData | null>(null);
+  const [selectedCandidate, setSelectedCandidate] =
+    useState<CandidateData | null>(null);
   const [selectedJob, setSelectedJob] = useState<JobData | null>(null);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [selectedFile, setSelectedFile] = useState<UploadedFile | null>(null);
@@ -120,24 +121,27 @@ export default function CVEvaluation() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Mock file upload simulation
-  const handleFileUpload = useCallback(async (file: File) => {
-    const uploadedFile: UploadedFile = {
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      url: URL.createObjectURL(file),
-      uploadedAt: new Date().toISOString(),
-      content: await readFileContent(file),
-    };
+  const handleFileUpload = useCallback(
+    async (file: File) => {
+      const uploadedFile: UploadedFile = {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        url: URL.createObjectURL(file),
+        uploadedAt: new Date().toISOString(),
+        content: await readFileContent(file),
+      };
 
-    setUploadedFiles(prev => [...prev, uploadedFile]);
-    setSelectedFile(uploadedFile);
-    
-    toast({
-      title: "File Uploaded Successfully",
-      description: `${file.name} has been uploaded and is ready for analysis.`,
-    });
-  }, [toast]);
+      setUploadedFiles((prev) => [...prev, uploadedFile]);
+      setSelectedFile(uploadedFile);
+
+      toast({
+        title: "File Uploaded Successfully",
+        description: `${file.name} has been uploaded and is ready for analysis.`,
+      });
+    },
+    [toast],
+  );
 
   // Read file content (simulated)
   const readFileContent = async (file: File): Promise<string> => {
@@ -183,24 +187,28 @@ export default function CVEvaluation() {
     setIsDragOver(false);
   }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    
-    const files = Array.from(e.dataTransfer.files);
-    files.forEach(file => {
-      if (file.type === 'application/pdf' || file.type.includes('document')) {
-        handleFileUpload(file);
-      }
-    });
-  }, [handleFileUpload]);
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setIsDragOver(false);
+
+      const files = Array.from(e.dataTransfer.files);
+      files.forEach((file) => {
+        if (file.type === "application/pdf" || file.type.includes("document")) {
+          handleFileUpload(file);
+        }
+      });
+    },
+    [handleFileUpload],
+  );
 
   // Mock CV analysis with progress
   const analyzeCV = async () => {
     if (!selectedFile || !selectedJob) {
       toast({
         title: "Missing Information",
-        description: "Please select both a CV file and a job position for analysis.",
+        description:
+          "Please select both a CV file and a job position for analysis.",
         variant: "destructive",
       });
       return;
@@ -219,9 +227,9 @@ export default function CVEvaluation() {
     ];
 
     for (const { step, message } of progressSteps) {
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await new Promise((resolve) => setTimeout(resolve, 800));
       setAnalysisProgress(step);
-      
+
       if (step < 100) {
         toast({
           title: message,
@@ -232,7 +240,8 @@ export default function CVEvaluation() {
 
     // Generate mock evaluation
     const mockEvaluation: CVEvaluation = {
-      summary: "This candidate shows strong technical skills with relevant experience in software development. Their background aligns well with the job requirements, particularly in React and Node.js development.",
+      summary:
+        "This candidate shows strong technical skills with relevant experience in software development. Their background aligns well with the job requirements, particularly in React and Node.js development.",
       strengths: [
         "5+ years of experience in software development",
         "Strong proficiency in React and JavaScript/TypeScript",
@@ -252,11 +261,16 @@ export default function CVEvaluation() {
         "Pursue AWS certification to strengthen cloud skills",
         "Gain more experience with design systems and UI/UX principles",
       ],
-      skillsMatch: selectedJob.expectedSkills.map(skill => ({
+      skillsMatch: selectedJob.expectedSkills.map((skill) => ({
         skill,
-        hasSkill: ['React', 'JavaScript', 'TypeScript', 'Node.js'].includes(skill),
-        level: ['React', 'JavaScript'].includes(skill) ? 'Advanced' : 
-               ['TypeScript', 'Node.js'].includes(skill) ? 'Intermediate' : 'Beginner',
+        hasSkill: ["React", "JavaScript", "TypeScript", "Node.js"].includes(
+          skill,
+        ),
+        level: ["React", "JavaScript"].includes(skill)
+          ? "Advanced"
+          : ["TypeScript", "Node.js"].includes(skill)
+            ? "Intermediate"
+            : "Beginner",
       })),
       experienceMatch: 85,
       educationMatch: 90,
@@ -275,13 +289,22 @@ export default function CVEvaluation() {
           "Senior Software Engineer at TechCorp (2020-2024)",
           "Software Engineer at StartupXYZ (2018-2020)",
         ],
-        skills: ["JavaScript", "TypeScript", "React", "Node.js", "Python", "SQL", "Docker", "AWS"],
+        skills: [
+          "JavaScript",
+          "TypeScript",
+          "React",
+          "Node.js",
+          "Python",
+          "SQL",
+          "Docker",
+          "AWS",
+        ],
       },
     };
 
     setEvaluation(mockEvaluation);
     setIsAnalyzing(false);
-    
+
     toast({
       title: "Analysis Complete!",
       description: "CV analysis has been completed successfully.",
@@ -292,10 +315,10 @@ export default function CVEvaluation() {
   const quickAnalysis = () => {
     const candidate = HARDCODED_CANDIDATES[0]; // Marissa Torres
     const job = HARDCODED_JOBS[0]; // Senior Frontend Developer
-    
+
     setSelectedCandidate(candidate);
     setSelectedJob(job);
-    
+
     // Create mock file from candidate data
     const mockFile: UploadedFile = {
       name: `${candidate.name}_resume.pdf`,
@@ -305,10 +328,10 @@ export default function CVEvaluation() {
       uploadedAt: new Date().toISOString(),
       content: `Resume content for ${candidate.name}`,
     };
-    
+
     setUploadedFiles([mockFile]);
     setSelectedFile(mockFile);
-    
+
     toast({
       title: "Demo Data Loaded",
       description: "Sample candidate and job data loaded for quick analysis.",
@@ -339,9 +362,12 @@ export default function CVEvaluation() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">CV Evaluation & Analysis</h1>
+          <h1 className="text-3xl font-bold text-slate-900">
+            CV Evaluation & Analysis
+          </h1>
           <p className="text-slate-600 mt-1">
-            Upload and analyze CVs against job requirements with AI-powered insights
+            Upload and analyze CVs against job requirements with AI-powered
+            insights
           </p>
         </div>
         <div className="flex space-x-3">
@@ -349,7 +375,7 @@ export default function CVEvaluation() {
             <Lightbulb className="w-4 h-4 mr-2" />
             Demo Analysis
           </Button>
-          <Button 
+          <Button
             onClick={() => fileInputRef.current?.click()}
             disabled={isAnalyzing}
           >
@@ -360,7 +386,9 @@ export default function CVEvaluation() {
             ref={fileInputRef}
             type="file"
             accept=".pdf,.doc,.docx"
-            onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0])}
+            onChange={(e) =>
+              e.target.files?.[0] && handleFileUpload(e.target.files[0])
+            }
             className="hidden"
           />
         </div>
@@ -390,7 +418,9 @@ export default function CVEvaluation() {
                 onClick={() => fileInputRef.current?.click()}
               >
                 <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="font-medium text-gray-900 mb-2">Upload CV File</h3>
+                <h3 className="font-medium text-gray-900 mb-2">
+                  Upload CV File
+                </h3>
                 <p className="text-sm text-gray-600 mb-2">
                   Drag and drop your CV here, or click to browse
                 </p>
@@ -407,14 +437,18 @@ export default function CVEvaluation() {
                     <div
                       key={index}
                       className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer ${
-                        selectedFile?.name === file.name ? "border-blue-500 bg-blue-50" : "border-gray-200"
+                        selectedFile?.name === file.name
+                          ? "border-blue-500 bg-blue-50"
+                          : "border-gray-200"
                       }`}
                       onClick={() => setSelectedFile(file)}
                     >
                       <div className="flex items-center space-x-3">
                         <FileText className="w-5 h-5 text-gray-500" />
                         <div>
-                          <p className="text-sm font-medium line-clamp-1">{file.name}</p>
+                          <p className="text-sm font-medium line-clamp-1">
+                            {file.name}
+                          </p>
                           <p className="text-xs text-gray-500">
                             {(file.size / 1024 / 1024).toFixed(2)} MB
                           </p>
@@ -436,7 +470,9 @@ export default function CVEvaluation() {
                           size="sm"
                           onClick={(e) => {
                             e.stopPropagation();
-                            setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+                            setUploadedFiles((prev) =>
+                              prev.filter((_, i) => i !== index),
+                            );
                             if (selectedFile?.name === file.name) {
                               setSelectedFile(null);
                             }
@@ -466,7 +502,7 @@ export default function CVEvaluation() {
                 <Select
                   value={selectedJob?.id || ""}
                   onValueChange={(value) => {
-                    const job = HARDCODED_JOBS.find(j => j.id === value);
+                    const job = HARDCODED_JOBS.find((j) => j.id === value);
                     setSelectedJob(job || null);
                   }}
                 >
@@ -474,11 +510,13 @@ export default function CVEvaluation() {
                     <SelectValue placeholder="Choose a job position" />
                   </SelectTrigger>
                   <SelectContent>
-                    {HARDCODED_JOBS.map(job => (
+                    {HARDCODED_JOBS.map((job) => (
                       <SelectItem key={job.id} value={job.id}>
                         <div className="flex flex-col">
                           <span>{job.position}</span>
-                          <span className="text-xs text-gray-500">{job.department}</span>
+                          <span className="text-xs text-gray-500">
+                            {job.department}
+                          </span>
                         </div>
                       </SelectItem>
                     ))}
@@ -489,17 +527,25 @@ export default function CVEvaluation() {
               {selectedJob && (
                 <div className="space-y-3">
                   <div>
-                    <Label className="text-sm font-medium">Required Skills</Label>
+                    <Label className="text-sm font-medium">
+                      Required Skills
+                    </Label>
                     <div className="flex flex-wrap gap-1 mt-1">
-                      {selectedJob.expectedSkills.map(skill => (
-                        <Badge key={skill} variant="outline" className="text-xs">
+                      {selectedJob.expectedSkills.map((skill) => (
+                        <Badge
+                          key={skill}
+                          variant="outline"
+                          className="text-xs"
+                        >
                           {skill}
                         </Badge>
                       ))}
                     </div>
                   </div>
                   <div>
-                    <Label className="text-sm font-medium">Job Description</Label>
+                    <Label className="text-sm font-medium">
+                      Job Description
+                    </Label>
                     <p className="text-sm text-gray-600 line-clamp-3 mt-1">
                       {selectedJob.description}
                     </p>
@@ -550,13 +596,17 @@ export default function CVEvaluation() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <Label className="text-sm font-medium">Overall Score</Label>
-                    <Badge className={`${getScoreColor(evaluation.jobFitScore)} border-0`}>
+                    <Badge
+                      className={`${getScoreColor(evaluation.jobFitScore)} border-0`}
+                    >
                       {evaluation.jobFitScore}%
                     </Badge>
                   </div>
                   <div className="flex items-center space-x-2">
                     {getVerdictIcon(evaluation.finalVerdict)}
-                    <span className="text-sm font-medium">{evaluation.finalVerdict}</span>
+                    <span className="text-sm font-medium">
+                      {evaluation.finalVerdict}
+                    </span>
                   </div>
                 </div>
               )}
@@ -598,14 +648,18 @@ export default function CVEvaluation() {
                       <span>Evaluation Summary</span>
                       <div className="flex items-center space-x-2">
                         {getVerdictIcon(evaluation.finalVerdict)}
-                        <Badge className={`${getScoreColor(evaluation.jobFitScore)} border-0`}>
+                        <Badge
+                          className={`${getScoreColor(evaluation.jobFitScore)} border-0`}
+                        >
                           {evaluation.jobFitScore}% Match
                         </Badge>
                       </div>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-700 leading-relaxed">{evaluation.summary}</p>
+                    <p className="text-gray-700 leading-relaxed">
+                      {evaluation.summary}
+                    </p>
                   </CardContent>
                 </Card>
 
@@ -614,17 +668,23 @@ export default function CVEvaluation() {
                   <Card>
                     <CardContent className="pt-6">
                       <div className="text-center">
-                        <div className={`text-2xl font-bold ${getScoreColor(evaluation.experienceMatch).split(' ')[0]}`}>
+                        <div
+                          className={`text-2xl font-bold ${getScoreColor(evaluation.experienceMatch).split(" ")[0]}`}
+                        >
                           {evaluation.experienceMatch}%
                         </div>
-                        <p className="text-sm text-gray-600">Experience Match</p>
+                        <p className="text-sm text-gray-600">
+                          Experience Match
+                        </p>
                       </div>
                     </CardContent>
                   </Card>
                   <Card>
                     <CardContent className="pt-6">
                       <div className="text-center">
-                        <div className={`text-2xl font-bold ${getScoreColor(evaluation.educationMatch).split(' ')[0]}`}>
+                        <div
+                          className={`text-2xl font-bold ${getScoreColor(evaluation.educationMatch).split(" ")[0]}`}
+                        >
                           {evaluation.educationMatch}%
                         </div>
                         <p className="text-sm text-gray-600">Education Match</p>
@@ -634,7 +694,9 @@ export default function CVEvaluation() {
                   <Card>
                     <CardContent className="pt-6">
                       <div className="text-center">
-                        <div className={`text-2xl font-bold ${getScoreColor(evaluation.jobFitScore).split(' ')[0]}`}>
+                        <div
+                          className={`text-2xl font-bold ${getScoreColor(evaluation.jobFitScore).split(" ")[0]}`}
+                        >
                           {evaluation.jobFitScore}%
                         </div>
                         <p className="text-sm text-gray-600">Overall Fit</p>
@@ -655,7 +717,10 @@ export default function CVEvaluation() {
                     <CardContent>
                       <ul className="space-y-2">
                         {evaluation.strengths.map((strength, index) => (
-                          <li key={index} className="flex items-start space-x-2">
+                          <li
+                            key={index}
+                            className="flex items-start space-x-2"
+                          >
                             <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
                             <span className="text-sm">{strength}</span>
                           </li>
@@ -674,7 +739,10 @@ export default function CVEvaluation() {
                     <CardContent>
                       <ul className="space-y-2">
                         {evaluation.weaknesses.map((weakness, index) => (
-                          <li key={index} className="flex items-start space-x-2">
+                          <li
+                            key={index}
+                            className="flex items-start space-x-2"
+                          >
                             <AlertTriangle className="w-4 h-4 text-orange-500 mt-0.5 flex-shrink-0" />
                             <span className="text-sm">{weakness}</span>
                           </li>
@@ -713,7 +781,10 @@ export default function CVEvaluation() {
                   <CardContent>
                     <div className="space-y-3">
                       {evaluation.skillsMatch.map((skill, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div
+                          key={index}
+                          className="flex items-center justify-between p-3 border rounded-lg"
+                        >
                           <div className="flex items-center space-x-3">
                             {skill.hasSkill ? (
                               <CheckCircle className="w-5 h-5 text-green-500" />
@@ -726,7 +797,9 @@ export default function CVEvaluation() {
                             {skill.hasSkill && skill.level && (
                               <Badge variant="outline">{skill.level}</Badge>
                             )}
-                            <Badge variant={skill.hasSkill ? "default" : "secondary"}>
+                            <Badge
+                              variant={skill.hasSkill ? "default" : "secondary"}
+                            >
                               {skill.hasSkill ? "Match" : "Missing"}
                             </Badge>
                           </div>
@@ -744,14 +817,21 @@ export default function CVEvaluation() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <Label className="text-sm font-medium">Suggested Improvements</Label>
+                      <Label className="text-sm font-medium">
+                        Suggested Improvements
+                      </Label>
                       <ul className="mt-2 space-y-1">
-                        {evaluation.suggestedImprovements.map((improvement, index) => (
-                          <li key={index} className="text-sm text-gray-600 flex items-start space-x-2">
-                            <span className="w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 flex-shrink-0"></span>
-                            <span>{improvement}</span>
-                          </li>
-                        ))}
+                        {evaluation.suggestedImprovements.map(
+                          (improvement, index) => (
+                            <li
+                              key={index}
+                              className="text-sm text-gray-600 flex items-start space-x-2"
+                            >
+                              <span className="w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 flex-shrink-0"></span>
+                              <span>{improvement}</span>
+                            </li>
+                          ),
+                        )}
                       </ul>
                     </div>
                   </CardContent>
@@ -766,7 +846,9 @@ export default function CVEvaluation() {
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <Label className="text-sm font-medium">Personal Information</Label>
+                        <Label className="text-sm font-medium">
+                          Personal Information
+                        </Label>
                         <div className="mt-2 space-y-2 text-sm">
                           <div className="flex items-center space-x-2">
                             <User className="w-4 h-4 text-gray-500" />
@@ -786,40 +868,56 @@ export default function CVEvaluation() {
                           </div>
                         </div>
                       </div>
-                      
+
                       <div>
                         <Label className="text-sm font-medium">Skills</Label>
                         <div className="mt-2 flex flex-wrap gap-1">
-                          {evaluation.extractedData.skills.map(skill => (
-                            <Badge key={skill} variant="outline" className="text-xs">
+                          {evaluation.extractedData.skills.map((skill) => (
+                            <Badge
+                              key={skill}
+                              variant="outline"
+                              className="text-xs"
+                            >
                               {skill}
                             </Badge>
                           ))}
                         </div>
                       </div>
                     </div>
-                    
+
                     <div>
                       <Label className="text-sm font-medium">Education</Label>
                       <ul className="mt-2 space-y-1">
-                        {evaluation.extractedData.education.map((edu, index) => (
-                          <li key={index} className="text-sm text-gray-600 flex items-start space-x-2">
-                            <GraduationCap className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
-                            <span>{edu}</span>
-                          </li>
-                        ))}
+                        {evaluation.extractedData.education.map(
+                          (edu, index) => (
+                            <li
+                              key={index}
+                              className="text-sm text-gray-600 flex items-start space-x-2"
+                            >
+                              <GraduationCap className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                              <span>{edu}</span>
+                            </li>
+                          ),
+                        )}
                       </ul>
                     </div>
-                    
+
                     <div>
-                      <Label className="text-sm font-medium">Work Experience</Label>
+                      <Label className="text-sm font-medium">
+                        Work Experience
+                      </Label>
                       <ul className="mt-2 space-y-1">
-                        {evaluation.extractedData.workExperience.map((exp, index) => (
-                          <li key={index} className="text-sm text-gray-600 flex items-start space-x-2">
-                            <Briefcase className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
-                            <span>{exp}</span>
-                          </li>
-                        ))}
+                        {evaluation.extractedData.workExperience.map(
+                          (exp, index) => (
+                            <li
+                              key={index}
+                              className="text-sm text-gray-600 flex items-start space-x-2"
+                            >
+                              <Briefcase className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                              <span>{exp}</span>
+                            </li>
+                          ),
+                        )}
                       </ul>
                     </div>
                   </CardContent>
@@ -832,7 +930,9 @@ export default function CVEvaluation() {
                 <div className="text-center text-gray-500">
                   <Brain className="w-16 h-16 mx-auto mb-4 text-gray-300" />
                   <h3 className="text-lg font-medium mb-2">No Analysis Yet</h3>
-                  <p className="mb-4">Upload a CV and select a job position to begin analysis</p>
+                  <p className="mb-4">
+                    Upload a CV and select a job position to begin analysis
+                  </p>
                   <Button onClick={quickAnalysis} variant="outline">
                     <Lightbulb className="w-4 h-4 mr-2" />
                     Try Demo Analysis
@@ -853,7 +953,9 @@ export default function CVEvaluation() {
           <div className="space-y-4">
             {selectedFile?.content && (
               <ScrollArea className="h-96 w-full border rounded-lg p-4">
-                <pre className="text-sm whitespace-pre-wrap">{selectedFile.content}</pre>
+                <pre className="text-sm whitespace-pre-wrap">
+                  {selectedFile.content}
+                </pre>
               </ScrollArea>
             )}
           </div>
@@ -861,13 +963,15 @@ export default function CVEvaluation() {
             <Button variant="outline" onClick={() => setShowFilePreview(false)}>
               Close
             </Button>
-            <Button onClick={() => {
-              // Simulate download
-              toast({
-                title: "Download Started",
-                description: `Downloading ${selectedFile?.name}`,
-              });
-            }}>
+            <Button
+              onClick={() => {
+                // Simulate download
+                toast({
+                  title: "Download Started",
+                  description: `Downloading ${selectedFile?.name}`,
+                });
+              }}
+            >
               <Download className="w-4 h-4 mr-2" />
               Download
             </Button>

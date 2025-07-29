@@ -435,10 +435,16 @@ export default function FollowUpDashboard() {
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-sm group-hover:text-blue-700 transition-colors line-clamp-1" title={candidate.name}>
+              <h3
+                className="font-semibold text-sm group-hover:text-blue-700 transition-colors line-clamp-1"
+                title={candidate.name}
+              >
                 {candidate.name}
               </h3>
-              <p className="text-xs text-gray-600 line-clamp-1" title={candidate.email}>
+              <p
+                className="text-xs text-gray-600 line-clamp-1"
+                title={candidate.email}
+              >
                 {candidate.email}
               </p>
               <div className="flex items-center space-x-2 mt-1">

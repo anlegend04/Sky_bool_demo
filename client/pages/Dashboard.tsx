@@ -287,7 +287,13 @@ export default function Dashboard() {
                 {t("dashboard.costPerHire")}
               </span>
               <span className="font-semibold text-responsive-base text-wrap-safe">
-                ${Math.round(HARDCODED_JOBS.reduce((sum, job) => sum + (job.budget?.actual || 0), 0) / Math.max(hiredCount, 1)).toLocaleString()}
+                $
+                {Math.round(
+                  HARDCODED_JOBS.reduce(
+                    (sum, job) => sum + (job.budget?.actual || 0),
+                    0,
+                  ) / Math.max(hiredCount, 1),
+                ).toLocaleString()}
               </span>
             </div>
             <div className="flex justify-between items-center">
@@ -303,7 +309,20 @@ export default function Dashboard() {
                 {t("dashboard.sourceEffectiveness")}
               </span>
               <span className="font-semibold text-responsive-base text-wrap-safe">
-                LinkedIn: {Math.round((HARDCODED_CANDIDATES.filter(c => c.source === "LinkedIn" && c.stage === "Hired").length / Math.max(HARDCODED_CANDIDATES.filter(c => c.source === "LinkedIn").length, 1)) * 100)}%
+                LinkedIn:{" "}
+                {Math.round(
+                  (HARDCODED_CANDIDATES.filter(
+                    (c) => c.source === "LinkedIn" && c.stage === "Hired",
+                  ).length /
+                    Math.max(
+                      HARDCODED_CANDIDATES.filter(
+                        (c) => c.source === "LinkedIn",
+                      ).length,
+                      1,
+                    )) *
+                    100,
+                )}
+                %
               </span>
             </div>
             <div className="flex justify-between items-center">
@@ -311,7 +330,10 @@ export default function Dashboard() {
                 {t("dashboard.pendingInterviews")}
               </span>
               <span className="font-semibold text-orange-600 text-responsive-base text-wrap-safe">
-                {HARDCODED_INTERVIEWS.filter(i => i.status === "Scheduled").length}
+                {
+                  HARDCODED_INTERVIEWS.filter((i) => i.status === "Scheduled")
+                    .length
+                }
               </span>
             </div>
           </CardContent>
