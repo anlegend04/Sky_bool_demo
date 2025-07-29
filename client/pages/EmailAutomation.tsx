@@ -46,18 +46,11 @@ import { useLanguage } from "@/hooks/use-language";
 import { useState, useMemo } from "react";
 import { getAllEmailTemplates, EmailTemplate, generateEmailContent } from "@/lib/email-utils";
 
-interface EmailTemplate {
-  id: number;
-  name: string;
-  subject: string;
-  type: string;
-  stage?: string;
+interface EmailTemplateExtended extends EmailTemplate {
   status: "active" | "inactive";
   usage: number;
   openRate: number;
-  content: string;
   lastModified: string;
-  variables: string[];
 }
 
 interface EmailPreviewData {
