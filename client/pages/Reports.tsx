@@ -607,9 +607,9 @@ export default function Reports() {
               ) : (
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={[
-                    { month: "Jan", applications: 45, hires: 5 },
-                    { month: "Feb", applications: 67, hires: 8 },
-                    { month: "Mar", applications: 89, hires: 12 },
+                    { month: "Jan", applications: Math.round(filteredData.length * 0.3), hires: Math.round(filteredData.filter(c => c.stage === "Hired").length * 0.2) },
+                    { month: "Feb", applications: Math.round(filteredData.length * 0.5), hires: Math.round(filteredData.filter(c => c.stage === "Hired").length * 0.4) },
+                    { month: "Mar", applications: Math.round(filteredData.length * 0.8), hires: Math.round(filteredData.filter(c => c.stage === "Hired").length * 0.7) },
                     { month: "Apr", applications: filteredData.length, hires: filteredData.filter(c => c.stage === "Hired").length },
                   ]}>
                     <CartesianGrid strokeDasharray="3 3" />
