@@ -149,6 +149,10 @@ export default function Candidates() {
   // Apply candidate to job states (for ListView component)
   const [applyCandidateId, setApplyCandidateId] = useState<string | null>(null);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+
+  // Manual entry form states
+  const [source, setSource] = useState<string | undefined>();
+  const [customSource, setCustomSource] = useState("");
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bulkFileInputRef = useRef<HTMLInputElement>(null);
