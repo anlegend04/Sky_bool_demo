@@ -1244,14 +1244,16 @@ export default function CandidateDetail() {
       </Dialog>
 
       {/* Email Trigger Modal */}
-      <EmailTrigger
-        isOpen={showEmailTrigger}
-        onClose={handleEmailSentOrSkipped}
-        candidate={candidate}
-        newStage={pendingStage}
-        jobTitle={candidate.position}
-        onEmailSent={handleEmailSentOrSkipped}
-      />
+      {candidate && (
+        <EmailTrigger
+          isOpen={showEmailTrigger}
+          onClose={handleEmailSentOrSkipped}
+          candidate={candidate}
+          newStage={pendingStage}
+          jobTitle={candidate.position}
+          onEmailSent={handleEmailSentOrSkipped}
+        />
+      )}
     </div>
   );
 }
