@@ -420,6 +420,52 @@ export default function Candidates() {
     }
   };
 
+  // Handle form submission
+  const handleFormSubmit = async () => {
+    setIsSubmittingForm(true);
+
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    toast({
+      title: "Candidate Added Successfully",
+      description: `${formData.name} has been added to the candidate database.`,
+    });
+
+    setIsSubmittingForm(false);
+    setShowManualEntry(false);
+
+    // Reset form
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      location: "",
+      position: "",
+      department: "",
+      source: "",
+      experience: "",
+      salary: "",
+      skills: "",
+    });
+  };
+
+  // Pre-fill form with sample data
+  const preFillSampleData = () => {
+    setFormData({
+      name: "Alex Johnson",
+      email: "alex.johnson@email.com",
+      phone: "+1 (555) 987-6543",
+      location: "San Francisco, CA",
+      position: "software-engineer",
+      department: "engineering",
+      source: "linkedin",
+      experience: "5",
+      salary: "$120,000 - $140,000",
+      skills: "React, TypeScript, Node.js, Python",
+    });
+  };
+
   // Handle bulk file upload
   const handleBulkFileUpload = async (files: FileList) => {
     const fileArray = Array.from(files);
