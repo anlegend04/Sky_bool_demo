@@ -1212,8 +1212,7 @@ export default function CandidateDetail() {
           <DialogHeader>
             <DialogTitle>Change Candidate Stage</DialogTitle>
             <DialogDescription>
-              Moving candidate to {newStage} stage. Please provide a reason for
-              this change.
+              {newStage && `Moving candidate to ${newStage} stage. Please provide a reason for this change.`}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
