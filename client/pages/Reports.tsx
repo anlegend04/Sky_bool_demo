@@ -99,6 +99,11 @@ export default function Reports() {
     });
   };
 
+  // Auto-apply filters when filter values change
+  useEffect(() => {
+    applyFilters();
+  }, [selectedJob, selectedRecruiter, selectedSource, selectedStage, dateRange]);
+
   // Filtered data based on current filters
   const filteredData = useMemo(() => {
     let filtered = HARDCODED_CANDIDATES;
@@ -367,7 +372,13 @@ export default function Reports() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
             <div>
               <Label>Date Range</Label>
-              <Select value={dateRange} onValueChange={setDateRange}>
+              <Select
+                value={dateRange}
+                onValueChange={(value) => {
+                  setDateRange(value);
+                  // Auto-apply filters will be triggered by useEffect
+                }}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -382,7 +393,13 @@ export default function Reports() {
 
             <div>
               <Label>Job Position</Label>
-              <Select value={selectedJob} onValueChange={setSelectedJob}>
+              <Select
+                value={selectedJob}
+                onValueChange={(value) => {
+                  setSelectedJob(value);
+                  // Auto-apply filters will be triggered by useEffect
+                }}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -401,7 +418,10 @@ export default function Reports() {
               <Label>Recruiter</Label>
               <Select
                 value={selectedRecruiter}
-                onValueChange={setSelectedRecruiter}
+                onValueChange={(value) => {
+                  setSelectedRecruiter(value);
+                  // Auto-apply filters will be triggered by useEffect
+                }}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -419,7 +439,13 @@ export default function Reports() {
 
             <div>
               <Label>Source</Label>
-              <Select value={selectedSource} onValueChange={setSelectedSource}>
+              <Select
+                value={selectedSource}
+                onValueChange={(value) => {
+                  setSelectedSource(value);
+                  // Auto-apply filters will be triggered by useEffect
+                }}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -436,7 +462,13 @@ export default function Reports() {
 
             <div>
               <Label>Stage</Label>
-              <Select value={selectedStage} onValueChange={setSelectedStage}>
+              <Select
+                value={selectedStage}
+                onValueChange={(value) => {
+                  setSelectedStage(value);
+                  // Auto-apply filters will be triggered by useEffect
+                }}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -453,16 +485,24 @@ export default function Reports() {
 
             <div className="flex items-end">
               <Button
-                onClick={applyFilters}
+                onClick={() => {
+                  // Reset all filters
+                  setDateRange("last30");
+                  setSelectedJob("all");
+                  setSelectedRecruiter("all");
+                  setSelectedSource("all");
+                  setSelectedStage("all");
+                  toast({
+                    title: "Filters Reset",
+                    description: "All filters have been reset to default values.",
+                  });
+                }}
+                variant="outline"
                 className="w-full"
                 disabled={isLoading}
               >
-                {isLoading ? (
-                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                ) : (
-                  <Filter className="w-4 h-4 mr-2" />
-                )}
-                Apply Filters
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Reset Filters
               </Button>
             </div>
           </div>
@@ -569,10 +609,11 @@ export default function Reports() {
                         dataKey="value"
                         label={({ name, value, percent }) =>
                           value > 0
-                            ? `${name}: ${value} (${(percent * 100).toFixed(0)}%)`
+                            ? `${name}\n${value} (${(percent * 100).toFixed(0)}%)`
                             : ""
                         }
                         labelLine={false}
+                        fontSize={12}
                       >
                         {chartData.stageDistribution.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.fill} />
@@ -581,8 +622,15 @@ export default function Reports() {
                       <Tooltip
                         formatter={(value, name) => [
                           `${value} candidates`,
-                          name,
+                          "Count",
                         ]}
+                        labelFormatter={(label) => `Stage: ${label}`}
+                        contentStyle={{
+                          backgroundColor: 'white',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: '6px',
+                          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                        }}
                       />
                       <Legend
                         formatter={(value, entry) =>
@@ -626,13 +674,19 @@ export default function Reports() {
                       <Tooltip
                         formatter={(value, name) => {
                           const labels = {
-                            applications: "Applications",
-                            interviews: "Interviews",
-                            hires: "Hires",
+                            applications: "Total Applications",
+                            interviews: "Reached Interview",
+                            hires: "Successfully Hired",
                           };
                           return [value, labels[name] || name];
                         }}
                         labelFormatter={(label) => `Recruiter: ${label}`}
+                        contentStyle={{
+                          backgroundColor: 'white',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: '6px',
+                          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                        }}
                       />
                       <Legend
                         formatter={(value) => {
@@ -723,33 +777,36 @@ export default function Reports() {
                     data={[
                       {
                         month: "Jan",
-                        applications: Math.round(filteredData.length * 0.3),
-                        hires: Math.round(
+                        applications: Math.max(1, Math.round(filteredData.length * 0.3)),
+                        hires: Math.max(0, Math.round(
                           filteredData.filter((c) => c.stage === "Hired")
                             .length * 0.2,
-                        ),
+                        )),
+                        interviews: Math.max(0, Math.round(filteredData.length * 0.15)),
                       },
                       {
                         month: "Feb",
-                        applications: Math.round(filteredData.length * 0.5),
-                        hires: Math.round(
+                        applications: Math.max(1, Math.round(filteredData.length * 0.5)),
+                        hires: Math.max(0, Math.round(
                           filteredData.filter((c) => c.stage === "Hired")
                             .length * 0.4,
-                        ),
+                        )),
+                        interviews: Math.max(0, Math.round(filteredData.length * 0.25)),
                       },
                       {
                         month: "Mar",
-                        applications: Math.round(filteredData.length * 0.8),
-                        hires: Math.round(
+                        applications: Math.max(1, Math.round(filteredData.length * 0.8)),
+                        hires: Math.max(0, Math.round(
                           filteredData.filter((c) => c.stage === "Hired")
                             .length * 0.7,
-                        ),
+                        )),
+                        interviews: Math.max(0, Math.round(filteredData.length * 0.4)),
                       },
                       {
                         month: "Apr",
-                        applications: filteredData.length,
-                        hires: filteredData.filter((c) => c.stage === "Hired")
-                          .length,
+                        applications: Math.max(1, filteredData.length),
+                        hires: filteredData.filter((c) => c.stage === "Hired").length,
+                        interviews: Math.max(0, Math.round(filteredData.length * 0.5)),
                       },
                     ]}
                   >
@@ -761,16 +818,24 @@ export default function Reports() {
                         const labels = {
                           applications: "Applications Received",
                           hires: "Candidates Hired",
+                          interviews: "Candidates Interviewed",
                         };
                         return [value, labels[name] || name];
                       }}
                       labelFormatter={(label) => `Month: ${label}`}
+                      contentStyle={{
+                        backgroundColor: 'white',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '6px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      }}
                     />
                     <Legend
                       formatter={(value) => {
                         const labels = {
                           applications: "Total Applications",
                           hires: "Successful Hires",
+                          interviews: "Candidates Interviewed",
                         };
                         return labels[value] || value;
                       }}
@@ -782,6 +847,15 @@ export default function Reports() {
                       strokeWidth={3}
                       dot={{ fill: "#3b82f6", strokeWidth: 2, r: 6 }}
                       activeDot={{ r: 8, stroke: "#3b82f6", strokeWidth: 2 }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="interviews"
+                      stroke="#8b5cf6"
+                      strokeWidth={2}
+                      dot={{ fill: "#8b5cf6", strokeWidth: 2, r: 4 }}
+                      activeDot={{ r: 6, stroke: "#8b5cf6", strokeWidth: 2 }}
+                      strokeDasharray="5 5"
                     />
                     <Line
                       type="monotone"
@@ -831,19 +905,28 @@ export default function Reports() {
                     />
                     <YAxis fontSize={12} />
                     <Tooltip
-                      formatter={(value, name) => [
-                        `${value} candidates`,
-                        "Applications",
-                      ]}
-                      labelFormatter={(label) => `Source: ${label}`}
                       content={({ active, payload, label }) => {
                         if (active && payload && payload.length) {
                           const data = payload[0].payload;
                           return (
-                            <div className="bg-white p-3 border border-gray-200 rounded shadow-lg">
-                              <p className="font-medium">{`Source: ${label}`}</p>
-                              <p className="text-blue-600">{`Applications: ${data.value}`}</p>
-                              <p className="text-green-600">{`Success Rate: ${data.effectiveness}%`}</p>
+                            <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-lg">
+                              <p className="font-semibold text-gray-900 mb-2">{`Source: ${label}`}</p>
+                              <div className="space-y-1">
+                                <p className="text-blue-600 flex justify-between">
+                                  <span>Applications:</span>
+                                  <span className="font-medium">{data.value}</span>
+                                </p>
+                                <p className="text-green-600 flex justify-between">
+                                  <span>Success Rate:</span>
+                                  <span className="font-medium">{data.effectiveness}%</span>
+                                </p>
+                                <p className="text-purple-600 flex justify-between">
+                                  <span>Hired:</span>
+                                  <span className="font-medium">
+                                    {filteredData.filter(c => c.source === label && c.stage === 'Hired').length}
+                                  </span>
+                                </p>
+                              </div>
                             </div>
                           );
                         }
