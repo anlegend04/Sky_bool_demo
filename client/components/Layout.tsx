@@ -94,6 +94,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       icon: FileText,
     },
     {
+      name: "Follow-Up Dashboard",
+      path: "/follow-up",
+      icon: Timer,
+    },
+    {
       name: t("nav.calendar"),
       path: "/calendar",
       icon: Calendar,
