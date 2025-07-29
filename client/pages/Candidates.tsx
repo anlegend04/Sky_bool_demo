@@ -1002,6 +1002,23 @@ export default function Candidates() {
             {candidate.recruiter}
           </Badge>
         </div>
+        <div className="flex space-x-1 mt-2">
+          <Select
+            value={candidate.stage}
+            onValueChange={(value) => handleStageChange(candidate, value)}
+          >
+            <SelectTrigger className="h-7 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {stages.map((stage) => (
+                <SelectItem key={stage} value={stage} className="text-xs">
+                  {stage}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </CardContent>
     </Card>
   );
