@@ -1855,35 +1855,46 @@ export const HARDCODED_ACTIVITIES: ActivityData[] = [
   },
 ];
 
-// Dashboard Stats
-export const DASHBOARD_STATS: DashboardStatsData = {
-  totalJobs: HARDCODED_JOBS.length,
-  activeJobs: HARDCODED_JOBS.filter((job) => job.status === "Open").length,
-  totalCandidates: HARDCODED_CANDIDATES.length,
-  activeCandidates: HARDCODED_CANDIDATES.filter(
-    (candidate) => candidate.status === "Active",
-  ).length,
-  interviewsThisWeek: 12,
-  offersExtended: HARDCODED_CANDIDATES.filter(
-    (candidate) => candidate.stage === "Offer",
-  ).length,
-  hiredThisMonth: HARDCODED_CANDIDATES.filter(
-    (candidate) => candidate.stage === "Hired",
-  ).length,
-  avgTimeToHire: 28,
-  topPerformingJobs: ["job_1", "job_3", "job_2"],
-  recentActivities: HARDCODED_ACTIVITIES.slice(0, 5),
-  upcomingInterviews: HARDCODED_INTERVIEWS.filter(
-    (interview) => interview.status === "Scheduled",
-  ),
-  pendingTasks: 8,
-  conversionRates: {
-    applicationToScreening: 38,
-    screeningToInterview: 65,
-    interviewToOffer: 45,
-    offerToHire: 85,
-  },
+// Helper function to calculate dashboard stats from actual data
+const calculateDashboardStats = (): DashboardStatsData => {
+  const totalCandidates = HARDCODED_CANDIDATES.length;
+  const activeCandidates = HARDCODED_CANDIDATES.filter(c => c.status === "Active").length;
+  const appliedCount = HARDCODED_CANDIDATES.filter(c => c.stage === "Applied").length;
+  const screeningCount = HARDCODED_CANDIDATES.filter(c => c.stage === "Screening").length;
+  const interviewCount = HARDCODED_CANDIDATES.filter(c => c.stage === "Interview").length;
+  const technicalCount = HARDCODED_CANDIDATES.filter(c => c.stage === "Technical").length;
+  const offerCount = HARDCODED_CANDIDATES.filter(c => c.stage === "Offer").length;
+  const hiredCount = HARDCODED_CANDIDATES.filter(c => c.stage === "Hired").length;
+
+  // Calculate realistic conversion rates
+  const passedScreening = screeningCount + interviewCount + technicalCount + offerCount + hiredCount;
+  const passedInterview = interviewCount + technicalCount + offerCount + hiredCount;
+  const gotOffer = offerCount + hiredCount;
+
+  return {
+    totalJobs: HARDCODED_JOBS.length,
+    activeJobs: HARDCODED_JOBS.filter((job) => job.status === "Open").length,
+    totalCandidates,
+    activeCandidates,
+    interviewsThisWeek: HARDCODED_INTERVIEWS.filter(i => i.status === "Scheduled").length,
+    offersExtended: offerCount,
+    hiredThisMonth: hiredCount,
+    avgTimeToHire: Math.round(HARDCODED_CANDIDATES.filter(c => c.stage === "Hired").reduce((sum, c) => sum + c.duration, 0) / Math.max(hiredCount, 1)),
+    topPerformingJobs: ["job_3", "job_1", "job_2"], // Order by success rate
+    recentActivities: HARDCODED_ACTIVITIES.slice(0, 5),
+    upcomingInterviews: HARDCODED_INTERVIEWS.filter((interview) => interview.status === "Scheduled"),
+    pendingTasks: HARDCODED_NOTIFICATIONS.filter(n => !n.read).length,
+    conversionRates: {
+      applicationToScreening: Math.round((passedScreening / totalCandidates) * 100),
+      screeningToInterview: Math.round((passedInterview / Math.max(passedScreening, 1)) * 100),
+      interviewToOffer: Math.round((gotOffer / Math.max(passedInterview, 1)) * 100),
+      offerToHire: Math.round((hiredCount / Math.max(gotOffer, 1)) * 100),
+    },
+  };
 };
+
+// Dashboard Stats - calculated from actual data
+export const DASHBOARD_STATS: DashboardStatsData = calculateDashboardStats();
 
 // Email Templates from the utility
 export const EMAIL_TEMPLATES = {
