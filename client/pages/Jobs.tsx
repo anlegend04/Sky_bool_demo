@@ -705,12 +705,12 @@ export default function FollowUpDashboard() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem
+                          {/* <DropdownMenuItem
                             onClick={() => setApplyCandidateId(candidate.id)}
                           >
                             <UserPlus className="w-4 h-4 mr-2" />
                             Apply to Job
-                          </DropdownMenuItem>
+                          </DropdownMenuItem> */}
                           <Link to={`/candidates/${candidate.id}`}>
                             <DropdownMenuItem>
                               <Eye className="w-4 h-4 mr-2" />
@@ -751,13 +751,13 @@ export default function FollowUpDashboard() {
               onOpenChange={(open) => !open && setApplyCandidateId(null)}
             >
               <DialogContent>
-                <DialogHeader>
+                {/* <DialogHeader>
                   <DialogTitle>Apply to Job</DialogTitle>
                   <DialogDescription>
                     Select a job to apply candidate:{" "}
                     <strong>{applyCandidate?.name}</strong>
                   </DialogDescription>
-                </DialogHeader>
+                </DialogHeader> */}
                 <Select onValueChange={(value) => setSelectedJobId(value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select Job" />
