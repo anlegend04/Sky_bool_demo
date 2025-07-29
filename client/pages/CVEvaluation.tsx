@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { SearchableSelect, SelectOption } from "@/components/ui/searchable-select";
 import {
   Dialog,
   DialogContent,
@@ -127,6 +128,14 @@ export default function CVEvaluation() {
   const [shareUrl, setShareUrl] = useState("");
   const [isExporting, setIsExporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Prepare job options for enhanced dropdown
+  const jobOptions: SelectOption[] = HARDCODED_JOBS.map((job) => ({
+    value: job.id,
+    label: job.position,
+    description: `${job.department} • ${job.location}`,
+    badge: job.priority,
+  }));
 
   // Mock file upload simulation
   const handleFileUpload = useCallback(
@@ -630,29 +639,19 @@ export default function CVEvaluation() {
             <CardContent className="space-y-4">
               <div>
                 <Label>Select Job Position</Label>
-                <Select
+                <SearchableSelect
                   value={selectedJob?.id || ""}
                   onValueChange={(value) => {
                     const job = HARDCODED_JOBS.find((j) => j.id === value);
                     setSelectedJob(job || null);
                   }}
-                >
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Choose a job position" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {HARDCODED_JOBS.map((job) => (
-                      <SelectItem key={job.id} value={job.id}>
-                        <div className="flex flex-col">
-                          <span>{job.position}</span>
-                          <span className="text-xs text-gray-500">
-                            {job.department}
-                          </span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  options={jobOptions}
+                  placeholder="Choose a job position..."
+                  searchPlaceholder="Search job positions..."
+                  emptyMessage="No job positions found."
+                  clearable={true}
+                  className="mt-1"
+                />
               </div>
 
               {selectedJob && (
