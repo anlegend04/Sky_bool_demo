@@ -1,3 +1,8 @@
+import { useState, useCallback, memo } from "react";
+import { Link } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/hooks/use-language";
+import { HARDCODED_JOBS, JobData } from "@/data/hardcoded-data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,7 +29,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -59,28 +63,727 @@ import {
   Eye,
   Trash2,
   Share,
-  DollarSign,
-  TrendingUp,
-  Target,
-  Building,
-  Clock,
-  Settings,
-  CheckCircle,
-  AlertCircle,
-  FileText,
   Briefcase,
   Grid3X3,
   List,
-  ExternalLink,
   Copy,
-  AlertTriangle,
+  TrendingUp,
+  Target,
+  CheckCircle,
+  Settings,
   Trash,
 } from "lucide-react";
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { HARDCODED_JOBS, JobData } from "@/data/hardcoded-data";
-import { useToast } from "@/hooks/use-toast";
-import { useLanguage } from "@/hooks/use-language";
+
+// Define initial job form state
+const initialJobState = {
+  emailAlias: "",
+  department: "",
+  location: "",
+  position: "",
+  type: "Full-time" as "Full-time" | "Part-time" | "Contract",
+  expectedSkills: [] as string[],
+  salaryMin: "",
+  salaryMax: "",
+  domain: "",
+  headcount: 1,
+  recruiter: "",
+  requester: "",
+  description: "",
+  priority: "Medium" as "High" | "Medium" | "Low",
+  deadline: "",
+  estimatedCost: "",
+};
+
+// Memoized JobCard to prevent unnecessary re-renders
+const JobCard = memo(
+  ({
+    job,
+    onEdit,
+    onShare,
+    onDelete,
+  }: {
+    job: JobData;
+    onEdit: (job: JobData) => void;
+    onShare: (jobId: string) => void;
+    onDelete: (jobId: string) => void;
+  }) => (
+    <Card className="hover:shadow-md transition-shadow card-responsive">
+      <CardHeader className="pb-3 card-mobile">
+        <div className="flex items-start justify-between min-w-0">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-2 min-w-0">
+              <Link
+                to={`/jobs/${job.id}`}
+                className="font-semibold text-slate-900 hover:text-blue-600 transition-colors text-wrap-safe min-w-0 flex-1 truncate"
+              >
+                {job.position}
+              </Link>
+              <div className="flex-shrink-0">
+                {getPriorityBadge(job.priority)}
+              </div>
+            </div>
+            <p className="text-responsive-sm text-slate-600 mb-2 text-wrap-safe truncate">
+              {job.department}
+            </p>
+            <div className="flex items-center gap-4 text-responsive-sm text-slate-500 min-w-0">
+              <span className="flex items-center gap-1 text-wrap-safe min-w-0 flex-1">
+                <MapPin className="icon-mobile flex-shrink-0" />
+                <span className="truncate">{job.location}</span>
+              </span>
+              <span className="flex items-center gap-1 text-wrap-safe min-w-0 flex-1">
+                <Calendar className="icon-mobile flex-shrink-0" />
+                <span className="truncate">{job.deadline}</span>
+              </span>
+            </div>
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="icon-mobile flex-shrink-0"
+              >
+                <MoreHorizontal className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="dropdown-mobile">
+              <Link to={`/jobs/${job.id}`}>
+                <DropdownMenuItem className="text-wrap-safe">
+                  <Eye className="icon-mobile mr-2" />
+                  View Details
+                </DropdownMenuItem>
+              </Link>
+              <DropdownMenuItem
+                onClick={() => onEdit(job)}
+                className="text-wrap-safe"
+              >
+                <Edit className="icon-mobile mr-2" />
+                Edit Job
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => onShare(job.id)}
+                className="text-wrap-safe"
+              >
+                <Share className="icon-mobile mr-2" />
+                Share
+              </DropdownMenuItem>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <DropdownMenuItem
+                    className="text-red-600 text-wrap-safe"
+                    onSelect={(e) => e.preventDefault()}
+                  >
+                    <Trash2 className="icon-mobile mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="modal-mobile">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-wrap-safe">
+                      Delete Job
+                    </AlertDialogTitle>
+                    <AlertDialogDescription className="text-wrap-safe">
+                      Are you sure you want to delete "{job.position}"? This
+                      action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel className="btn-mobile">
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => onDelete(job.id)}
+                      className="btn-mobile"
+                    >
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3 card-mobile">
+        <div className="flex items-center justify-between">
+          <span className="text-responsive-sm text-slate-600 text-wrap-safe">
+            Applications
+          </span>
+          <Badge variant="outline" className="badge-mobile">
+            {job.applications}
+          </Badge>
+        </div>
+        <div className="space-y-2">
+          <div className="flex justify-between text-responsive-sm">
+            <span className="text-wrap-safe">Pipeline Summary</span>
+            <span className="text-wrap-safe">
+              {job.pipelineSummary.hired}/{job.target} hired
+            </span>
+          </div>
+          <div className="grid grid-cols-3 gap-1 text-responsive-sm">
+            <div className="text-center p-1 bg-blue-50 rounded">
+              <div className="font-medium text-wrap-safe">
+                {job.pipelineSummary.applied}
+              </div>
+              <div className="text-slate-600 text-wrap-safe">Applied</div>
+            </div>
+            <div className="text-center p-1 bg-yellow-50 rounded">
+              <div className="font-medium text-wrap-safe">
+                {job.pipelineSummary.interview}
+              </div>
+              <div className="text-slate-600 text-wrap-safe">Interview</div>
+            </div>
+            <div className="text-center p-1 bg-green-50 rounded">
+              <div className="font-medium text-wrap-safe">
+                {job.pipelineSummary.hired}
+              </div>
+              <div className="text-slate-600 text-wrap-safe">Hired</div>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <div className="flex-shrink-0">{getStatusBadge(job.status)}</div>
+            <span className="text-responsive-sm text-slate-500 text-wrap-safe truncate">
+              by {job.recruiter}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <TrendingUp
+              className={`icon-mobile ${getPerformanceColor(job.performance)}`}
+            />
+            <span
+              className={`text-responsive-sm ${getPerformanceColor(job.performance)} text-wrap-safe`}
+            >
+              {job.performance}%
+            </span>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  ),
+);
+
+// Memoized AddJobForm to prevent re-renders when parent state changes
+const AddJobForm = memo(
+  ({
+    open,
+    onOpenChange,
+    onAddJob,
+    onUpdateJob,
+    editingJob,
+  }: {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    onAddJob: (job: any) => void;
+    onUpdateJob: (job: any) => void;
+    editingJob: JobData | null;
+  }) => {
+    const [newJob, setNewJob] = useState(initialJobState);
+    const [jobStages, setJobStages] = useState(
+      ["Applied", "Screening", "Interview", "Offer", "Hired"].map((name) => ({
+        name,
+        durationHours: "",
+      })),
+    );
+
+    // Reset form when editingJob changes
+    useEffect(() => {
+      if (editingJob) {
+        setNewJob({
+          emailAlias: editingJob.emailAlias,
+          department: editingJob.department,
+          location: editingJob.location,
+          position: editingJob.position,
+          type: editingJob.type as "Full-time" | "Part-time" | "Contract",
+          expectedSkills: editingJob.expectedSkills,
+          salaryMin: editingJob.salaryMin,
+          salaryMax: editingJob.salaryMax,
+          domain: editingJob.domain,
+          headcount: editingJob.headcount,
+          recruiter: editingJob.recruiter,
+          requester: editingJob.requester,
+          description: editingJob.description,
+          priority: editingJob.priority as "High" | "Medium" | "Low",
+          deadline: editingJob.deadline,
+          estimatedCost: editingJob.estimatedCost,
+        });
+      } else {
+        setNewJob(initialJobState);
+      }
+    }, [editingJob]);
+
+    const updateStage = useCallback(
+      (index: number, newStage: { name: string; durationHours: string }) => {
+        setJobStages((prev) => {
+          const updated = [...prev];
+          updated[index] = newStage;
+          return updated;
+        });
+      },
+      [],
+    );
+
+    const addNewStage = useCallback(() => {
+      setJobStages((prev) => [...prev, { name: "", durationHours: "" }]);
+    }, []);
+
+    const removeStage = useCallback((index: number) => {
+      setJobStages((prev) => prev.filter((_, i) => i !== index));
+    }, []);
+
+    const handleSubmit = useCallback(() => {
+      const jobData = {
+        ...newJob,
+        applications: 0,
+        target: newJob.headcount,
+        hired: 0,
+        openDate: new Date().toISOString().split("T")[0],
+        actualCost: "0",
+        performance: 0,
+        status: "Open" as const,
+        pipelineSummary: {
+          applied: 0,
+          screening: 0,
+          interview: 0,
+          technical: 0,
+          offer: 0,
+          hired: 0,
+          rejected: 0,
+        },
+      };
+
+      if (editingJob) {
+        onUpdateJob(jobData);
+      } else {
+        onAddJob(jobData);
+      }
+
+      setNewJob(initialJobState);
+      setJobStages(
+        ["Applied", "Screening", "Interview", "Offer", "Hired"].map((name) => ({
+          name,
+          durationHours: "",
+        })),
+      );
+      onOpenChange(false);
+    }, [newJob, editingJob, onAddJob, onUpdateJob, onOpenChange]);
+
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="modal-mobile max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-wrap-safe">
+              {editingJob ? "Edit Job" : "Add New Job"}
+            </DialogTitle>
+            <DialogDescription className="text-wrap-safe">
+              {editingJob
+                ? "Update the job details below."
+                : "Create a new job posting with all the necessary details."}
+            </DialogDescription>
+          </DialogHeader>
+          <Tabs defaultValue="basic" className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="basic" className="text-wrap-safe">
+                Basic Info
+              </TabsTrigger>
+              <TabsTrigger value="details" className="text-wrap-safe">
+                Job Details
+              </TabsTrigger>
+              <TabsTrigger value="team" className="text-wrap-safe">
+                Team & Budget
+              </TabsTrigger>
+              <TabsTrigger value="pipeline" className="text-wrap-safe">
+                Stages
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="basic" className="form-responsive">
+              <div className="form-grid-responsive">
+                <div>
+                  <label className="text-responsive-sm font-medium text-slate-700 flex items-center gap-2 text-wrap-safe">
+                    Email Alias
+                    <HelpTooltip content={helpContent.emailAlias} />
+                  </label>
+                  <Input
+                    placeholder="jobs@company.com"
+                    value={newJob.emailAlias}
+                    onChange={(e) =>
+                      setNewJob({ ...newJob, emailAlias: e.target.value })
+                    }
+                    className="mt-1 text-wrap-safe"
+                  />
+                </div>
+                <div>
+                  <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
+                    Department
+                  </label>
+                  <Select
+                    value={newJob.department}
+                    onValueChange={(value) =>
+                      setNewJob({ ...newJob, department: value })
+                    }
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Select department" />
+                    </SelectTrigger>
+                    <SelectContent className="dropdown-mobile">
+                      <SelectItem
+                        value="Engineering"
+                        className="text-wrap-safe"
+                      >
+                        Engineering
+                      </SelectItem>
+                      <SelectItem value="Product" className="text-wrap-safe">
+                        Product
+                      </SelectItem>
+                      <SelectItem value="Design" className="text-wrap-safe">
+                        Design
+                      </SelectItem>
+                      <SelectItem value="Marketing" className="text-wrap-safe">
+                        Marketing
+                      </SelectItem>
+                      <SelectItem value="Data" className="text-wrap-safe">
+                        Data
+                      </SelectItem>
+                      <SelectItem value="Sales" className="text-wrap-safe">
+                        Sales
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
+                    Job Location
+                  </label>
+                  <Input
+                    placeholder="San Francisco, CA or Remote"
+                    value={newJob.location}
+                    onChange={(e) =>
+                      setNewJob({ ...newJob, location: e.target.value })
+                    }
+                    className="mt-1 text-wrap-safe"
+                  />
+                </div>
+                <div>
+                  <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
+                    Job Position
+                  </label>
+                  <Input
+                    placeholder="Senior Software Engineer"
+                    value={newJob.position}
+                    onChange={(e) =>
+                      setNewJob({ ...newJob, position: e.target.value })
+                    }
+                    className="mt-1 text-wrap-safe"
+                  />
+                </div>
+                <div>
+                  <label className="text-responsive-sm font-medium text-slate-700 flex items-center gap-2 text-wrap-safe">
+                    Employment Type
+                    <HelpTooltip content={helpContent.employmentType} />
+                  </label>
+                  <Select
+                    value={newJob.type}
+                    onValueChange={(value: any) =>
+                      setNewJob({ ...newJob, type: value })
+                    }
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Select employment type" />
+                    </SelectTrigger>
+                    <SelectContent className="dropdown-mobile">
+                      <SelectItem value="Full-time" className="text-wrap-safe">
+                        Full-time
+                      </SelectItem>
+                      <SelectItem value="Part-time" className="text-wrap-safe">
+                        Part-time
+                      </SelectItem>
+                      <SelectItem value="Contract" className="text-wrap-safe">
+                        Contract
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-responsive-sm font-medium text-slate-700 flex items-center gap-2 text-wrap-safe">
+                    Domain/Industry
+                    <HelpTooltip content={helpContent.domain} />
+                  </label>
+                  <Input
+                    placeholder="Technology, Finance, Healthcare"
+                    value={newJob.domain}
+                    onChange={(e) =>
+                      setNewJob({ ...newJob, domain: e.target.value })
+                    }
+                    className="mt-1 text-wrap-safe"
+                  />
+                </div>
+                <div>
+                  <label className="text-responsive-sm font-medium text-slate-700 flex items-center gap-2 text-wrap-safe">
+                    Priority
+                    <HelpTooltip content={helpContent.priority} />
+                  </label>
+                  <Select
+                    value={newJob.priority}
+                    onValueChange={(value: any) =>
+                      setNewJob({ ...newJob, priority: value })
+                    }
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Select priority" />
+                    </SelectTrigger>
+                    <SelectContent className="dropdown-mobile">
+                      <SelectItem value="High" className="text-wrap-safe">
+                        High
+                      </SelectItem>
+                      <SelectItem value="Medium" className="text-wrap-safe">
+                        Medium
+                      </SelectItem>
+                      <SelectItem value="Low" className="text-wrap-safe">
+                        Low
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
+                    Deadline
+                  </label>
+                  <Input
+                    type="date"
+                    value={newJob.deadline}
+                    onChange={(e) =>
+                      setNewJob({ ...newJob, deadline: e.target.value })
+                    }
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+            </TabsContent>
+            <TabsContent value="details" className="form-responsive">
+              <div className="space-y-4">
+                <div>
+                  <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
+                    Expected Skills
+                  </label>
+                  <Input
+                    placeholder="React, TypeScript, Node.js (comma separated)"
+                    onChange={(e) =>
+                      setNewJob({
+                        ...newJob,
+                        expectedSkills: e.target.value
+                          .split(",")
+                          .map((s) => s.trim())
+                          .filter(Boolean),
+                      })
+                    }
+                    className="mt-1 text-wrap-safe"
+                  />
+                </div>
+                <div className="form-grid-responsive">
+                  <div>
+                    <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
+                      Salary Min
+                    </label>
+                    <Input
+                      placeholder="80000"
+                      type="number"
+                      value={newJob.salaryMin}
+                      onChange={(e) =>
+                        setNewJob({ ...newJob, salaryMin: e.target.value })
+                      }
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
+                      Salary Max
+                    </label>
+                    <Input
+                      placeholder="120000"
+                      type="number"
+                      value={newJob.salaryMax}
+                      onChange={(e) =>
+                        setNewJob({ ...newJob, salaryMax: e.target.value })
+                      }
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
+                    Job Description
+                  </label>
+                  <Textarea
+                    placeholder="Describe the role, responsibilities, and requirements..."
+                    value={newJob.description}
+                    onChange={(e) =>
+                      setNewJob({ ...newJob, description: e.target.value })
+                    }
+                    className="mt-1 text-wrap-safe"
+                    rows={6}
+                  />
+                </div>
+              </div>
+            </TabsContent>
+            <TabsContent value="team" className="form-responsive">
+              <div className="form-grid-responsive">
+                <div>
+                  <label className="text-responsive-sm font-medium text-slate-700 flex items-center gap-2 text-wrap-safe">
+                    Headcount
+                    <HelpTooltip content={helpContent.headcount} />
+                  </label>
+                  <Input
+                    placeholder="2"
+                    type="number"
+                    value={newJob.headcount}
+                    onChange={(e) =>
+                      setNewJob({
+                        ...newJob,
+                        headcount: parseInt(e.target.value) || 1,
+                      })
+                    }
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
+                    Recruiter
+                  </label>
+                  <Select
+                    value={newJob.recruiter}
+                    onValueChange={(value) =>
+                      setNewJob({ ...newJob, recruiter: value })
+                    }
+                  >
+                    <SelectTrigger className="mt-1">
+                      <SelectValue placeholder="Select recruiter" />
+                    </SelectTrigger>
+                    <SelectContent className="dropdown-mobile">
+                      <SelectItem value="Alex Chen" className="text-wrap-safe">
+                        Alex Chen
+                      </SelectItem>
+                      <SelectItem value="Sarah Kim" className="text-wrap-safe">
+                        Sarah Kim
+                      </SelectItem>
+                      <SelectItem
+                        value="Mike Wilson"
+                        className="text-wrap-safe"
+                      >
+                        Mike Wilson
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div>
+                <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
+                  Requester
+                </label>
+                <Input
+                  placeholder="Select requester who requested this job"
+                  className="mt-1 text-wrap-safe"
+                />
+              </div>
+              <div>
+                <label className="text-responsive-sm font-medium text-slate-700 flex items-center gap-2 text-wrap-safe">
+                  Estimated Budget
+                  <HelpTooltip content={helpContent.estimatedBudget} />
+                </label>
+                <Input
+                  placeholder="15000"
+                  type="number"
+                  value={newJob.estimatedCost}
+                  onChange={(e) =>
+                    setNewJob({ ...newJob, estimatedCost: e.target.value })
+                  }
+                  className="mt-1"
+                />
+              </div>
+              <div className="flex justify-end space-x-2 pt-4 btn-group-mobile">
+                <Button
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                  className="btn-mobile"
+                >
+                  Cancel
+                </Button>
+                <Button onClick={handleSubmit} className="btn-mobile">
+                  {editingJob ? "Update Job" : "Create Job"}
+                </Button>
+              </div>
+            </TabsContent>
+            <TabsContent value="pipeline" className="form-responsive">
+              <div className="space-y-3">
+                <label className="text-responsive-sm font-medium text-slate-700">
+                  Recruitment Stages
+                </label>
+                <div className="space-y-2">
+                  {jobStages.map((stage, index) => (
+                    <div
+                      key={index}
+                      className="flex flex-col gap-2 border border-slate-200 rounded-xl p-3 bg-slate-50"
+                    >
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <Input
+                          value={stage.name}
+                          onChange={(e) =>
+                            updateStage(index, {
+                              ...stage,
+                              name: e.target.value,
+                            })
+                          }
+                          className="flex-1"
+                          placeholder="Stage name"
+                        />
+                        <Input
+                          type="number"
+                          min={1}
+                          value={stage.durationHours || ""}
+                          onChange={(e) =>
+                            updateStage(index, {
+                              ...stage,
+                              durationHours: e.target.value,
+                            })
+                          }
+                          className="w-36"
+                          placeholder="Duration (h)"
+                        />
+                        {![
+                          "Applied",
+                          "Screening",
+                          "Interview",
+                          "Offer",
+                          "Hired",
+                        ].includes(stage.name) && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeStage(index)}
+                            className="text-red-500"
+                          >
+                            <Trash className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={addNewStage}
+                  className="text-sm"
+                >
+                  + Add Stage
+                </Button>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </DialogContent>
+      </Dialog>
+    );
+  },
+);
 
 export default function Jobs() {
   const { t } = useLanguage();
@@ -96,28 +799,7 @@ export default function Jobs() {
   const [shareJobId, setShareJobId] = useState<string | null>(null);
   const { toast } = useToast();
 
-  // Form state for new job
-  const [newJob, setNewJob] = useState({
-    emailAlias: "",
-    department: "",
-    location: "",
-    position: "",
-    type: "Full-time" as "Full-time" | "Part-time" | "Contract",
-    expectedSkills: [] as string[],
-    salaryMin: "",
-    salaryMax: "",
-    domain: "",
-    headcount: 1,
-    recruiter: "",
-    requester: "",
-    description: "",
-    priority: "Medium" as "High" | "Medium" | "Low",
-    deadline: "",
-    estimatedCost: "",
-  });
-
-  // Customizable field visibility
-  const [visibleFields, setVisibleFields] = useState({
+  const visibleFields = useState({
     position: true,
     department: true,
     recruiter: true,
@@ -132,12 +814,8 @@ export default function Jobs() {
     performance: true,
     priority: true,
     pipelineSummary: true,
-  });
+  })[0];
 
-  // Load jobs from localStorage on component mount
-  // Jobs are loaded from hardcoded data
-
-  // Filter jobs based on search and filters
   const filteredJobs = jobs.filter((job) => {
     const matchesSearch =
       job.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -196,156 +874,80 @@ export default function Jobs() {
     },
   ];
 
-  const handleAddJob = () => {
-    try {
-      const jobData = {
-        ...newJob,
-        applications: 0,
-        target: newJob.headcount,
-        hired: 0,
-        openDate: new Date().toISOString().split("T")[0],
-        actualCost: "0",
-        performance: 0,
-        status: "Open" as const,
-        pipelineSummary: {
-          applied: 0,
-          screening: 0,
-          interview: 0,
-          technical: 0,
-          offer: 0,
-          hired: 0,
-          rejected: 0,
-        },
-      };
-
-      // In a real app, this would create the job
-      setShowAddJobDialog(false);
-
-      // Reset form
-      setNewJob({
-        emailAlias: "",
-        department: "",
-        location: "",
-        position: "",
-        type: "Full-time",
-        expectedSkills: [],
-        salaryMin: "",
-        salaryMax: "",
-        domain: "",
-        headcount: 1,
-        recruiter: "",
-        requester: "",
-        description: "",
-        priority: "Medium",
-        deadline: "",
-        estimatedCost: "",
-      });
-
-      toast({
-        title: "Job Created",
-        description: `"${newJob.position}" has been successfully created.`,
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to create job. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleEditJob = (job: JobData) => {
-    setEditingJob(job);
-    setNewJob({
-      emailAlias: job.emailAlias,
-      department: job.department,
-      location: job.location,
-      position: job.position,
-      type: job.type as "Full-time" | "Part-time" | "Contract",
-      expectedSkills: job.expectedSkills,
-      salaryMin: job.salaryMin,
-      salaryMax: job.salaryMax,
-      domain: job.domain,
-      headcount: job.headcount,
-      recruiter: job.recruiter,
-      requester: job.requester,
-      description: job.description,
-      priority: job.priority as "High" | "Medium" | "Low",
-      deadline: job.deadline,
-      estimatedCost: job.estimatedCost,
-    });
-    setShowAddJobDialog(true);
-  };
-
-  const defaultStages = ["Applied", "Screening", "Interview", "Offer", "Hired"];
-  const [jobStages, setJobStages] = useState(
-    defaultStages.map((name) => ({ name, durationHours: "" })),
+  const handleAddJob = useCallback(
+    (jobData: any) => {
+      try {
+        // In a real app, this would create the job
+        toast({
+          title: "Job Created",
+          description: `"${jobData.position}" has been successfully created.`,
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to create job. Please try again.",
+          variant: "destructive",
+        });
+      }
+    },
+    [toast],
   );
 
-  const updateStage = (
-    index: number,
-    newStage: { name: string; durationHours: string },
-  ) => {
-    const updated = [...jobStages];
-    updated[index] = newStage;
-    setJobStages(updated);
-  };
+  const handleUpdateJob = useCallback(
+    (jobData: any) => {
+      try {
+        // In a real app, this would update the job
+        toast({
+          title: "Job Updated",
+          description: `"${jobData.position}" has been successfully updated.`,
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to update job. Please try again.",
+          variant: "destructive",
+        });
+      }
+    },
+    [toast],
+  );
 
-  const addNewStage = () => {
-    setJobStages([...jobStages, { name: "", durationHours: "" }]);
-  };
+  const handleEditJob = useCallback((job: JobData) => {
+    setEditingJob(job);
+    setShowAddJobDialog(true);
+  }, []);
 
-  const removeStage = (index: number) => {
-    const updated = jobStages.filter((_, i) => i !== index);
-    setJobStages(updated);
-  };
+  const handleDeleteJob = useCallback(
+    (jobId: string) => {
+      try {
+        // In a real app, this would delete the job
+        toast({
+          title: "Job Deleted",
+          description: "The job has been successfully deleted.",
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to delete job. Please try again.",
+          variant: "destructive",
+        });
+      }
+    },
+    [toast],
+  );
 
-  const handleUpdateJob = () => {
-    if (!editingJob) return;
-
-    try {
-      // In a real app, this would update the job
-      setShowAddJobDialog(false);
-      setEditingJob(null);
-
+  const handleShareJob = useCallback(
+    (jobId: string) => {
+      const shareUrl = `${window.location.origin}/jobs/${jobId}/public`;
+      navigator.clipboard.writeText(shareUrl);
+      setShareJobId(null);
       toast({
-        title: "Job Updated",
-        description: `"${newJob.position}" has been successfully updated.`,
+        title: "Link Copied",
+        description: "Job sharing link has been copied to clipboard.",
       });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update job. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleDeleteJob = (jobId: string) => {
-    try {
-      // In a real app, this would delete the job
-      toast({
-        title: "Job Deleted",
-        description: "The job has been successfully deleted.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to delete job. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleShareJob = (jobId: string) => {
-    const shareUrl = `${window.location.origin}/jobs/${jobId}/public`;
-    navigator.clipboard.writeText(shareUrl);
-    setShareJobId(null);
-    toast({
-      title: "Link Copied",
-      description: "Job sharing link has been copied to clipboard.",
-    });
-  };
+    },
+    [toast],
+  );
 
   const getPerformanceColor = (performance: number) => {
     if (performance >= 80) return "text-green-600";
@@ -393,166 +995,7 @@ export default function Jobs() {
     }
   };
 
-  const JobCard = ({ job }: { job: JobData }) => (
-    <Card className="hover:shadow-md transition-shadow card-responsive">
-      <CardHeader className="pb-3 card-mobile">
-        <div className="flex items-start justify-between min-w-0">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-2 min-w-0">
-              <Link
-                to={`/jobs/${job.id}`}
-                className="font-semibold text-slate-900 hover:text-blue-600 transition-colors text-wrap-safe min-w-0 flex-1 truncate"
-              >
-                {job.position}
-              </Link>
-              <div className="flex-shrink-0">
-                {getPriorityBadge(job.priority)}
-              </div>
-            </div>
-            <p className="text-responsive-sm text-slate-600 mb-2 text-wrap-safe truncate">
-              {job.department}
-            </p>
-            <div className="flex items-center gap-4 text-responsive-sm text-slate-500 min-w-0">
-              <span className="flex items-center gap-1 text-wrap-safe min-w-0 flex-1">
-                <MapPin className="icon-mobile flex-shrink-0" />
-                <span className="truncate">{job.location}</span>
-              </span>
-              <span className="flex items-center gap-1 text-wrap-safe min-w-0 flex-1">
-                <Calendar className="icon-mobile flex-shrink-0" />
-                <span className="truncate">{job.deadline}</span>
-              </span>
-            </div>
-          </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="icon-mobile flex-shrink-0"
-              >
-                <MoreHorizontal className="w-4 h-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="dropdown-mobile">
-              <Link to={`/jobs/${job.id}`}>
-                <DropdownMenuItem className="text-wrap-safe">
-                  <Eye className="icon-mobile mr-2" />
-                  View Details
-                </DropdownMenuItem>
-              </Link>
-              <DropdownMenuItem
-                onClick={() => handleEditJob(job)}
-                className="text-wrap-safe"
-              >
-                <Edit className="icon-mobile mr-2" />
-                Edit Job
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setShareJobId(job.id)}
-                className="text-wrap-safe"
-              >
-                <Share className="icon-mobile mr-2" />
-                Share
-              </DropdownMenuItem>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <DropdownMenuItem
-                    className="text-red-600 text-wrap-safe"
-                    onSelect={(e) => e.preventDefault()}
-                  >
-                    <Trash2 className="icon-mobile mr-2" />
-                    Delete
-                  </DropdownMenuItem>
-                </AlertDialogTrigger>
-                <AlertDialogContent className="modal-mobile">
-                  <AlertDialogHeader>
-                    <AlertDialogTitle className="text-wrap-safe">
-                      Delete Job
-                    </AlertDialogTitle>
-                    <AlertDialogDescription className="text-wrap-safe">
-                      Are you sure you want to delete "{job.position}"? This
-                      action cannot be undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel className="btn-mobile">
-                      Cancel
-                    </AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={() => handleDeleteJob(job.id)}
-                      className="btn-mobile"
-                    >
-                      Delete
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-3 card-mobile">
-        <div className="flex items-center justify-between">
-          <span className="text-responsive-sm text-slate-600 text-wrap-safe">
-            Applications
-          </span>
-          <Badge variant="outline" className="badge-mobile">
-            {job.applications}
-          </Badge>
-        </div>
-
-        <div className="space-y-2">
-          <div className="flex justify-between text-responsive-sm">
-            <span className="text-wrap-safe">Pipeline Summary</span>
-            <span className="text-wrap-safe">
-              {job.pipelineSummary.hired}/{job.target} hired
-            </span>
-          </div>
-          <div className="grid grid-cols-3 gap-1 text-responsive-sm">
-            <div className="text-center p-1 bg-blue-50 rounded">
-              <div className="font-medium text-wrap-safe">
-                {job.pipelineSummary.applied}
-              </div>
-              <div className="text-slate-600 text-wrap-safe">Applied</div>
-            </div>
-            <div className="text-center p-1 bg-yellow-50 rounded">
-              <div className="font-medium text-wrap-safe">
-                {job.pipelineSummary.interview}
-              </div>
-              <div className="text-slate-600 text-wrap-safe">Interview</div>
-            </div>
-            <div className="text-center p-1 bg-green-50 rounded">
-              <div className="font-medium text-wrap-safe">
-                {job.pipelineSummary.hired}
-              </div>
-              <div className="text-slate-600 text-wrap-safe">Hired</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-          <div className="flex items-center gap-2 min-w-0 flex-1">
-            <div className="flex-shrink-0">{getStatusBadge(job.status)}</div>
-            <span className="text-responsive-sm text-slate-500 text-wrap-safe truncate">
-              by {job.recruiter}
-            </span>
-          </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <TrendingUp
-              className={`icon-mobile ${getPerformanceColor(job.performance)}`}
-            />
-            <span
-              className={`text-responsive-sm ${getPerformanceColor(job.performance)} text-wrap-safe`}
-            >
-              {job.performance}%
-            </span>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-
-  const ListView = () => (
+  const ListView = memo(() => (
     <Card>
       <CardContent className="p-0">
         <div className="overflow-x-auto">
@@ -769,432 +1212,21 @@ export default function Jobs() {
         </div>
       </CardContent>
     </Card>
-  );
+  ));
 
-  const GridView = () => (
+  const GridView = memo(() => (
     <div className="grid-responsive">
       {filteredJobs.map((job) => (
-        <JobCard key={job.id} job={job} />
+        <JobCard
+          key={job.id}
+          job={job}
+          onEdit={handleEditJob}
+          onShare={setShareJobId}
+          onDelete={handleDeleteJob}
+        />
       ))}
     </div>
-  );
-
-  const AddJobForm = () => (
-    <Dialog
-      open={showAddJobDialog}
-      onOpenChange={(open) => {
-        setShowAddJobDialog(open);
-        if (!open) {
-          setEditingJob(null);
-        }
-      }}
-    >
-      <DialogContent className="modal-mobile max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-wrap-safe">
-            {editingJob ? "Edit Job" : "Add New Job"}
-          </DialogTitle>
-          <DialogDescription className="text-wrap-safe">
-            {editingJob
-              ? "Update the job details below."
-              : "Create a new job posting with all the necessary details."}
-          </DialogDescription>
-        </DialogHeader>
-
-        <Tabs defaultValue="basic" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="basic" className="text-wrap-safe">
-              Basic Info
-            </TabsTrigger>
-            <TabsTrigger value="details" className="text-wrap-safe">
-              Job Details
-            </TabsTrigger>
-            <TabsTrigger value="team" className="text-wrap-safe">
-              Team & Budget
-            </TabsTrigger>
-            <TabsTrigger value="pipeline" className="text-wrap-safe">
-              Stages
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="basic" className="form-responsive">
-            <div className="form-grid-responsive">
-              <div>
-                <label className="text-responsive-sm font-medium text-slate-700 flex items-center gap-2 text-wrap-safe">
-                  Email Alias
-                  <HelpTooltip content={helpContent.emailAlias} />
-                </label>
-                <Input
-                  placeholder="jobs@company.com"
-                  value={newJob.emailAlias}
-                  onChange={(e) =>
-                    setNewJob({ ...newJob, emailAlias: e.target.value })
-                  }
-                  className="mt-1 text-wrap-safe"
-                />
-              </div>
-              <div>
-                <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
-                  Department
-                </label>
-                <Select
-                  value={newJob.department}
-                  onValueChange={(value) =>
-                    setNewJob({ ...newJob, department: value })
-                  }
-                >
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Select department" />
-                  </SelectTrigger>
-                  <SelectContent className="dropdown-mobile">
-                    <SelectItem value="Engineering" className="text-wrap-safe">
-                      Engineering
-                    </SelectItem>
-                    <SelectItem value="Product" className="text-wrap-safe">
-                      Product
-                    </SelectItem>
-                    <SelectItem value="Design" className="text-wrap-safe">
-                      Design
-                    </SelectItem>
-                    <SelectItem value="Marketing" className="text-wrap-safe">
-                      Marketing
-                    </SelectItem>
-                    <SelectItem value="Data" className="text-wrap-safe">
-                      Data
-                    </SelectItem>
-                    <SelectItem value="Sales" className="text-wrap-safe">
-                      Sales
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
-                  Job Location
-                </label>
-                <Input
-                  placeholder="San Francisco, CA or Remote"
-                  value={newJob.location}
-                  onChange={(e) =>
-                    setNewJob({ ...newJob, location: e.target.value })
-                  }
-                  className="mt-1 text-wrap-safe"
-                />
-              </div>
-              <div>
-                <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
-                  Job Position
-                </label>
-                <Input
-                  placeholder="Senior Software Engineer"
-                  value={newJob.position}
-                  onChange={(e) =>
-                    setNewJob({ ...newJob, position: e.target.value })
-                  }
-                  className="mt-1 text-wrap-safe"
-                />
-              </div>
-              <div>
-                <label className="text-responsive-sm font-medium text-slate-700 flex items-center gap-2 text-wrap-safe">
-                  Employment Type
-                  <HelpTooltip content={helpContent.employmentType} />
-                </label>
-                <Select
-                  value={newJob.type}
-                  onValueChange={(value: any) =>
-                    setNewJob({ ...newJob, type: value })
-                  }
-                >
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Select employment type" />
-                  </SelectTrigger>
-                  <SelectContent className="dropdown-mobile">
-                    <SelectItem value="Full-time" className="text-wrap-safe">
-                      Full-time
-                    </SelectItem>
-                    <SelectItem value="Part-time" className="text-wrap-safe">
-                      Part-time
-                    </SelectItem>
-                    <SelectItem value="Contract" className="text-wrap-safe">
-                      Contract
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="text-responsive-sm font-medium text-slate-700 flex items-center gap-2 text-wrap-safe">
-                  Domain/Industry
-                  <HelpTooltip content={helpContent.domain} />
-                </label>
-                <Input
-                  placeholder="Technology, Finance, Healthcare"
-                  value={newJob.domain}
-                  onChange={(e) =>
-                    setNewJob({ ...newJob, domain: e.target.value })
-                  }
-                  className="mt-1 text-wrap-safe"
-                />
-              </div>
-              <div>
-                <label className="text-responsive-sm font-medium text-slate-700 flex items-center gap-2 text-wrap-safe">
-                  Priority
-                  <HelpTooltip content={helpContent.priority} />
-                </label>
-                <Select
-                  value={newJob.priority}
-                  onValueChange={(value: any) =>
-                    setNewJob({ ...newJob, priority: value })
-                  }
-                >
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Select priority" />
-                  </SelectTrigger>
-                  <SelectContent className="dropdown-mobile">
-                    <SelectItem value="High" className="text-wrap-safe">
-                      High
-                    </SelectItem>
-                    <SelectItem value="Medium" className="text-wrap-safe">
-                      Medium
-                    </SelectItem>
-                    <SelectItem value="Low" className="text-wrap-safe">
-                      Low
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
-                  Deadline
-                </label>
-                <Input
-                  type="date"
-                  value={newJob.deadline}
-                  onChange={(e) =>
-                    setNewJob({ ...newJob, deadline: e.target.value })
-                  }
-                  className="mt-1"
-                />
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="details" className="form-responsive">
-            <div className="space-y-4">
-              <div>
-                <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
-                  Expected Skills
-                </label>
-                <Input
-                  placeholder="React, TypeScript, Node.js (comma separated)"
-                  onChange={(e) =>
-                    setNewJob({
-                      ...newJob,
-                      expectedSkills: e.target.value
-                        .split(",")
-                        .map((s) => s.trim())
-                        .filter(Boolean),
-                    })
-                  }
-                  className="mt-1 text-wrap-safe"
-                />
-              </div>
-              <div className="form-grid-responsive">
-                <div>
-                  <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
-                    Salary Min
-                  </label>
-                  <Input
-                    placeholder="80000"
-                    type="number"
-                    value={newJob.salaryMin}
-                    onChange={(e) =>
-                      setNewJob({ ...newJob, salaryMin: e.target.value })
-                    }
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
-                    Salary Max
-                  </label>
-                  <Input
-                    placeholder="120000"
-                    type="number"
-                    value={newJob.salaryMax}
-                    onChange={(e) =>
-                      setNewJob({ ...newJob, salaryMax: e.target.value })
-                    }
-                    className="mt-1"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
-                  Job Description
-                </label>
-                <Textarea
-                  placeholder="Describe the role, responsibilities, and requirements..."
-                  value={newJob.description}
-                  onChange={(e) =>
-                    setNewJob({ ...newJob, description: e.target.value })
-                  }
-                  className="mt-1 text-wrap-safe"
-                  rows={6}
-                />
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="team" className="form-responsive">
-            <div className="form-grid-responsive">
-              <div>
-                <label className="text-responsive-sm font-medium text-slate-700 flex items-center gap-2 text-wrap-safe">
-                  Headcount
-                  <HelpTooltip content={helpContent.headcount} />
-                </label>
-                <Input
-                  placeholder="2"
-                  type="number"
-                  value={newJob.headcount}
-                  onChange={(e) =>
-                    setNewJob({
-                      ...newJob,
-                      headcount: parseInt(e.target.value) || 1,
-                    })
-                  }
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
-                  Recruiter
-                </label>
-                <Select
-                  value={newJob.recruiter}
-                  onValueChange={(value) =>
-                    setNewJob({ ...newJob, recruiter: value })
-                  }
-                >
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Select recruiter" />
-                  </SelectTrigger>
-                  <SelectContent className="dropdown-mobile">
-                    <SelectItem value="Alex Chen" className="text-wrap-safe">
-                      Alex Chen
-                    </SelectItem>
-                    <SelectItem value="Sarah Kim" className="text-wrap-safe">
-                      Sarah Kim
-                    </SelectItem>
-                    <SelectItem value="Mike Wilson" className="text-wrap-safe">
-                      Mike Wilson
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div>
-              <label className="text-responsive-sm font-medium text-slate-700 text-wrap-safe">
-                Requester
-              </label>
-              <Input
-                placeholder="Select requester who requested this job"
-                className="mt-1 text-wrap-safe"
-              />
-            </div>
-            <div>
-              <label className="text-responsive-sm font-medium text-slate-700 flex items-center gap-2 text-wrap-safe">
-                Estimated Budget
-                <HelpTooltip content={helpContent.estimatedBudget} />
-              </label>
-              <Input
-                placeholder="15000"
-                type="number"
-                value={newJob.estimatedCost}
-                onChange={(e) =>
-                  setNewJob({ ...newJob, estimatedCost: e.target.value })
-                }
-                className="mt-1"
-              />
-            </div>
-            <div className="flex justify-end space-x-2 pt-4 btn-group-mobile">
-              <Button
-                variant="outline"
-                onClick={() => setShowAddJobDialog(false)}
-                className="btn-mobile"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={editingJob ? handleUpdateJob : handleAddJob}
-                className="btn-mobile"
-              >
-                {editingJob ? "Update Job" : "Create Job"}
-              </Button>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="pipeline" className="form-responsive">
-            <div className="space-y-3">
-              <label className="text-responsive-sm font-medium text-slate-700">
-                Recruitment Stages
-              </label>
-
-              <div className="space-y-2">
-                {jobStages.map((stage, index) => (
-                  <div
-                    key={index}
-                    className="flex flex-col gap-2 border border-slate-200 rounded-xl p-3 bg-slate-50"
-                  >
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <Input
-                        value={stage.name}
-                        onChange={(e) =>
-                          updateStage(index, { ...stage, name: e.target.value })
-                        }
-                        className="flex-1"
-                        placeholder="Stage name"
-                      />
-                      <Input
-                        type="number"
-                        min={1}
-                        value={stage.durationHours || ""}
-                        onChange={(e) =>
-                          updateStage(index, {
-                            ...stage,
-                            durationHours: e.target.value,
-                          })
-                        }
-                        className="w-36"
-                        placeholder="Duration (h)"
-                      />
-                      {!defaultStages.includes(stage.name) && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => removeStage(index)}
-                          className="text-red-500"
-                        >
-                          <Trash className="w-4 h-4" />
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <Button
-                variant="outline"
-                onClick={addNewStage}
-                className="text-sm"
-              >
-                + Add Stage
-              </Button>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </DialogContent>
-    </Dialog>
-  );
+  ));
 
   return (
     <div className="padding-responsive space-mobile">
@@ -1209,10 +1241,6 @@ export default function Jobs() {
           </p>
         </div>
         <div className="btn-group-mobile">
-          {/* <Button variant="outline" size="sm" className="btn-mobile">
-            <FileText className="icon-mobile mr-2" />
-            Export Report
-          </Button> */}
           <Button
             size="sm"
             onClick={() => setShowAddJobDialog(true)}
@@ -1257,7 +1285,6 @@ export default function Jobs() {
         <CardContent className="pt-6 card-mobile">
           <div className="flex-responsive gap-4 justify-responsive">
             <div className="flex items-center space-x-4">
-              {/* View Mode Toggle */}
               <div className="flex items-center space-x-2 border rounded-lg p-1">
                 <Button
                   variant={viewMode === "list" ? "default" : "ghost"}
@@ -1278,8 +1305,6 @@ export default function Jobs() {
                   Grid
                 </Button>
               </div>
-
-              {/* Field Visibility Settings (only for list view) */}
               {viewMode === "list" && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -1309,8 +1334,6 @@ export default function Jobs() {
                 </DropdownMenu>
               )}
             </div>
-
-            {/* Search and Filters */}
             <div className="filters-mobile">
               <div className="flex-1">
                 <div className="relative">
@@ -1434,7 +1457,16 @@ export default function Jobs() {
         </div>
       </div>
 
-      <AddJobForm />
+      <AddJobForm
+        open={showAddJobDialog}
+        onOpenChange={(open) => {
+          setShowAddJobDialog(open);
+          if (!open) setEditingJob(null);
+        }}
+        onAddJob={handleAddJob}
+        onUpdateJob={handleUpdateJob}
+        editingJob={editingJob}
+      />
 
       {/* Share Job Dialog */}
       <Dialog open={!!shareJobId} onOpenChange={() => setShareJobId(null)}>

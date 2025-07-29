@@ -79,6 +79,8 @@ export default function Candidates() {
   const [departmentFilter, setDepartmentFilter] = useState("all");
   const [recruiterFilter, setRecruiterFilter] = useState("all");
   const [showMoreFilters, setShowMoreFilters] = useState(false);
+  const [source, setSource] = useState<string | undefined>();
+  const [customSource, setCustomSource] = useState("");
   const { toast } = useToast();
 
   // Candidates loaded from hardcoded data
@@ -272,7 +274,9 @@ export default function Candidates() {
             <TableHeader>
               <TableRow>
                 {/* FIxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx */}
-                {visibleFields.name && <TableHead>{t("candidates.name")}</TableHead>}
+                {visibleFields.name && (
+                  <TableHead>{t("candidates.name")}</TableHead>
+                )}
                 {visibleFields.appliedDate && <TableHead>Applied On</TableHead>}
                 {visibleFields.email && <TableHead>Email</TableHead>}
                 {visibleFields.phone && <TableHead>Phone</TableHead>}
@@ -577,7 +581,7 @@ export default function Candidates() {
                       <label className="text-sm font-medium text-slate-700">
                         Source
                       </label>
-                      <Select>
+                      <Select onValueChange={setSource}>
                         <SelectTrigger className="mt-1">
                           <SelectValue placeholder="Select source" />
                         </SelectTrigger>
@@ -588,9 +592,26 @@ export default function Candidates() {
                           <SelectItem value="third-party">
                             Third Party
                           </SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
+                          <SelectItem
+                            value="customize"
+                            className="text-blue-600 font-semibold hover:bg-blue-50"
+                          >
+                            <div className="flex items-center gap-2 pl-1">
+                              <Plus className="w-4 h-4 stroke-[3]" />
+                              <span>Customize</span>
+                            </div>
+                          </SelectItem>
                         </SelectContent>
                       </Select>
+
+                      {source === "customize" && (
+                        <Input
+                          className="mt-2"
+                          placeholder="Enter custom source"
+                          value={customSource}
+                          onChange={(e) => setCustomSource(e.target.value)}
+                        />
+                      )}
                     </div>
                   </div>
                   <div className="flex justify-end space-x-2">
