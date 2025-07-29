@@ -331,19 +331,7 @@ const AddJobForm = memo(
       [],
     );
 
-    const [applyJobId, setApplyJobId] = useState<string | null>(null);
-    const [selectedCandidateId, setSelectedCandidateId] = useState<
-      string | null
-    >(null);
 
-    // Call apply action
-    const handleApplyCandidate = () => {
-      if (applyJobId && selectedCandidateId) {
-        applyCandidateToJob(applyJobId, selectedCandidateId); // API or action
-        setApplyJobId(null);
-        setSelectedCandidateId(null);
-      }
-    };
 
     const addNewStage = useCallback(() => {
       setJobStages((prev) => [...prev, { name: "", durationHours: "" }]);
