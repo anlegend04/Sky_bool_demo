@@ -661,63 +661,7 @@ export default function FollowUpDashboard() {
                 </Button>
               </div>
 
-              {/* Field Visibility Settings (only for list view) */}
-              {viewMode === "list" && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <Settings className="w-4 h-4 mr-2" />
-                      Fields
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56">
-                    {Object.entries(visibleFields).map(([field, visible]) => (
-                      <DropdownMenuCheckboxItem
-                        key={field}
-                        checked={visible}
-                        onCheckedChange={(checked) =>
-                          setVisibleFields((prev) => ({
-                            ...prev,
-                            [field]: checked,
-                          }))
-                        }
-                      >
-                        {field.charAt(0).toUpperCase() +
-                          field.slice(1).replace(/([A-Z])/g, " $1")}
-                      </DropdownMenuCheckboxItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
 
-              {/* Field Visibility Settings (only for list view) */}
-              {viewMode === "list" && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <Settings className="w-4 h-4 mr-2" />
-                      Fields
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56">
-                    {Object.entries(visibleFields).map(([field, visible]) => (
-                      <DropdownMenuCheckboxItem
-                        key={field}
-                        checked={visible}
-                        onCheckedChange={(checked) =>
-                          setVisibleFields((prev) => ({
-                            ...prev,
-                            [field]: checked,
-                          }))
-                        }
-                      >
-                        {field.charAt(0).toUpperCase() +
-                          field.slice(1).replace(/([A-Z])/g, " $1")}
-                      </DropdownMenuCheckboxItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
             </div>
           </div>
 
