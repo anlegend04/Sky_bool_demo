@@ -972,6 +972,18 @@ export default function Candidates() {
                 <Download className="w-4 h-4 mr-2" />
                 Download CV
               </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  const nextStageIndex = stages.findIndex(s => s === candidate.stage) + 1;
+                  if (nextStageIndex < stages.length) {
+                    handleStageChange(candidate, stages[nextStageIndex]);
+                  }
+                }}
+                disabled={stages.findIndex(s => s === candidate.stage) === stages.length - 1}
+              >
+                <Mail className="w-4 h-4 mr-2" />
+                Move to Next Stage
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
