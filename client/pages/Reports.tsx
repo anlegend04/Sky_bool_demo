@@ -77,7 +77,7 @@ export default function Reports() {
 
     const csvContent = [
       headers.join(","),
-      ...data.map(row => row.join(","))
+      ...data.map((row) => row.join(",")),
     ].join("\n");
 
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -105,8 +105,6 @@ export default function Reports() {
     );
     setCandidates(filtered);
   }, [selectedJob, selectedRecruiter, dateRange]);
-
-
 
   // Conversion Funnel Data
   const funnelData = [
