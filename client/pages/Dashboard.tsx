@@ -82,40 +82,14 @@ export default function Dashboard() {
     },
   ];
 
-  const recentJobs = [
-    {
-      id: 1,
-      title: "Senior Frontend Developer",
-      department: "Engineering",
-      applicants: 45,
-      status: "Active",
-      priority: "High",
-    },
-    {
-      id: 2,
-      title: "Product Manager",
-      department: "Product",
-      applicants: 32,
-      status: "Active",
-      priority: "Medium",
-    },
-    {
-      id: 3,
-      title: "UX Designer",
-      department: "Design",
-      applicants: 28,
-      status: "Draft",
-      priority: "Low",
-    },
-    {
-      id: 4,
-      title: "Data Scientist",
-      department: "Analytics",
-      applicants: 19,
-      status: "Active",
-      priority: "High",
-    },
-  ];
+  const recentJobs = HARDCODED_JOBS.slice(0, 4).map(job => ({
+    id: job.id,
+    title: job.position,
+    department: job.department,
+    applicants: job.applications,
+    status: job.status === "Open" ? "Active" : job.status,
+    priority: job.priority,
+  }));
 
   const pipeline = [
     { stageKey: "dashboard.applied", count: 145, percentage: 100 },
