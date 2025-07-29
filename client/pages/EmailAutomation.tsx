@@ -288,7 +288,7 @@ export default function EmailAutomation() {
     setIsPreviewDialogOpen(true);
   };
 
-  const handleEditTemplate = (template: EmailTemplate) => {
+  const handleEditTemplate = (template: EmailTemplateExtended) => {
     setEditingTemplate(template);
     setNewTemplate({
       name: template.name,
