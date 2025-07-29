@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
@@ -20,6 +21,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -57,6 +59,9 @@ import {
   ThumbsDown,
   Target,
   ChevronDown,
+  Trash2,
+  Plus,
+  Star,
 } from "lucide-react";
 import {
   HARDCODED_CANDIDATES,
@@ -64,6 +69,7 @@ import {
   type CandidateData,
   type JobData,
 } from "@/data/hardcoded-data";
+import { useToast } from "@/hooks/use-toast";
 
 interface CVEvaluation {
   summary: string;
@@ -80,6 +86,15 @@ interface CVEvaluation {
   experienceMatch: number;
   educationMatch: number;
   recommendations: string[];
+  extractedData: {
+    name: string;
+    email: string;
+    phone: string;
+    location: string;
+    education: string[];
+    workExperience: string[];
+    skills: string[];
+  };
 }
 
 interface UploadedFile {
@@ -88,965 +103,777 @@ interface UploadedFile {
   type: string;
   url: string;
   uploadedAt: string;
+  content?: string;
 }
 
 export default function CVEvaluation() {
-  const [selectedCandidate, setSelectedCandidate] =
-    useState<CandidateData | null>(null);
+  const { toast } = useToast();
+  const [selectedCandidate, setSelectedCandidate] = useState<CandidateData | null>(null);
   const [selectedJob, setSelectedJob] = useState<JobData | null>(null);
-  const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null);
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const [selectedFile, setSelectedFile] = useState<UploadedFile | null>(null);
   const [evaluation, setEvaluation] = useState<CVEvaluation | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-
-  const [candidateFilter, setCandidateFilter] = useState<string>("all");
-  const [showResumeViewer, setShowResumeViewer] = useState(false);
-  const [evaluationNotes, setEvaluationNotes] = useState("");
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [jobSearchQuery, setJobSearchQuery] = useState("");
-  const [isJobDropdownOpen, setIsJobDropdownOpen] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [analysisProgress, setAnalysisProgress] = useState(0);
+  const [showFilePreview, setShowFilePreview] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Filter candidates based on search and filters
-  const filteredCandidates = HARDCODED_CANDIDATES.filter((candidate) => {
-    const matchesSearch =
-      candidate.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      candidate.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      candidate.position.toLowerCase().includes(searchQuery.toLowerCase());
-
-    const matchesFilter =
-      candidateFilter === "all" ||
-      candidate.stage.toLowerCase() === candidateFilter.toLowerCase();
-
-    return matchesSearch && matchesFilter;
-  });
-
-  // Filter jobs based on search query
-  const filteredJobs = HARDCODED_JOBS.filter((job) =>
-    `${job.position} ${job.department} ${job.location} ${job.recruiter}`
-      .toLowerCase()
-      .includes(jobSearchQuery.toLowerCase()),
-  );
-
-  // Mock CV analysis function
-  const analyzeCV = useCallback(async () => {
-    if (!selectedCandidate && !uploadedFile) return;
-    if (!selectedJob) {
-      alert("Please select a job position to evaluate against");
-      return;
-    }
-
-    setIsAnalyzing(true);
-
-    // Simulate AI analysis delay
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-
-    const candidate = selectedCandidate;
-    const job = selectedJob;
-
-    // Mock evaluation based on candidate and job data
-    const mockEvaluation: CVEvaluation = {
-      summary: candidate
-        ? `${candidate.name} is a ${candidate.experience} professional with expertise in ${candidate.skills.slice(0, 3).join(", ")}. Currently in ${candidate.stage} stage with a ${candidate.rating}/5 rating. Strong background in ${candidate.position} with proven track record.`
-        : "Uploaded resume shows a skilled professional with relevant experience in the target domain. Good educational background and diverse skill set.",
-
-      strengths: candidate
-        ? [
-            `Strong technical skills in ${candidate.skills[0]}`,
-            `${candidate.experience} of relevant experience`,
-            `High rating (${candidate.rating}/5) from previous evaluations`,
-            `Successfully reached ${candidate.stage} stage`,
-            ...(candidate.tags.length > 0
-              ? [`Tagged as: ${candidate.tags.join(", ")}`]
-              : []),
-          ]
-        : [
-            "Relevant technical skills for the position",
-            "Strong educational background",
-            "Good communication skills evident in resume structure",
-            "Professional experience in similar roles",
-          ],
-
-      weaknesses: [
-        "Limited experience with some required technologies",
-        "Could benefit from more leadership experience",
-        "Portfolio could be more comprehensive",
-        "Some skill gaps in advanced frameworks",
-      ],
-
-      jobFitScore: candidate
-        ? Math.min(95, candidate.rating * 20 + Math.random() * 15)
-        : Math.floor(Math.random() * 40) + 60,
-
-      suggestedImprovements: [
-        "Consider gaining experience with additional frameworks mentioned in job requirements",
-        "Develop leadership and mentoring skills",
-        "Create a more comprehensive portfolio showcasing recent projects",
-        "Obtain relevant certifications in the domain",
-        "Improve technical writing and documentation skills",
-      ],
-
-      finalVerdict: candidate
-        ? candidate.rating >= 4
-          ? "Good Fit"
-          : candidate.rating >= 3
-            ? "Needs Improvement"
-            : "Not Suitable"
-        : "Needs Improvement",
-
-      skillsMatch: job.expectedSkills.map((skill) => ({
-        skill,
-        hasSkill: candidate
-          ? candidate.skills.includes(skill)
-          : Math.random() > 0.3,
-        level: ["Beginner", "Intermediate", "Advanced", "Expert"][
-          Math.floor(Math.random() * 4)
-        ] as any,
-      })),
-
-      experienceMatch: candidate
-        ? Math.min(100, parseInt(candidate.experience) * 20)
-        : 70,
-      educationMatch: Math.floor(Math.random() * 30) + 70,
-
-      recommendations: [
-        "Schedule technical interview to assess practical skills",
-        "Conduct behavioral interview to evaluate cultural fit",
-        "Request code samples or portfolio review",
-        "Check references from previous employers",
-        "Consider probationary period to evaluate performance",
-      ],
-    };
-
-    setEvaluation(mockEvaluation);
-    setIsAnalyzing(false);
-  }, [selectedCandidate, selectedJob, uploadedFile]);
-
-  // Handle file upload
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    // Validate file type
-    const allowedTypes = [
-      "application/pdf",
-      "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    ];
-    if (!allowedTypes.includes(file.type)) {
-      alert("Please upload a PDF, DOC, or DOCX file");
-      return;
-    }
-
-    // Create uploaded file object
+  // Mock file upload simulation
+  const handleFileUpload = useCallback(async (file: File) => {
     const uploadedFile: UploadedFile = {
       name: file.name,
       size: file.size,
       type: file.type,
       url: URL.createObjectURL(file),
       uploadedAt: new Date().toISOString(),
+      content: await readFileContent(file),
     };
 
-    setUploadedFile(uploadedFile);
-    setSelectedCandidate(null); // Clear candidate selection when uploading file
+    setUploadedFiles(prev => [...prev, uploadedFile]);
+    setSelectedFile(uploadedFile);
+    
+    toast({
+      title: "File Uploaded Successfully",
+      description: `${file.name} has been uploaded and is ready for analysis.`,
+    });
+  }, [toast]);
+
+  // Read file content (simulated)
+  const readFileContent = async (file: File): Promise<string> => {
+    return new Promise((resolve) => {
+      // Simulate file reading delay
+      setTimeout(() => {
+        resolve(`
+          John Doe
+          Software Engineer
+          
+          Email: john.doe@email.com
+          Phone: +1 (555) 123-4567
+          Location: San Francisco, CA
+          
+          EXPERIENCE:
+          • Senior Software Engineer at TechCorp (2020-2024)
+            - Led development of React-based web applications
+            - Implemented CI/CD pipelines with Docker and Jenkins
+            - Mentored junior developers and conducted code reviews
+          
+          • Software Engineer at StartupXYZ (2018-2020)
+            - Developed full-stack applications using Node.js and React
+            - Collaborated with product managers to deliver user-focused features
+          
+          EDUCATION:
+          • Bachelor of Science in Computer Science
+            University of California, Berkeley (2014-2018)
+          
+          SKILLS:
+          JavaScript, TypeScript, React, Node.js, Python, SQL, Docker, AWS, Git
+        `);
+      }, 1000);
+    });
   };
 
-  // Handle save evaluation
-  const handleSaveEvaluation = () => {
-    if (!evaluation) return;
-
-    const evaluationData = {
-      candidate: selectedCandidate?.name || uploadedFile?.name || "Unknown",
-      job: selectedJob?.position || "No job selected",
-      evaluation,
-      notes: evaluationNotes,
-      tags: selectedTags,
-      savedAt: new Date().toISOString(),
-    };
-
-    // In a real app, this would save to a database
-    console.log("Saving evaluation:", evaluationData);
-    alert("Evaluation saved successfully!");
-  };
-
-  // Handle share evaluation
-  const handleShareEvaluation = () => {
-    if (!evaluation) return;
-
-    const shareData = {
-      title: `CV Evaluation: ${selectedCandidate?.name || uploadedFile?.name}`,
-      text: `Job Fit Score: ${evaluation.jobFitScore}% - ${evaluation.finalVerdict}`,
-      url: window.location.href,
-    };
-
-    if (navigator.share) {
-      navigator.share(shareData);
-    } else {
-      // Fallback: copy to clipboard
-      navigator.clipboard.writeText(
-        `${shareData.title}\n${shareData.text}\n${shareData.url}`,
-      );
-      alert("Evaluation details copied to clipboard!");
-    }
-  };
-
-  // Get verdict color
-  const getVerdictColor = (verdict: string) => {
-    switch (verdict) {
-      case "Good Fit":
-        return "text-green-600 bg-green-50 border-green-200";
-      case "Needs Improvement":
-        return "text-yellow-600 bg-yellow-50 border-yellow-200";
-      case "Not Suitable":
-        return "text-red-600 bg-red-50 border-red-200";
-      default:
-        return "text-gray-600 bg-gray-50 border-gray-200";
-    }
-  };
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsJobDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+  // Handle drag and drop
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
   }, []);
 
-  // Reset selected job when it doesn't match search results
-  useEffect(() => {
-    if (selectedJob && !filteredJobs.some((job) => job.id === selectedJob.id)) {
-      setSelectedJob(null);
+  const handleDragLeave = useCallback(() => {
+    setIsDragOver(false);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    
+    const files = Array.from(e.dataTransfer.files);
+    files.forEach(file => {
+      if (file.type === 'application/pdf' || file.type.includes('document')) {
+        handleFileUpload(file);
+      }
+    });
+  }, [handleFileUpload]);
+
+  // Mock CV analysis with progress
+  const analyzeCV = async () => {
+    if (!selectedFile || !selectedJob) {
+      toast({
+        title: "Missing Information",
+        description: "Please select both a CV file and a job position for analysis.",
+        variant: "destructive",
+      });
+      return;
     }
-  }, [jobSearchQuery, filteredJobs]);
+
+    setIsAnalyzing(true);
+    setAnalysisProgress(0);
+
+    // Simulate analysis progress
+    const progressSteps = [
+      { step: 20, message: "Extracting text from CV..." },
+      { step: 40, message: "Analyzing skills and experience..." },
+      { step: 60, message: "Matching with job requirements..." },
+      { step: 80, message: "Generating recommendations..." },
+      { step: 100, message: "Analysis complete!" },
+    ];
+
+    for (const { step, message } of progressSteps) {
+      await new Promise(resolve => setTimeout(resolve, 800));
+      setAnalysisProgress(step);
+      
+      if (step < 100) {
+        toast({
+          title: message,
+          description: `Progress: ${step}%`,
+        });
+      }
+    }
+
+    // Generate mock evaluation
+    const mockEvaluation: CVEvaluation = {
+      summary: "This candidate shows strong technical skills with relevant experience in software development. Their background aligns well with the job requirements, particularly in React and Node.js development.",
+      strengths: [
+        "5+ years of experience in software development",
+        "Strong proficiency in React and JavaScript/TypeScript",
+        "Experience with modern development tools and practices",
+        "Leadership and mentoring experience",
+        "Full-stack development capabilities",
+      ],
+      weaknesses: [
+        "Limited experience with Python (job requirement)",
+        "No specific AWS certification mentioned",
+        "Could benefit from more UI/UX design experience",
+      ],
+      jobFitScore: 85,
+      finalVerdict: "Good Fit",
+      suggestedImprovements: [
+        "Consider additional Python training for backend development",
+        "Pursue AWS certification to strengthen cloud skills",
+        "Gain more experience with design systems and UI/UX principles",
+      ],
+      skillsMatch: selectedJob.expectedSkills.map(skill => ({
+        skill,
+        hasSkill: ['React', 'JavaScript', 'TypeScript', 'Node.js'].includes(skill),
+        level: ['React', 'JavaScript'].includes(skill) ? 'Advanced' : 
+               ['TypeScript', 'Node.js'].includes(skill) ? 'Intermediate' : 'Beginner',
+      })),
+      experienceMatch: 85,
+      educationMatch: 90,
+      recommendations: [
+        "Schedule technical interview to assess coding skills",
+        "Discuss Python learning plan during interview",
+        "Consider for senior-level position based on leadership experience",
+      ],
+      extractedData: {
+        name: "John Doe",
+        email: "john.doe@email.com",
+        phone: "+1 (555) 123-4567",
+        location: "San Francisco, CA",
+        education: ["Bachelor of Science in Computer Science - UC Berkeley"],
+        workExperience: [
+          "Senior Software Engineer at TechCorp (2020-2024)",
+          "Software Engineer at StartupXYZ (2018-2020)",
+        ],
+        skills: ["JavaScript", "TypeScript", "React", "Node.js", "Python", "SQL", "Docker", "AWS"],
+      },
+    };
+
+    setEvaluation(mockEvaluation);
+    setIsAnalyzing(false);
+    
+    toast({
+      title: "Analysis Complete!",
+      description: "CV analysis has been completed successfully.",
+    });
+  };
+
+  // Quick analysis with pre-selected candidate and job
+  const quickAnalysis = () => {
+    const candidate = HARDCODED_CANDIDATES[0]; // Marissa Torres
+    const job = HARDCODED_JOBS[0]; // Senior Frontend Developer
+    
+    setSelectedCandidate(candidate);
+    setSelectedJob(job);
+    
+    // Create mock file from candidate data
+    const mockFile: UploadedFile = {
+      name: `${candidate.name}_resume.pdf`,
+      size: 245760,
+      type: "application/pdf",
+      url: candidate.avatar, // Use avatar as placeholder
+      uploadedAt: new Date().toISOString(),
+      content: `Resume content for ${candidate.name}`,
+    };
+    
+    setUploadedFiles([mockFile]);
+    setSelectedFile(mockFile);
+    
+    toast({
+      title: "Demo Data Loaded",
+      description: "Sample candidate and job data loaded for quick analysis.",
+    });
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return "text-green-600 bg-green-100";
+    if (score >= 60) return "text-yellow-600 bg-yellow-100";
+    return "text-red-600 bg-red-100";
+  };
+
+  const getVerdictIcon = (verdict: string) => {
+    switch (verdict) {
+      case "Good Fit":
+        return <ThumbsUp className="w-5 h-5 text-green-600" />;
+      case "Needs Improvement":
+        return <AlertTriangle className="w-5 h-5 text-yellow-600" />;
+      case "Not Suitable":
+        return <ThumbsDown className="w-5 h-5 text-red-600" />;
+      default:
+        return <Target className="w-5 h-5 text-gray-600" />;
+    }
+  };
 
   return (
-    <TooltipProvider>
-      <div className="p-6 max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              CV Evaluation Tool
-            </h1>
-            <p className="text-gray-600 mt-2">
-              Analyze and evaluate candidate resumes with AI-powered insights
-            </p>
-          </div>
+    <div className="p-6 space-y-6">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900">CV Evaluation & Analysis</h1>
+          <p className="text-slate-600 mt-1">
+            Upload and analyze CVs against job requirements with AI-powered insights
+          </p>
         </div>
+        <div className="flex space-x-3">
+          <Button variant="outline" onClick={quickAnalysis}>
+            <Lightbulb className="w-4 h-4 mr-2" />
+            Demo Analysis
+          </Button>
+          <Button 
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isAnalyzing}
+          >
+            <Upload className="w-4 h-4 mr-2" />
+            Upload CV
+          </Button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".pdf,.doc,.docx"
+            onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0])}
+            className="hidden"
+          />
+        </div>
+      </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Left Panel - CV Input Section */}
-          <div className="lg:col-span-1 space-y-6">
-            {/* Job Selection */}
-            <div className="bg-white shadow-sm rounded-lg border border-gray-200">
-              <div className="p-4 border-b border-gray-200">
-                <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900">
-                  <Target className="w-5 h-5" />
-                  Select Job Position
-                </h3>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Panel - Upload & Configuration */}
+        <div className="space-y-6">
+          {/* File Upload */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Upload className="w-5 h-5" />
+                <span>Upload CV</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div
+                className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer ${
+                  isDragOver
+                    ? "border-blue-400 bg-blue-50"
+                    : "border-gray-300 hover:border-gray-400"
+                }`}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="font-medium text-gray-900 mb-2">Upload CV File</h3>
+                <p className="text-sm text-gray-600 mb-2">
+                  Drag and drop your CV here, or click to browse
+                </p>
+                <p className="text-xs text-gray-500">
+                  Supports PDF, DOC, DOCX up to 10MB
+                </p>
               </div>
-              <div className="p-4">
-                <div className="relative" ref={dropdownRef}>
-                  <button
-                    type="button"
-                    className="w-full h-12 px-4 py-2 flex items-center justify-between bg-gray-50 border border-gray-300 rounded-md text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-                    onClick={() => setIsJobDropdownOpen(!isJobDropdownOpen)}
-                  >
-                    <div className="flex items-center gap-2">
-                      <Search className="w-4 h-4 text-gray-400" />
-                      <span className="truncate">
-                        {selectedJob
-                          ? selectedJob.position
-                          : "Search and select a job position..."}
-                      </span>
-                    </div>
-                    <ChevronDown
-                      className={`w-4 h-4 text-gray-400 transition-transform ${
-                        isJobDropdownOpen ? "rotate-180" : ""
-                      }`}
-                    />
-                  </button>
 
-                  {isJobDropdownOpen && (
-                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-80 overflow-y-auto">
-                      <div className="p-2">
-                        <div className="relative">
-                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                          <input
-                            type="text"
-                            placeholder="Search jobs..."
-                            value={jobSearchQuery}
-                            onChange={(e) => setJobSearchQuery(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
-                            onClick={(e) => e.stopPropagation()}
-                          />
+              {/* Uploaded Files List */}
+              {uploadedFiles.length > 0 && (
+                <div className="mt-4 space-y-2">
+                  <Label className="text-sm font-medium">Uploaded Files</Label>
+                  {uploadedFiles.map((file, index) => (
+                    <div
+                      key={index}
+                      className={`flex items-center justify-between p-3 border rounded-lg cursor-pointer ${
+                        selectedFile?.name === file.name ? "border-blue-500 bg-blue-50" : "border-gray-200"
+                      }`}
+                      onClick={() => setSelectedFile(file)}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <FileText className="w-5 h-5 text-gray-500" />
+                        <div>
+                          <p className="text-sm font-medium line-clamp-1">{file.name}</p>
+                          <p className="text-xs text-gray-500">
+                            {(file.size / 1024 / 1024).toFixed(2)} MB
+                          </p>
                         </div>
                       </div>
-                      <div className="divide-y divide-gray-100">
-                        {filteredJobs.length > 0 ? (
-                          filteredJobs.map((job) => (
-                            <button
-                              key={job.id}
-                              type="button"
-                              className="w-full px-4 py-3 text-left hover:bg-blue-50 transition-colors focus:outline-none focus:bg-blue-50"
-                              onClick={() => {
-                                setSelectedJob(job);
-                                setIsJobDropdownOpen(false);
-                                setJobSearchQuery("");
-                              }}
-                            >
-                              <div className="flex flex-col">
-                                <span className="font-medium text-gray-900">
-                                  {job.position}
-                                </span>
-                                <span className="text-xs text-gray-500">
-                                  {job.department} • {job.location} •{" "}
-                                  {job.recruiter}
-                                </span>
-                              </div>
-                            </button>
-                          ))
-                        ) : (
-                          <div className="px-4 py-2 text-sm text-gray-500">
-                            No matching jobs found
-                          </div>
-                        )}
+                      <div className="flex space-x-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setShowFilePreview(true);
+                          }}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+                            if (selectedFile?.name === file.name) {
+                              setSelectedFile(null);
+                            }
+                          }}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
                     </div>
-                  )}
+                  ))}
                 </div>
+              )}
+            </CardContent>
+          </Card>
 
-                {selectedJob && (
-                  <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200 transition-all duration-200">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <Briefcase className="w-4 h-4 text-blue-600" />
-                        <span className="font-medium text-blue-900">
-                          {selectedJob.position}
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        className="text-blue-600 hover:text-blue-800"
-                        onClick={() => {
-                          setSelectedJob(null);
-                          setJobSearchQuery("");
-                        }}
-                      >
-                        <XCircle className="w-4 h-4" />
-                      </button>
-                    </div>
-                    <div className="text-sm text-blue-700 space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">Department:</span>{" "}
-                        {selectedJob.department}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">Location:</span>{" "}
-                        {selectedJob.location}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">Type:</span>{" "}
-                        {selectedJob.type}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">Recruiter:</span>{" "}
-                        {selectedJob.recruiter}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">Status:</span>{" "}
-                        {selectedJob.status}
-                      </div>
+          {/* Job Selection */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Briefcase className="w-5 h-5" />
+                <span>Job Position</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label>Select Job Position</Label>
+                <Select
+                  value={selectedJob?.id || ""}
+                  onValueChange={(value) => {
+                    const job = HARDCODED_JOBS.find(j => j.id === value);
+                    setSelectedJob(job || null);
+                  }}
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Choose a job position" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {HARDCODED_JOBS.map(job => (
+                      <SelectItem key={job.id} value={job.id}>
+                        <div className="flex flex-col">
+                          <span>{job.position}</span>
+                          <span className="text-xs text-gray-500">{job.department}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {selectedJob && (
+                <div className="space-y-3">
+                  <div>
+                    <Label className="text-sm font-medium">Required Skills</Label>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {selectedJob.expectedSkills.map(skill => (
+                        <Badge key={skill} variant="outline" className="text-xs">
+                          {skill}
+                        </Badge>
+                      ))}
                     </div>
                   </div>
-                )}
-              </div>
-            </div>
+                  <div>
+                    <Label className="text-sm font-medium">Job Description</Label>
+                    <p className="text-sm text-gray-600 line-clamp-3 mt-1">
+                      {selectedJob.description}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
-            <Tabs defaultValue="upload" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="upload">Upload CV</TabsTrigger>
-                <TabsTrigger value="select">Select Candidate</TabsTrigger>
+          {/* Analysis Controls */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Brain className="w-5 h-5" />
+                <span>Analysis</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Button
+                onClick={analyzeCV}
+                disabled={!selectedFile || !selectedJob || isAnalyzing}
+                className="w-full"
+              >
+                {isAnalyzing ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    Analyzing...
+                  </>
+                ) : (
+                  <>
+                    <Brain className="w-4 h-4 mr-2" />
+                    Analyze CV
+                  </>
+                )}
+              </Button>
+
+              {isAnalyzing && (
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Analysis Progress</span>
+                    <span>{analysisProgress}%</span>
+                  </div>
+                  <Progress value={analysisProgress} className="h-2" />
+                </div>
+              )}
+
+              {evaluation && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-medium">Overall Score</Label>
+                    <Badge className={`${getScoreColor(evaluation.jobFitScore)} border-0`}>
+                      {evaluation.jobFitScore}%
+                    </Badge>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    {getVerdictIcon(evaluation.finalVerdict)}
+                    <span className="text-sm font-medium">{evaluation.finalVerdict}</span>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Right Panel - Results */}
+        <div className="lg:col-span-2">
+          {isAnalyzing ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>Analyzing CV...</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-4 w-1/2" />
+                <div className="grid grid-cols-2 gap-4">
+                  <Skeleton className="h-20 w-full" />
+                  <Skeleton className="h-20 w-full" />
+                </div>
+              </CardContent>
+            </Card>
+          ) : evaluation ? (
+            <Tabs defaultValue="overview" className="space-y-6">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="skills">Skills Match</TabsTrigger>
+                <TabsTrigger value="details">Details</TabsTrigger>
+                <TabsTrigger value="extracted">Extracted Data</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="upload" className="space-y-4">
+              <TabsContent value="overview" className="space-y-6">
+                {/* Overview Summary */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Upload className="w-5 h-5" />
-                      Upload Resume
+                    <CardTitle className="flex items-center justify-between">
+                      <span>Evaluation Summary</span>
+                      <div className="flex items-center space-x-2">
+                        {getVerdictIcon(evaluation.finalVerdict)}
+                        <Badge className={`${getScoreColor(evaluation.jobFitScore)} border-0`}>
+                          {evaluation.jobFitScore}% Match
+                        </Badge>
+                      </div>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      <div
-                        className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-gray-400 transition-colors"
-                        onClick={() => fileInputRef.current?.click()}
-                      >
-                        <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                        <p className="text-gray-600 mb-2">
-                          Click to upload or drag and drop
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          PDF, DOC, DOCX up to 10MB
-                        </p>
+                    <p className="text-gray-700 leading-relaxed">{evaluation.summary}</p>
+                  </CardContent>
+                </Card>
+
+                {/* Scores */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="text-center">
+                        <div className={`text-2xl font-bold ${getScoreColor(evaluation.experienceMatch).split(' ')[0]}`}>
+                          {evaluation.experienceMatch}%
+                        </div>
+                        <p className="text-sm text-gray-600">Experience Match</p>
                       </div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="text-center">
+                        <div className={`text-2xl font-bold ${getScoreColor(evaluation.educationMatch).split(' ')[0]}`}>
+                          {evaluation.educationMatch}%
+                        </div>
+                        <p className="text-sm text-gray-600">Education Match</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="text-center">
+                        <div className={`text-2xl font-bold ${getScoreColor(evaluation.jobFitScore).split(' ')[0]}`}>
+                          {evaluation.jobFitScore}%
+                        </div>
+                        <p className="text-sm text-gray-600">Overall Fit</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
 
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept=".pdf,.doc,.docx"
-                        onChange={handleFileUpload}
-                        className="hidden"
-                      />
+                {/* Strengths & Weaknesses */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center space-x-2 text-green-700">
+                        <CheckCircle className="w-5 h-5" />
+                        <span>Strengths</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-2">
+                        {evaluation.strengths.map((strength, index) => (
+                          <li key={index} className="flex items-start space-x-2">
+                            <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                            <span className="text-sm">{strength}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
 
-                      {uploadedFile && (
-                        <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-                          <div className="flex items-center gap-2">
-                            <FileCheck className="w-5 h-5 text-green-600" />
-                            <span className="font-medium text-green-900">
-                              {uploadedFile.name}
-                            </span>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center space-x-2 text-orange-700">
+                        <AlertTriangle className="w-5 h-5" />
+                        <span>Areas for Improvement</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-2">
+                        {evaluation.weaknesses.map((weakness, index) => (
+                          <li key={index} className="flex items-start space-x-2">
+                            <AlertTriangle className="w-4 h-4 text-orange-500 mt-0.5 flex-shrink-0" />
+                            <span className="text-sm">{weakness}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Recommendations */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2">
+                      <Lightbulb className="w-5 h-5" />
+                      <span>Recommendations</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      {evaluation.recommendations.map((rec, index) => (
+                        <li key={index} className="flex items-start space-x-2">
+                          <Lightbulb className="w-4 h-4 text-yellow-500 mt-0.5 flex-shrink-0" />
+                          <span className="text-sm">{rec}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="skills" className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Skills Analysis</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {evaluation.skillsMatch.map((skill, index) => (
+                        <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                          <div className="flex items-center space-x-3">
+                            {skill.hasSkill ? (
+                              <CheckCircle className="w-5 h-5 text-green-500" />
+                            ) : (
+                              <XCircle className="w-5 h-5 text-red-500" />
+                            )}
+                            <span className="font-medium">{skill.skill}</span>
                           </div>
-                          <div className="text-sm text-green-700 mt-1">
-                            {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB •{" "}
-                            {uploadedFile.type}
+                          <div className="flex items-center space-x-2">
+                            {skill.hasSkill && skill.level && (
+                              <Badge variant="outline">{skill.level}</Badge>
+                            )}
+                            <Badge variant={skill.hasSkill ? "default" : "secondary"}>
+                              {skill.hasSkill ? "Match" : "Missing"}
+                            </Badge>
                           </div>
                         </div>
-                      )}
+                      ))}
                     </div>
                   </CardContent>
                 </Card>
               </TabsContent>
 
-              <TabsContent value="select" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <User className="w-5 h-5" />
-                      Select from Database
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex gap-2">
-                      <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                        <Input
-                          placeholder="Search candidates..."
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          className="pl-10"
-                        />
-                      </div>
-                      <Select
-                        value={candidateFilter}
-                        onValueChange={setCandidateFilter}
-                      >
-                        <SelectTrigger className="w-32">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All</SelectItem>
-                          <SelectItem value="applied">Applied</SelectItem>
-                          <SelectItem value="screening">Screening</SelectItem>
-                          <SelectItem value="interview">Interview</SelectItem>
-                          <SelectItem value="technical">Technical</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <ScrollArea className="h-64">
-                      <div className="space-y-2">
-                        {filteredCandidates.map((candidate) => (
-                          <div
-                            key={candidate.id}
-                            className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                              selectedCandidate?.id === candidate.id
-                                ? "border-blue-500 bg-blue-50"
-                                : "border-gray-200 hover:border-gray-300"
-                            }`}
-                            onClick={() => {
-                              setSelectedCandidate(candidate);
-                              setUploadedFile(null);
-                            }}
-                          >
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <h4 className="font-medium">
-                                  {candidate.name}
-                                </h4>
-                                <p className="text-sm text-gray-600">
-                                  {candidate.position}
-                                </p>
-                                <p className="text-xs text-gray-500">
-                                  {candidate.email}
-                                </p>
-                              </div>
-                              <div className="text-right">
-                                <Badge
-                                  variant={
-                                    candidate.stage === "Hired"
-                                      ? "default"
-                                      : "secondary"
-                                  }
-                                >
-                                  {candidate.stage}
-                                </Badge>
-                                <div className="text-xs text-gray-500 mt-1">
-                                  Rating: {candidate.rating}/5
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </ScrollArea>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
-
-            {/* Analysis Button */}
-            <Button
-              onClick={analyzeCV}
-              disabled={
-                (!selectedCandidate && !uploadedFile) ||
-                !selectedJob ||
-                isAnalyzing
-              }
-              className="w-full"
-              size="lg"
-            >
-              {isAnalyzing ? (
-                <>
-                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                  Analyzing CV...
-                </>
-              ) : (
-                <>
-                  <Brain className="w-4 h-4 mr-2" />
-                  Start AI Analysis
-                </>
-              )}
-            </Button>
-          </div>
-
-          {/* Right Panel - Evaluation Results */}
-          <div className="lg:col-span-2 space-y-6">
-            {selectedCandidate && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <User className="w-5 h-5" />
-                      Candidate Information
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setShowResumeViewer(true)}
-                    >
-                      <Eye className="w-4 h-4 mr-2" />
-                      View Resume
-                    </Button>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid md:grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm">
-                        <User className="w-4 h-4 text-gray-500" />
-                        <span className="font-medium">
-                          {selectedCandidate.name}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Mail className="w-4 h-4" />
-                        {selectedCandidate.email}
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Phone className="w-4 h-4" />
-                        {selectedCandidate.phone}
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <MapPin className="w-4 h-4" />
-                        {selectedCandidate.location}
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Briefcase className="w-4 h-4" />
-                        {selectedCandidate.experience}
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Calendar className="w-4 h-4" />
-                        Applied: {selectedCandidate.appliedDate}
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Badge
-                        variant={
-                          selectedCandidate.stage === "Hired"
-                            ? "default"
-                            : "secondary"
-                        }
-                      >
-                        {selectedCandidate.stage}
-                      </Badge>
-                      <div className="text-sm text-gray-600">
-                        Rating: {selectedCandidate.rating}/5
-                      </div>
-                      <div className="flex flex-wrap gap-1">
-                        {selectedCandidate.skills.slice(0, 3).map((skill) => (
-                          <Badge
-                            key={skill}
-                            variant="outline"
-                            className="text-xs"
-                          >
-                            {skill}
-                          </Badge>
-                        ))}
-                        {selectedCandidate.skills.length > 3 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{selectedCandidate.skills.length - 3} more
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {evaluation ? (
-              <div className="space-y-6">
-                {/* AI Analysis Results */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Brain className="w-5 h-5" />
-                      AI-Powered Analysis
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                    {/* Job Fit Score */}
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <Label className="text-base font-medium">
-                          Job Fit Score
-                        </Label>
-                        <span className="text-2xl font-bold text-blue-600">
-                          {evaluation.jobFitScore}%
-                        </span>
-                      </div>
-                      <Progress
-                        value={evaluation.jobFitScore}
-                        className="h-3"
-                      />
-                      <p className="text-sm text-gray-600 mt-1">
-                        Overall compatibility with the selected position
-                      </p>
-                    </div>
-
-                    {/* Final Verdict */}
-                    <div>
-                      <Label className="text-base font-medium mb-2 block">
-                        Final Verdict
-                      </Label>
-                      <div
-                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border font-medium ${getVerdictColor(evaluation.finalVerdict)}`}
-                      >
-                        {evaluation.finalVerdict === "Good Fit" && (
-                          <CheckCircle className="w-5 h-5" />
-                        )}
-                        {evaluation.finalVerdict === "Needs Improvement" && (
-                          <AlertTriangle className="w-5 h-5" />
-                        )}
-                        {evaluation.finalVerdict === "Not Suitable" && (
-                          <XCircle className="w-5 h-5" />
-                        )}
-                        {evaluation.finalVerdict}
-                      </div>
-                    </div>
-
-                    {/* CV Summary */}
-                    <div>
-                      <Label className="text-base font-medium mb-2 block">
-                        CV Summary
-                      </Label>
-                      <p className="text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-lg">
-                        {evaluation.summary}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Detailed Analysis Tabs */}
+              <TabsContent value="details" className="space-y-6">
                 <Card>
                   <CardHeader>
                     <CardTitle>Detailed Analysis</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <Tabs defaultValue="strengths" className="w-full">
-                      <TabsList className="grid w-full grid-cols-4">
-                        <TabsTrigger value="strengths">Strengths</TabsTrigger>
-                        <TabsTrigger value="weaknesses">Weaknesses</TabsTrigger>
-                        <TabsTrigger value="skills">Skills Match</TabsTrigger>
-                        <TabsTrigger value="recommendations">
-                          Suggestions
-                        </TabsTrigger>
-                      </TabsList>
-
-                      <TabsContent value="strengths" className="space-y-3 mt-4">
-                        {evaluation.strengths.map((strength, index) => (
-                          <div
-                            key={index}
-                            className="flex items-start gap-3 p-3 bg-green-50 rounded-lg border border-green-200"
-                          >
-                            <ThumbsUp className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                            <span className="text-green-900">{strength}</span>
-                          </div>
-                        ))}
-                      </TabsContent>
-
-                      <TabsContent
-                        value="weaknesses"
-                        className="space-y-3 mt-4"
-                      >
-                        {evaluation.weaknesses.map((weakness, index) => (
-                          <div
-                            key={index}
-                            className="flex items-start gap-3 p-3 bg-red-50 rounded-lg border border-red-200"
-                          >
-                            <ThumbsDown className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
-                            <span className="text-red-900">{weakness}</span>
-                          </div>
-                        ))}
-                      </TabsContent>
-
-                      <TabsContent value="skills" className="space-y-3 mt-4">
-                        <div className="grid gap-3">
-                          {evaluation.skillsMatch.map((skill, index) => (
-                            <div
-                              key={index}
-                              className="flex items-center justify-between p-3 rounded-lg border"
-                            >
-                              <div className="flex items-center gap-3">
-                                {skill.hasSkill ? (
-                                  <CheckCircle className="w-5 h-5 text-green-600" />
-                                ) : (
-                                  <XCircle className="w-5 h-5 text-red-600" />
-                                )}
-                                <span className="font-medium">
-                                  {skill.skill}
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                {skill.hasSkill && skill.level && (
-                                  <Badge variant="outline">{skill.level}</Badge>
-                                )}
-                                <Badge
-                                  variant={
-                                    skill.hasSkill ? "default" : "secondary"
-                                  }
-                                >
-                                  {skill.hasSkill ? "Match" : "Missing"}
-                                </Badge>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </TabsContent>
-
-                      <TabsContent
-                        value="recommendations"
-                        className="space-y-3 mt-4"
-                      >
-                        {evaluation.suggestedImprovements.map(
-                          (suggestion, index) => (
-                            <div
-                              key={index}
-                              className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200"
-                            >
-                              <Lightbulb className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                              <span className="text-blue-900">
-                                {suggestion}
-                              </span>
-                            </div>
-                          ),
-                        )}
-                      </TabsContent>
-                    </Tabs>
-                  </CardContent>
-                </Card>
-
-                {/* Experience & Education Match */}
-                <div className="grid md:grid-cols-2 gap-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Briefcase className="w-5 h-5" />
-                        Experience Match
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2">
-                        <div className="flex justify-between">
-                          <span>Experience Alignment</span>
-                          <span className="font-medium">
-                            {evaluation.experienceMatch}%
-                          </span>
-                        </div>
-                        <Progress value={evaluation.experienceMatch} />
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <GraduationCap className="w-5 h-5" />
-                        Education Match
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2">
-                        <div className="flex justify-between">
-                          <span>Education Alignment</span>
-                          <span className="font-medium">
-                            {evaluation.educationMatch}%
-                          </span>
-                        </div>
-                        <Progress value={evaluation.educationMatch} />
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                {/* Action Bar */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Evaluation Actions</CardTitle>
-                  </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <Label htmlFor="notes" className="text-base font-medium">
-                        Additional Notes
-                      </Label>
-                      <Textarea
-                        id="notes"
-                        placeholder="Add your evaluation notes and comments..."
-                        value={evaluationNotes}
-                        onChange={(e) => setEvaluationNotes(e.target.value)}
-                        className="mt-2"
-                        rows={3}
-                      />
-                    </div>
-
-                    <div>
-                      <Label className="text-base font-medium mb-2 block">
-                        Tags
-                      </Label>
-                      <div className="flex flex-wrap gap-2">
-                        {[
-                          "High Potential",
-                          "Technical Expert",
-                          "Cultural Fit",
-                          "Needs Training",
-                          "Follow Up",
-                          "Quick Hire",
-                        ].map((tag) => (
-                          <Badge
-                            key={tag}
-                            variant={
-                              selectedTags.includes(tag) ? "default" : "outline"
-                            }
-                            className="cursor-pointer"
-                            onClick={() => {
-                              setSelectedTags((prev) =>
-                                prev.includes(tag)
-                                  ? prev.filter((t) => t !== tag)
-                                  : [...prev, tag],
-                              );
-                            }}
-                          >
-                            <Tag className="w-3 h-3 mr-1" />
-                            {tag}
-                          </Badge>
+                      <Label className="text-sm font-medium">Suggested Improvements</Label>
+                      <ul className="mt-2 space-y-1">
+                        {evaluation.suggestedImprovements.map((improvement, index) => (
+                          <li key={index} className="text-sm text-gray-600 flex items-start space-x-2">
+                            <span className="w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 flex-shrink-0"></span>
+                            <span>{improvement}</span>
+                          </li>
                         ))}
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    <div className="flex flex-wrap gap-3">
-                      <Button onClick={handleSaveEvaluation}>
-                        <Save className="w-4 h-4 mr-2" />
-                        Save Evaluation
-                      </Button>
-                      <Button variant="outline" onClick={handleShareEvaluation}>
-                        <Share2 className="w-4 h-4 mr-2" />
-                        Share Results
-                      </Button>
-                      <Button variant="outline">
-                        <Download className="w-4 h-4 mr-2" />
-                        Export PDF
-                      </Button>
-                      <Button variant="outline">
-                        <Mail className="w-4 h-4 mr-2" />
-                        Email Report
-                      </Button>
+                      </ul>
                     </div>
                   </CardContent>
                 </Card>
-              </div>
-            ) : (
-              <Card className="border-dashed">
-                <CardContent className="flex flex-col items-center justify-center py-12">
-                  <Brain className="w-16 h-16 text-gray-300 mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    Ready for Analysis
-                  </h3>
-                  <p className="text-gray-600 text-center max-w-md">
-                    Select a job position and upload a CV or choose a candidate
-                    from the database to start the AI-powered evaluation
-                    process.
-                  </p>
-                </CardContent>
-              </Card>
+              </TabsContent>
+
+              <TabsContent value="extracted" className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Extracted Information</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-sm font-medium">Personal Information</Label>
+                        <div className="mt-2 space-y-2 text-sm">
+                          <div className="flex items-center space-x-2">
+                            <User className="w-4 h-4 text-gray-500" />
+                            <span>{evaluation.extractedData.name}</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Mail className="w-4 h-4 text-gray-500" />
+                            <span>{evaluation.extractedData.email}</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Phone className="w-4 h-4 text-gray-500" />
+                            <span>{evaluation.extractedData.phone}</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <MapPin className="w-4 h-4 text-gray-500" />
+                            <span>{evaluation.extractedData.location}</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <Label className="text-sm font-medium">Skills</Label>
+                        <div className="mt-2 flex flex-wrap gap-1">
+                          {evaluation.extractedData.skills.map(skill => (
+                            <Badge key={skill} variant="outline" className="text-xs">
+                              {skill}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <Label className="text-sm font-medium">Education</Label>
+                      <ul className="mt-2 space-y-1">
+                        {evaluation.extractedData.education.map((edu, index) => (
+                          <li key={index} className="text-sm text-gray-600 flex items-start space-x-2">
+                            <GraduationCap className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                            <span>{edu}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    <div>
+                      <Label className="text-sm font-medium">Work Experience</Label>
+                      <ul className="mt-2 space-y-1">
+                        {evaluation.extractedData.workExperience.map((exp, index) => (
+                          <li key={index} className="text-sm text-gray-600 flex items-start space-x-2">
+                            <Briefcase className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                            <span>{exp}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          ) : (
+            <Card>
+              <CardContent className="py-12">
+                <div className="text-center text-gray-500">
+                  <Brain className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                  <h3 className="text-lg font-medium mb-2">No Analysis Yet</h3>
+                  <p className="mb-4">Upload a CV and select a job position to begin analysis</p>
+                  <Button onClick={quickAnalysis} variant="outline">
+                    <Lightbulb className="w-4 h-4 mr-2" />
+                    Try Demo Analysis
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
+
+      {/* File Preview Dialog */}
+      <Dialog open={showFilePreview} onOpenChange={setShowFilePreview}>
+        <DialogContent className="sm:max-w-4xl sm:max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle>File Preview - {selectedFile?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {selectedFile?.content && (
+              <ScrollArea className="h-96 w-full border rounded-lg p-4">
+                <pre className="text-sm whitespace-pre-wrap">{selectedFile.content}</pre>
+              </ScrollArea>
             )}
           </div>
-        </div>
-
-        {/* Resume Viewer Dialog */}
-        <Dialog open={showResumeViewer} onOpenChange={setShowResumeViewer}>
-          <DialogContent className="max-w-4xl max-h-[80vh]">
-            <DialogHeader>
-              <DialogTitle>Resume Viewer</DialogTitle>
-            </DialogHeader>
-            <div className="flex-1 min-h-0">
-              <div className="h-96 bg-gray-100 rounded-lg flex items-center justify-center">
-                <div className="text-center">
-                  <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600">
-                    Resume preview would be displayed here
-                  </p>
-                  <p className="text-sm text-gray-500 mt-2">
-                    {selectedCandidate?.resume || uploadedFile?.name}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
-    </TooltipProvider>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowFilePreview(false)}>
+              Close
+            </Button>
+            <Button onClick={() => {
+              // Simulate download
+              toast({
+                title: "Download Started",
+                description: `Downloading ${selectedFile?.name}`,
+              });
+            }}>
+              <Download className="w-4 h-4 mr-2" />
+              Download
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }
