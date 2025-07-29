@@ -91,12 +91,21 @@ export default function Dashboard() {
     priority: job.priority,
   }));
 
+  // Calculate realistic pipeline data from actual candidates
+  const totalCandidates = HARDCODED_CANDIDATES.length;
+  const appliedCount = HARDCODED_CANDIDATES.filter(c => c.stage === "Applied").length;
+  const screeningCount = HARDCODED_CANDIDATES.filter(c => c.stage === "Screening").length;
+  const interviewCount = HARDCODED_CANDIDATES.filter(c => c.stage === "Interview").length;
+  const technicalCount = HARDCODED_CANDIDATES.filter(c => c.stage === "Technical").length;
+  const offerCount = HARDCODED_CANDIDATES.filter(c => c.stage === "Offer").length;
+  const hiredCount = HARDCODED_CANDIDATES.filter(c => c.stage === "Hired").length;
+
   const pipeline = [
-    { stageKey: "dashboard.applied", count: 145, percentage: 100 },
-    { stageKey: "dashboard.screening", count: 67, percentage: 46 },
-    { stageKey: "dashboard.interview", count: 23, percentage: 16 },
-    { stageKey: "dashboard.offer", count: 8, percentage: 6 },
-    { stageKey: "dashboard.hired", count: 5, percentage: 3 },
+    { stageKey: "dashboard.applied", count: totalCandidates, percentage: 100 },
+    { stageKey: "dashboard.screening", count: screeningCount + interviewCount + technicalCount + offerCount + hiredCount, percentage: Math.round(((screeningCount + interviewCount + technicalCount + offerCount + hiredCount) / totalCandidates) * 100) },
+    { stageKey: "dashboard.interview", count: interviewCount + technicalCount + offerCount + hiredCount, percentage: Math.round(((interviewCount + technicalCount + offerCount + hiredCount) / totalCandidates) * 100) },
+    { stageKey: "dashboard.offer", count: offerCount + hiredCount, percentage: Math.round(((offerCount + hiredCount) / totalCandidates) * 100) },
+    { stageKey: "dashboard.hired", count: hiredCount, percentage: Math.round((hiredCount / totalCandidates) * 100) },
   ];
 
   return (
