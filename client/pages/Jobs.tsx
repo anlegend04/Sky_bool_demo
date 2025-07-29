@@ -852,6 +852,7 @@ export default function Jobs() {
     priority: true,
     pipelineSummary: true,
   });
+  
 
   const filteredJobs = jobs.filter((job) => {
     const matchesSearch =
@@ -883,7 +884,9 @@ export default function Jobs() {
       matchesRecruiter
     );
   });
+  const applyJob = filteredJobs.find((job) => job.id === applyJobId);
 
+  
   const stats = [
     {
       title: "Active Jobs",
@@ -1203,53 +1206,6 @@ export default function Jobs() {
                           Apply Candidate
                         </DropdownMenuItem>
 
-                        <Dialog
-                          open={!!applyJobId}
-                          onOpenChange={(open) => !open && setApplyJobId(null)}
-                        >
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Apply Candidate</DialogTitle>
-                              <DialogDescription>
-                                Select a candidate to apply to job:{" "}
-                                <strong>{job?.position}</strong>
-                              </DialogDescription>
-                            </DialogHeader>
-
-                            <Select
-                              onValueChange={(value) =>
-                                setSelectedCandidateId(value)
-                              }
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select Candidate" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {candidates.map((c) => (
-                                  <SelectItem key={c.id} value={c.id}>
-                                    {c.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-
-                            <DialogFooter>
-                              <Button
-                                variant="outline"
-                                onClick={() => setApplyJobId(null)}
-                              >
-                                Cancel
-                              </Button>
-                              <Button
-                                onClick={handleApplyCandidate}
-                                disabled={!selectedCandidateId}
-                              >
-                                Apply
-                              </Button>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-
                         <Link to={`/jobs/${job.id}`}>
                           <DropdownMenuItem>
                             <Eye className="w-4 h-4 mr-2" />
@@ -1300,6 +1256,45 @@ export default function Jobs() {
               ))}
             </TableBody>
           </Table>
+          <Dialog
+            open={!!applyJobId}
+            onOpenChange={(open) => !open && setApplyJobId(null)}
+          >
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Apply Candidate</DialogTitle>
+                <DialogDescription>
+                  Select a candidate to apply to job:{" "}
+                  <strong>{applyJob?.position}</strong>
+                </DialogDescription>
+              </DialogHeader>
+
+              <Select onValueChange={(value) => setSelectedCandidateId(value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Candidate" />
+                </SelectTrigger>
+                <SelectContent>
+                  {candidates.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setApplyJobId(null)}>
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleApplyCandidate}
+                  disabled={!selectedCandidateId}
+                >
+                  Apply
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </CardContent>
     </Card>

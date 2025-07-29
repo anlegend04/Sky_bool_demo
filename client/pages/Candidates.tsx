@@ -26,6 +26,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter
 } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -59,6 +60,7 @@ import {
   Clock,
   DollarSign,
   Building,
+  UserPlus,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -111,6 +113,11 @@ export default function Candidates() {
     "Hired",
     "Rejected",
   ];
+  const jobs = [
+  { id: '1', position: 'Frontend Developer' },
+  { id: '2', position: 'Backend Engineer' },
+];
+
 
   const stats = [
     {
@@ -141,6 +148,13 @@ export default function Candidates() {
       color: "purple",
     },
   ];
+
+  const [applyCandidateId, setApplyCandidateId] = useState<string | null>(null);
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+  const applyCandidateToJob = (candidateId: string, jobId: string) => {
+  console.log(`Applying candidate ${candidateId} to job ${jobId}`);
+};
+
 
   // Filter candidates based on search and filters
   const filteredCandidates = candidates.filter((candidate) => {
@@ -176,6 +190,7 @@ export default function Candidates() {
       matchesRecruiter
     );
   });
+  const applyCandidate = candidates.find((c) => c.id === applyCandidateId);
 
   const CandidateCard = ({ candidate }: { candidate: CandidateData }) => (
     <Card className="hover:shadow-md transition-shadow cursor-pointer">
@@ -409,6 +424,14 @@ export default function Candidates() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
+                        {/* Action apply Job for specific candidate */}
+                        <DropdownMenuItem
+                          onClick={() => setApplyCandidateId(candidate.id)}
+                        >
+                          <UserPlus className="w-4 h-4 mr-2" />
+                          Apply to Job
+                        </DropdownMenuItem>
+
                         <Link to={`/candidates/${candidate.id}`}>
                           <DropdownMenuItem>
                             <Eye className="w-4 h-4 mr-2" />
@@ -430,6 +453,54 @@ export default function Candidates() {
               ))}
             </TableBody>
           </Table>
+          <Dialog
+            open={!!applyCandidateId}
+            onOpenChange={(open) => !open && setApplyCandidateId(null)}
+          >
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Apply to Job</DialogTitle>
+                <DialogDescription>
+                  Select a job to apply candidate:{" "}
+                  <strong>{applyCandidate?.name}</strong>
+                </DialogDescription>
+              </DialogHeader>
+
+              <Select onValueChange={(value) => setSelectedJobId(value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Job" />
+                </SelectTrigger>
+                <SelectContent>
+                  {jobs.map((job) => (
+                    <SelectItem key={job.id} value={job.id}>
+                      {job.position}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => setApplyCandidateId(null)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => {
+                    if (applyCandidateId && selectedJobId) {
+                      applyCandidateToJob(applyCandidateId, selectedJobId);
+                      setApplyCandidateId(null);
+                      setSelectedJobId(null);
+                    }
+                  }}
+                  disabled={!selectedJobId}
+                >
+                  Apply
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </CardContent>
     </Card>
