@@ -381,6 +381,11 @@ export default function CandidateDetail() {
     }
   };
 
+  const handleTemplateSelect = (template: string) => {
+    // Handle template selection logic
+    console.log("Template selected:", template);
+  };
+
   const StatusTracker = () => {
     const currentStageIndex = stages.findIndex(
       (stage) => stage.name === currentStage,
