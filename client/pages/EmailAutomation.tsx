@@ -44,6 +44,7 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/hooks/use-language";
 import { useState, useMemo } from "react";
+import { getAllEmailTemplates, EmailTemplate, generateEmailContent } from "@/lib/email-utils";
 
 interface EmailTemplate {
   id: number;
