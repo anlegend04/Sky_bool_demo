@@ -713,12 +713,38 @@ export default function Reports() {
                 </div>
               ) : (
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={chartData.sourceDistribution}>
+                  <BarChart data={chartData.sourceDistribution.filter(d => d.value > 0)}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="value" fill="#3b82f6" />
+                    <XAxis
+                      dataKey="name"
+                      angle={-45}
+                      textAnchor="end"
+                      height={80}
+                      fontSize={12}
+                    />
+                    <YAxis fontSize={12} />
+                    <Tooltip
+                      formatter={(value, name) => [`${value} candidates`, 'Applications']}
+                      labelFormatter={(label) => `Source: ${label}`}
+                      content={({active, payload, label}) => {
+                        if (active && payload && payload.length) {
+                          const data = payload[0].payload;
+                          return (
+                            <div className="bg-white p-3 border border-gray-200 rounded shadow-lg">
+                              <p className="font-medium">{`Source: ${label}`}</p>
+                              <p className="text-blue-600">{`Applications: ${data.value}`}</p>
+                              <p className="text-green-600">{`Success Rate: ${data.effectiveness}%`}</p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Bar
+                      dataKey="value"
+                      fill="#3b82f6"
+                      radius={[4, 4, 0, 0]}
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               )}
