@@ -108,6 +108,9 @@ export default function CandidateDetail() {
   const [pendingStage, setPendingStage] = useState(""); // NEW
   const [pendingReason, setPendingReason] = useState(""); // NEW
   const [stageChangeReason, setStageChangeReason] = useState("");
+  const [newStage, setNewStage] = useState("");
+  const [selectedEmail, setSelectedEmail] = useState<EmailData | null>(null);
+  const [emailSubject, setEmailSubject] = useState("");
   const { toast } = useToast();
 
   // Load candidate from hardcoded data or localStorage
