@@ -651,12 +651,43 @@ export default function Reports() {
                     { month: "Apr", applications: filteredData.length, hires: filteredData.filter(c => c.stage === "Hired").length },
                   ]}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="applications" stroke="#3b82f6" />
-                    <Line type="monotone" dataKey="hires" stroke="#10b981" />
+                    <XAxis dataKey="month" fontSize={12} />
+                    <YAxis fontSize={12} />
+                    <Tooltip
+                      formatter={(value, name) => {
+                        const labels = {
+                          applications: 'Applications Received',
+                          hires: 'Candidates Hired'
+                        };
+                        return [value, labels[name] || name];
+                      }}
+                      labelFormatter={(label) => `Month: ${label}`}
+                    />
+                    <Legend
+                      formatter={(value) => {
+                        const labels = {
+                          applications: 'Total Applications',
+                          hires: 'Successful Hires'
+                        };
+                        return labels[value] || value;
+                      }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="applications"
+                      stroke="#3b82f6"
+                      strokeWidth={3}
+                      dot={{ fill: '#3b82f6', strokeWidth: 2, r: 6 }}
+                      activeDot={{ r: 8, stroke: '#3b82f6', strokeWidth: 2 }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="hires"
+                      stroke="#10b981"
+                      strokeWidth={3}
+                      dot={{ fill: '#10b981', strokeWidth: 2, r: 6 }}
+                      activeDot={{ r: 8, stroke: '#10b981', strokeWidth: 2 }}
+                    />
                   </LineChart>
                 </ResponsiveContainer>
               )}
