@@ -1152,6 +1152,125 @@ export default function Candidates() {
           <Button variant="outline" size="sm">
             <Plus className="w-4 h-4 mr-2" />
             Add Manually
+
+            <TabsContent value="manual" className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-slate-700">
+                        Full Name
+                      </label>
+                      <Input placeholder="John Doe" className="mt-1" />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-slate-700">
+                        Email
+                      </label>
+                      <Input
+                        type="email"
+                        placeholder="john@example.com"
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-slate-700">
+                        Phone
+                      </label>
+                      <Input placeholder="+1 (555) 123-4567" className="mt-1" />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-slate-700">
+                        Location
+                      </label>
+                      <Input placeholder="City, State" className="mt-1" />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-slate-700">
+                        Job Position
+                      </label>
+                      <Select>
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder="Select position" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="software-engineer">
+                            Software Engineer
+                          </SelectItem>
+                          <SelectItem value="product-manager">
+                            Product Manager
+                          </SelectItem>
+                          <SelectItem value="ux-designer">
+                            UX Designer
+                          </SelectItem>
+                          <SelectItem value="data-analyst">
+                            Data Analyst
+                          </SelectItem>
+                          <SelectItem value="marketing-specialist">
+                            Marketing Specialist
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-slate-700">
+                        Department
+                      </label>
+                      <Select>
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder="Select department" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="engineering">
+                            Engineering
+                          </SelectItem>
+                          <SelectItem value="product">Product</SelectItem>
+                          <SelectItem value="design">Design</SelectItem>
+                          <SelectItem value="marketing">Marketing</SelectItem>
+                          <SelectItem value="data">Data</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-slate-700">
+                        Source
+                      </label>
+                      <Select onValueChange={setSource}>
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder="Select source" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="linkedin">LinkedIn</SelectItem>
+                          <SelectItem value="topcv">TopCV</SelectItem>
+                          <SelectItem value="facebook">Facebook</SelectItem>
+                          <SelectItem value="third-party">
+                            Third Party
+                          </SelectItem>
+                          <SelectItem
+                            value="customize"
+                            className="text-blue-600 font-semibold hover:bg-blue-50"
+                          >
+                            <div className="flex items-center gap-2 pl-1">
+                              <Plus className="w-4 h-4 stroke-[3]" />
+                              <span>Customize</span>
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+
+                      {source === "customize" && (
+                        <Input
+                          className="mt-2"
+                          placeholder="Enter custom source"
+                          value={customSource}
+                          onChange={(e) => setCustomSource(e.target.value)}
+                        />
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex justify-end space-x-2">
+                    <Button variant="outline">Cancel</Button>
+                    <Button>Create Candidate</Button>
+                  </div>
+                </TabsContent>
           </Button>
         </div>
       </div>
