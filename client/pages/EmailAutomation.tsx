@@ -54,7 +54,7 @@ interface EmailTemplateExtended extends EmailTemplate {
 }
 
 interface EmailPreviewData {
-  template: EmailTemplate;
+  template: EmailTemplateExtended;
   candidateName: string;
   jobTitle: string;
   companyName: string;
