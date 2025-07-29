@@ -279,7 +279,7 @@ export default function EmailAutomation() {
     return { subject, content, data };
   };
 
-  const handlePreviewTemplate = (template: EmailTemplate) => {
+  const handlePreviewTemplate = (template: EmailTemplateExtended) => {
     const preview = generateEmailPreview(template);
     setPreviewData({
       template,
