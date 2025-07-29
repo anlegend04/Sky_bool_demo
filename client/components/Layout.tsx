@@ -88,6 +88,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       icon: Users,
     },
     {
+      name: "CV Evaluation",
+      path: "/cv-evaluation",
+      icon: FileText,
+    },
+    {
       name: t("nav.calendar"),
       path: "/calendar",
       icon: Calendar,
