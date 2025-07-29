@@ -57,8 +57,8 @@ export function EmailTrigger({
   const [isEmailOptional, setIsEmailOptional] = useState(false);
 
   // Get templates for the new stage
-  const stageTemplates = emailTemplates.filter(template => template.stage === newStage);
-  const selectedTemplate = emailTemplates.find(t => t.id === selectedTemplateId);
+  const stageTemplates = getTemplatesForStage(newStage);
+  const selectedTemplate = stageTemplates.find(t => t.id === selectedTemplateId);
 
   // Auto-select template if only one is available for the stage
   useEffect(() => {
