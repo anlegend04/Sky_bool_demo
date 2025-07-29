@@ -84,6 +84,7 @@ import {
 } from "@/lib/storage";
 import { useToast } from "@/hooks/use-toast";
 import { HARDCODED_CANDIDATES, EMAIL_TEMPLATES } from "@/data/hardcoded-data";
+import { EmailTrigger } from "@/components/EmailTrigger";
 
 type StageData = {
   name: string;
@@ -102,16 +103,12 @@ export default function CandidateDetail() {
   const [candidate, setCandidate] = useState<CandidateData | null>(null);
   const [currentStage, setCurrentStage] = useState("Interview");
   const [newNote, setNewNote] = useState("");
-  const [emailContent, setEmailContent] = useState("");
-  const [emailSubject, setEmailSubject] = useState("");
-  const [selectedTemplate, setSelectedTemplate] = useState("");
   const [showStageChangeDialog, setShowStageChangeDialog] = useState(false);
-  const [showEmailDialog, setShowEmailDialog] = useState(false);
-  const [newStage, setNewStage] = useState("");
+  const [showEmailTrigger, setShowEmailTrigger] = useState(false); // NEW
+  const [pendingStage, setPendingStage] = useState(""); // NEW
+  const [pendingReason, setPendingReason] = useState(""); // NEW
   const [stageChangeReason, setStageChangeReason] = useState("");
-  const [emailPreview, setEmailPreview] = useState("");
   const { toast } = useToast();
-  const [selectedEmail, setSelectedEmail] = useState(null);
 
   // Load candidate from hardcoded data or localStorage
   useEffect(() => {
@@ -369,70 +366,16 @@ export default function CandidateDetail() {
     }
 
     if (template) {
-      setSelectedTemplate(template);
-      setEmailSubject(subject);
-      setEmailContent(emailTemplates[template] || "");
-      setShowEmailDialog(true);
+      // setSelectedTemplate(template); // No longer needed
+      // setEmailSubject(subject); // No longer needed
+      // setEmailContent(emailTemplates[template] || ""); // No longer needed
+      // setShowEmailDialog(true); // No longer needed
 
       toast({
         title: "Email Suggested",
         description: `Would you like to send a ${stage.toLowerCase()} email to ${candidate.name}?`,
       });
     }
-  };
-
-  const handleSendEmail = () => {
-    const emailData: Omit<EmailData, "id"> = {
-      subject: emailSubject,
-      content: emailContent,
-      from: "recruiter@company.com",
-      to: candidate.email,
-      timestamp: new Date().toISOString(),
-      status: "sent",
-      template: selectedTemplate || undefined,
-    };
-
-    // In a real app, you'd send the email and store it
-    toast({
-      title: "Email Sent",
-      description: `Email sent to ${candidate.name} successfully.`,
-    });
-
-    setShowEmailDialog(false);
-    setEmailContent("");
-    setEmailSubject("");
-    setSelectedTemplate("");
-  };
-
-  const handleSaveDraft = () => {
-    const emailData: Omit<EmailData, "id"> = {
-      subject: emailSubject,
-      content: emailContent,
-      from: "recruiter@company.com",
-      to: candidate.email,
-      timestamp: new Date().toISOString(),
-      status: "draft",
-      template: selectedTemplate || undefined,
-    };
-
-    toast({
-      title: "Draft Saved",
-      description: "Email draft has been saved successfully.",
-    });
-  };
-
-  const handleTemplateSelect = (templateKey: string) => {
-    setSelectedTemplate(templateKey);
-    const template = emailTemplates[templateKey] || "";
-
-    // Replace template variables
-    const processedTemplate = template
-      .replace(/{{name}}/g, candidate.name)
-      .replace(/{{position}}/g, candidate.position)
-      .replace(/{{company}}/g, "TalentFlow");
-
-    setEmailContent(processedTemplate);
-    setEmailPreview(processedTemplate);
   };
 
   const StatusTracker = () => {
@@ -819,7 +762,7 @@ export default function CandidateDetail() {
         <CardContent className="space-y-3 sm:space-y-4">
           <Button
             className="w-full justify-start text-sm"
-            onClick={() => setShowEmailDialog(true)}
+            onClick={() => setShowEmailTrigger(true)}
           >
             <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
             <span className="truncate">Compose Email</span>
@@ -840,7 +783,7 @@ export default function CandidateDetail() {
                   setEmailSubject(
                     `Interview Invitation - ${candidate.position}`,
                   );
-                  setShowEmailDialog(true);
+                  setShowEmailTrigger(true);
                 }}
               >
                 <span className="truncate">Interview Invitation</span>
@@ -852,7 +795,7 @@ export default function CandidateDetail() {
                 onClick={() => {
                   handleTemplateSelect("offer_letter");
                   setEmailSubject(`Job Offer - ${candidate.position}`);
-                  setShowEmailDialog(true);
+                  setShowEmailTrigger(true);
                 }}
               >
                 <span className="truncate">Offer Letter</span>
@@ -866,7 +809,7 @@ export default function CandidateDetail() {
                   setEmailSubject(
                     `Thank you for your application - ${candidate.position}`,
                   );
-                  setShowEmailDialog(true);
+                  setShowEmailTrigger(true);
                 }}
               >
                 <span className="truncate">Rejection Notice</span>
@@ -1159,6 +1102,35 @@ export default function CandidateDetail() {
     </div>
   );
 
+  const handleStageChangeRequest = () => {
+    // Called when user clicks 'Update Stage' in dialog
+    setShowStageChangeDialog(false);
+    setPendingStage(newStage);
+    setPendingReason(stageChangeReason);
+    setShowEmailTrigger(true); // Open EmailTrigger for double check
+  };
+
+  const handleEmailSentOrSkipped = () => {
+    // Actually update stage after email is sent or skipped
+    if (!candidate) return;
+    const updatedCandidate = storage.updateCandidate(candidate.id, {
+      stage: pendingStage,
+    });
+    if (updatedCandidate) {
+      setCandidate(updatedCandidate);
+      setCurrentStage(pendingStage);
+      setPendingStage("");
+      setPendingReason("");
+      setShowEmailTrigger(false);
+      setStageChangeReason("");
+      // Toast
+      toast({
+        title: "Stage Updated",
+        description: `${candidate.name} has been moved to ${pendingStage} stage.`,
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
@@ -1258,133 +1230,21 @@ export default function CandidateDetail() {
               >
                 Cancel
               </Button>
-              <Button onClick={handleStageChange}>Update Stage</Button>
+              <Button onClick={handleStageChangeRequest}>Update Stage</Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Email Compose Dialog */}
-      <Dialog open={showEmailDialog} onOpenChange={setShowEmailDialog}>
-        <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
-              Compose Email
-              <HelpTooltip content={helpContent.template} />
-            </DialogTitle>
-            <DialogDescription className="text-sm sm:text-base">
-              Send an email to {candidate.name} ({candidate.email})
-            </DialogDescription>
-          </DialogHeader>
-
-          <Tabs defaultValue="compose" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="compose">Compose</TabsTrigger>
-              <TabsTrigger value="preview">Preview</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="compose" className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                  Email Template
-                  <HelpTooltip content={helpContent.template} />
-                </label>
-                <Select
-                  value={selectedTemplate}
-                  onValueChange={handleTemplateSelect}
-                >
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Select a template or compose manually" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Manual Compose</SelectItem>
-                    <SelectItem value="interview_invitation">
-                      Interview Invitation
-                    </SelectItem>
-                    <SelectItem value="offer_letter">Offer Letter</SelectItem>
-                    <SelectItem value="rejection_notice">
-                      Rejection Notice
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-slate-700">
-                  Subject Line
-                </label>
-                <Input
-                  value={emailSubject}
-                  onChange={(e) => setEmailSubject(e.target.value)}
-                  placeholder="Enter email subject..."
-                  className="mt-1"
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-medium text-slate-700">
-                  Email Content
-                </label>
-                <Textarea
-                  value={emailContent}
-                  onChange={(e) => setEmailContent(e.target.value)}
-                  placeholder="Compose your email..."
-                  rows={12}
-                  className="mt-1"
-                />
-              </div>
-
-              <div className="flex items-center justify-between pt-4">
-                <Button variant="outline" size="sm">
-                  <Paperclip className="w-4 h-4 mr-2" />
-                  Attach File
-                </Button>
-                <div className="flex items-center space-x-2">
-                  <Button variant="outline" onClick={handleSaveDraft}>
-                    <Save className="w-4 h-4 mr-2" />
-                    Save Draft
-                  </Button>
-                  <Button onClick={handleSendEmail}>
-                    <Send className="w-4 h-4 mr-2" />
-                    Send Email
-                  </Button>
-                </div>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="preview" className="space-y-4">
-              <div className="border border-slate-200 rounded-lg p-4 bg-slate-50">
-                <div className="space-y-3 mb-4 pb-4 border-b border-slate-200">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium">To:</span>
-                    <span>{candidate.email}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium">Subject:</span>
-                    <span>{emailSubject || "No subject"}</span>
-                  </div>
-                </div>
-                <div className="prose prose-sm max-w-none">
-                  <div className="whitespace-pre-wrap text-sm text-slate-700">
-                    {emailContent || "No content"}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-end space-x-2">
-                <Button variant="outline" onClick={handleSaveDraft}>
-                  <Save className="w-4 h-4 mr-2" />
-                  Save Draft
-                </Button>
-                <Button onClick={handleSendEmail}>
-                  <Send className="w-4 h-4 mr-2" />
-                  Send Email
-                </Button>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </DialogContent>
-      </Dialog>
+      {/* Email Trigger Modal */}
+      <EmailTrigger
+        isOpen={showEmailTrigger}
+        onClose={handleEmailSentOrSkipped}
+        candidate={candidate}
+        newStage={pendingStage}
+        jobTitle={candidate.position}
+        onEmailSent={handleEmailSentOrSkipped}
+      />
     </div>
   );
 }
