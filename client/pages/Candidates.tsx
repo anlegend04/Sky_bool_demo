@@ -142,6 +142,9 @@ export default function Candidates() {
     [],
   );
   const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
+  const [emailTriggerOpen, setEmailTriggerOpen] = useState(false);
+  const [selectedCandidateForEmail, setSelectedCandidateForEmail] = useState<CandidateData | null>(null);
+  const [newStageForEmail, setNewStageForEmail] = useState<string>("");
   const [isDragOver, setIsDragOver] = useState(false);
   const [bulkJobPosition, setBulkJobPosition] = useState("");
   const [bulkSource, setBulkSource] = useState("");
