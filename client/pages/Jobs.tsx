@@ -57,6 +57,7 @@ import {
   Filter,
   MoreHorizontal,
   Users,
+  UserPlus,
   MapPin,
   Calendar,
   Edit,
