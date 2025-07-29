@@ -288,15 +288,10 @@ export default function Reports() {
           <p className="text-slate-600 mt-1">{t("reports.subtitle")}</p>
         </div>
         <div className="flex space-x-3">
-          <CSVLink
-            data={hardcodedData}
-            headers={headers}
-            filename={"report-export.csv"}
-            className="inline-flex items-center px-3 py-1.5 text-sm border rounded-md text-slate-700 border-slate-300 hover:bg-slate-50"
-          >
+          <Button variant="outline" size="sm" onClick={downloadCSV}>
             <Download className="w-4 h-4 mr-2" />
             {t("reports.exportReport")}
-          </CSVLink>
+          </Button>
         </div>
       </div>
 
