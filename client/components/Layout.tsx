@@ -104,6 +104,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       icon: Calendar,
     },
     {
+      name: "Schedule",
+      path: "/schedule",
+      icon: Clock,
+    },
+    {
       name: t("nav.email"),
       path: "/email-automation",
       icon: Mail,
