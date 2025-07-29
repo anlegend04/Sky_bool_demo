@@ -73,8 +73,24 @@ import {
   Target,
   CheckCircle,
   Settings,
-  Trash,
 } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { GripVertical, Trash } from "lucide-react";
 
 // Define initial job form state
 const initialJobState = {
@@ -95,6 +111,81 @@ const initialJobState = {
   deadline: "",
   estimatedCost: "",
 };
+
+const [jobStages, setJobStages] = useState([
+  { id: "1", name: "Applied", durationHours: 2 },
+  { id: "2", name: "Interview", durationHours: 4 },
+]);
+
+const addNewStage = () => {
+  const newStage = {
+    id: crypto.randomUUID(),
+    name: "",
+    durationHours: 1,
+  };
+  setJobStages([...jobStages, newStage]);
+};
+
+function SortableStageItem({ id, index, stage, updateStage, removeStage }) {
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      className="flex flex-col gap-2 border border-slate-200 rounded-xl p-3 bg-slate-50"
+    >
+      <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+        <span {...listeners} className="cursor-move text-slate-400">
+          <GripVertical className="w-4 h-4 mt-1" />
+        </span>
+        <Input
+          value={stage.name}
+          onChange={(e) =>
+            updateStage(index, {
+              ...stage,
+              name: e.target.value,
+            })
+          }
+          className="flex-1"
+          placeholder="Stage name"
+        />
+        <Input
+          type="number"
+          min={1}
+          value={stage.durationHours || ""}
+          onChange={(e) =>
+            updateStage(index, {
+              ...stage,
+              durationHours: e.target.value,
+            })
+          }
+          className="w-36"
+          placeholder="Duration (h)"
+        />
+        {!["Applied", "Screening", "Interview", "Offer", "Hired"].includes(
+          stage.name,
+        ) && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => removeStage(index)}
+            className="text-red-500"
+          >
+            <Trash className="w-4 h-4" />
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
 
 // Memoized JobCard to prevent unnecessary re-renders
 const JobCard = memo(
@@ -726,57 +817,49 @@ const AddJobForm = memo(
                 <label className="text-responsive-sm font-medium text-slate-700">
                   Recruitment Stages
                 </label>
-                <div className="space-y-2">
-                  {jobStages.map((stage, index) => (
-                    <div
-                      key={index}
-                      className="flex flex-col gap-2 border border-slate-200 rounded-xl p-3 bg-slate-50"
-                    >
-                      <div className="flex flex-col sm:flex-row gap-2">
-                        <Input
-                          value={stage.name}
-                          onChange={(e) =>
-                            updateStage(index, {
-                              ...stage,
-                              name: e.target.value,
-                            })
-                          }
-                          className="flex-1"
-                          placeholder="Stage name"
+
+                <DndContext
+                  sensors={useSensors(
+                    useSensor(PointerSensor),
+                    useSensor(KeyboardSensor, {
+                      coordinateGetter: sortableKeyboardCoordinates,
+                    }),
+                  )}
+                  collisionDetection={closestCenter}
+                  onDragEnd={(event) => {
+                    const { active, over } = event;
+                    if (active.id !== over?.id) {
+                      const oldIndex = jobStages.findIndex(
+                        (s) => s.id === active.id,
+                      );
+                      const newIndex = jobStages.findIndex(
+                        (s) => s.id === over?.id,
+                      );
+                      setJobStages((items) =>
+                        arrayMove(items, oldIndex, newIndex),
+                      );
+                    }
+                  }}
+                >
+                  <SortableContext
+                    items={jobStages.map((s) => s.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="space-y-2">
+                      {jobStages.map((stage, index) => (
+                        <SortableStageItem
+                          key={stage.id}
+                          id={stage.id}
+                          index={index}
+                          stage={stage}
+                          updateStage={updateStage}
+                          removeStage={removeStage}
                         />
-                        <Input
-                          type="number"
-                          min={1}
-                          value={stage.durationHours || ""}
-                          onChange={(e) =>
-                            updateStage(index, {
-                              ...stage,
-                              durationHours: e.target.value,
-                            })
-                          }
-                          className="w-36"
-                          placeholder="Duration (h)"
-                        />
-                        {![
-                          "Applied",
-                          "Screening",
-                          "Interview",
-                          "Offer",
-                          "Hired",
-                        ].includes(stage.name) && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => removeStage(index)}
-                            className="text-red-500"
-                          >
-                            <Trash className="w-4 h-4" />
-                          </Button>
-                        )}
-                      </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </SortableContext>
+                </DndContext>
+
                 <Button
                   variant="outline"
                   onClick={addNewStage}
@@ -852,7 +935,6 @@ export default function Jobs() {
     priority: true,
     pipelineSummary: true,
   });
-  
 
   const filteredJobs = jobs.filter((job) => {
     const matchesSearch =
@@ -886,7 +968,6 @@ export default function Jobs() {
   });
   const applyJob = filteredJobs.find((job) => job.id === applyJobId);
 
-  
   const stats = [
     {
       title: "Active Jobs",

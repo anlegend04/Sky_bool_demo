@@ -175,7 +175,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             {/* Header actions */}
             <div className="flex items-center space-x-3">
               {/* Quick Add dropdown */}
-              <DropdownMenu>
+              {/* <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="outline"
@@ -196,7 +196,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     </Link>
                   ))}
                 </DropdownMenuContent>
-              </DropdownMenu>
+              </DropdownMenu> */}
 
               {/* Language Switcher */}
               <DropdownMenu>
