@@ -587,12 +587,16 @@ export default function FollowUpDashboard() {
                   )}
                   {visibleFields.email && <TableHead>Email</TableHead>}
                   {visibleFields.phone && <TableHead>Phone</TableHead>}
-                  {visibleFields.position && <TableHead>Job Position</TableHead>}
+                  {visibleFields.position && (
+                    <TableHead>Job Position</TableHead>
+                  )}
                   {visibleFields.recruiter && <TableHead>Recruiter</TableHead>}
                   {visibleFields.source && <TableHead>Source</TableHead>}
                   {visibleFields.salary && <TableHead>Salary</TableHead>}
                   {visibleFields.location && <TableHead>Location</TableHead>}
-                  {visibleFields.department && <TableHead>Department</TableHead>}
+                  {visibleFields.department && (
+                    <TableHead>Department</TableHead>
+                  )}
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -641,16 +645,16 @@ export default function FollowUpDashboard() {
                             candidate.stage === "Offer"
                               ? "default"
                               : candidate.stage === "Hired"
-                              ? "default"
-                              : candidate.stage === "Technical"
-                              ? "secondary"
-                              : candidate.stage === "Interview"
-                              ? "outline"
-                              : candidate.stage === "Screening"
-                              ? "secondary"
-                              : candidate.stage === "Applied"
-                              ? "outline"
-                              : "destructive"
+                                ? "default"
+                                : candidate.stage === "Technical"
+                                  ? "secondary"
+                                  : candidate.stage === "Interview"
+                                    ? "outline"
+                                    : candidate.stage === "Screening"
+                                      ? "secondary"
+                                      : candidate.stage === "Applied"
+                                        ? "outline"
+                                        : "destructive"
                           }
                           className="truncate max-w-24"
                         >
@@ -741,12 +745,12 @@ export default function FollowUpDashboard() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem
+                          {/* <DropdownMenuItem
                             onClick={() => setApplyCandidateId(candidate.id)}
                           >
                             <UserPlus className="w-4 h-4 mr-2" />
                             Apply to Job
-                          </DropdownMenuItem>
+                          </DropdownMenuItem> */}
                           <Link to={`/candidates/${candidate.id}`}>
                             <DropdownMenuItem>
                               <Eye className="w-4 h-4 mr-2" />
@@ -1133,7 +1137,10 @@ export default function FollowUpDashboard() {
                 <div className="text-sm space-y-2">
                   <div>
                     <strong>Subject:</strong>{" "}
-                    {emailTemplates.find((t) => t.id === emailTemplate)?.subject}
+                    {
+                      emailTemplates.find((t) => t.id === emailTemplate)
+                        ?.subject
+                    }
                   </div>
                   <div>
                     <strong>Body:</strong>

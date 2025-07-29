@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -43,21 +43,20 @@ import {
   AlertTriangle,
   Lightbulb,
   Brain,
-  TrendingUp,
+  Briefcase,
+  GraduationCap,
   User,
   Calendar,
   MapPin,
   Mail,
   Phone,
-  Briefcase,
-  GraduationCap,
-  Award,
   Filter,
   RefreshCw,
   FileCheck,
   ThumbsUp,
   ThumbsDown,
   Target,
+  ChevronDown,
 } from "lucide-react";
 import {
   HARDCODED_CANDIDATES,
@@ -98,12 +97,16 @@ export default function CVEvaluation() {
   const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null);
   const [evaluation, setEvaluation] = useState<CVEvaluation | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+
   const [candidateFilter, setCandidateFilter] = useState<string>("all");
   const [showResumeViewer, setShowResumeViewer] = useState(false);
   const [evaluationNotes, setEvaluationNotes] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [jobSearchQuery, setJobSearchQuery] = useState("");
+  const [isJobDropdownOpen, setIsJobDropdownOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Filter candidates based on search and filters
   const filteredCandidates = HARDCODED_CANDIDATES.filter((candidate) => {
@@ -118,6 +121,13 @@ export default function CVEvaluation() {
 
     return matchesSearch && matchesFilter;
   });
+
+  // Filter jobs based on search query
+  const filteredJobs = HARDCODED_JOBS.filter((job) =>
+    `${job.position} ${job.department} ${job.location} ${job.recruiter}`
+      .toLowerCase()
+      .includes(jobSearchQuery.toLowerCase()),
+  );
 
   // Mock CV analysis function
   const analyzeCV = useCallback(async () => {
@@ -212,7 +222,6 @@ export default function CVEvaluation() {
     setEvaluation(mockEvaluation);
     setIsAnalyzing(false);
   }, [selectedCandidate, selectedJob, uploadedFile]);
-  const [searchTerm, setSearchTerm] = useState("");
 
   // Handle file upload
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -295,11 +304,27 @@ export default function CVEvaluation() {
         return "text-gray-600 bg-gray-50 border-gray-200";
     }
   };
-  const filteredJobs = HARDCODED_JOBS.filter((job) =>
-    `${job.position} ${job.department} ${job.location} ${job.recruiter}`
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase()),
-  );
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsJobDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Reset selected job when it doesn't match search results
+  useEffect(() => {
+    if (selectedJob && !filteredJobs.some((job) => job.id === selectedJob.id)) {
+      setSelectedJob(null);
+    }
+  }, [jobSearchQuery, filteredJobs]);
 
   return (
     <TooltipProvider>
@@ -314,89 +339,136 @@ export default function CVEvaluation() {
               Analyze and evaluate candidate resumes with AI-powered insights
             </p>
           </div>
-
-          {/*<div className="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm">
-              <Filter className="w-4 h-4 mr-2" />
-              Filters
-            </Button>
-            <Button variant="outline" size="sm">
-              <Download className="w-4 h-4 mr-2" />
-              Export Report
-            </Button>
-          </div> */}
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Left Panel - CV Input Section */}
           <div className="lg:col-span-1 space-y-6">
             {/* Job Selection */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+            <div className="bg-white shadow-sm rounded-lg border border-gray-200">
+              <div className="p-4 border-b border-gray-200">
+                <h3 className="flex items-center gap-2 text-lg font-semibold text-gray-900">
                   <Target className="w-5 h-5" />
                   Select Job Position
-                </CardTitle>
-              </CardHeader>
-
-              <CardContent className="space-y-4">
-                <Input
-                  type="text"
-                  placeholder="Search by title, department, location, recruiter..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full"
-                />
-
-                <Select
-                  onValueChange={(value) => {
-                    const job = HARDCODED_JOBS.find((j) => j.id === value);
-                    setSelectedJob(job || null);
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choose a job to evaluate against" />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-60 overflow-y-auto">
-                    {filteredJobs.length > 0 ? (
-                      filteredJobs.map((job) => (
-                        <SelectItem key={job.id} value={job.id}>
-                          <div className="flex flex-col">
-                            <span className="font-medium">{job.position}</span>
-                            <span className="text-xs text-muted-foreground">
-                              {job.department} • {job.location} •{" "}
-                              {job.recruiter}
-                            </span>
-                          </div>
-                        </SelectItem>
-                      ))
-                    ) : (
-                      <div className="px-4 py-2 text-sm text-muted-foreground">
-                        No matching jobs found.
-                      </div>
-                    )}
-                  </SelectContent>
-                </Select>
-
-                {selectedJob && (
-                  <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Briefcase className="w-4 h-4 text-blue-600" />
-                      <span className="font-medium text-blue-900">
-                        {selectedJob.position}
+                </h3>
+              </div>
+              <div className="p-4">
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    type="button"
+                    className="w-full h-12 px-4 py-2 flex items-center justify-between bg-gray-50 border border-gray-300 rounded-md text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                    onClick={() => setIsJobDropdownOpen(!isJobDropdownOpen)}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Search className="w-4 h-4 text-gray-400" />
+                      <span className="truncate">
+                        {selectedJob
+                          ? selectedJob.position
+                          : "Search and select a job position..."}
                       </span>
                     </div>
+                    <ChevronDown
+                      className={`w-4 h-4 text-gray-400 transition-transform ${
+                        isJobDropdownOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {isJobDropdownOpen && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-80 overflow-y-auto">
+                      <div className="p-2">
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                          <input
+                            type="text"
+                            placeholder="Search jobs..."
+                            value={jobSearchQuery}
+                            onChange={(e) => setJobSearchQuery(e.target.value)}
+                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        </div>
+                      </div>
+                      <div className="divide-y divide-gray-100">
+                        {filteredJobs.length > 0 ? (
+                          filteredJobs.map((job) => (
+                            <button
+                              key={job.id}
+                              type="button"
+                              className="w-full px-4 py-3 text-left hover:bg-blue-50 transition-colors focus:outline-none focus:bg-blue-50"
+                              onClick={() => {
+                                setSelectedJob(job);
+                                setIsJobDropdownOpen(false);
+                                setJobSearchQuery("");
+                              }}
+                            >
+                              <div className="flex flex-col">
+                                <span className="font-medium text-gray-900">
+                                  {job.position}
+                                </span>
+                                <span className="text-xs text-gray-500">
+                                  {job.department} • {job.location} •{" "}
+                                  {job.recruiter}
+                                </span>
+                              </div>
+                            </button>
+                          ))
+                        ) : (
+                          <div className="px-4 py-2 text-sm text-gray-500">
+                            No matching jobs found
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {selectedJob && (
+                  <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200 transition-all duration-200">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Briefcase className="w-4 h-4 text-blue-600" />
+                        <span className="font-medium text-blue-900">
+                          {selectedJob.position}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        className="text-blue-600 hover:text-blue-800"
+                        onClick={() => {
+                          setSelectedJob(null);
+                          setJobSearchQuery("");
+                        }}
+                      >
+                        <XCircle className="w-4 h-4" />
+                      </button>
+                    </div>
                     <div className="text-sm text-blue-700 space-y-1">
-                      <div>Department: {selectedJob.department}</div>
-                      <div>Location: {selectedJob.location}</div>
-                      <div>Type: {selectedJob.type}</div>
-                      <div>Recruiter: {selectedJob.recruiter}</div>
-                      <div>Status: {selectedJob.status}</div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">Department:</span>{" "}
+                        {selectedJob.department}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">Location:</span>{" "}
+                        {selectedJob.location}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">Type:</span>{" "}
+                        {selectedJob.type}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">Recruiter:</span>{" "}
+                        {selectedJob.recruiter}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">Status:</span>{" "}
+                        {selectedJob.status}
+                      </div>
                     </div>
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             <Tabs defaultValue="upload" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
