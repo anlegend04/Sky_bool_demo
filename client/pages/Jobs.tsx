@@ -332,8 +332,6 @@ const AddJobForm = memo(
       [],
     );
 
-
-
     const addNewStage = useCallback(() => {
       setJobStages((prev) => [...prev, { name: "", durationHours: "" }]);
     }, []);
@@ -808,7 +806,9 @@ export default function Jobs() {
   const [editingJob, setEditingJob] = useState<JobData | null>(null);
   const [shareJobId, setShareJobId] = useState<string | null>(null);
   const [applyJobId, setApplyJobId] = useState<string | null>(null);
-  const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null);
+  const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(
+    null,
+  );
   const { toast } = useToast();
 
   // Mock candidates data for the apply functionality
@@ -821,8 +821,10 @@ export default function Jobs() {
   // Handle applying candidate to job
   const handleApplyCandidate = () => {
     if (applyJobId && selectedCandidateId) {
-      const selectedCandidate = candidates.find(c => c.id === selectedCandidateId);
-      const selectedJob = jobs.find(j => j.id === applyJobId);
+      const selectedCandidate = candidates.find(
+        (c) => c.id === selectedCandidateId,
+      );
+      const selectedJob = jobs.find((j) => j.id === applyJobId);
 
       toast({
         title: "Candidate Applied",
