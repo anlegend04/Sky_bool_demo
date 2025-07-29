@@ -110,7 +110,13 @@ const addNewStage = () => {
   setJobStages([...jobStages, newStage]);
 };
 
-function StageItem({ id, index, stage, updateStage, removeStage }) {
+function StageItem({ id, index, stage, updateStage, removeStage }: {
+  id: string;
+  index: number;
+  stage: any;
+  updateStage: (index: number, stage: any) => void;
+  removeStage: (index: number) => void;
+}) {
   return (
     <div className="flex flex-col gap-2 border border-slate-200 rounded-xl p-3 bg-slate-50">
       <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
