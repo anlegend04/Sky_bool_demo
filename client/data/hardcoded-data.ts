@@ -1485,7 +1485,18 @@ const generateMoreCandidates = (): CandidateData[] => {
   for (let i = 5; i <= 100; i++) {
     const name = names[Math.floor(Math.random() * names.length)];
     const position = positions[Math.floor(Math.random() * positions.length)];
-    const stage = stages[Math.floor(Math.random() * stages.length)];
+
+    // Realistic stage distribution: more candidates in early stages
+    let stage;
+    const stageRand = Math.random();
+    if (stageRand < 0.4) stage = "Applied";  // 40%
+    else if (stageRand < 0.65) stage = "Screening";  // 25%
+    else if (stageRand < 0.8) stage = "Interview";  // 15%
+    else if (stageRand < 0.9) stage = "Technical";  // 10%
+    else if (stageRand < 0.95) stage = "Offer";  // 5%
+    else if (stageRand < 0.98) stage = "Hired";  // 3%
+    else stage = "Rejected";  // 2%
+
     const source = sources[Math.floor(Math.random() * sources.length)];
     const recruiter = recruiters[Math.floor(Math.random() * recruiters.length)];
 
