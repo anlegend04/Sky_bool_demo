@@ -64,7 +64,10 @@ import {
   Edit3,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { HARDCODED_CANDIDATES, type CandidateData } from "@/data/hardcoded-data";
+import {
+  HARDCODED_CANDIDATES,
+  type CandidateData,
+} from "@/data/hardcoded-data";
 
 // Extended types for follow-up dashboard
 interface FollowUpCandidate extends CandidateData {
@@ -121,18 +124,29 @@ interface EmailTemplate {
 
 export default function FollowUpDashboard() {
   const { toast } = useToast();
-  
+
   // Mock data transformation
   const [candidates] = useState<FollowUpCandidate[]>(
     HARDCODED_CANDIDATES.map((candidate, index) => ({
       ...candidate,
-      lastInteraction: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString(),
-      nextFollowUp: new Date(Date.now() + Math.random() * 3 * 24 * 60 * 60 * 1000).toISOString(),
+      lastInteraction: new Date(
+        Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000,
+      ).toISOString(),
+      nextFollowUp: new Date(
+        Date.now() + Math.random() * 3 * 24 * 60 * 60 * 1000,
+      ).toISOString(),
       daysInStage: Math.floor(Math.random() * 14) + 1,
       emailsSent: Math.floor(Math.random() * 5) + 1,
-      lastEmailSent: Math.random() > 0.3 ? new Date(Date.now() - Math.random() * 3 * 24 * 60 * 60 * 1000).toISOString() : undefined,
+      lastEmailSent:
+        Math.random() > 0.3
+          ? new Date(
+              Date.now() - Math.random() * 3 * 24 * 60 * 60 * 1000,
+            ).toISOString()
+          : undefined,
       responseRate: Math.floor(Math.random() * 100),
-      urgencyLevel: ["low", "medium", "high", "critical"][Math.floor(Math.random() * 4)] as any,
+      urgencyLevel: ["low", "medium", "high", "critical"][
+        Math.floor(Math.random() * 4)
+      ] as any,
       upcomingActions: [
         {
           id: `action-${index}-1`,
@@ -142,7 +156,7 @@ export default function FollowUpDashboard() {
           priority: "high",
           template: "interview_confirmation",
           completed: false,
-        }
+        },
       ],
       interactions: [
         {
@@ -153,7 +167,7 @@ export default function FollowUpDashboard() {
           summary: "Discussed role requirements and candidate expectations",
           outcome: "positive",
           nextAction: "Send technical assessment",
-        }
+        },
       ],
       emailHistory: [
         {
@@ -163,19 +177,25 @@ export default function FollowUpDashboard() {
           sentDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
           opened: Math.random() > 0.3,
           responded: Math.random() > 0.5,
-          responseDate: Math.random() > 0.5 ? new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString() : undefined,
-        }
+          responseDate:
+            Math.random() > 0.5
+              ? new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString()
+              : undefined,
+        },
       ],
-    }))
+    })),
   );
 
   const [selectedCandidates, setSelectedCandidates] = useState<string[]>([]);
-  const [viewMode, setViewMode] = useState<"pipeline" | "list" | "timeline">("pipeline");
+  const [viewMode, setViewMode] = useState<"pipeline" | "list" | "timeline">(
+    "pipeline",
+  );
   const [filterStage, setFilterStage] = useState("all");
   const [filterJob, setFilterJob] = useState("all");
   const [filterUrgency, setFilterUrgency] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCandidate, setSelectedCandidate] = useState<FollowUpCandidate | null>(null);
+  const [selectedCandidate, setSelectedCandidate] =
+    useState<FollowUpCandidate | null>(null);
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [showNoteDialog, setShowNoteDialog] = useState(false);
   const [emailTemplate, setEmailTemplate] = useState("");
@@ -211,15 +231,21 @@ export default function FollowUpDashboard() {
 
   // Filter and search logic
   const filteredCandidates = useMemo(() => {
-    return candidates.filter(candidate => {
-      const matchesSearch = candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           candidate.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           candidate.email.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesStage = filterStage === "all" || candidate.stage.toLowerCase() === filterStage.toLowerCase();
-      const matchesJob = filterJob === "all" || candidate.position.toLowerCase().includes(filterJob.toLowerCase());
-      const matchesUrgency = filterUrgency === "all" || candidate.urgencyLevel === filterUrgency;
-      
+    return candidates.filter((candidate) => {
+      const matchesSearch =
+        candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        candidate.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        candidate.email.toLowerCase().includes(searchTerm.toLowerCase());
+
+      const matchesStage =
+        filterStage === "all" ||
+        candidate.stage.toLowerCase() === filterStage.toLowerCase();
+      const matchesJob =
+        filterJob === "all" ||
+        candidate.position.toLowerCase().includes(filterJob.toLowerCase());
+      const matchesUrgency =
+        filterUrgency === "all" || candidate.urgencyLevel === filterUrgency;
+
       return matchesSearch && matchesStage && matchesJob && matchesUrgency;
     });
   }, [candidates, searchTerm, filterStage, filterJob, filterUrgency]);
@@ -227,83 +253,98 @@ export default function FollowUpDashboard() {
   // Statistics
   const stats = useMemo(() => {
     const total = candidates.length;
-    const needingFollowUp = candidates.filter(c => 
-      new Date(c.nextFollowUp) <= new Date(Date.now() + 24 * 60 * 60 * 1000)
+    const needingFollowUp = candidates.filter(
+      (c) =>
+        new Date(c.nextFollowUp) <= new Date(Date.now() + 24 * 60 * 60 * 1000),
     ).length;
-    const overdue = candidates.filter(c => c.daysInStage > 7).length;
-    const activeToday = candidates.filter(c => c.upcomingActions.some(a => !a.completed)).length;
+    const overdue = candidates.filter((c) => c.daysInStage > 7).length;
+    const activeToday = candidates.filter((c) =>
+      c.upcomingActions.some((a) => !a.completed),
+    ).length;
 
     return { total, needingFollowUp, overdue, activeToday };
   }, [candidates]);
 
   // Handlers
   const handleCandidateSelect = useCallback((candidateId: string) => {
-    setSelectedCandidates(prev => 
-      prev.includes(candidateId) 
-        ? prev.filter(id => id !== candidateId)
-        : [...prev, candidateId]
+    setSelectedCandidates((prev) =>
+      prev.includes(candidateId)
+        ? prev.filter((id) => id !== candidateId)
+        : [...prev, candidateId],
     );
   }, []);
 
   const handleSelectAll = useCallback(() => {
-    setSelectedCandidates(filteredCandidates.map(c => c.id));
+    setSelectedCandidates(filteredCandidates.map((c) => c.id));
   }, [filteredCandidates]);
 
-  const handleBulkAction = useCallback((action: string) => {
-    if (selectedCandidates.length === 0) {
-      toast({
-        title: "No candidates selected",
-        description: "Please select candidates to perform bulk actions.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    switch (action) {
-      case "email":
-        setShowEmailDialog(true);
-        break;
-      case "move_stage":
+  const handleBulkAction = useCallback(
+    (action: string) => {
+      if (selectedCandidates.length === 0) {
         toast({
-          title: "Moving candidates",
-          description: `Moving ${selectedCandidates.length} candidates to next stage.`,
+          title: "No candidates selected",
+          description: "Please select candidates to perform bulk actions.",
+          variant: "destructive",
         });
-        break;
-      case "add_note":
-        setShowNoteDialog(true);
-        break;
-      default:
-        break;
-    }
-  }, [selectedCandidates, toast]);
+        return;
+      }
 
-  const sendEmail = useCallback((templateId: string, candidateIds: string[]) => {
-    const template = emailTemplates.find(t => t.id === templateId);
-    if (!template) return;
+      switch (action) {
+        case "email":
+          setShowEmailDialog(true);
+          break;
+        case "move_stage":
+          toast({
+            title: "Moving candidates",
+            description: `Moving ${selectedCandidates.length} candidates to next stage.`,
+          });
+          break;
+        case "add_note":
+          setShowNoteDialog(true);
+          break;
+        default:
+          break;
+      }
+    },
+    [selectedCandidates, toast],
+  );
 
-    toast({
-      title: "Emails sent",
-      description: `Sent "${template.name}" to ${candidateIds.length} candidate(s).`,
-    });
-    
-    setShowEmailDialog(false);
-    setSelectedCandidates([]);
-  }, [emailTemplates, toast]);
+  const sendEmail = useCallback(
+    (templateId: string, candidateIds: string[]) => {
+      const template = emailTemplates.find((t) => t.id === templateId);
+      if (!template) return;
+
+      toast({
+        title: "Emails sent",
+        description: `Sent "${template.name}" to ${candidateIds.length} candidate(s).`,
+      });
+
+      setShowEmailDialog(false);
+      setSelectedCandidates([]);
+    },
+    [emailTemplates, toast],
+  );
 
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
-      case "critical": return "bg-red-100 text-red-800 border-red-300";
-      case "high": return "bg-orange-100 text-orange-800 border-orange-300";
-      case "medium": return "bg-yellow-100 text-yellow-800 border-yellow-300";
-      default: return "bg-green-100 text-green-800 border-green-300";
+      case "critical":
+        return "bg-red-100 text-red-800 border-red-300";
+      case "high":
+        return "bg-orange-100 text-orange-800 border-orange-300";
+      case "medium":
+        return "bg-yellow-100 text-yellow-800 border-yellow-300";
+      default:
+        return "bg-green-100 text-green-800 border-green-300";
     }
   };
 
   const formatTimeAgo = (date: string) => {
     const now = new Date();
     const then = new Date(date);
-    const diffInHours = Math.floor((now.getTime() - then.getTime()) / (1000 * 60 * 60));
-    
+    const diffInHours = Math.floor(
+      (now.getTime() - then.getTime()) / (1000 * 60 * 60),
+    );
+
     if (diffInHours < 24) return `${diffInHours}h ago`;
     const diffInDays = Math.floor(diffInHours / 24);
     return `${diffInDays}d ago`;
@@ -311,9 +352,13 @@ export default function FollowUpDashboard() {
 
   // Candidate Card Component
   const CandidateCard = ({ candidate }: { candidate: FollowUpCandidate }) => (
-    <Card className={`hover:shadow-lg transition-all cursor-pointer ${
-      selectedCandidates.includes(candidate.id) ? 'ring-2 ring-blue-500 bg-blue-50' : ''
-    }`}>
+    <Card
+      className={`hover:shadow-lg transition-all cursor-pointer ${
+        selectedCandidates.includes(candidate.id)
+          ? "ring-2 ring-blue-500 bg-blue-50"
+          : ""
+      }`}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-start space-x-3 flex-1 min-w-0">
@@ -324,19 +369,34 @@ export default function FollowUpDashboard() {
             />
             <Avatar className="w-10 h-10">
               <AvatarImage src={candidate.avatar} />
-              <AvatarFallback>{candidate.name.split(" ").map(n => n[0]).join("")}</AvatarFallback>
+              <AvatarFallback>
+                {candidate.name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")}
+              </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
               <div className="flex items-center space-x-2 mb-1">
-                <h3 className="font-semibold text-sm truncate">{candidate.name}</h3>
-                <Badge className={`text-xs ${getUrgencyColor(candidate.urgencyLevel)}`}>
+                <h3 className="font-semibold text-sm truncate">
+                  {candidate.name}
+                </h3>
+                <Badge
+                  className={`text-xs ${getUrgencyColor(candidate.urgencyLevel)}`}
+                >
                   {candidate.urgencyLevel}
                 </Badge>
               </div>
-              <p className="text-xs text-gray-600 truncate">{candidate.position}</p>
+              <p className="text-xs text-gray-600 truncate">
+                {candidate.position}
+              </p>
               <div className="flex items-center space-x-2 mt-1">
-                <Badge variant="outline" className="text-xs">{candidate.stage}</Badge>
-                <span className="text-xs text-gray-500">{candidate.daysInStage}d in stage</span>
+                <Badge variant="outline" className="text-xs">
+                  {candidate.stage}
+                </Badge>
+                <span className="text-xs text-gray-500">
+                  {candidate.daysInStage}d in stage
+                </span>
               </div>
             </div>
           </div>
@@ -371,16 +431,24 @@ export default function FollowUpDashboard() {
         {/* Last Interaction */}
         <div className="flex items-center justify-between text-xs">
           <span className="text-gray-500">Last contact:</span>
-          <span className="font-medium">{formatTimeAgo(candidate.lastInteraction)}</span>
+          <span className="font-medium">
+            {formatTimeAgo(candidate.lastInteraction)}
+          </span>
         </div>
 
         {/* Next Follow-up */}
         <div className="flex items-center justify-between text-xs">
           <span className="text-gray-500">Next follow-up:</span>
-          <span className={`font-medium ${
-            new Date(candidate.nextFollowUp) <= new Date() ? 'text-red-600' : 'text-green-600'
-          }`}>
-            {new Date(candidate.nextFollowUp) <= new Date() ? 'Overdue' : formatTimeAgo(candidate.nextFollowUp)}
+          <span
+            className={`font-medium ${
+              new Date(candidate.nextFollowUp) <= new Date()
+                ? "text-red-600"
+                : "text-green-600"
+            }`}
+          >
+            {new Date(candidate.nextFollowUp) <= new Date()
+              ? "Overdue"
+              : formatTimeAgo(candidate.nextFollowUp)}
           </span>
         </div>
 
@@ -398,10 +466,18 @@ export default function FollowUpDashboard() {
           <div className="space-y-1">
             <span className="text-xs text-gray-500">Next action:</span>
             <div className="flex items-center space-x-2">
-              {candidate.upcomingActions[0].type === 'email' && <Mail className="w-3 h-3 text-blue-500" />}
-              {candidate.upcomingActions[0].type === 'call' && <Phone className="w-3 h-3 text-green-500" />}
-              {candidate.upcomingActions[0].type === 'meeting' && <Calendar className="w-3 h-3 text-purple-500" />}
-              <span className="text-xs font-medium truncate">{candidate.upcomingActions[0].title}</span>
+              {candidate.upcomingActions[0].type === "email" && (
+                <Mail className="w-3 h-3 text-blue-500" />
+              )}
+              {candidate.upcomingActions[0].type === "call" && (
+                <Phone className="w-3 h-3 text-green-500" />
+              )}
+              {candidate.upcomingActions[0].type === "meeting" && (
+                <Calendar className="w-3 h-3 text-purple-500" />
+              )}
+              <span className="text-xs font-medium truncate">
+                {candidate.upcomingActions[0].title}
+              </span>
             </div>
           </div>
         )}
@@ -427,13 +503,22 @@ export default function FollowUpDashboard() {
 
   // Pipeline View Component
   const PipelineView = () => {
-    const stages = ["Applied", "Screening", "Interview", "Technical", "Offer", "Hired"];
-    
+    const stages = [
+      "Applied",
+      "Screening",
+      "Interview",
+      "Technical",
+      "Offer",
+      "Hired",
+    ];
+
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        {stages.map(stage => {
-          const stageCandidates = filteredCandidates.filter(c => c.stage === stage);
-          
+        {stages.map((stage) => {
+          const stageCandidates = filteredCandidates.filter(
+            (c) => c.stage === stage,
+          );
+
           return (
             <div key={stage} className="bg-gray-50 rounded-lg p-4">
               <div className="flex items-center justify-between mb-4">
@@ -441,7 +526,7 @@ export default function FollowUpDashboard() {
                 <Badge variant="outline">{stageCandidates.length}</Badge>
               </div>
               <div className="space-y-3 max-h-96 overflow-y-auto">
-                {stageCandidates.map(candidate => (
+                {stageCandidates.map((candidate) => (
                   <CandidateCard key={candidate.id} candidate={candidate} />
                 ))}
               </div>
@@ -457,10 +542,14 @@ export default function FollowUpDashboard() {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Follow-Up Dashboard</h1>
-          <p className="text-gray-600 mt-1">Track and manage candidate progress across the hiring pipeline</p>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Follow-Up Dashboard
+          </h1>
+          <p className="text-gray-600 mt-1">
+            Track and manage candidate progress across the hiring pipeline
+          </p>
         </div>
-        
+
         <div className="flex flex-wrap gap-3">
           <Button variant="outline" size="sm">
             <Calendar className="w-4 h-4 mr-2" />
@@ -490,37 +579,43 @@ export default function FollowUpDashboard() {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Need Follow-up</p>
-                <p className="text-2xl font-bold text-orange-600">{stats.needingFollowUp}</p>
+                <p className="text-2xl font-bold text-orange-600">
+                  {stats.needingFollowUp}
+                </p>
               </div>
               <AlertTriangle className="w-8 h-8 text-orange-500" />
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Overdue</p>
-                <p className="text-2xl font-bold text-red-600">{stats.overdue}</p>
+                <p className="text-2xl font-bold text-red-600">
+                  {stats.overdue}
+                </p>
               </div>
               <Timer className="w-8 h-8 text-red-500" />
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Active Today</p>
-                <p className="text-2xl font-bold text-green-600">{stats.activeToday}</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {stats.activeToday}
+                </p>
               </div>
               <Zap className="w-8 h-8 text-green-500" />
             </div>
@@ -543,7 +638,7 @@ export default function FollowUpDashboard() {
                   className="pl-10"
                 />
               </div>
-              
+
               <Select value={filterStage} onValueChange={setFilterStage}>
                 <SelectTrigger className="w-40">
                   <SelectValue placeholder="Stage" />
@@ -558,7 +653,7 @@ export default function FollowUpDashboard() {
                   <SelectItem value="hired">Hired</SelectItem>
                 </SelectContent>
               </Select>
-              
+
               <Select value={filterUrgency} onValueChange={setFilterUrgency}>
                 <SelectTrigger className="w-32">
                   <SelectValue placeholder="Urgency" />
@@ -613,18 +708,30 @@ export default function FollowUpDashboard() {
                     <Mail className="w-4 h-4 mr-2" />
                     Send Email
                   </Button>
-                  <Button size="sm" variant="outline" onClick={() => handleBulkAction("move_stage")}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleBulkAction("move_stage")}
+                  >
                     <ArrowRight className="w-4 h-4 mr-2" />
                     Move Stage
                   </Button>
-                  <Button size="sm" variant="outline" onClick={() => handleBulkAction("add_note")}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleBulkAction("add_note")}
+                  >
                     <Edit3 className="w-4 h-4 mr-2" />
                     Add Note
                   </Button>
                   <Button size="sm" variant="outline" onClick={handleSelectAll}>
                     Select All
                   </Button>
-                  <Button size="sm" variant="outline" onClick={() => setSelectedCandidates([])}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setSelectedCandidates([])}
+                  >
                     Clear
                   </Button>
                 </div>
@@ -636,10 +743,10 @@ export default function FollowUpDashboard() {
 
       {/* Main Content */}
       {viewMode === "pipeline" && <PipelineView />}
-      
+
       {viewMode === "list" && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredCandidates.map(candidate => (
+          {filteredCandidates.map((candidate) => (
             <CandidateCard key={candidate.id} candidate={candidate} />
           ))}
         </div>
@@ -652,18 +759,31 @@ export default function FollowUpDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {filteredCandidates.slice(0, 10).map(candidate => (
-                <div key={candidate.id} className="flex items-center space-x-4 p-3 border rounded-lg">
+              {filteredCandidates.slice(0, 10).map((candidate) => (
+                <div
+                  key={candidate.id}
+                  className="flex items-center space-x-4 p-3 border rounded-lg"
+                >
                   <Avatar className="w-8 h-8">
-                    <AvatarFallback>{candidate.name.split(" ").map(n => n[0]).join("")}</AvatarFallback>
+                    <AvatarFallback>
+                      {candidate.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
                     <div className="flex items-center space-x-2">
-                      <span className="font-medium text-sm">{candidate.name}</span>
-                      <Badge variant="outline" className="text-xs">{candidate.stage}</Badge>
+                      <span className="font-medium text-sm">
+                        {candidate.name}
+                      </span>
+                      <Badge variant="outline" className="text-xs">
+                        {candidate.stage}
+                      </Badge>
                     </div>
                     <p className="text-xs text-gray-600">
-                      Last contact {formatTimeAgo(candidate.lastInteraction)} • Next follow-up {formatTimeAgo(candidate.nextFollowUp)}
+                      Last contact {formatTimeAgo(candidate.lastInteraction)} •
+                      Next follow-up {formatTimeAgo(candidate.nextFollowUp)}
                     </p>
                   </div>
                   <Button size="sm" variant="outline">
@@ -685,7 +805,7 @@ export default function FollowUpDashboard() {
               Send email to {selectedCandidates.length} selected candidate(s)
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <div>
               <Label>Email Template</Label>
@@ -694,7 +814,7 @@ export default function FollowUpDashboard() {
                   <SelectValue placeholder="Choose a template" />
                 </SelectTrigger>
                 <SelectContent>
-                  {emailTemplates.map(template => (
+                  {emailTemplates.map((template) => (
                     <SelectItem key={template.id} value={template.id}>
                       {template.name}
                     </SelectItem>
@@ -702,24 +822,37 @@ export default function FollowUpDashboard() {
                 </SelectContent>
               </Select>
             </div>
-            
+
             {emailTemplate && (
               <div className="p-4 bg-gray-50 rounded-lg">
                 <h4 className="font-medium mb-2">Preview:</h4>
                 <div className="text-sm space-y-2">
-                  <div><strong>Subject:</strong> {emailTemplates.find(t => t.id === emailTemplate)?.subject}</div>
-                  <div><strong>Body:</strong></div>
-                  <pre className="text-xs whitespace-pre-wrap">{emailTemplates.find(t => t.id === emailTemplate)?.body}</pre>
+                  <div>
+                    <strong>Subject:</strong>{" "}
+                    {
+                      emailTemplates.find((t) => t.id === emailTemplate)
+                        ?.subject
+                    }
+                  </div>
+                  <div>
+                    <strong>Body:</strong>
+                  </div>
+                  <pre className="text-xs whitespace-pre-wrap">
+                    {emailTemplates.find((t) => t.id === emailTemplate)?.body}
+                  </pre>
                 </div>
               </div>
             )}
           </div>
-          
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowEmailDialog(false)}>
               Cancel
             </Button>
-            <Button onClick={() => sendEmail(emailTemplate, selectedCandidates)} disabled={!emailTemplate}>
+            <Button
+              onClick={() => sendEmail(emailTemplate, selectedCandidates)}
+              disabled={!emailTemplate}
+            >
               <Send className="w-4 h-4 mr-2" />
               Send Emails
             </Button>
@@ -728,22 +861,32 @@ export default function FollowUpDashboard() {
       </Dialog>
 
       {/* Candidate Profile Dialog */}
-      <Dialog open={!!selectedCandidate} onOpenChange={() => setSelectedCandidate(null)}>
+      <Dialog
+        open={!!selectedCandidate}
+        onOpenChange={() => setSelectedCandidate(null)}
+      >
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           {selectedCandidate && (
             <>
               <DialogHeader>
                 <DialogTitle className="flex items-center space-x-3">
                   <Avatar>
-                    <AvatarFallback>{selectedCandidate.name.split(" ").map(n => n[0]).join("")}</AvatarFallback>
+                    <AvatarFallback>
+                      {selectedCandidate.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
+                    </AvatarFallback>
                   </Avatar>
                   <div>
                     <div>{selectedCandidate.name}</div>
-                    <div className="text-sm text-gray-600">{selectedCandidate.position}</div>
+                    <div className="text-sm text-gray-600">
+                      {selectedCandidate.position}
+                    </div>
                   </div>
                 </DialogTitle>
               </DialogHeader>
-              
+
               <Tabs defaultValue="overview" className="w-full">
                 <TabsList className="grid w-full grid-cols-4">
                   <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -751,7 +894,7 @@ export default function FollowUpDashboard() {
                   <TabsTrigger value="emails">Emails</TabsTrigger>
                   <TabsTrigger value="actions">Actions</TabsTrigger>
                 </TabsList>
-                
+
                 <TabsContent value="overview" className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <Card>
@@ -761,25 +904,35 @@ export default function FollowUpDashboard() {
                       <CardContent className="space-y-3">
                         <div className="flex justify-between">
                           <span>Days in stage:</span>
-                          <span className="font-medium">{selectedCandidate.daysInStage}</span>
+                          <span className="font-medium">
+                            {selectedCandidate.daysInStage}
+                          </span>
                         </div>
                         <div className="flex justify-between">
                           <span>Emails sent:</span>
-                          <span className="font-medium">{selectedCandidate.emailsSent}</span>
+                          <span className="font-medium">
+                            {selectedCandidate.emailsSent}
+                          </span>
                         </div>
                         <div className="flex justify-between">
                           <span>Response rate:</span>
-                          <span className="font-medium">{selectedCandidate.responseRate}%</span>
+                          <span className="font-medium">
+                            {selectedCandidate.responseRate}%
+                          </span>
                         </div>
                         <div className="flex justify-between">
                           <span>Urgency level:</span>
-                          <Badge className={getUrgencyColor(selectedCandidate.urgencyLevel)}>
+                          <Badge
+                            className={getUrgencyColor(
+                              selectedCandidate.urgencyLevel,
+                            )}
+                          >
                             {selectedCandidate.urgencyLevel}
                           </Badge>
                         </div>
                       </CardContent>
                     </Card>
-                    
+
                     <Card>
                       <CardHeader>
                         <CardTitle className="text-lg">Contact Info</CardTitle>
@@ -787,71 +940,106 @@ export default function FollowUpDashboard() {
                       <CardContent className="space-y-3">
                         <div className="flex items-center space-x-2">
                           <Mail className="w-4 h-4 text-gray-500" />
-                          <span className="text-sm">{selectedCandidate.email}</span>
+                          <span className="text-sm">
+                            {selectedCandidate.email}
+                          </span>
                         </div>
                         <div className="flex items-center space-x-2">
                           <Phone className="w-4 h-4 text-gray-500" />
-                          <span className="text-sm">{selectedCandidate.phone}</span>
+                          <span className="text-sm">
+                            {selectedCandidate.phone}
+                          </span>
                         </div>
                         <div className="flex items-center space-x-2">
                           <User className="w-4 h-4 text-gray-500" />
-                          <span className="text-sm">{selectedCandidate.location}</span>
+                          <span className="text-sm">
+                            {selectedCandidate.location}
+                          </span>
                         </div>
                       </CardContent>
                     </Card>
                   </div>
                 </TabsContent>
-                
+
                 <TabsContent value="timeline" className="space-y-4">
                   <div className="space-y-3">
-                    {selectedCandidate.interactions.map(interaction => (
-                      <div key={interaction.id} className="flex space-x-3 p-3 border rounded-lg">
+                    {selectedCandidate.interactions.map((interaction) => (
+                      <div
+                        key={interaction.id}
+                        className="flex space-x-3 p-3 border rounded-lg"
+                      >
                         <div className="flex-shrink-0">
-                          {interaction.type === 'call' && <Phone className="w-5 h-5 text-green-500" />}
-                          {interaction.type === 'email' && <Mail className="w-5 h-5 text-blue-500" />}
-                          {interaction.type === 'meeting' && <Calendar className="w-5 h-5 text-purple-500" />}
-                          {interaction.type === 'note' && <FileText className="w-5 h-5 text-gray-500" />}
+                          {interaction.type === "call" && (
+                            <Phone className="w-5 h-5 text-green-500" />
+                          )}
+                          {interaction.type === "email" && (
+                            <Mail className="w-5 h-5 text-blue-500" />
+                          )}
+                          {interaction.type === "meeting" && (
+                            <Calendar className="w-5 h-5 text-purple-500" />
+                          )}
+                          {interaction.type === "note" && (
+                            <FileText className="w-5 h-5 text-gray-500" />
+                          )}
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center justify-between">
-                            <span className="font-medium capitalize">{interaction.type}</span>
-                            <span className="text-sm text-gray-500">{formatTimeAgo(interaction.date)}</span>
+                            <span className="font-medium capitalize">
+                              {interaction.type}
+                            </span>
+                            <span className="text-sm text-gray-500">
+                              {formatTimeAgo(interaction.date)}
+                            </span>
                           </div>
-                          <p className="text-sm text-gray-700 mt-1">{interaction.summary}</p>
+                          <p className="text-sm text-gray-700 mt-1">
+                            {interaction.summary}
+                          </p>
                           {interaction.nextAction && (
-                            <p className="text-sm text-blue-600 mt-1">Next: {interaction.nextAction}</p>
+                            <p className="text-sm text-blue-600 mt-1">
+                              Next: {interaction.nextAction}
+                            </p>
                           )}
                         </div>
                       </div>
                     ))}
                   </div>
                 </TabsContent>
-                
+
                 <TabsContent value="emails" className="space-y-4">
                   <div className="space-y-3">
-                    {selectedCandidate.emailHistory.map(email => (
+                    {selectedCandidate.emailHistory.map((email) => (
                       <div key={email.id} className="p-3 border rounded-lg">
                         <div className="flex items-center justify-between mb-2">
                           <span className="font-medium">{email.subject}</span>
                           <div className="flex items-center space-x-2">
-                            {email.opened && <CheckCircle className="w-4 h-4 text-green-500" />}
-                            {email.responded && <MessageSquare className="w-4 h-4 text-blue-500" />}
-                            <span className="text-sm text-gray-500">{formatTimeAgo(email.sentDate)}</span>
+                            {email.opened && (
+                              <CheckCircle className="w-4 h-4 text-green-500" />
+                            )}
+                            {email.responded && (
+                              <MessageSquare className="w-4 h-4 text-blue-500" />
+                            )}
+                            <span className="text-sm text-gray-500">
+                              {formatTimeAgo(email.sentDate)}
+                            </span>
                           </div>
                         </div>
                         <div className="flex items-center space-x-4 text-sm">
-                          <span className={`px-2 py-1 rounded text-xs ${email.opened ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-                            {email.opened ? 'Opened' : 'Not opened'}
+                          <span
+                            className={`px-2 py-1 rounded text-xs ${email.opened ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}
+                          >
+                            {email.opened ? "Opened" : "Not opened"}
                           </span>
-                          <span className={`px-2 py-1 rounded text-xs ${email.responded ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}>
-                            {email.responded ? 'Responded' : 'No response'}
+                          <span
+                            className={`px-2 py-1 rounded text-xs ${email.responded ? "bg-blue-100 text-blue-800" : "bg-gray-100 text-gray-800"}`}
+                          >
+                            {email.responded ? "Responded" : "No response"}
                           </span>
                         </div>
                       </div>
                     ))}
                   </div>
                 </TabsContent>
-                
+
                 <TabsContent value="actions" className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <Button className="h-20 flex-col">
