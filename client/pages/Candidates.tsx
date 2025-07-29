@@ -82,7 +82,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { HARDCODED_CANDIDATES, CandidateData } from "@/data/hardcoded-data";
+import { HARDCODED_CANDIDATES, HARDCODED_JOBS, CandidateData } from "@/data/hardcoded-data";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/hooks/use-language";
 
@@ -205,12 +205,10 @@ export default function Candidates() {
     "Rejected",
   ];
 
-  const jobs = [
-    { id: "1", position: "Frontend Developer" },
-    { id: "2", position: "Backend Engineer" },
-    { id: "3", position: "Product Manager" },
-    { id: "4", position: "UX Designer" },
-  ];
+  const jobs = HARDCODED_JOBS.map(job => ({
+    id: job.id,
+    position: job.position,
+  }));
 
   const applyCandidateToJob = (candidateId: string, jobId: string) => {
     console.log(`Applying candidate ${candidateId} to job ${jobId}`);
