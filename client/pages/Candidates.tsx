@@ -145,6 +145,10 @@ export default function Candidates() {
   const [selectedCandidates, setSelectedCandidates] = useState<string[]>([]);
   const [showParseFilters, setShowParseFilters] = useState(false);
   const [parseFilter, setParseFilter] = useState<'all' | 'incomplete' | 'duplicates'>('all');
+
+  // Apply candidate to job states (for ListView component)
+  const [applyCandidateId, setApplyCandidateId] = useState<string | null>(null);
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bulkFileInputRef = useRef<HTMLInputElement>(null);
