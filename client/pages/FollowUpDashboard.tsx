@@ -1043,13 +1043,7 @@ export default function FollowUpDashboard() {
                 >
                   List
                 </Button>
-                <Button
-                  variant={viewMode === "timeline" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("timeline")}
-                >
-                  Timeline
-                </Button>
+               
               </div>
               {viewMode === "list" && (
                 <DropdownMenu>
