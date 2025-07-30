@@ -97,8 +97,8 @@ const App = () => (
 const rootElement = document.getElementById("root")!;
 
 // Check if root is already initialized (for HMR)
-if (!rootElement.hasAttribute('data-root-initialized')) {
+if (!rootElement.hasAttribute("data-root-initialized")) {
   const root = createRoot(rootElement);
   root.render(<App />);
-  rootElement.setAttribute('data-root-initialized', 'true');
+  rootElement.setAttribute("data-root-initialized", "true");
 }

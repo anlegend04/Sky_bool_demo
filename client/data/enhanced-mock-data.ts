@@ -1,13 +1,23 @@
 // Enhanced mock data utilities for multiple job applications
-import { CandidateData, JobApplicationData, getCandidate, HARDCODED_CANDIDATES } from "@/data/hardcoded-data";
-import { JobApplication, EnhancedCandidateData } from "@/types/enhanced-candidate";
+import {
+  CandidateData,
+  JobApplicationData,
+  getCandidate,
+  HARDCODED_CANDIDATES,
+} from "@/data/hardcoded-data";
+import {
+  JobApplication,
+  EnhancedCandidateData,
+} from "@/types/enhanced-candidate";
 
 // Helper function to get a specific job application from enhanced candidate data
 export function getJobApplication(
   candidateData: EnhancedCandidateData,
   jobApplicationId: string,
 ): JobApplication | undefined {
-  return candidateData.jobApplications.find((app) => app.id === jobApplicationId);
+  return candidateData.jobApplications.find(
+    (app) => app.id === jobApplicationId,
+  );
 }
 
 // Helper function to get the current/primary job application
@@ -18,7 +28,7 @@ export function getCurrentJobApplication(
   const activeApplications = candidateData.jobApplications.filter(
     (app) => app.status === "Active",
   );
-  
+
   if (activeApplications.length === 0) {
     return candidateData.jobApplications[0];
   }
@@ -58,7 +68,7 @@ export function convertCandidateToEnhanced(
     timezone: candidate.timezone,
     availability: candidate.availability,
     cvEvaluations: candidate.cvEvaluations,
-    jobApplications: candidate.jobApplications.map(app => ({
+    jobApplications: candidate.jobApplications.map((app) => ({
       id: app.id,
       jobId: app.jobId,
       jobTitle: app.jobTitle,
@@ -81,7 +91,9 @@ export function convertCandidateToEnhanced(
 }
 
 // Get enhanced candidate data from the main hardcoded data
-export function getEnhancedCandidate(candidateId: string): EnhancedCandidateData | null {
+export function getEnhancedCandidate(
+  candidateId: string,
+): EnhancedCandidateData | null {
   const candidate = getCandidate(candidateId);
 
   if (!candidate) {
