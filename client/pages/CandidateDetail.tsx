@@ -734,6 +734,54 @@ export default function CandidateDetail() {
               </div>
             </div>
           </div>
+
+          {/* CV Evaluation Section */}
+          {candidate.cvEvaluations && candidate.cvEvaluations.length > 0 && (
+            <div className="pt-4 border-t">
+              <h4 className="font-medium text-slate-900 mb-2 flex items-center gap-2">
+                CV Evaluation
+                <HelpTooltip content="AI-powered analysis of candidate's CV" />
+              </h4>
+              <div className="space-y-3">
+                {candidate.cvEvaluations.map((evaluation) => (
+                  <div key={evaluation.id} className="border border-slate-200 rounded-lg p-4 bg-slate-50">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-3 h-3 rounded-full ${
+                          evaluation.finalVerdict === "Good Fit" ? "bg-green-500" :
+                          evaluation.finalVerdict === "Needs Improvement" ? "bg-yellow-500" :
+                          "bg-red-500"
+                        }`} />
+                        <span className="text-sm font-medium">{evaluation.finalVerdict}</span>
+                        <Badge variant="outline" className="text-xs">
+                          {evaluation.jobFitScore}% match
+                        </Badge>
+                      </div>
+                      <Button variant="outline" size="sm" onClick={() => setSelectedCVEvaluation(evaluation)}>
+                        <Eye className="w-4 h-4 mr-1" />
+                        View Details
+                      </Button>
+                    </div>
+                    <p className="text-sm text-slate-600 line-clamp-2">
+                      {evaluation.summary}
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-1">
+                      {evaluation.strengths.slice(0, 2).map((strength, index) => (
+                        <Badge key={index} variant="secondary" className="text-xs">
+                          {strength}
+                        </Badge>
+                      ))}
+                      {evaluation.strengths.length > 2 && (
+                        <Badge variant="outline" className="text-xs">
+                          +{evaluation.strengths.length - 2} more
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
