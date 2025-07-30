@@ -91,6 +91,42 @@ export interface CandidateData {
   updatedAt: string;
 }
 
+// CV Evaluation Interfaces
+export interface CVEvaluationData {
+  id: string;
+  candidateId: string;
+  jobId: string;
+  fileName: string;
+  summary: string;
+  strengths: string[];
+  weaknesses: string[];
+  jobFitScore: number;
+  suggestedImprovements: string[];
+  finalVerdict: "Good Fit" | "Needs Improvement" | "Not Suitable";
+  skillsMatch: {
+    skill: string;
+    hasSkill: boolean;
+    level?: "Beginner" | "Intermediate" | "Advanced" | "Expert";
+  }[];
+  experienceMatch: number;
+  educationMatch: number;
+  recommendations: string[];
+  extractedData: {
+    name: string;
+    email: string;
+    phone: string;
+    location: string;
+    education: string[];
+    workExperience: string[];
+    skills: string[];
+  };
+  notes?: string;
+  savedAt: string;
+  createdBy: string;
+  isShared: boolean;
+  shareUrl?: string;
+}
+
 export interface EducationData {
   id: string;
   institution: string;
@@ -113,11 +149,12 @@ export interface WorkExperienceData {
 export interface ExpenseData {
   id: string;
   amount: number;
-  category: "Job Boards" | "Recruitment Agency" | "Events" | "Tools" | "Other";
+  category: "Job Boards" | "Recruitment Agency" | "Events" | "Tools" | "Social Media Ads" | "Referral Bonus" | "Assessment Tools" | "Interview Software" | "Background Checks" | "Other";
   description: string;
   expectedOutcome: string;
   evaluationPeriod: string;
-  effectiveness: number;
+  effectiveness?: number;
+  notes?: string;
   createdAt: string;
   createdBy: string;
   jobId?: string;
