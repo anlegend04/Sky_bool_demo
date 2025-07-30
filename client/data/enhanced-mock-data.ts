@@ -93,6 +93,5 @@ export function getEnhancedCandidate(candidateId: string): EnhancedCandidateData
 
 // Get all enhanced candidates
 export function getAllEnhancedCandidates(): EnhancedCandidateData[] {
-  const { HARDCODED_CANDIDATES } = require("@/data/hardcoded-data");
   return HARDCODED_CANDIDATES.map(convertCandidateToEnhanced);
 }
