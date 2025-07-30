@@ -137,7 +137,7 @@ export default function CandidateApplicationProgress(props: CandidateApplication
           </p>
           <div className="flex gap-2 justify-center">
             <Link to="/follow-up">
-              <Button variant="outline">Back to Follow-up Dashboard</Button>
+              <Button variant="outline">Back to Recuitment Process</Button>
             </Link>
             <Link to="/candidates">
               <Button variant="outline">View All Candidates</Button>
@@ -283,7 +283,7 @@ export default function CandidateApplicationProgress(props: CandidateApplication
           
           <div className="flex gap-2 mt-6 justify-center">
             <Link to="/follow-up">
-              <Button variant="outline">Back to Follow-up Dashboard</Button>
+              <Button variant="outline">Back to Recuitment Process</Button>
             </Link>
             <Link to={`/candidates/${candidate.id}`}>
               <Button variant="outline">View Candidate Profile</Button>
@@ -836,7 +836,7 @@ export default function CandidateApplicationProgress(props: CandidateApplication
               <Link to="/follow-up">
                 <Button variant="ghost" size="sm" className="w-full sm:w-auto">
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Follow-up Dashboard
+                  Back to Recuitment Process
                 </Button>
               </Link>
               <Link to={`/candidates/${candidate.id}`}>

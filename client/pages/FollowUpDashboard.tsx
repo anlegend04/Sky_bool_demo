@@ -1244,7 +1244,7 @@ export default function FollowUpDashboard() {
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            Follow-Up Dashboard
+            Recuitment Process
           </h1>
           <p className="text-gray-600 mt-1">
             Track and manage candidate progress across the hiring pipeline

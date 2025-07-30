@@ -1043,7 +1043,7 @@ export default function CandidateDetail() {
             </div>
           </div>
 
-          {/* CV Evaluation Section */}
+          {/* CV Evaluation Section
           {candidate.cvEvaluations && candidate.cvEvaluations.length > 0 && (
             <div className="pt-4 border-t">
               <h4 className="font-medium text-slate-900 mb-2 flex items-center gap-2">
@@ -1108,7 +1108,7 @@ export default function CandidateDetail() {
                 ))}
               </div>
             </div>
-          )}
+          )} */}
         </CardContent>
       </Card>
 

@@ -95,7 +95,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       icon: FileText,
     },
     {
-      name: "Follow-Up Dashboard",
+      name: "Recuitment Process",
       path: "/follow-up",
       icon: Timer,
     },
@@ -104,11 +104,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       path: "/calendar",
       icon: Calendar,
     },
-    {
-      name: "Schedule",
-      path: "/schedule",
-      icon: Clock,
-    },
+    // {
+    //   name: "Schedule",
+    //   path: "/schedule",
+    //   icon: Clock,
+    // },
     {
       name: t("nav.email"),
       path: "/email-automation",
