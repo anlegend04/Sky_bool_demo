@@ -60,7 +60,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
-import { HARDCODED_JOBS, HARDCODED_CANDIDATES } from "@/data/hardcoded-data";
+import { HARDCODED_JOBS, HARDCODED_CANDIDATES, HARDCODED_INTERVIEWS } from "@/data/hardcoded-data";
 import { useLanguage } from "@/hooks/use-language";
 import { useToast } from "@/hooks/use-toast";
 import { RechartsWarningSuppress } from "@/components/RechartsWarningSuppress";
