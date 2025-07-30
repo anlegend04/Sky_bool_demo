@@ -42,6 +42,7 @@
   };
 })();
 
+import React from "react";
 import "@/lib/suppress-warnings";
 import "./global.css";
 
