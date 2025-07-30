@@ -142,7 +142,8 @@ export default function CandidateDetail() {
   const [showEmailTrigger, setShowEmailTrigger] = useState(false);
   const [showResumePreview, setShowResumePreview] = useState(false);
   const [showEditProfileDialog, setShowEditProfileDialog] = useState(false);
-  const [selectedCVEvaluation, setSelectedCVEvaluation] = useState<CVEvaluationData | null>(null);
+  const [selectedCVEvaluation, setSelectedCVEvaluation] =
+    useState<CVEvaluationData | null>(null);
   const [selectedEmail, setSelectedEmail] = useState<any>(null);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [showJobProgress, setShowJobProgress] = useState(false);
@@ -176,51 +177,111 @@ export default function CandidateDetail() {
   const stages: StageData[] = [
     {
       name: "Applied",
-      completed: primaryJob?.stageHistory?.some(s => s.stage === "Applied") || false,
-      duration: primaryJob?.stageHistory?.find(s => s.stage === "Applied")?.duration || 0,
+      completed:
+        primaryJob?.stageHistory?.some((s) => s.stage === "Applied") || false,
+      duration:
+        primaryJob?.stageHistory?.find((s) => s.stage === "Applied")
+          ?.duration || 0,
       startDate: primaryJob?.appliedDate || "",
-      mailSent: primaryJob?.emails?.some(e => e.template === "application_confirmation") || false,
-      mailConfirmed: primaryJob?.emails?.some(e => e.template === "application_confirmation" && e.repliedAt) || false,
+      mailSent:
+        primaryJob?.emails?.some(
+          (e) => e.template === "application_confirmation",
+        ) || false,
+      mailConfirmed:
+        primaryJob?.emails?.some(
+          (e) => e.template === "application_confirmation" && e.repliedAt,
+        ) || false,
     },
     {
       name: "Screening",
-      completed: primaryJob?.stageHistory?.some(s => s.stage === "Screening") || false,
-      duration: primaryJob?.stageHistory?.find(s => s.stage === "Screening")?.duration || 0,
-      startDate: primaryJob?.stageHistory?.find(s => s.stage === "Screening")?.startDate || "",
-      mailSent: primaryJob?.emails?.some(e => e.template === "screening_invitation") || false,
-      mailConfirmed: primaryJob?.emails?.some(e => e.template === "screening_invitation" && e.repliedAt) || false,
+      completed:
+        primaryJob?.stageHistory?.some((s) => s.stage === "Screening") || false,
+      duration:
+        primaryJob?.stageHistory?.find((s) => s.stage === "Screening")
+          ?.duration || 0,
+      startDate:
+        primaryJob?.stageHistory?.find((s) => s.stage === "Screening")
+          ?.startDate || "",
+      mailSent:
+        primaryJob?.emails?.some(
+          (e) => e.template === "screening_invitation",
+        ) || false,
+      mailConfirmed:
+        primaryJob?.emails?.some(
+          (e) => e.template === "screening_invitation" && e.repliedAt,
+        ) || false,
     },
     {
       name: "Interview",
-      completed: primaryJob?.stageHistory?.some(s => s.stage === "Interview") || false,
-      duration: primaryJob?.stageHistory?.find(s => s.stage === "Interview")?.duration || 0,
-      startDate: primaryJob?.stageHistory?.find(s => s.stage === "Interview")?.startDate || "",
-      mailSent: primaryJob?.emails?.some(e => e.template === "interview_invitation") || false,
-      mailConfirmed: primaryJob?.emails?.some(e => e.template === "interview_invitation" && e.repliedAt) || false,
+      completed:
+        primaryJob?.stageHistory?.some((s) => s.stage === "Interview") || false,
+      duration:
+        primaryJob?.stageHistory?.find((s) => s.stage === "Interview")
+          ?.duration || 0,
+      startDate:
+        primaryJob?.stageHistory?.find((s) => s.stage === "Interview")
+          ?.startDate || "",
+      mailSent:
+        primaryJob?.emails?.some(
+          (e) => e.template === "interview_invitation",
+        ) || false,
+      mailConfirmed:
+        primaryJob?.emails?.some(
+          (e) => e.template === "interview_invitation" && e.repliedAt,
+        ) || false,
     },
     {
       name: "Technical",
-      completed: primaryJob?.stageHistory?.some(s => s.stage === "Technical") || false,
-      duration: primaryJob?.stageHistory?.find(s => s.stage === "Technical")?.duration || 0,
-      startDate: primaryJob?.stageHistory?.find(s => s.stage === "Technical")?.startDate || "",
-      mailSent: primaryJob?.emails?.some(e => e.template === "technical_interview") || false,
-      mailConfirmed: primaryJob?.emails?.some(e => e.template === "technical_interview" && e.repliedAt) || false,
+      completed:
+        primaryJob?.stageHistory?.some((s) => s.stage === "Technical") || false,
+      duration:
+        primaryJob?.stageHistory?.find((s) => s.stage === "Technical")
+          ?.duration || 0,
+      startDate:
+        primaryJob?.stageHistory?.find((s) => s.stage === "Technical")
+          ?.startDate || "",
+      mailSent:
+        primaryJob?.emails?.some((e) => e.template === "technical_interview") ||
+        false,
+      mailConfirmed:
+        primaryJob?.emails?.some(
+          (e) => e.template === "technical_interview" && e.repliedAt,
+        ) || false,
     },
     {
       name: "Offer",
-      completed: primaryJob?.stageHistory?.some(s => s.stage === "Offer") || false,
-      duration: primaryJob?.stageHistory?.find(s => s.stage === "Offer")?.duration || 0,
-      startDate: primaryJob?.stageHistory?.find(s => s.stage === "Offer")?.startDate || "",
-      mailSent: primaryJob?.emails?.some(e => e.template === "offer_letter") || false,
-      mailConfirmed: primaryJob?.emails?.some(e => e.template === "offer_letter" && e.repliedAt) || false,
+      completed:
+        primaryJob?.stageHistory?.some((s) => s.stage === "Offer") || false,
+      duration:
+        primaryJob?.stageHistory?.find((s) => s.stage === "Offer")?.duration ||
+        0,
+      startDate:
+        primaryJob?.stageHistory?.find((s) => s.stage === "Offer")?.startDate ||
+        "",
+      mailSent:
+        primaryJob?.emails?.some((e) => e.template === "offer_letter") || false,
+      mailConfirmed:
+        primaryJob?.emails?.some(
+          (e) => e.template === "offer_letter" && e.repliedAt,
+        ) || false,
     },
     {
       name: "Hired",
-      completed: primaryJob?.stageHistory?.some(s => s.stage === "Hired") || false,
-      duration: primaryJob?.stageHistory?.find(s => s.stage === "Hired")?.duration || 0,
-      startDate: primaryJob?.stageHistory?.find(s => s.stage === "Hired")?.startDate || "",
-      mailSent: primaryJob?.emails?.some(e => e.template === "welcome_email") || false,
-      mailConfirmed: primaryJob?.emails?.some(e => e.template === "welcome_email" && e.repliedAt) || false,
+      completed:
+        primaryJob?.stageHistory?.some((s) => s.stage === "Hired") || false,
+      duration:
+        primaryJob?.stageHistory?.find((s) => s.stage === "Hired")?.duration ||
+        0,
+      startDate:
+        primaryJob?.stageHistory?.find((s) => s.stage === "Hired")?.startDate ||
+        "",
+      mailSent:
+        primaryJob?.emails?.some((e) => e.template === "welcome_email") ||
+        false,
+      mailConfirmed:
+        primaryJob?.emails?.some(
+          (e) => e.template === "welcome_email" && e.repliedAt,
+        ) || false,
     },
   ];
 
@@ -309,13 +370,14 @@ export default function CandidateDetail() {
   ];
 
   // Convert candidate stage history to StageData format
-  const stageHistory = primaryJob?.stageHistory?.map((stage) => ({
-    id: stage.id,
-    stage: stage.stage,
-    date: stage.startDate, // Use startDate instead of date
-    duration: stage.duration,
-    notes: stage.notes,
-  })) || [];
+  const stageHistory =
+    primaryJob?.stageHistory?.map((stage) => ({
+      id: stage.id,
+      stage: stage.stage,
+      date: stage.startDate, // Use startDate instead of date
+      duration: stage.duration,
+      notes: stage.notes,
+    })) || [];
 
   // Get candidate notes
   const candidateNotes = [
@@ -908,292 +970,210 @@ export default function CandidateDetail() {
 
   const JobsPanel = () => {
     const candidateJobs = getCandidateJobs(candidate);
-    const selectedJob = candidateJobs.find(job => job.id === selectedJobId);
+    const selectedJob = candidateJobs.find((job) => job.id === selectedJobId);
 
     return (
-      <div className="space-y-4 sm:space-y-6">
-        {/* Jobs Overview */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Briefcase className="w-5 h-5" />
-              Job Applications
-              <Badge variant="outline">{candidateJobs.length}</Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {candidateJobs.map((job) => {
-                const isSelected = job.id === selectedJobId;
-                return (
-                  <div
-                    key={job.id}
-                    className={`p-4 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
-                      isSelected
-                        ? "border-primary bg-primary/5"
-                        : "border-slate-200 hover:border-slate-300"
-                    }`}
-                    onClick={() => {
-                      setSelectedJobId(job.id);
-                      setShowJobProgress(true);
-                    }}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-3">
-                        <Briefcase className="w-5 h-5 text-slate-500" />
-                        <div>
-                          <h4 className="font-medium text-slate-900">
-                            {job.jobTitle}
-                          </h4>
-                          <p className="text-sm text-slate-600">
-                            {job.department}
-                          </p>
-                        </div>
-                      </div>
-                      <Badge
-                        variant={
-                          job.status === "Active" ? "default" : "secondary"
-                        }
-                        className="text-xs"
+      <div className="lg:col-span-2 order-1 lg:order-2">
+        <Tabs defaultValue="applications" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 h-auto">
+            <TabsTrigger
+              value="applications"
+              className="text-xs sm:text-sm px-2 py-2"
+            >
+              <span className="hidden sm:inline">Job Applications</span>
+              <span className="sm:hidden">Jobs</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="education"
+              className="text-xs sm:text-sm px-2 py-2"
+            >
+              <span className="hidden sm:inline">Education & Experience</span>
+              <span className="sm:hidden">Experience</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="evaluations"
+              className="text-xs sm:text-sm px-2 py-2"
+            >
+              <span className="hidden sm:inline">CV Evaluations</span>
+              <span className="sm:hidden">CV Eval</span>
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="applications" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span>
+                    Active Applications ({candidate.jobApplications.length})
+                  </span>
+                  <Button size="sm">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Apply to New Job
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {candidate.jobApplications.map((application) => (
+                    <JobApplicationCard
+                      key={application.id}
+                      application={application}
+                    />
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="education" className="space-y-4">
+            {/* Education */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Education</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {candidate.education.map((edu) => (
+                    <div
+                      key={edu.id}
+                      className="border-l-4 border-l-primary pl-4"
+                    >
+                      <h4 className="font-medium text-slate-900">
+                        {edu.degree} in {edu.field}
+                      </h4>
+                      <p className="text-sm text-slate-600">
+                        {edu.institution}
+                      </p>
+                      <p className="text-sm text-slate-500">
+                        Graduated: {edu.graduationYear}{" "}
+                        {edu.gpa && `• GPA: ${edu.gpa}`}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Work Experience */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Work Experience</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {candidate.workExperience.map((work) => (
+                    <div
+                      key={work.id}
+                      className="border-l-4 border-l-secondary pl-4"
+                    >
+                      <h4 className="font-medium text-slate-900">
+                        {work.position}
+                      </h4>
+                      <p className="text-sm text-slate-600">{work.company}</p>
+                      <p className="text-sm text-slate-500">
+                        {work.startDate} - {work.endDate || "Present"}
+                      </p>
+                      <p className="text-sm text-slate-600 mt-2">
+                        {work.description}
+                      </p>
+                      {work.achievements && work.achievements.length > 0 && (
+                        <ul className="text-sm text-slate-600 mt-2 list-disc list-inside">
+                          {work.achievements.map((achievement, index) => (
+                            <li key={index}>{achievement}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="evaluations" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>CV Evaluations</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {candidate.cvEvaluations &&
+                candidate.cvEvaluations.length > 0 ? (
+                  <div className="space-y-4">
+                    {candidate.cvEvaluations.map((evaluation) => (
+                      <div
+                        key={evaluation.id}
+                        className="border border-slate-200 rounded-lg p-4 hover:bg-slate-50"
                       >
-                        {job.currentStage}
-                      </Badge>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 text-xs text-slate-600">
-                      <div className="flex items-center gap-1">
-                        <User className="w-3 h-3" />
-                        <span>{job.recruiter}</span>
-                      </div>
-                      {/* <div className="flex items-center gap-1">
-                        <DollarSign className="w-3 h-3" />
-                        <span>{job.salary}</span>
-                      </div> */}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Job Progress Section - Only show when a job is selected */}
-        {selectedJob && showJobProgress && (
-          <>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-slate-900">
-                Progress for {selectedJob.jobTitle}
-              </h3>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setSelectedJobId(null);
-                  setShowJobProgress(false);
-                }}
-              >
-                Back to Jobs Overview
-              </Button>
-            </div>
-            <StatusTracker />
-
-            {/* Notes and Activities for Selected Job */}
-            <Tabs defaultValue="notes" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="notes" className="text-sm sm:text-base">
-                  Notes & Timeline
-                </TabsTrigger>
-                <TabsTrigger value="activities" className="text-sm sm:text-base">
-                  Activity Log
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="notes" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <FileText className="w-5 h-5" />
-                      Job-Specific Notes
-                      <Badge variant="outline">{selectedJob.jobTitle}</Badge>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <Textarea
-                        placeholder="Add a note about this job application..."
-                        value={newNote}
-                        onChange={(e) => setNewNote(e.target.value)}
-                      />
-                      <Button size="sm">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add Note
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Stage Timeline</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {stages
-                        .filter((stage) => stage.startDate)
-                        .map((stage) => (
-                          <div
-                            key={stage.name}
-                            className="flex items-start space-x-3 pb-4 border-b border-slate-100 last:border-b-0"
-                          >
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
                             <div
-                              className={`w-3 h-3 rounded-full mt-2 ${stage.completed ? "bg-green-500" : "bg-blue-500"}`}
+                              className={`w-3 h-3 rounded-full ${
+                                evaluation.finalVerdict === "Good Fit"
+                                  ? "bg-green-500"
+                                  : evaluation.finalVerdict ===
+                                      "Needs Improvement"
+                                    ? "bg-yellow-500"
+                                    : "bg-red-500"
+                              }`}
                             />
-                            <div className="flex-1">
-                              <div className="flex items-center justify-between">
-                                <h4 className="font-medium text-slate-900">
-                                  {stage.name}
-                                </h4>
-                                <span className="text-xs text-slate-500 flex items-center gap-1">
-                                  <Clock className="w-3 h-3" />
-                                  {stage.duration} days
-                                </span>
-                              </div>
-                              <p className="text-sm text-slate-600 mt-1">
-                                {stage.startDate}{" "}
-                                {stage.endDate && `- ${stage.endDate}`}
-                              </p>
-                              {stage.notes && (
-                                <p className="text-sm text-slate-600 mt-2 bg-slate-50 p-2 rounded">
-                                  {stage.notes}
-                                </p>
-                              )}
-                            </div>
+                            <span className="font-medium">
+                              {evaluation.finalVerdict}
+                            </span>
+                            <Badge variant="outline">
+                              {evaluation.jobFitScore}% match
+                            </Badge>
                           </div>
-                        ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="activities" className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Recent Activities</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {activities.map((activity) => (
-                        <div
-                          key={activity.id}
-                          className="flex items-start space-x-3 pb-4 border-b border-slate-100 last:border-b-0"
-                        >
-                          <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                            {activity.type === "stage_change" && (
-                              <Zap className="w-4 h-4 text-blue-600" />
-                            )}
-                            {activity.type === "note" && (
-                              <FileText className="w-4 h-4 text-green-600" />
-                            )}
-                            {activity.type === "email" && (
-                              <Mail className="w-4 h-4 text-purple-600" />
-                            )}
-                            {activity.type === "call" && (
-                              <Phone className="w-4 h-4 text-orange-600" />
-                            )}
-                            {activity.type === "interview" && (
-                              <Video className="w-4 h-4 text-indigo-600" />
-                            )}
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between">
-                              <h4 className="font-medium text-slate-900">
-                                {activity.action}
-                              </h4>
-                              <span className="text-xs text-slate-500">
-                                {activity.timestamp}
-                              </span>
-                            </div>
-                            <p className="text-sm text-slate-600">
-                              by {activity.user}
-                            </p>
-                            {activity.content && (
-                              <p className="text-sm text-slate-600 mt-1 bg-slate-50 p-2 rounded">
-                                {activity.content}
-                              </p>
-                            )}
-                            {activity.reason && (
-                              <p className="text-sm text-slate-600 mt-1">
-                                <span className="font-medium">Reason:</span>{" "}
-                                {activity.reason}
-                              </p>
-                            )}
-                            {activity.duration && (
-                              <p className="text-sm text-slate-600 mt-1">
-                                <span className="font-medium">Duration:</span>{" "}
-                                {activity.duration}
-                              </p>
-                            )}
-                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setSelectedCVEvaluation(evaluation)}
+                          >
+                            <Eye className="w-4 h-4 mr-1" />
+                            View Details
+                          </Button>
                         </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-                         </Tabs>
-
-             {/* Email History for Selected Job */}
-             <Card>
-               <CardHeader>
-                 <CardTitle className="text-lg sm:text-xl">Email History</CardTitle>
-               </CardHeader>
-               <CardContent>
-                 <div className="space-y-3 sm:space-y-4">
-                   {emails.map((email) => (
-                     <div
-                       key={email.id}
-                       className="p-3 border border-slate-200 rounded-lg hover:bg-slate-50"
-                     >
-                       <div className="flex items-center justify-between mb-2 min-w-0">
-                         <h4 className="font-medium text-sm text-slate-900 break-words flex items-center gap-2 min-w-0 flex-1">
-                           <span className="text-wrap">{email.subject}</span>
-                         </h4>
-                         <DropdownMenu>
-                           <DropdownMenuTrigger asChild>
-                             <Button
-                               variant="ghost"
-                               size="sm"
-                               className="flex-shrink-0"
-                             >
-                               <MoreHorizontal className="w-4 h-4" />
-                             </Button>
-                           </DropdownMenuTrigger>
-                           <DropdownMenuContent align="end">
-                             <DropdownMenuItem onClick={() => setSelectedEmail(email)}>
-                               <Eye className="w-4 h-4 mr-2" />
-                               View Full
-                             </DropdownMenuItem>
-                           </DropdownMenuContent>
-                         </DropdownMenu>
-                       </div>
-                       <p className="text-xs text-slate-600 mb-1 break-words">
-                         From: {email.from}
-                       </p>
-                       <p className="text-xs text-slate-600 mb-2">{email.timestamp}</p>
-                       <p className="text-xs text-slate-600 line-clamp-2">
-                         {email.content}
-                       </p>
-                     </div>
-                   ))}
-                 </div>
-               </CardContent>
-             </Card>
-           </>
-         )}
-       </div>
-     );
-   };
-
-
+                        <p className="text-sm text-slate-600 line-clamp-2">
+                          {evaluation.summary}
+                        </p>
+                        <div className="mt-3 flex flex-wrap gap-1">
+                          {evaluation.strengths
+                            .slice(0, 3)
+                            .map((strength, index) => (
+                              <Badge
+                                key={index}
+                                variant="secondary"
+                                className="text-xs"
+                              >
+                                {strength}
+                              </Badge>
+                            ))}
+                          {evaluation.strengths.length > 3 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{evaluation.strengths.length - 3} more
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <FileText className="w-12 h-12 mx-auto text-slate-300 mb-4" />
+                    <p className="text-slate-500">
+                      No CV evaluations available
+                    </p>
+                    <Button className="mt-4" size="sm">
+                      Start CV Evaluation
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+    );
+  };
 
   const handleStageChangeRequest = () => {
     // Called when user clicks 'Update Stage' in dialog
