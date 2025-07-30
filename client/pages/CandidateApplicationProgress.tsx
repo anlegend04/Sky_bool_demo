@@ -391,9 +391,7 @@ export default function CandidateApplicationProgress(props: CandidateApplication
     };
   });
 
-  const currentStageIndex = stages.findIndex(
-    (stage) => stage.name === jobApplication.currentStage,
-  );
+
   const completedStages = stages.filter((s) => s.completed).length;
   const totalStages = stages.length;
 
