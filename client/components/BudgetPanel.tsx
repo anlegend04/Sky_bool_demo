@@ -48,7 +48,7 @@ import {
   Edit,
   Trash2,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { JobData, ExpenseData } from "@/data/hardcoded-data";
 import { useToast } from "@/hooks/use-toast";
 import { RechartsWarningSuppress } from "./RechartsWarningSuppress";
@@ -98,7 +98,7 @@ export default function BudgetPanel({ job, onJobUpdate }: BudgetPanelProps) {
   // Prepare data for charts
   const expenseData = job.budget?.expenses || [];
 
-  const pieData = React.useMemo(() => {
+  const pieData = useMemo(() => {
     return expenseCategories
       .map((category) => {
         const categoryExpenses = expenseData.filter(
@@ -128,7 +128,7 @@ export default function BudgetPanel({ job, onJobUpdate }: BudgetPanelProps) {
   }, [expenseData, expenseCategories]);
 
   // Generate dynamic monthly data based on actual expenses
-  const monthlyData = React.useMemo(() => {
+  const monthlyData = useMemo(() => {
     const months = [
       "Jan",
       "Feb",

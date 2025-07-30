@@ -77,9 +77,14 @@ import {
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { storage, EmailData, StageHistoryData } from "@/lib/storage";
-import { CandidateData } from "@/data/hardcoded-data";
+import { CandidateData, CVEvaluationData } from "@/data/hardcoded-data";
 import { useToast } from "@/hooks/use-toast";
-import { HARDCODED_CANDIDATES, EMAIL_TEMPLATES } from "@/data/hardcoded-data";
+import {
+  HARDCODED_CANDIDATES,
+  EMAIL_TEMPLATES,
+  getCandidate,
+  getCandidateTimeline,
+} from "@/data/hardcoded-data";
 import { EmailTrigger } from "@/components/EmailTrigger";
 
 type StageData = {
@@ -98,7 +103,7 @@ type StageData = {
 function convertCandidateStatus(candidate: any): CandidateData {
   return {
     ...candidate,
-    status: 
+    status:
       candidate.status === "Active" ||
       candidate.status === "Inactive" ||
       candidate.status === "Blacklisted"
@@ -120,6 +125,10 @@ export default function CandidateDetail() {
   const [newStage, setNewStage] = useState("");
   const [selectedEmail, setSelectedEmail] = useState<EmailData | null>(null);
   const [emailSubject, setEmailSubject] = useState("");
+  const [selectedCVEvaluation, setSelectedCVEvaluation] =
+    useState<CVEvaluationData | null>(null);
+  const [showEditProfileDialog, setShowEditProfileDialog] = useState(false);
+  const [showResumePreview, setShowResumePreview] = useState(false);
   const { toast } = useToast();
 
   // Load candidate from hardcoded data or localStorage
@@ -136,9 +145,7 @@ export default function CandidateDetail() {
           emails: hardcodedCandidate.emails.map((email) => ({
             ...email,
             status:
-              (email.status as any) === "draft"
-                ? "pending"
-                : email.status,
+              (email.status as any) === "draft" ? "pending" : email.status,
           })),
         };
 
@@ -173,165 +180,155 @@ export default function CandidateDetail() {
     );
   }
 
-  // Enhanced demo stages data
+  // Convert candidate stage history to StageData format
   const stages: StageData[] = [
     {
       name: "Applied",
-      completed: true,
-      duration: 1,
-      startDate: "2024-01-15",
-      endDate: "2024-01-16",
+      completed: candidate.stageHistory.some((s) => s.stage === "Applied"),
+      duration:
+        candidate.stageHistory.find((s) => s.stage === "Applied")?.duration ||
+        0,
+      startDate:
+        candidate.stageHistory.find((s) => s.stage === "Applied")?.startDate ||
+        "",
+      endDate: candidate.stageHistory.find((s) => s.stage === "Applied")
+        ?.endDate,
       notes:
-        "Application received via LinkedIn. Strong profile match with required skills.",
-      mailSent: true,
+        candidate.stageHistory.find((s) => s.stage === "Applied")?.notes ||
+        "Application submitted",
+      mailSent:
+        candidate.stageHistory.find((s) => s.stage === "Applied")?.mailSent ||
+        false,
+      mailConfirmed:
+        candidate.stageHistory.find((s) => s.stage === "Applied")
+          ?.mailConfirmed || false,
     },
     {
       name: "Screening",
-      completed: true,
-      duration: 3,
-      startDate: "2024-01-16",
-      endDate: "2024-01-19",
+      completed: candidate.stageHistory.some((s) => s.stage === "Screening"),
+      duration:
+        candidate.stageHistory.find((s) => s.stage === "Screening")?.duration ||
+        0,
+      startDate:
+        candidate.stageHistory.find((s) => s.stage === "Screening")
+          ?.startDate || "",
+      endDate: candidate.stageHistory.find((s) => s.stage === "Screening")
+        ?.endDate,
       notes:
-        "Initial screening call completed. Excellent communication skills and cultural fit.",
-      mailSent: true,
+        candidate.stageHistory.find((s) => s.stage === "Screening")?.notes ||
+        "Initial screening pending",
+      mailSent:
+        candidate.stageHistory.find((s) => s.stage === "Screening")?.mailSent ||
+        false,
+      mailConfirmed:
+        candidate.stageHistory.find((s) => s.stage === "Screening")
+          ?.mailConfirmed || false,
     },
     {
       name: "Interview",
-      completed: false,
-      duration: 5,
-      startDate: "2024-01-19",
+      completed: candidate.stageHistory.some((s) => s.stage === "Interview"),
+      duration:
+        candidate.stageHistory.find((s) => s.stage === "Interview")?.duration ||
+        0,
+      startDate:
+        candidate.stageHistory.find((s) => s.stage === "Interview")
+          ?.startDate || "",
+      endDate: candidate.stageHistory.find((s) => s.stage === "Interview")
+        ?.endDate,
       notes:
-        "Scheduled for panel interview on Jan 25th. Technical assessment completed successfully.",
-      mailSent: true,
-      mailConfirmed: true,
+        candidate.stageHistory.find((s) => s.stage === "Interview")?.notes ||
+        "Interview scheduling",
+      mailSent:
+        candidate.stageHistory.find((s) => s.stage === "Interview")?.mailSent ||
+        false,
+      mailConfirmed:
+        candidate.stageHistory.find((s) => s.stage === "Interview")
+          ?.mailConfirmed || false,
     },
     {
       name: "Technical",
-      completed: false,
-      duration: 0,
-      startDate: "",
+      completed: candidate.stageHistory.some((s) => s.stage === "Technical"),
+      duration:
+        candidate.stageHistory.find((s) => s.stage === "Technical")?.duration ||
+        0,
+      startDate:
+        candidate.stageHistory.find((s) => s.stage === "Technical")
+          ?.startDate || "",
+      endDate: candidate.stageHistory.find((s) => s.stage === "Technical")
+        ?.endDate,
       notes:
-        "Technical round pending - coding challenge and system design discussion.",
-      mailSent: false,
-      mailConfirmed: false,
+        candidate.stageHistory.find((s) => s.stage === "Technical")?.notes ||
+        "Technical assessment pending",
+      mailSent:
+        candidate.stageHistory.find((s) => s.stage === "Technical")?.mailSent ||
+        false,
+      mailConfirmed:
+        candidate.stageHistory.find((s) => s.stage === "Technical")
+          ?.mailConfirmed || false,
     },
     {
       name: "Offer",
-      completed: false,
-      duration: 0,
-      startDate: "",
-      notes: "Final offer stage - salary negotiation and benefits discussion.",
-      mailSent: false,
-      mailConfirmed: false,
+      completed: candidate.stageHistory.some((s) => s.stage === "Offer"),
+      duration:
+        candidate.stageHistory.find((s) => s.stage === "Offer")?.duration || 0,
+      startDate:
+        candidate.stageHistory.find((s) => s.stage === "Offer")?.startDate ||
+        "",
+      endDate: candidate.stageHistory.find((s) => s.stage === "Offer")?.endDate,
+      notes:
+        candidate.stageHistory.find((s) => s.stage === "Offer")?.notes ||
+        "Offer preparation",
+      mailSent:
+        candidate.stageHistory.find((s) => s.stage === "Offer")?.mailSent ||
+        false,
+      mailConfirmed:
+        candidate.stageHistory.find((s) => s.stage === "Offer")
+          ?.mailConfirmed || false,
     },
     {
       name: "Hired",
-      completed: false,
-      duration: 0,
-      startDate: "",
-      notes: "Onboarding and start date coordination.",
-      mailSent: false,
-      mailConfirmed: false,
+      completed: candidate.stageHistory.some((s) => s.stage === "Hired"),
+      duration:
+        candidate.stageHistory.find((s) => s.stage === "Hired")?.duration || 0,
+      startDate:
+        candidate.stageHistory.find((s) => s.stage === "Hired")?.startDate ||
+        "",
+      endDate: candidate.stageHistory.find((s) => s.stage === "Hired")?.endDate,
+      notes:
+        candidate.stageHistory.find((s) => s.stage === "Hired")?.notes ||
+        "Onboarding",
+      mailSent:
+        candidate.stageHistory.find((s) => s.stage === "Hired")?.mailSent ||
+        false,
+      mailConfirmed:
+        candidate.stageHistory.find((s) => s.stage === "Hired")
+          ?.mailConfirmed || false,
     },
   ];
 
-  // Enhanced demo activities data
-  const activities = [
-    {
-      id: 1,
-      type: "stage_change",
-      action: "Moved to Interview stage",
-      user: "Alex Chen",
-      timestamp: "2024-01-19 10:30 AM",
-      reason:
-        "Passed initial screening successfully with strong technical background",
-      content:
-        "Candidate demonstrated excellent problem-solving skills during screening call.",
-    },
-    {
-      id: 2,
-      type: "note",
-      action: "Added detailed note",
-      user: "Sarah Kim",
-      timestamp: "2024-01-18 2:15 PM",
-      content:
-        "Great cultural fit, strong technical background. Portfolio shows impressive React projects. Recommended for technical interview.",
-    },
-    {
-      id: 3,
-      type: "email",
-      action: "Sent interview invitation",
-      user: "Alex Chen",
-      timestamp: "2024-01-17 9:00 AM",
-      content:
-        "Interview invitation sent with calendar link and preparation materials.",
-    },
-    {
-      id: 4,
-      type: "call",
-      action: "Phone screening completed",
-      user: "Alex Chen",
-      timestamp: "2024-01-16 3:30 PM",
-      duration: "45 minutes",
-      content:
-        "Discussed technical background, career goals, and company culture. Very positive impression.",
-    },
-    {
-      id: 5,
-      type: "interview",
-      action: "Technical assessment scheduled",
-      user: "Sarah Kim",
-      timestamp: "2024-01-20 11:00 AM",
-      content:
-        "Scheduled technical round with senior developers for Jan 25th, 2:00 PM.",
-    },
-    {
-      id: 6,
-      type: "note",
-      action: "Resume review completed",
-      user: "Mike Wilson",
-      timestamp: "2024-01-15 4:45 PM",
-      content:
-        "Resume shows strong React/TypeScript experience. Previous work at top tech companies is impressive.",
-    },
-  ];
+  // Use candidate timeline from centralized data
+  const candidateTimeline = getCandidateTimeline(candidate.id);
+  const activities = candidateTimeline.map((item, index) => ({
+    id: index + 1,
+    type: item.type,
+    action: item.description,
+    user:
+      item.type === "stage_change"
+        ? candidate.stageHistory.find((s) => s.startDate === item.date)
+            ?.userName || "System"
+        : item.type === "email"
+          ? candidate.emails.find((e) => e.timestamp === item.date)?.from ||
+            "System"
+          : item.type === "note"
+            ? candidate.notes.find((n) => n.timestamp === item.date)
+                ?.userName || "System"
+            : "System",
+    timestamp: new Date(item.date).toLocaleString(),
+    content: item.details,
+  }));
 
-  // Enhanced demo email history
-  const emailHistory: EmailData[] = [
-    {
-      id: "email_1",
-      subject: "Interview Invitation - Senior Product Manager",
-      content:
-        "Hi Marissa, Thank you for your interest in the Senior Product Manager position. We would like to invite you for an interview on January 25th at 2:00 PM. Please find the calendar invitation attached. We'll be discussing your background, technical skills, and how you approach product challenges. Looking forward to meeting you!",
-      from: "alex.chen@company.com",
-      to: candidate.email,
-      timestamp: "2024-01-17 9:00 AM",
-      status: "sent",
-      template: "interview_invitation",
-    },
-    {
-      id: "email_2",
-      subject: "Application Received - Senior Product Manager",
-      content:
-        "Thank you for applying to our Senior Product Manager position. We have received your application and will review it shortly. You can expect to hear from us within 3-5 business days. In the meantime, feel free to explore our company culture and values on our website.",
-      from: "noreply@company.com",
-      to: candidate.email,
-      timestamp: "2024-01-15 2:30 PM",
-      status: "sent",
-      template: "application_received",
-    },
-    {
-      id: "email_3",
-      subject: "Technical Assessment Details",
-      content:
-        "Hi Marissa, Following our successful initial interview, we'd like to proceed with the technical assessment. This will include a coding challenge and system design discussion. Please find the assessment materials attached. You have 48 hours to complete this. Good luck!",
-      from: "sarah.kim@company.com",
-      to: candidate.email,
-      timestamp: "2024-01-20 3:15 PM",
-      status: "sent",
-      template: "technical_assessment",
-    },
-  ];
+  // Use candidate emails from centralized data
+  const emailHistory: EmailData[] = candidate.emails || [];
 
   const emailTemplates = EMAIL_TEMPLATES;
 
@@ -619,15 +616,17 @@ export default function CandidateDetail() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setShowEditProfileDialog(true)}
+                >
                   <Edit className="w-4 h-4 mr-2" />
                   Edit Profile
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleDownloadResume()}>
                   <Download className="w-4 h-4 mr-2" />
                   Download Resume
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleShareProfile()}>
                   <Share className="w-4 h-4 mr-2" />
                   Share Profile
                 </DropdownMenuItem>
@@ -724,13 +723,85 @@ export default function CandidateDetail() {
                     </p>
                   </div>
                 </div>
-                <Button variant="outline" size="sm" className="flex-shrink-0">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-shrink-0"
+                  onClick={() => setShowResumePreview(true)}
+                >
                   <Eye className="w-4 h-4 mr-2" />
                   View
                 </Button>
               </div>
             </div>
           </div>
+
+          {/* CV Evaluation Section */}
+          {candidate.cvEvaluations && candidate.cvEvaluations.length > 0 && (
+            <div className="pt-4 border-t">
+              <h4 className="font-medium text-slate-900 mb-2 flex items-center gap-2">
+                CV Evaluation
+                <HelpTooltip content="AI-powered analysis of candidate's CV" />
+              </h4>
+              <div className="space-y-3">
+                {candidate.cvEvaluations.map((evaluation) => (
+                  <div
+                    key={evaluation.id}
+                    className="border border-slate-200 rounded-lg p-4 bg-slate-50"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className={`w-3 h-3 rounded-full ${
+                            evaluation.finalVerdict === "Good Fit"
+                              ? "bg-green-500"
+                              : evaluation.finalVerdict === "Needs Improvement"
+                                ? "bg-yellow-500"
+                                : "bg-red-500"
+                          }`}
+                        />
+                        <span className="text-sm font-medium">
+                          {evaluation.finalVerdict}
+                        </span>
+                        <Badge variant="outline" className="text-xs">
+                          {evaluation.jobFitScore}% match
+                        </Badge>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedCVEvaluation(evaluation)}
+                      >
+                        <Eye className="w-4 h-4 mr-1" />
+                        View Details
+                      </Button>
+                    </div>
+                    <p className="text-sm text-slate-600 line-clamp-2">
+                      {evaluation.summary}
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-1">
+                      {evaluation.strengths
+                        .slice(0, 2)
+                        .map((strength, index) => (
+                          <Badge
+                            key={index}
+                            variant="secondary"
+                            className="text-xs"
+                          >
+                            {strength}
+                          </Badge>
+                        ))}
+                      {evaluation.strengths.length > 2 && (
+                        <Badge variant="outline" className="text-xs">
+                          +{evaluation.strengths.length - 2} more
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -1147,6 +1218,52 @@ export default function CandidateDetail() {
     }
   };
 
+  const handleDownloadResume = () => {
+    // Create a mock download
+    const link = document.createElement("a");
+    link.href = `/files/resumes/${candidate.resume}`;
+    link.download = candidate.resume;
+    link.click();
+
+    toast({
+      title: "Download Started",
+      description: `Downloading ${candidate.resume}`,
+    });
+  };
+
+  const handleDownloadAttachment = (attachment: any) => {
+    // Create a mock download
+    const link = document.createElement("a");
+    link.href = attachment.url;
+    link.download = attachment.name;
+    link.click();
+
+    toast({
+      title: "Download Started",
+      description: `Downloading ${attachment.name}`,
+    });
+  };
+
+  const handleShareProfile = () => {
+    // Copy profile link to clipboard
+    const profileUrl = `${window.location.origin}/candidates/${candidate.id}`;
+    navigator.clipboard.writeText(profileUrl).then(() => {
+      toast({
+        title: "Profile Link Copied",
+        description: "Profile URL copied to clipboard",
+      });
+    });
+  };
+
+  const handleSaveProfile = () => {
+    // Mock save functionality
+    toast({
+      title: "Profile Updated",
+      description: "Candidate profile has been successfully updated",
+    });
+    setShowEditProfileDialog(false);
+  };
+
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
@@ -1247,6 +1364,204 @@ export default function CandidateDetail() {
                 Cancel
               </Button>
               <Button onClick={handleStageChangeRequest}>Update Stage</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* CV Evaluation Dialog */}
+      <Dialog
+        open={!!selectedCVEvaluation}
+        onOpenChange={() => setSelectedCVEvaluation(null)}
+      >
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              CV Evaluation Details
+              <Badge
+                variant={
+                  selectedCVEvaluation?.finalVerdict === "Good Fit"
+                    ? "default"
+                    : selectedCVEvaluation?.finalVerdict === "Needs Improvement"
+                      ? "secondary"
+                      : "destructive"
+                }
+              >
+                {selectedCVEvaluation?.finalVerdict}
+              </Badge>
+            </DialogTitle>
+            <DialogDescription>
+              Analysis for {selectedCVEvaluation?.fileName} •{" "}
+              {selectedCVEvaluation?.jobFitScore}% job fit score
+            </DialogDescription>
+          </DialogHeader>
+          {selectedCVEvaluation && (
+            <div className="space-y-6">
+              <div>
+                <h4 className="font-semibold mb-2">Summary</h4>
+                <p className="text-sm text-slate-600">
+                  {selectedCVEvaluation.summary}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="font-semibold mb-2 text-green-700">
+                    Strengths
+                  </h4>
+                  <ul className="space-y-1">
+                    {selectedCVEvaluation.strengths.map((strength, index) => (
+                      <li
+                        key={index}
+                        className="text-sm text-slate-600 flex items-start gap-2"
+                      >
+                        <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        {strength}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold mb-2 text-orange-700">
+                    Areas for Improvement
+                  </h4>
+                  <ul className="space-y-1">
+                    {selectedCVEvaluation.weaknesses.map((weakness, index) => (
+                      <li
+                        key={index}
+                        className="text-sm text-slate-600 flex items-start gap-2"
+                      >
+                        <AlertCircle className="w-4 h-4 text-orange-500 mt-0.5 flex-shrink-0" />
+                        {weakness}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-2">Skills Match</h4>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {selectedCVEvaluation.skillsMatch.map((skill, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-2 p-2 bg-slate-50 rounded"
+                    >
+                      <div
+                        className={`w-2 h-2 rounded-full ${
+                          skill.hasSkill ? "bg-green-500" : "bg-red-500"
+                        }`}
+                      />
+                      <span className="text-sm truncate">{skill.skill}</span>
+                      {skill.hasSkill && skill.level && (
+                        <Badge variant="outline" className="text-xs">
+                          {skill.level}
+                        </Badge>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-2">Recommendations</h4>
+                <ul className="space-y-1">
+                  {selectedCVEvaluation.recommendations.map((rec, index) => (
+                    <li
+                      key={index}
+                      className="text-sm text-slate-600 flex items-start gap-2"
+                    >
+                      <Target className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                      {rec}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {selectedCVEvaluation.notes && (
+                <div>
+                  <h4 className="font-semibold mb-2">Additional Notes</h4>
+                  <p className="text-sm text-slate-600 bg-slate-50 p-3 rounded">
+                    {selectedCVEvaluation.notes}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Resume Preview Dialog */}
+      <Dialog open={showResumePreview} onOpenChange={setShowResumePreview}>
+        <DialogContent className="sm:max-w-4xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>Resume Preview</DialogTitle>
+            <DialogDescription>{candidate.resume}</DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 bg-slate-100 rounded-lg p-4 min-h-[60vh] flex items-center justify-center">
+            <div className="text-center text-slate-500">
+              <FileText className="w-16 h-16 mx-auto mb-4 text-slate-300" />
+              <p className="mb-2">Resume Preview</p>
+              <p className="text-sm">PDF viewer would be integrated here</p>
+              <Button className="mt-4" onClick={() => handleDownloadResume()}>
+                <Download className="w-4 h-4 mr-2" />
+                Download Resume
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Profile Dialog */}
+      <Dialog
+        open={showEditProfileDialog}
+        onOpenChange={setShowEditProfileDialog}
+      >
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Candidate Profile</DialogTitle>
+            <DialogDescription>
+              Update candidate information and details
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium">Name</label>
+                <Input defaultValue={candidate.name} />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Email</label>
+                <Input defaultValue={candidate.email} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium">Phone</label>
+                <Input defaultValue={candidate.phone} />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Location</label>
+                <Input defaultValue={candidate.location} />
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium">Position</label>
+              <Input defaultValue={candidate.position} />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Experience</label>
+              <Input defaultValue={candidate.experience} />
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowEditProfileDialog(false)}
+              >
+                Cancel
+              </Button>
+              <Button onClick={() => handleSaveProfile()}>Save Changes</Button>
             </div>
           </div>
         </DialogContent>

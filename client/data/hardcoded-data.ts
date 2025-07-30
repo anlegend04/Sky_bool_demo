@@ -87,8 +87,45 @@ export interface CandidateData {
   timezone: string;
   availability: string;
   jobId?: string; // Link to the job they applied for
+  cvEvaluations?: CVEvaluationData[]; // CV evaluations for this candidate
   createdAt: string;
   updatedAt: string;
+}
+
+// CV Evaluation Interfaces
+export interface CVEvaluationData {
+  id: string;
+  candidateId: string;
+  jobId: string;
+  fileName: string;
+  summary: string;
+  strengths: string[];
+  weaknesses: string[];
+  jobFitScore: number;
+  suggestedImprovements: string[];
+  finalVerdict: "Good Fit" | "Needs Improvement" | "Not Suitable";
+  skillsMatch: {
+    skill: string;
+    hasSkill: boolean;
+    level?: "Beginner" | "Intermediate" | "Advanced" | "Expert";
+  }[];
+  experienceMatch: number;
+  educationMatch: number;
+  recommendations: string[];
+  extractedData: {
+    name: string;
+    email: string;
+    phone: string;
+    location: string;
+    education: string[];
+    workExperience: string[];
+    skills: string[];
+  };
+  notes?: string;
+  savedAt: string;
+  createdBy: string;
+  isShared: boolean;
+  shareUrl?: string;
 }
 
 export interface EducationData {
@@ -113,11 +150,22 @@ export interface WorkExperienceData {
 export interface ExpenseData {
   id: string;
   amount: number;
-  category: "Job Boards" | "Recruitment Agency" | "Events" | "Tools" | "Other";
+  category:
+    | "Job Boards"
+    | "Recruitment Agency"
+    | "Events"
+    | "Tools"
+    | "Social Media Ads"
+    | "Referral Bonus"
+    | "Assessment Tools"
+    | "Interview Software"
+    | "Background Checks"
+    | "Other";
   description: string;
   expectedOutcome: string;
   evaluationPeriod: string;
-  effectiveness: number;
+  effectiveness?: number;
+  notes?: string;
   createdAt: string;
   createdBy: string;
   jobId?: string;
@@ -477,6 +525,30 @@ export const HARDCODED_JOBS: JobData[] = [
           createdBy: "Alex Chen",
           jobId: "job_1",
         },
+        {
+          id: "exp_3",
+          amount: 2000,
+          category: "Assessment Tools",
+          description: "Technical screening platform",
+          expectedOutcome: "Automated technical assessment",
+          evaluationPeriod: "30 days",
+          effectiveness: 90,
+          createdAt: getRandomDate(20),
+          createdBy: "Alex Chen",
+          jobId: "job_1",
+        },
+        {
+          id: "exp_4",
+          amount: 2000,
+          category: "Referral Bonus",
+          description: "Employee referral rewards",
+          expectedOutcome: "High-quality candidates via referrals",
+          evaluationPeriod: "90 days",
+          effectiveness: 95,
+          createdAt: getRandomDate(15),
+          createdBy: "Alex Chen",
+          jobId: "job_1",
+        },
       ],
     },
     createdAt: "2024-01-10T09:00:00Z",
@@ -525,6 +597,60 @@ export const HARDCODED_JOBS: JobData[] = [
       hired: 0,
       rejected: 45,
     },
+    budget: {
+      estimated: 18000,
+      actual: 16200,
+      expenses: [
+        {
+          id: "exp_5",
+          amount: 7000,
+          category: "Job Boards",
+          description: "Executive search platform subscription",
+          expectedOutcome: "Senior PM candidates",
+          evaluationPeriod: "60 days",
+          effectiveness: 80,
+          createdAt: getRandomDate(40),
+          createdBy: "David Park",
+          jobId: "job_2",
+        },
+        {
+          id: "exp_6",
+          amount: 4500,
+          category: "Recruitment Agency",
+          description: "External headhunter services",
+          expectedOutcome: "Pre-screened senior candidates",
+          evaluationPeriod: "45 days",
+          effectiveness: 75,
+          createdAt: getRandomDate(35),
+          createdBy: "David Park",
+          jobId: "job_2",
+        },
+        {
+          id: "exp_7",
+          amount: 2200,
+          category: "Assessment Tools",
+          description: "Product management case study platform",
+          expectedOutcome: "Structured PM evaluation",
+          evaluationPeriod: "30 days",
+          effectiveness: 88,
+          createdAt: getRandomDate(25),
+          createdBy: "David Park",
+          jobId: "job_2",
+        },
+        {
+          id: "exp_8",
+          amount: 2500,
+          category: "Events",
+          description: "Product management meetup sponsorship",
+          expectedOutcome: "Network with PM professionals",
+          evaluationPeriod: "30 days",
+          effectiveness: 65,
+          createdAt: getRandomDate(20),
+          createdBy: "David Park",
+          jobId: "job_2",
+        },
+      ],
+    },
     createdAt: "2023-12-15T10:30:00Z",
     updatedAt: getRandomDateTime(3),
   },
@@ -570,6 +696,60 @@ export const HARDCODED_JOBS: JobData[] = [
       offer: 2,
       hired: 1,
       rejected: 18,
+    },
+    budget: {
+      estimated: 12000,
+      actual: 10800,
+      expenses: [
+        {
+          id: "exp_9",
+          amount: 3500,
+          category: "Job Boards",
+          description: "Design-focused job boards (Dribbble, Behance)",
+          expectedOutcome: "Creative talent pool access",
+          evaluationPeriod: "45 days",
+          effectiveness: 90,
+          createdAt: getRandomDate(35),
+          createdBy: "Alex Chen",
+          jobId: "job_3",
+        },
+        {
+          id: "exp_10",
+          amount: 2800,
+          category: "Events",
+          description: "UX/UI design conference networking",
+          expectedOutcome: "Meet top designers",
+          evaluationPeriod: "30 days",
+          effectiveness: 85,
+          createdAt: getRandomDate(30),
+          createdBy: "Alex Chen",
+          jobId: "job_3",
+        },
+        {
+          id: "exp_11",
+          amount: 2500,
+          category: "Referral Bonus",
+          description: "Design team referral incentives",
+          expectedOutcome: "High-quality designer referrals",
+          evaluationPeriod: "60 days",
+          effectiveness: 100,
+          createdAt: getRandomDate(25),
+          createdBy: "Alex Chen",
+          jobId: "job_3",
+        },
+        {
+          id: "exp_12",
+          amount: 2000,
+          category: "Assessment Tools",
+          description: "Design portfolio review platform",
+          expectedOutcome: "Standardized design evaluation",
+          evaluationPeriod: "30 days",
+          effectiveness: 92,
+          createdAt: getRandomDate(20),
+          createdBy: "Alex Chen",
+          jobId: "job_3",
+        },
+      ],
     },
     createdAt: "2024-01-20T14:15:00Z",
     updatedAt: getRandomDateTime(2),
@@ -619,6 +799,61 @@ export const HARDCODED_JOBS: JobData[] = [
       hired: 0,
       rejected: 32,
     },
+    budget: {
+      estimated: 20000,
+      actual: 15600,
+      expenses: [
+        {
+          id: "exp_13",
+          amount: 6000,
+          category: "Job Boards",
+          description:
+            "Technical recruitment platforms (Stack Overflow, GitHub)",
+          expectedOutcome: "Backend engineer candidates",
+          evaluationPeriod: "60 days",
+          effectiveness: 78,
+          createdAt: getRandomDate(40),
+          createdBy: "Sarah Kim",
+          jobId: "job_4",
+        },
+        {
+          id: "exp_14",
+          amount: 4500,
+          category: "Assessment Tools",
+          description: "Coding challenge platform license",
+          expectedOutcome: "Technical skill assessment",
+          evaluationPeriod: "30 days",
+          effectiveness: 85,
+          createdAt: getRandomDate(35),
+          createdBy: "Sarah Kim",
+          jobId: "job_4",
+        },
+        {
+          id: "exp_15",
+          amount: 3100,
+          category: "Recruitment Agency",
+          description: "Technical recruiting specialists",
+          expectedOutcome: "Pre-screened backend developers",
+          evaluationPeriod: "45 days",
+          effectiveness: 70,
+          createdAt: getRandomDate(30),
+          createdBy: "Sarah Kim",
+          jobId: "job_4",
+        },
+        {
+          id: "exp_16",
+          amount: 2000,
+          category: "Events",
+          description: "Tech meetup sponsorships",
+          expectedOutcome: "Developer community engagement",
+          evaluationPeriod: "30 days",
+          effectiveness: 60,
+          createdAt: getRandomDate(25),
+          createdBy: "Sarah Kim",
+          jobId: "job_4",
+        },
+      ],
+    },
     createdAt: "2024-01-05T08:45:00Z",
     updatedAt: getRandomDateTime(4),
   },
@@ -666,6 +901,60 @@ export const HARDCODED_JOBS: JobData[] = [
       offer: 1,
       hired: 0,
       rejected: 18,
+    },
+    budget: {
+      estimated: 16000,
+      actual: 8500,
+      expenses: [
+        {
+          id: "exp_17",
+          amount: 3500,
+          category: "Job Boards",
+          description: "Data science job platforms (Kaggle, DataJobs)",
+          expectedOutcome: "Data scientist candidates",
+          evaluationPeriod: "45 days",
+          effectiveness: 55,
+          createdAt: getRandomDate(25),
+          createdBy: "David Park",
+          jobId: "job_5",
+        },
+        {
+          id: "exp_18",
+          amount: 2500,
+          category: "Events",
+          description: "Data science conference booth",
+          expectedOutcome: "ML/AI talent networking",
+          evaluationPeriod: "30 days",
+          effectiveness: 50,
+          createdAt: getRandomDate(20),
+          createdBy: "David Park",
+          jobId: "job_5",
+        },
+        {
+          id: "exp_19",
+          amount: 1500,
+          category: "Assessment Tools",
+          description: "Data science challenge platform",
+          expectedOutcome: "Technical skill evaluation",
+          evaluationPeriod: "30 days",
+          effectiveness: 65,
+          createdAt: getRandomDate(15),
+          createdBy: "David Park",
+          jobId: "job_5",
+        },
+        {
+          id: "exp_20",
+          amount: 1000,
+          category: "Social Media Ads",
+          description: "LinkedIn targeted ads for data scientists",
+          expectedOutcome: "Reach passive candidates",
+          evaluationPeriod: "14 days",
+          effectiveness: 45,
+          createdAt: getRandomDate(10),
+          createdBy: "David Park",
+          jobId: "job_5",
+        },
+      ],
     },
     createdAt: "2024-02-01T11:20:00Z",
     updatedAt: getRandomDateTime(1),
@@ -906,6 +1195,78 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         url: "/files/portfolios/marissa_portfolio.zip",
         uploadedAt: getRandomDateTime(15),
         uploadedBy: "marissa.torres@email.com",
+      },
+    ],
+    cvEvaluations: [
+      {
+        id: "eval_1",
+        candidateId: "candidate_1",
+        jobId: "job_1",
+        fileName: "marissa_torres_resume.pdf",
+        summary:
+          "This candidate shows exceptional technical skills with strong experience in React and frontend development. Their background aligns perfectly with our Senior Frontend Developer requirements.",
+        strengths: [
+          "5+ years of experience in frontend development",
+          "Expert-level proficiency in React and TypeScript",
+          "Strong portfolio demonstrating modern development practices",
+          "Leadership experience mentoring junior developers",
+          "Full-stack development capabilities with Node.js",
+        ],
+        weaknesses: [
+          "Limited experience with GraphQL (nice-to-have requirement)",
+          "No AWS certification mentioned",
+          "Could benefit from more experience with testing frameworks",
+        ],
+        jobFitScore: 92,
+        finalVerdict: "Good Fit",
+        suggestedImprovements: [
+          "Consider GraphQL training for our upcoming API migration",
+          "Explore advanced testing frameworks like Jest and Cypress",
+          "AWS certification would strengthen cloud deployment skills",
+        ],
+        skillsMatch: [
+          { skill: "React", hasSkill: true, level: "Expert" },
+          { skill: "TypeScript", hasSkill: true, level: "Advanced" },
+          { skill: "Node.js", hasSkill: true, level: "Advanced" },
+          { skill: "JavaScript", hasSkill: true, level: "Expert" },
+          { skill: "CSS", hasSkill: true, level: "Advanced" },
+          { skill: "HTML", hasSkill: true, level: "Expert" },
+          { skill: "Redux", hasSkill: true, level: "Intermediate" },
+          { skill: "GraphQL", hasSkill: false, level: "Beginner" },
+        ],
+        experienceMatch: 95,
+        educationMatch: 90,
+        recommendations: [
+          "Strongly recommend proceeding to final interview",
+          "Consider for senior-level position based on leadership experience",
+          "Discuss potential GraphQL learning plan during interview",
+        ],
+        extractedData: {
+          name: "Marissa Torres",
+          email: "marissa.torres@email.com",
+          phone: "+1 (555) 987-6543",
+          location: "San Francisco, CA",
+          education: ["Bachelor of Computer Science - UC Berkeley (2019)"],
+          workExperience: [
+            "Frontend Developer at StartupCo (2019-2022)",
+            "Senior Frontend Developer at TechFirm (2023-present)",
+          ],
+          skills: [
+            "React",
+            "TypeScript",
+            "Node.js",
+            "GraphQL",
+            "Redux",
+            "CSS3",
+            "HTML5",
+            "JavaScript",
+          ],
+        },
+        notes:
+          "Exceptional candidate with strong technical background. Portfolio shows impressive React projects.",
+        savedAt: getRandomDateTime(10),
+        createdBy: "Alex Chen",
+        isShared: false,
       },
     ],
     createdAt: getRandomDateTime(15),

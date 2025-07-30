@@ -8,6 +8,9 @@ interface State {
   hasError: boolean;
 }
 
+// Store original React warning function
+let originalWarn: any = null;
+
 export class RechartsWarningSuppress extends Component<Props, State> {
   private originalConsoleWarn: typeof console.warn;
   private originalConsoleError: typeof console.error;
@@ -22,7 +25,6 @@ export class RechartsWarningSuppress extends Component<Props, State> {
   }
 
   componentDidMount() {
-    // Override console methods specifically for this component's context
     this.suppressWarnings();
   }
 
@@ -30,10 +32,27 @@ export class RechartsWarningSuppress extends Component<Props, State> {
     // Restore original console methods
     console.warn = this.originalConsoleWarn;
     console.error = this.originalConsoleError;
+
+    // Restore React's original warn if we modified it
+    if (
+      originalWarn &&
+      (React as any).__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED
+        ?.ReactDebugCurrentFrame
+    ) {
+      try {
+        const internals = (React as any)
+          .__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+        if (internals.ReactDebugCurrentFrame) {
+          console.warn = originalWarn;
+        }
+      } catch (e) {
+        // Ignore errors in restoring
+      }
+    }
   }
 
   private suppressWarnings() {
-    const isRechartsWarning = (message: string) => {
+    const isRechartsDefaultPropsWarning = (message: string) => {
       return (
         message.includes("Support for defaultProps will be removed") &&
         (message.includes("XAxis") ||
@@ -51,19 +70,38 @@ export class RechartsWarningSuppress extends Component<Props, State> {
       );
     };
 
+    // Suppress console warnings
     console.warn = (...args: any[]) => {
       const message = args.join(" ");
-      if (!isRechartsWarning(message)) {
+      if (!isRechartsDefaultPropsWarning(message)) {
         this.originalConsoleWarn(...args);
       }
     };
 
     console.error = (...args: any[]) => {
       const message = args.join(" ");
-      if (!isRechartsWarning(message)) {
+      if (!isRechartsDefaultPropsWarning(message)) {
         this.originalConsoleError(...args);
       }
     };
+
+    // Try to suppress React's internal warnings as well
+    try {
+      const internals = (React as any)
+        .__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+      if (internals?.ReactDebugCurrentFrame && !originalWarn) {
+        originalWarn = console.warn;
+        const originalReactWarn = console.warn;
+        console.warn = function (...args: any[]) {
+          const message = args.join(" ");
+          if (!isRechartsDefaultPropsWarning(message)) {
+            originalReactWarn.apply(console, args);
+          }
+        };
+      }
+    } catch (e) {
+      // If we can't access React internals, just continue with console suppression
+    }
   }
 
   static getDerivedStateFromError(error: Error): State {
