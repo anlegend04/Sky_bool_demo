@@ -383,12 +383,20 @@ export default function CandidateApplicationProgress() {
       <div className="bg-white border-b border-slate-200 p-3 sm:p-4 lg:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
           <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-            <Link to={`/candidates/${candidateId}`}>
-              <Button variant="ghost" size="sm" className="w-full sm:w-auto">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Candidate Profile
-              </Button>
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Link to="/follow-up">
+                <Button variant="ghost" size="sm" className="w-full sm:w-auto">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back to Follow-up Dashboard
+                </Button>
+              </Link>
+              <Link to={`/candidates/${candidateId}`}>
+                <Button variant="outline" size="sm" className="w-full sm:w-auto">
+                  <User className="w-4 h-4 mr-2" />
+                  View Full Profile
+                </Button>
+              </Link>
+            </div>
             <div>
               <h1 className="text-xl sm:text-2xl font-bold text-slate-900">
                 Application Progress
