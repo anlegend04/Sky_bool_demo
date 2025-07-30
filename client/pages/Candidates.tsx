@@ -1020,10 +1020,10 @@ export default function Candidates() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <Link to={`/candidates/${candidate.id}`}>
+              <Link to={`/candidates-profile/${candidate.id}`}>
                 <DropdownMenuItem>
                   <Eye className="w-4 h-4 mr-2" />
-                  View Details
+                  View Profile
                 </DropdownMenuItem>
               </Link>
               <DropdownMenuItem>
@@ -1261,10 +1261,10 @@ export default function Candidates() {
                           Apply to Job
                         </DropdownMenuItem>
 
-                        <Link to={`/candidates/${candidate.id}`}>
+                        <Link to={`/candidates-profile/${candidate.id}`}>
                           <DropdownMenuItem>
                             <Eye className="w-4 h-4 mr-2" />
-                            View Details
+                            View Profile
                           </DropdownMenuItem>
                         </Link>
                         <DropdownMenuItem>
