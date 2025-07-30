@@ -1,54 +1,49 @@
-import "@/lib/suppress-warnings";
-import "./global.css";
+// MUST BE FIRST - Suppress Recharts warnings before any imports
+(function () {
+  const originalWarn = console.warn;
+  const originalError = console.error;
 
-// Enhanced React warning suppression
-(() => {
-  const originalReactWarn = console.warn;
-  console.warn = function (format: any, ...args: any[]) {
-    // Handle React's warning format with %s placeholders
-    if (typeof format === "string") {
-      // Check for defaultProps warning pattern
-      if (format.includes("Support for defaultProps will be removed")) {
-        // Check if any argument contains Recharts component names
-        const hasRechartsComponent = args.some((arg: any) => {
-          const argStr = String(arg);
-          return (
-            argStr.includes("XAxis") ||
-            argStr.includes("YAxis") ||
-            argStr.includes("XAxis2") ||
-            argStr.includes("YAxis2") ||
-            argStr.includes("CartesianGrid") ||
-            argStr.includes("Tooltip") ||
-            argStr.includes("Legend") ||
-            argStr.includes("ResponsiveContainer") ||
-            argStr.includes("BarChart") ||
-            argStr.includes("LineChart") ||
-            argStr.includes("PieChart")
-          );
-        });
+  // Aggressive suppression of defaultProps warnings
+  console.warn = function (...args) {
+    const message = args.join(" ");
 
-        if (hasRechartsComponent) {
-          return; // Suppress this warning
-        }
-      }
+    // Multiple detection patterns for different warning formats
+    const isRechartsWarning =
+      // Pattern 1: Direct message check
+      (message.includes("Support for defaultProps will be removed") &&
+        (message.includes("XAxis") || message.includes("YAxis"))) ||
+      // Pattern 2: Check individual arguments
+      (args.some((arg) =>
+        String(arg).includes("Support for defaultProps will be removed"),
+      ) &&
+        args.some((arg) =>
+          String(arg).match(/\b(XAxis|YAxis|XAxis2|YAxis2)\b/),
+        )) ||
+      // Pattern 3: Template string format
+      (args[0] &&
+        typeof args[0] === "string" &&
+        args[0].includes("Support for defaultProps will be removed") &&
+        args.slice(1).some((arg) => String(arg).match(/\b(XAxis|YAxis)\b/)));
 
-      // Also check the full formatted message
-      const fullMessage = format.replace(/%s/g, () =>
-        String(args.shift() || ""),
-      );
-      if (
-        fullMessage.includes("Support for defaultProps will be removed") &&
-        (fullMessage.includes("XAxis") ||
-          fullMessage.includes("YAxis") ||
-          fullMessage.includes("recharts"))
-      ) {
-        return; // Suppress this warning
-      }
+    if (!isRechartsWarning) {
+      originalWarn.apply(console, args);
     }
+  };
 
-    return originalReactWarn.apply(console, [format, ...args]);
+  console.error = function (...args) {
+    const message = args.join(" ");
+    const isRechartsWarning =
+      message.includes("Support for defaultProps will be removed") &&
+      (message.includes("XAxis") || message.includes("YAxis"));
+
+    if (!isRechartsWarning) {
+      originalError.apply(console, args);
+    }
   };
 })();
+
+import "@/lib/suppress-warnings";
+import "./global.css";
 
 import { Toaster } from "@/components/ui/toaster";
 import { createRoot } from "react-dom/client";

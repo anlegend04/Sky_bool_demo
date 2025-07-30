@@ -54,26 +54,43 @@ export class RechartsWarningSuppress extends Component<Props, State> {
   private suppressWarnings() {
     const isRechartsDefaultPropsWarning = (message: string) => {
       return (
-        message.includes("Support for defaultProps will be removed") &&
-        (message.includes("XAxis") ||
-          message.includes("YAxis") ||
-          message.includes("XAxis2") ||
-          message.includes("YAxis2") ||
-          message.includes("CartesianGrid") ||
-          message.includes("Tooltip") ||
-          message.includes("Legend") ||
-          message.includes("ResponsiveContainer") ||
-          message.includes("BarChart") ||
-          message.includes("LineChart") ||
-          message.includes("PieChart") ||
-          message.includes("recharts"))
+        message.includes("Support for defaultProps will be removed") ||
+        (message.includes("defaultProps") &&
+          (message.includes("XAxis") ||
+            message.includes("YAxis") ||
+            message.includes("XAxis2") ||
+            message.includes("YAxis2") ||
+            message.includes("CartesianGrid") ||
+            message.includes("Tooltip") ||
+            message.includes("Legend") ||
+            message.includes("ResponsiveContainer") ||
+            message.includes("BarChart") ||
+            message.includes("LineChart") ||
+            message.includes("PieChart") ||
+            message.includes("FunnelChart") ||
+            message.includes("Funnel") ||
+            message.includes("RadarChart") ||
+            message.includes("Radar") ||
+            message.includes("recharts")))
       );
     };
 
     // Suppress console warnings
     console.warn = (...args: any[]) => {
       const message = args.join(" ");
-      if (!isRechartsDefaultPropsWarning(message)) {
+      // Handle both regular strings and React's template format
+      const isRechartsWarning =
+        isRechartsDefaultPropsWarning(message) ||
+        (args[0] &&
+          typeof args[0] === "string" &&
+          args[0].includes("Support for defaultProps will be removed") &&
+          args.some(
+            (arg) =>
+              typeof arg === "string" &&
+              (arg.includes("XAxis") || arg.includes("YAxis")),
+          ));
+
+      if (!isRechartsWarning) {
         this.originalConsoleWarn(...args);
       }
     };
