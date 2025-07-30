@@ -116,31 +116,58 @@ export default function CandidateProfileEnhanced() {
 
     return (
       <Card className="hover:shadow-md transition-all duration-200 border-l-4 border-l-primary group">
-        <CardContent className="p-4">
-          <div className="space-y-4">
+        <CardContent className="p-3 sm:p-4">
+          <div className="space-y-3 sm:space-y-4">
             {/* Header */}
-            <div className="flex items-start justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-start gap-3">
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-slate-900 truncate group-hover:text-primary transition-colors">
-                  {application.jobTitle}
-                </h3>
-                <div className="flex flex-wrap items-center gap-2 mt-1 text-sm text-slate-600">
-                  <div className="flex items-center gap-1">
-                    <Building2 className="w-3 h-3" />
-                    {application.department}
+                <div className="flex items-start justify-between sm:justify-start gap-2">
+                  <h3 className="font-semibold text-slate-900 group-hover:text-primary transition-colors text-base sm:text-lg flex-1 min-w-0">
+                    {application.jobTitle}
+                  </h3>
+                  <div className="sm:hidden">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                          <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem asChild>
+                          <Link to={`/candidates/${candidate.id}/jobs/${application.id}/progress`}>
+                            <Eye className="w-4 h-4 mr-2" />
+                            View Progress
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Edit className="w-4 h-4 mr-2" />
+                          Edit Application
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Download className="w-4 h-4 mr-2" />
+                          Export Details
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Calendar className="w-3 h-3" />
-                    {new Date(application.appliedDate).toLocaleDateString()}
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-2 mt-2 text-xs sm:text-sm text-slate-600">
+                  <div className="flex items-center gap-1 min-w-0">
+                    <Building2 className="w-3 h-3 flex-shrink-0" />
+                    <span className="truncate">{application.department}</span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <User className="w-3 h-3" />
-                    {application.recruiter}
+                  <div className="flex items-center gap-1 min-w-0">
+                    <Calendar className="w-3 h-3 flex-shrink-0" />
+                    <span className="truncate">{new Date(application.appliedDate).toLocaleDateString()}</span>
+                  </div>
+                  <div className="flex items-center gap-1 min-w-0">
+                    <User className="w-3 h-3 flex-shrink-0" />
+                    <span className="truncate">{application.recruiter}</span>
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col items-end gap-2">
-                <Badge 
+              <div className="hidden sm:flex flex-col items-end gap-2">
+                <Badge
                   className={`${getPriorityColor(application.priority)} border font-medium`}
                 >
                   {application.priority}
