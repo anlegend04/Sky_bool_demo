@@ -98,7 +98,7 @@ export default function BudgetPanel({ job, onJobUpdate }: BudgetPanelProps) {
   // Prepare data for charts
   const expenseData = job.budget?.expenses || [];
 
-  const pieData = React.useMemo(() => {
+  const pieData = useMemo(() => {
     return expenseCategories
       .map((category) => {
         const categoryExpenses = expenseData.filter(
