@@ -460,14 +460,14 @@ export default function CandidateProfileEnhanced() {
 
       {/* Main Content */}
       <div className="p-3 sm:p-4 lg:p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
           {/* Left Panel - Candidate Overview */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 order-2 lg:order-1">
             <CandidateOverview />
           </div>
 
           {/* Right Panel - Job Applications */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 order-1 lg:order-2">
             <Tabs defaultValue="applications" className="w-full">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="applications">Job Applications</TabsTrigger>
