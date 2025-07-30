@@ -457,8 +457,8 @@ export default function CVEvaluation() {
 
     // In a real app, this would update the backend to mark evaluation as shared
     if (evaluation) {
-      setSavedEvaluations(prev => prev.map(eval =>
-        eval.id === selectedSavedEvaluation?.id ? {...eval, isShared: true, shareUrl: generatedUrl} : eval
+      setSavedEvaluations(prev => prev.map(evalItem =>
+        evalItem.id === selectedSavedEvaluation?.id ? {...evalItem, isShared: true, shareUrl: generatedUrl} : evalItem
       ));
     }
 
