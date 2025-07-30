@@ -128,7 +128,7 @@ export default function BudgetPanel({ job, onJobUpdate }: BudgetPanelProps) {
   }, [expenseData, expenseCategories]);
 
   // Generate dynamic monthly data based on actual expenses
-  const monthlyData = React.useMemo(() => {
+  const monthlyData = useMemo(() => {
     const months = [
       "Jan",
       "Feb",
