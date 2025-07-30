@@ -78,8 +78,11 @@ export default function JobDetail() {
     useState<CandidateData | null>(null);
   const [dragOverStage, setDragOverStage] = useState<string | null>(null);
   const [showEditJobDialog, setShowEditJobDialog] = useState(false);
-  const [selectedCandidatePopup, setSelectedCandidatePopup] = useState<CandidateData | null>(null);
-  const [showMoreCandidates, setShowMoreCandidates] = useState<{[key: string]: boolean}>({});
+  const [selectedCandidatePopup, setSelectedCandidatePopup] =
+    useState<CandidateData | null>(null);
+  const [showMoreCandidates, setShowMoreCandidates] = useState<{
+    [key: string]: boolean;
+  }>({});
   const { toast } = useToast();
 
   const stages = [
@@ -334,7 +337,11 @@ export default function JobDetail() {
     </Card>
   );
 
-  const CompactCandidateCard = ({ candidate }: { candidate: CandidateData }) => (
+  const CompactCandidateCard = ({
+    candidate,
+  }: {
+    candidate: CandidateData;
+  }) => (
     <div
       className="flex items-center gap-2 p-2 hover:bg-slate-50 rounded cursor-pointer transition-colors"
       onClick={() => setSelectedCandidatePopup(candidate)}
@@ -381,7 +388,9 @@ export default function JobDetail() {
         const isDropTarget = dragOverStage === stage;
         const maxVisible = 5;
         const showingMore = showMoreCandidates[stage] || false;
-        const visibleCandidates = showingMore ? stageCandidates : stageCandidates.slice(0, maxVisible);
+        const visibleCandidates = showingMore
+          ? stageCandidates
+          : stageCandidates.slice(0, maxVisible);
         const hasMore = stageCandidates.length > maxVisible;
 
         return (
@@ -406,7 +415,10 @@ export default function JobDetail() {
             </div>
             <div className="space-y-2 min-h-[200px] relative">
               {visibleCandidates.map((candidate) => (
-                <CompactCandidateCard key={candidate.id} candidate={candidate} />
+                <CompactCandidateCard
+                  key={candidate.id}
+                  candidate={candidate}
+                />
               ))}
               {stageCandidates.length === 0 && (
                 <div className="text-center text-slate-400 text-xs py-8">
@@ -418,9 +430,16 @@ export default function JobDetail() {
                   variant="ghost"
                   size="sm"
                   className="w-full text-xs"
-                  onClick={() => setShowMoreCandidates(prev => ({...prev, [stage]: !showingMore}))}
+                  onClick={() =>
+                    setShowMoreCandidates((prev) => ({
+                      ...prev,
+                      [stage]: !showingMore,
+                    }))
+                  }
                 >
-                  {showingMore ? `Show Less` : `Show ${stageCandidates.length - maxVisible} More`}
+                  {showingMore
+                    ? `Show Less`
+                    : `Show ${stageCandidates.length - maxVisible} More`}
                 </Button>
               )}
               {isDropTarget && (
@@ -705,7 +724,11 @@ export default function JobDetail() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 Job Summary
-                <Button variant="ghost" size="sm" onClick={() => setShowEditJobDialog(true)}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowEditJobDialog(true)}
+                >
                   <Edit className="w-4 h-4" />
                 </Button>
               </CardTitle>
@@ -987,16 +1010,21 @@ export default function JobDetail() {
               </div>
             </div>
             <div className="flex justify-end space-x-2">
-              <Button variant="outline" onClick={() => setShowEditJobDialog(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setShowEditJobDialog(false)}
+              >
                 Cancel
               </Button>
-              <Button onClick={() => {
-                toast({
-                  title: "Job Updated",
-                  description: "Job details have been successfully updated",
-                });
-                setShowEditJobDialog(false);
-              }}>
+              <Button
+                onClick={() => {
+                  toast({
+                    title: "Job Updated",
+                    description: "Job details have been successfully updated",
+                  });
+                  setShowEditJobDialog(false);
+                }}
+              >
                 Save Changes
               </Button>
             </div>
@@ -1005,7 +1033,10 @@ export default function JobDetail() {
       </Dialog>
 
       {/* Candidate Details Popup */}
-      <Dialog open={!!selectedCandidatePopup} onOpenChange={() => setSelectedCandidatePopup(null)}>
+      <Dialog
+        open={!!selectedCandidatePopup}
+        onOpenChange={() => setSelectedCandidatePopup(null)}
+      >
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -1028,28 +1059,48 @@ export default function JobDetail() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-slate-700">Email</label>
-                  <p className="text-sm text-slate-600">{selectedCandidatePopup.email}</p>
+                  <label className="text-sm font-medium text-slate-700">
+                    Email
+                  </label>
+                  <p className="text-sm text-slate-600">
+                    {selectedCandidatePopup.email}
+                  </p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-slate-700">Phone</label>
-                  <p className="text-sm text-slate-600">{selectedCandidatePopup.phone}</p>
+                  <label className="text-sm font-medium text-slate-700">
+                    Phone
+                  </label>
+                  <p className="text-sm text-slate-600">
+                    {selectedCandidatePopup.phone}
+                  </p>
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700">Location</label>
-                <p className="text-sm text-slate-600">{selectedCandidatePopup.location}</p>
+                <label className="text-sm font-medium text-slate-700">
+                  Location
+                </label>
+                <p className="text-sm text-slate-600">
+                  {selectedCandidatePopup.location}
+                </p>
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700">Experience</label>
-                <p className="text-sm text-slate-600">{selectedCandidatePopup.experience}</p>
+                <label className="text-sm font-medium text-slate-700">
+                  Experience
+                </label>
+                <p className="text-sm text-slate-600">
+                  {selectedCandidatePopup.experience}
+                </p>
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700">Current Stage</label>
+                <label className="text-sm font-medium text-slate-700">
+                  Current Stage
+                </label>
                 <Badge className="mt-1">{selectedCandidatePopup.stage}</Badge>
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-700">Skills</label>
+                <label className="text-sm font-medium text-slate-700">
+                  Skills
+                </label>
                 <div className="flex flex-wrap gap-1 mt-1">
                   {selectedCandidatePopup.skills.slice(0, 6).map((skill) => (
                     <Badge key={skill} variant="secondary" className="text-xs">
@@ -1064,7 +1115,10 @@ export default function JobDetail() {
                 </div>
               </div>
               <div className="flex gap-2 pt-4">
-                <Link to={`/candidates/${selectedCandidatePopup.id}`} className="flex-1">
+                <Link
+                  to={`/candidates/${selectedCandidatePopup.id}`}
+                  className="flex-1"
+                >
                   <Button className="w-full">
                     <User className="w-4 h-4 mr-2" />
                     View Full Profile

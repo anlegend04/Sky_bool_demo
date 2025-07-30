@@ -1,17 +1,23 @@
 // Helper functions for CV Evaluation data
-import { HARDCODED_CANDIDATES, CVEvaluationData } from './hardcoded-data';
+import { HARDCODED_CANDIDATES, CVEvaluationData } from "./hardcoded-data";
 
 // Get CV evaluations for a specific candidate
-export const getCandidateCVEvaluations = (candidateId: string): CVEvaluationData[] => {
-  const candidate = HARDCODED_CANDIDATES.find(c => c.id === candidateId);
+export const getCandidateCVEvaluations = (
+  candidateId: string,
+): CVEvaluationData[] => {
+  const candidate = HARDCODED_CANDIDATES.find((c) => c.id === candidateId);
   return candidate?.cvEvaluations || [];
 };
 
 // Get a specific CV evaluation by ID
-export const getCVEvaluation = (evaluationId: string): CVEvaluationData | null => {
+export const getCVEvaluation = (
+  evaluationId: string,
+): CVEvaluationData | null => {
   for (const candidate of HARDCODED_CANDIDATES) {
     if (candidate.cvEvaluations) {
-      const evaluation = candidate.cvEvaluations.find(e => e.id === evaluationId);
+      const evaluation = candidate.cvEvaluations.find(
+        (e) => e.id === evaluationId,
+      );
       if (evaluation) return evaluation;
     }
   }
@@ -23,7 +29,9 @@ export const getJobCVEvaluations = (jobId: string): CVEvaluationData[] => {
   const evaluations: CVEvaluationData[] = [];
   for (const candidate of HARDCODED_CANDIDATES) {
     if (candidate.cvEvaluations) {
-      evaluations.push(...candidate.cvEvaluations.filter(e => e.jobId === jobId));
+      evaluations.push(
+        ...candidate.cvEvaluations.filter((e) => e.jobId === jobId),
+      );
     }
   }
   return evaluations;
@@ -33,25 +41,33 @@ export const getJobCVEvaluations = (jobId: string): CVEvaluationData[] => {
 export const getRecentCVEvaluations = (): CVEvaluationData[] => {
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-  
+
   const evaluations: CVEvaluationData[] = [];
   for (const candidate of HARDCODED_CANDIDATES) {
     if (candidate.cvEvaluations) {
-      evaluations.push(...candidate.cvEvaluations.filter(e => 
-        new Date(e.savedAt) >= thirtyDaysAgo
-      ));
+      evaluations.push(
+        ...candidate.cvEvaluations.filter(
+          (e) => new Date(e.savedAt) >= thirtyDaysAgo,
+        ),
+      );
     }
   }
-  
-  return evaluations.sort((a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime());
+
+  return evaluations.sort(
+    (a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime(),
+  );
 };
 
 // Get CV evaluations by verdict
-export const getCVEvaluationsByVerdict = (verdict: "Good Fit" | "Needs Improvement" | "Not Suitable"): CVEvaluationData[] => {
+export const getCVEvaluationsByVerdict = (
+  verdict: "Good Fit" | "Needs Improvement" | "Not Suitable",
+): CVEvaluationData[] => {
   const evaluations: CVEvaluationData[] = [];
   for (const candidate of HARDCODED_CANDIDATES) {
     if (candidate.cvEvaluations) {
-      evaluations.push(...candidate.cvEvaluations.filter(e => e.finalVerdict === verdict));
+      evaluations.push(
+        ...candidate.cvEvaluations.filter((e) => e.finalVerdict === verdict),
+      );
     }
   }
   return evaluations;
@@ -62,7 +78,7 @@ export const getSharedCVEvaluations = (): CVEvaluationData[] => {
   const evaluations: CVEvaluationData[] = [];
   for (const candidate of HARDCODED_CANDIDATES) {
     if (candidate.cvEvaluations) {
-      evaluations.push(...candidate.cvEvaluations.filter(e => e.isShared));
+      evaluations.push(...candidate.cvEvaluations.filter((e) => e.isShared));
     }
   }
   return evaluations;
@@ -72,7 +88,7 @@ export const getSharedCVEvaluations = (): CVEvaluationData[] => {
 export const searchCVEvaluations = (searchTerm: string): CVEvaluationData[] => {
   const term = searchTerm.toLowerCase();
   const evaluations: CVEvaluationData[] = [];
-  
+
   for (const candidate of HARDCODED_CANDIDATES) {
     if (candidate.cvEvaluations) {
       for (const evaluation of candidate.cvEvaluations) {
@@ -86,6 +102,6 @@ export const searchCVEvaluations = (searchTerm: string): CVEvaluationData[] => {
       }
     }
   }
-  
+
   return evaluations;
 };

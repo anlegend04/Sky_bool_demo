@@ -34,9 +34,14 @@ export class RechartsWarningSuppress extends Component<Props, State> {
     console.error = this.originalConsoleError;
 
     // Restore React's original warn if we modified it
-    if (originalWarn && (React as any).__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED?.ReactDebugCurrentFrame) {
+    if (
+      originalWarn &&
+      (React as any).__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED
+        ?.ReactDebugCurrentFrame
+    ) {
       try {
-        const internals = (React as any).__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+        const internals = (React as any)
+          .__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
         if (internals.ReactDebugCurrentFrame) {
           console.warn = originalWarn;
         }
@@ -82,11 +87,12 @@ export class RechartsWarningSuppress extends Component<Props, State> {
 
     // Try to suppress React's internal warnings as well
     try {
-      const internals = (React as any).__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+      const internals = (React as any)
+        .__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
       if (internals?.ReactDebugCurrentFrame && !originalWarn) {
         originalWarn = console.warn;
         const originalReactWarn = console.warn;
-        console.warn = function(...args: any[]) {
+        console.warn = function (...args: any[]) {
           const message = args.join(" ");
           if (!isRechartsDefaultPropsWarning(message)) {
             originalReactWarn.apply(console, args);

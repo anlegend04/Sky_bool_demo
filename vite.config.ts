@@ -17,11 +17,7 @@ export default defineConfig(({ mode }) => ({
     outDir: "dist/spa",
   },
 
-  plugins: [
-    react(),
-    expressPlugin(),
-    warningSuppressionPlugin()
-  ],
+  plugins: [react(), expressPlugin(), warningSuppressionPlugin()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./client"),
@@ -48,11 +44,11 @@ function warningSuppressionPlugin(): Plugin {
     name: "warning-suppression",
     apply: "serve",
     transformIndexHtml: {
-      order: 'pre',
+      order: "pre",
       handler(html) {
         // Inject our warning suppression script at the very beginning
         return html.replace(
-          '<head>',
+          "<head>",
           `<head>
     <script>
       // Immediate React warning suppression - runs before any other code
@@ -67,9 +63,9 @@ function warningSuppressionPlugin(): Plugin {
           return originalWarn.apply(console, [format, ...args]);
         };
       })();
-    </script>`
+    </script>`,
         );
-      }
-    }
+      },
+    },
   };
 }

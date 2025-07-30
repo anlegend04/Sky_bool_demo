@@ -150,7 +150,17 @@ export interface WorkExperienceData {
 export interface ExpenseData {
   id: string;
   amount: number;
-  category: "Job Boards" | "Recruitment Agency" | "Events" | "Tools" | "Social Media Ads" | "Referral Bonus" | "Assessment Tools" | "Interview Software" | "Background Checks" | "Other";
+  category:
+    | "Job Boards"
+    | "Recruitment Agency"
+    | "Events"
+    | "Tools"
+    | "Social Media Ads"
+    | "Referral Bonus"
+    | "Assessment Tools"
+    | "Interview Software"
+    | "Background Checks"
+    | "Other";
   description: string;
   expectedOutcome: string;
   evaluationPeriod: string;
@@ -797,7 +807,8 @@ export const HARDCODED_JOBS: JobData[] = [
           id: "exp_13",
           amount: 6000,
           category: "Job Boards",
-          description: "Technical recruitment platforms (Stack Overflow, GitHub)",
+          description:
+            "Technical recruitment platforms (Stack Overflow, GitHub)",
           expectedOutcome: "Backend engineer candidates",
           evaluationPeriod: "60 days",
           effectiveness: 78,
@@ -1192,25 +1203,26 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         candidateId: "candidate_1",
         jobId: "job_1",
         fileName: "marissa_torres_resume.pdf",
-        summary: "This candidate shows exceptional technical skills with strong experience in React and frontend development. Their background aligns perfectly with our Senior Frontend Developer requirements.",
+        summary:
+          "This candidate shows exceptional technical skills with strong experience in React and frontend development. Their background aligns perfectly with our Senior Frontend Developer requirements.",
         strengths: [
           "5+ years of experience in frontend development",
           "Expert-level proficiency in React and TypeScript",
           "Strong portfolio demonstrating modern development practices",
           "Leadership experience mentoring junior developers",
-          "Full-stack development capabilities with Node.js"
+          "Full-stack development capabilities with Node.js",
         ],
         weaknesses: [
           "Limited experience with GraphQL (nice-to-have requirement)",
           "No AWS certification mentioned",
-          "Could benefit from more experience with testing frameworks"
+          "Could benefit from more experience with testing frameworks",
         ],
         jobFitScore: 92,
         finalVerdict: "Good Fit",
         suggestedImprovements: [
           "Consider GraphQL training for our upcoming API migration",
           "Explore advanced testing frameworks like Jest and Cypress",
-          "AWS certification would strengthen cloud deployment skills"
+          "AWS certification would strengthen cloud deployment skills",
         ],
         skillsMatch: [
           { skill: "React", hasSkill: true, level: "Expert" },
@@ -1220,14 +1232,14 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
           { skill: "CSS", hasSkill: true, level: "Advanced" },
           { skill: "HTML", hasSkill: true, level: "Expert" },
           { skill: "Redux", hasSkill: true, level: "Intermediate" },
-          { skill: "GraphQL", hasSkill: false, level: "Beginner" }
+          { skill: "GraphQL", hasSkill: false, level: "Beginner" },
         ],
         experienceMatch: 95,
         educationMatch: 90,
         recommendations: [
           "Strongly recommend proceeding to final interview",
           "Consider for senior-level position based on leadership experience",
-          "Discuss potential GraphQL learning plan during interview"
+          "Discuss potential GraphQL learning plan during interview",
         ],
         extractedData: {
           name: "Marissa Torres",
@@ -1237,15 +1249,25 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
           education: ["Bachelor of Computer Science - UC Berkeley (2019)"],
           workExperience: [
             "Frontend Developer at StartupCo (2019-2022)",
-            "Senior Frontend Developer at TechFirm (2023-present)"
+            "Senior Frontend Developer at TechFirm (2023-present)",
           ],
-          skills: ["React", "TypeScript", "Node.js", "GraphQL", "Redux", "CSS3", "HTML5", "JavaScript"]
+          skills: [
+            "React",
+            "TypeScript",
+            "Node.js",
+            "GraphQL",
+            "Redux",
+            "CSS3",
+            "HTML5",
+            "JavaScript",
+          ],
         },
-        notes: "Exceptional candidate with strong technical background. Portfolio shows impressive React projects.",
+        notes:
+          "Exceptional candidate with strong technical background. Portfolio shows impressive React projects.",
         savedAt: getRandomDateTime(10),
         createdBy: "Alex Chen",
-        isShared: false
-      }
+        isShared: false,
+      },
     ],
     createdAt: getRandomDateTime(15),
     updatedAt: getRandomDateTime(2),

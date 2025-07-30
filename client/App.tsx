@@ -33,7 +33,9 @@ import "./global.css";
       }
 
       // Also check the full formatted message
-      const fullMessage = format.replace(/%s/g, () => String(args.shift() || ""));
+      const fullMessage = format.replace(/%s/g, () =>
+        String(args.shift() || ""),
+      );
       if (
         fullMessage.includes("Support for defaultProps will be removed") &&
         (fullMessage.includes("XAxis") ||
