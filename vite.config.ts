@@ -21,15 +21,7 @@ export default defineConfig(({ mode }) => ({
     __DEV__: mode === 'development' ? 'false' : 'true',
   },
   plugins: [
-    react({
-      // Configure React plugin to suppress specific warnings
-      plugins: mode === 'development' ? [
-        ['@swc/plugin-transform-react-jsx-dev', {
-          refresh: true,
-          development: false, // This might help suppress dev warnings
-        }]
-      ] : []
-    }),
+    react(),
     expressPlugin(),
     warningSuppressionPlugin()
   ],
