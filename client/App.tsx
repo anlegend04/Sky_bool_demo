@@ -1,6 +1,21 @@
 import React, { Component, ErrorInfo, ReactNode } from "react";
 import "./global.css";
 
+// Suppress Recharts defaultProps warnings
+const originalWarn = console.warn;
+console.warn = (...args: any[]) => {
+  const message = args.join(" ");
+
+  // Only suppress specific Recharts defaultProps warnings
+  const isRechartsDefaultPropsWarning =
+    message.includes("Support for defaultProps will be removed") &&
+    (message.includes("XAxis") || message.includes("YAxis"));
+
+  if (!isRechartsDefaultPropsWarning) {
+    originalWarn.apply(console, args);
+  }
+};
+
 import { Toaster } from "@/components/ui/toaster";
 import { createRoot } from "react-dom/client";
 import { Toaster as Sonner } from "@/components/ui/sonner";
