@@ -240,66 +240,19 @@ export default function CandidateDetail() {
     },
   ];
 
-  // Enhanced demo activities data
-  const activities = [
-    {
-      id: 1,
-      type: "stage_change",
-      action: "Moved to Interview stage",
-      user: "Alex Chen",
-      timestamp: "2024-01-19 10:30 AM",
-      reason:
-        "Passed initial screening successfully with strong technical background",
-      content:
-        "Candidate demonstrated excellent problem-solving skills during screening call.",
-    },
-    {
-      id: 2,
-      type: "note",
-      action: "Added detailed note",
-      user: "Sarah Kim",
-      timestamp: "2024-01-18 2:15 PM",
-      content:
-        "Great cultural fit, strong technical background. Portfolio shows impressive React projects. Recommended for technical interview.",
-    },
-    {
-      id: 3,
-      type: "email",
-      action: "Sent interview invitation",
-      user: "Alex Chen",
-      timestamp: "2024-01-17 9:00 AM",
-      content:
-        "Interview invitation sent with calendar link and preparation materials.",
-    },
-    {
-      id: 4,
-      type: "call",
-      action: "Phone screening completed",
-      user: "Alex Chen",
-      timestamp: "2024-01-16 3:30 PM",
-      duration: "45 minutes",
-      content:
-        "Discussed technical background, career goals, and company culture. Very positive impression.",
-    },
-    {
-      id: 5,
-      type: "interview",
-      action: "Technical assessment scheduled",
-      user: "Sarah Kim",
-      timestamp: "2024-01-20 11:00 AM",
-      content:
-        "Scheduled technical round with senior developers for Jan 25th, 2:00 PM.",
-    },
-    {
-      id: 6,
-      type: "note",
-      action: "Resume review completed",
-      user: "Mike Wilson",
-      timestamp: "2024-01-15 4:45 PM",
-      content:
-        "Resume shows strong React/TypeScript experience. Previous work at top tech companies is impressive.",
-    },
-  ];
+  // Use candidate timeline from centralized data
+  const candidateTimeline = getCandidateTimeline(candidate.id);
+  const activities = candidateTimeline.map((item, index) => ({
+    id: index + 1,
+    type: item.type,
+    action: item.description,
+    user: item.type === "stage_change" ? candidate.stageHistory.find(s => s.startDate === item.date)?.userName || "System" :
+           item.type === "email" ? candidate.emails.find(e => e.timestamp === item.date)?.from || "System" :
+           item.type === "note" ? candidate.notes.find(n => n.timestamp === item.date)?.userName || "System" :
+           "System",
+    timestamp: new Date(item.date).toLocaleString(),
+    content: item.details,
+  }));
 
   // Enhanced demo email history
   const emailHistory: EmailData[] = [
