@@ -112,6 +112,28 @@ function convertCandidateStatus(candidate: any): CandidateData {
   };
 }
 
+// Helper function to get candidate's jobs
+function getCandidateJobs(candidate: CandidateData) {
+  // For now, create a single job from the candidate's position
+  // In a real app, this would come from a jobs table
+  return [
+    {
+      id: "job-1",
+      title: candidate.position,
+      department: candidate.department,
+      status: candidate.status,
+      currentStage: candidate.stage,
+      appliedDate: candidate.appliedDate || new Date().toISOString(),
+      recruiter: candidate.recruiter,
+      salary: candidate.salary,
+      priority: "High",
+      stageHistory: candidate.stageHistory,
+      notes: candidate.notes || [],
+      emails: candidate.emails || [],
+    }
+  ];
+}
+
 export default function CandidateDetail() {
   const { id } = useParams();
   const [candidate, setCandidate] = useState<CandidateData | null>(null);
@@ -129,6 +151,8 @@ export default function CandidateDetail() {
     useState<CVEvaluationData | null>(null);
   const [showEditProfileDialog, setShowEditProfileDialog] = useState(false);
   const [showResumePreview, setShowResumePreview] = useState(false);
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+  const [showJobProgress, setShowJobProgress] = useState(false);
   const { toast } = useToast();
 
   // Load candidate from hardcoded data or localStorage
@@ -582,7 +606,7 @@ export default function CandidateDetail() {
     );
   };
 
-  const LeftPanel = () => (
+  const CandidateInfoPanel = () => (
     <div className="space-y-4 sm:space-y-6">
       {/* Candidate Info */}
       <Card>
@@ -603,7 +627,7 @@ export default function CandidateDetail() {
                   {candidate.name}
                 </h2>
                 <p className="text-sm sm:text-base text-slate-600 text-wrap">
-                  {candidate.position}
+                  {candidate.experience} Experience
                 </p>
                 <div className="flex items-center justify-center sm:justify-start space-x-1 mt-1">
                   {[...Array(5)].map((_, i) => (
@@ -659,27 +683,15 @@ export default function CandidateDetail() {
               <span className="text-sm truncate">{candidate.location}</span>
             </div>
             <div className="flex items-center space-x-3 min-w-0">
-              <Briefcase className="w-4 h-4 text-slate-500 flex-shrink-0" />
-              <span className="text-sm truncate">{candidate.position}</span>
-            </div>
-            <div className="flex items-center space-x-3 min-w-0">
-              <Building2 className="w-4 h-4 text-slate-500 flex-shrink-0" />
-              <span className="text-sm truncate">{candidate.department}</span>
+              <GraduationCap className="w-4 h-4 text-slate-500 flex-shrink-0" />
+              <span className="text-sm truncate">
+                Experience: {candidate.experience}
+              </span>
             </div>
             <div className="flex items-center space-x-3 min-w-0">
               <User className="w-4 h-4 text-slate-500 flex-shrink-0" />
               <span className="text-sm truncate">
                 Recruiter: {candidate.recruiter}
-              </span>
-            </div>
-            <div className="flex items-center space-x-3 min-w-0">
-              <DollarSign className="w-4 h-4 text-slate-500 flex-shrink-0" />
-              <span className="text-sm truncate">{candidate.salary}</span>
-            </div>
-            <div className="flex items-center space-x-3 min-w-0">
-              <GraduationCap className="w-4 h-4 text-slate-500 flex-shrink-0" />
-              <span className="text-sm truncate">
-                Experience: {candidate.experience}
               </span>
             </div>
           </div>
@@ -815,41 +827,7 @@ export default function CandidateDetail() {
         </CardContent>
       </Card>
 
-      {/* Quick Actions */}
-      {/* <Card>
-        <CardHeader>
-          <CardTitle className="text-lg sm:text-xl">Quick Actions</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2 sm:space-y-3">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
-            <Button className="w-full justify-start text-sm" variant="outline">
-              <Video className="w-4 h-4 mr-2 flex-shrink-0" />
-              <span className="truncate">Schedule Video Interview</span>
-            </Button>
-            <Button className="w-full justify-start text-sm" variant="outline">
-              <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
-              <span className="truncate">Schedule Phone Call</span>
-            </Button>
-            <Button className="w-full justify-start text-sm" variant="outline">
-              <CalendarIcon className="w-4 h-4 mr-2 flex-shrink-0" />
-              <span className="truncate">Schedule In-Person Meeting</span>
-            </Button>
-            <Button className="w-full justify-start text-sm" variant="outline">
-              <FileText className="w-4 h-4 mr-2 flex-shrink-0" />
-              <span className="truncate">Send Assessment</span>
-            </Button>
-          </div>
-          <Button
-            className="w-full justify-start text-sm"
-            variant="outline"
-            onClick={() => setShowEmailDialog(true)}
-          >
-            <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
-            <span className="truncate">Send Email</span>
-          </Button>
-        </CardContent>
-      </Card> */}
-
+      {/* Email Actions */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
@@ -919,285 +897,294 @@ export default function CandidateDetail() {
     </div>
   );
 
-  const CenterPanel = () => (
-    <div className="space-y-4 sm:space-y-6">
-      <StatusTracker />
+  const JobsPanel = () => {
+    const candidateJobs = getCandidateJobs(candidate);
+    const selectedJob = candidateJobs.find(job => job.id === selectedJobId);
 
-      {/* Notes and Activities */}
-      <Tabs defaultValue="notes" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="notes" className="text-sm sm:text-base">
-            Notes & Timeline
-          </TabsTrigger>
-          <TabsTrigger value="activities" className="text-sm sm:text-base">
-            Activity Log
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="notes" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Add Note</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <Textarea
-                  placeholder="Add a note about this candidate..."
-                  value={newNote}
-                  onChange={(e) => setNewNote(e.target.value)}
-                />
-                <Button size="sm">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Note
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Stage Timeline</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {stages
-                  .filter((stage) => stage.startDate)
-                  .map((stage) => (
-                    <div
-                      key={stage.name}
-                      className="flex items-start space-x-3 pb-4 border-b border-slate-100 last:border-b-0"
-                    >
-                      <div
-                        className={`w-3 h-3 rounded-full mt-2 ${stage.completed ? "bg-green-500" : "bg-blue-500"}`}
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <h4 className="font-medium text-slate-900">
-                            {stage.name}
-                          </h4>
-                          <span className="text-xs text-slate-500 flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            {stage.duration} days
-                          </span>
-                        </div>
-                        <p className="text-sm text-slate-600 mt-1">
-                          {stage.startDate}{" "}
-                          {stage.endDate && `- ${stage.endDate}`}
-                        </p>
-                        {stage.notes && (
-                          <p className="text-sm text-slate-600 mt-2 bg-slate-50 p-2 rounded">
-                            {stage.notes}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="activities" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Activities</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {activities.map((activity) => (
+    return (
+      <div className="space-y-4 sm:space-y-6">
+        {/* Jobs Overview */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Briefcase className="w-5 h-5" />
+              Job Applications
+              <Badge variant="outline">{candidateJobs.length}</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {candidateJobs.map((job) => {
+                const isSelected = job.id === selectedJobId;
+                return (
                   <div
-                    key={activity.id}
-                    className="flex items-start space-x-3 pb-4 border-b border-slate-100 last:border-b-0"
+                    key={job.id}
+                    className={`p-4 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
+                      isSelected
+                        ? "border-primary bg-primary/5"
+                        : "border-slate-200 hover:border-slate-300"
+                    }`}
+                    onClick={() => {
+                      setSelectedJobId(job.id);
+                      setShowJobProgress(true);
+                    }}
                   >
-                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                      {activity.type === "stage_change" && (
-                        <Zap className="w-4 h-4 text-blue-600" />
-                      )}
-                      {activity.type === "note" && (
-                        <FileText className="w-4 h-4 text-green-600" />
-                      )}
-                      {activity.type === "email" && (
-                        <Mail className="w-4 h-4 text-purple-600" />
-                      )}
-                      {activity.type === "call" && (
-                        <Phone className="w-4 h-4 text-orange-600" />
-                      )}
-                      {activity.type === "interview" && (
-                        <Video className="w-4 h-4 text-indigo-600" />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <h4 className="font-medium text-slate-900">
-                          {activity.action}
-                        </h4>
-                        <span className="text-xs text-slate-500">
-                          {activity.timestamp}
-                        </span>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-3">
+                        <Briefcase className="w-5 h-5 text-slate-500" />
+                        <div>
+                          <h4 className="font-medium text-slate-900">
+                            {job.title}
+                          </h4>
+                          <p className="text-sm text-slate-600">
+                            {job.department}
+                          </p>
+                        </div>
                       </div>
-                      <p className="text-sm text-slate-600">
-                        by {activity.user}
-                      </p>
-                      {activity.content && (
-                        <p className="text-sm text-slate-600 mt-1 bg-slate-50 p-2 rounded">
-                          {activity.content}
-                        </p>
-                      )}
-                      {activity.reason && (
-                        <p className="text-sm text-slate-600 mt-1">
-                          <span className="font-medium">Reason:</span>{" "}
-                          {activity.reason}
-                        </p>
-                      )}
-                      {activity.duration && (
-                        <p className="text-sm text-slate-600 mt-1">
-                          <span className="font-medium">Duration:</span>{" "}
-                          {activity.duration}
-                        </p>
-                      )}
+                      <Badge
+                        variant={
+                          job.status === "Active" ? "default" : "secondary"
+                        }
+                        className="text-xs"
+                      >
+                        {job.currentStage}
+                      </Badge>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs text-slate-600">
+                      <div className="flex items-center gap-1">
+                        <User className="w-3 h-3" />
+                        <span>{job.recruiter}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <DollarSign className="w-3 h-3" />
+                        <span>{job.salary}</span>
+                      </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
-  );
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
 
-  const RightPanel = () => (
-    <div className="space-y-4 sm:space-y-6">
-      {/* Send Email Section */}
-
-      {/* Email History */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg sm:text-xl">Email History</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3 sm:space-y-4">
-            {emailHistory.map((email) => (
-              <div
-                key={email.id}
-                className="p-3 border border-slate-200 rounded-lg hover:bg-slate-50"
+        {/* Job Progress Section - Only show when a job is selected */}
+        {selectedJob && showJobProgress && (
+          <>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-slate-900">
+                Progress for {selectedJob.title}
+              </h3>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSelectedJobId(null);
+                  setShowJobProgress(false);
+                }}
               >
-                <div className="flex items-center justify-between mb-2 min-w-0">
-                  <h4 className="font-medium text-sm text-slate-900 truncate flex items-center gap-2 min-w-0 flex-1">
-                    <span className="text-wrap">{email.subject}</span>
-                    {/* <Badge
-                      variant={
-                        email.status === "sent" ? "default" : "secondary"
-                      }
-                      className="text-xs flex-shrink-0"
-                    >
-                      {email.status}
-                    </Badge> */}
-                  </h4>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="flex-shrink-0"
-                      >
-                        <MoreHorizontal className="w-4 h-4" />
+                Back to Jobs Overview
+              </Button>
+            </div>
+            <StatusTracker />
+
+            {/* Notes and Activities for Selected Job */}
+            <Tabs defaultValue="notes" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="notes" className="text-sm sm:text-base">
+                  Notes & Timeline
+                </TabsTrigger>
+                <TabsTrigger value="activities" className="text-sm sm:text-base">
+                  Activity Log
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="notes" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <FileText className="w-5 h-5" />
+                      Job-Specific Notes
+                      <Badge variant="outline">{selectedJob.title}</Badge>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <Textarea
+                        placeholder="Add a note about this job application..."
+                        value={newNote}
+                        onChange={(e) => setNewNote(e.target.value)}
+                      />
+                      <Button size="sm">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Note
                       </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => setSelectedEmail(email)}>
-                        <Eye className="w-4 h-4 mr-2" />
-                        View Full
-                      </DropdownMenuItem>
+                    </div>
+                  </CardContent>
+                </Card>
 
-                      {/* <DropdownMenuItem>
-                        <Forward className="w-4 h-4 mr-2" />
-                        Forward
-                      </DropdownMenuItem> */}
-                      {/* <DropdownMenuItem>
-                        <Copy className="w-4 h-4 mr-2" />
-                        Resend
-                      </DropdownMenuItem> */}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-                <p className="text-xs text-slate-600 mb-1 truncate">
-                  From: {email.from}
-                </p>
-                <p className="text-xs text-slate-600 mb-2">{email.timestamp}</p>
-                <p className="text-xs text-slate-600 line-clamp-2">
-                  {email.content}
-                </p>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Stage Timeline</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {stages
+                        .filter((stage) => stage.startDate)
+                        .map((stage) => (
+                          <div
+                            key={stage.name}
+                            className="flex items-start space-x-3 pb-4 border-b border-slate-100 last:border-b-0"
+                          >
+                            <div
+                              className={`w-3 h-3 rounded-full mt-2 ${stage.completed ? "bg-green-500" : "bg-blue-500"}`}
+                            />
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between">
+                                <h4 className="font-medium text-slate-900">
+                                  {stage.name}
+                                </h4>
+                                <span className="text-xs text-slate-500 flex items-center gap-1">
+                                  <Clock className="w-3 h-3" />
+                                  {stage.duration} days
+                                </span>
+                              </div>
+                              <p className="text-sm text-slate-600 mt-1">
+                                {stage.startDate}{" "}
+                                {stage.endDate && `- ${stage.endDate}`}
+                              </p>
+                              {stage.notes && (
+                                <p className="text-sm text-slate-600 mt-2 bg-slate-50 p-2 rounded">
+                                  {stage.notes}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-      {/* Attachments */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg sm:text-xl">Attachments</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2 sm:space-y-3">
-            <div className="flex items-center justify-between p-3 border border-slate-200 rounded-lg">
-              <div className="flex items-center space-x-3 min-w-0 flex-1">
-                <FileText className="w-4 h-4 text-slate-500 flex-shrink-0" />
-                <span className="text-sm font-medium truncate">Resume.pdf</span>
-              </div>
-              <Button variant="ghost" size="sm" className="flex-shrink-0">
-                <Download className="w-4 h-4" />
-              </Button>
-            </div>
-            <div className="flex items-center justify-between p-3 border border-slate-200 rounded-lg">
-              <div className="flex items-center space-x-3 min-w-0 flex-1">
-                <FileText className="w-4 h-4 text-slate-500 flex-shrink-0" />
-                <span className="text-sm font-medium truncate">
-                  Cover_Letter.pdf
-                </span>
-              </div>
-              <Button variant="ghost" size="sm" className="flex-shrink-0">
-                <Download className="w-4 h-4" />
-              </Button>
-            </div>
-            <div className="flex items-center justify-between p-3 border border-slate-200 rounded-lg">
-              <div className="flex items-center space-x-3 min-w-0 flex-1">
-                <FileText className="w-4 h-4 text-slate-500 flex-shrink-0" />
-                <span className="text-sm font-medium truncate">
-                  Portfolio.pdf
-                </span>
-              </div>
-              <Button variant="ghost" size="sm" className="flex-shrink-0">
-                <Download className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-        <Dialog
-          open={!!selectedEmail}
-          onOpenChange={() => setSelectedEmail(null)}
-        >
-          <DialogContent className="sm:max-w-xl">
-            <DialogHeader>
-              <DialogTitle>{selectedEmail?.subject}</DialogTitle>
-              <DialogDescription>
-                Sent on {selectedEmail?.timestamp}
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-2">
-              <p className="text-sm text-slate-600">
-                <strong>From:</strong> {selectedEmail?.from}
-              </p>
-              <p className="text-sm text-slate-600 whitespace-pre-line">
-                {selectedEmail?.content}
-              </p>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </Card>
-    </div>
-  );
+              <TabsContent value="activities" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Recent Activities</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {activities.map((activity) => (
+                        <div
+                          key={activity.id}
+                          className="flex items-start space-x-3 pb-4 border-b border-slate-100 last:border-b-0"
+                        >
+                          <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                            {activity.type === "stage_change" && (
+                              <Zap className="w-4 h-4 text-blue-600" />
+                            )}
+                            {activity.type === "note" && (
+                              <FileText className="w-4 h-4 text-green-600" />
+                            )}
+                            {activity.type === "email" && (
+                              <Mail className="w-4 h-4 text-purple-600" />
+                            )}
+                            {activity.type === "call" && (
+                              <Phone className="w-4 h-4 text-orange-600" />
+                            )}
+                            {activity.type === "interview" && (
+                              <Video className="w-4 h-4 text-indigo-600" />
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between">
+                              <h4 className="font-medium text-slate-900">
+                                {activity.action}
+                              </h4>
+                              <span className="text-xs text-slate-500">
+                                {activity.timestamp}
+                              </span>
+                            </div>
+                            <p className="text-sm text-slate-600">
+                              by {activity.user}
+                            </p>
+                            {activity.content && (
+                              <p className="text-sm text-slate-600 mt-1 bg-slate-50 p-2 rounded">
+                                {activity.content}
+                              </p>
+                            )}
+                            {activity.reason && (
+                              <p className="text-sm text-slate-600 mt-1">
+                                <span className="font-medium">Reason:</span>{" "}
+                                {activity.reason}
+                              </p>
+                            )}
+                            {activity.duration && (
+                              <p className="text-sm text-slate-600 mt-1">
+                                <span className="font-medium">Duration:</span>{" "}
+                                {activity.duration}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+                         </Tabs>
+
+             {/* Email History for Selected Job */}
+             <Card>
+               <CardHeader>
+                 <CardTitle className="text-lg sm:text-xl">Email History</CardTitle>
+               </CardHeader>
+               <CardContent>
+                 <div className="space-y-3 sm:space-y-4">
+                   {emailHistory.map((email) => (
+                     <div
+                       key={email.id}
+                       className="p-3 border border-slate-200 rounded-lg hover:bg-slate-50"
+                     >
+                       <div className="flex items-center justify-between mb-2 min-w-0">
+                         <h4 className="font-medium text-sm text-slate-900 truncate flex items-center gap-2 min-w-0 flex-1">
+                           <span className="text-wrap">{email.subject}</span>
+                         </h4>
+                         <DropdownMenu>
+                           <DropdownMenuTrigger asChild>
+                             <Button
+                               variant="ghost"
+                               size="sm"
+                               className="flex-shrink-0"
+                             >
+                               <MoreHorizontal className="w-4 h-4" />
+                             </Button>
+                           </DropdownMenuTrigger>
+                           <DropdownMenuContent align="end">
+                             <DropdownMenuItem onClick={() => setSelectedEmail(email)}>
+                               <Eye className="w-4 h-4 mr-2" />
+                               View Full
+                             </DropdownMenuItem>
+                           </DropdownMenuContent>
+                         </DropdownMenu>
+                       </div>
+                       <p className="text-xs text-slate-600 mb-1 truncate">
+                         From: {email.from}
+                       </p>
+                       <p className="text-xs text-slate-600 mb-2">{email.timestamp}</p>
+                       <p className="text-xs text-slate-600 line-clamp-2">
+                         {email.content}
+                       </p>
+                     </div>
+                   ))}
+                 </div>
+               </CardContent>
+             </Card>
+           </>
+         )}
+       </div>
+     );
+   };
+
+
 
   const handleStageChangeRequest = () => {
     // Called when user clicks 'Update Stage' in dialog
@@ -1291,7 +1278,7 @@ export default function CandidateDetail() {
                 Candidate Profile
               </h1>
               <p className="text-sm sm:text-base text-slate-600">
-                Manage candidate information and track progress
+                View candidate information and manage job applications
               </p>
             </div>
           </div>
@@ -1304,17 +1291,10 @@ export default function CandidateDetail() {
               <HelpTooltip content={helpContent.source} />
             </Badge>
             <Badge
-              variant={
-                currentStage === "Hired"
-                  ? "default"
-                  : currentStage === "Rejected"
-                    ? "destructive"
-                    : "secondary"
-              }
+              variant="default"
               className="flex items-center gap-1 w-full sm:w-auto justify-center sm:justify-start"
             >
-              {currentStage}
-              <HelpTooltip content={helpContent.stage} />
+              {getCandidateJobs(candidate).length} Job Applications
             </Badge>
           </div>
         </div>
@@ -1322,19 +1302,14 @@ export default function CandidateDetail() {
 
       {/* Responsive Layout */}
       <div className="p-3 sm:p-4 lg:p-6 space-y-6 lg:space-y-0 lg:grid lg:grid-cols-12 lg:gap-6">
-        {/* Left Panel - Full width on mobile, 3 columns on desktop */}
-        <div className="lg:col-span-3">
-          <LeftPanel />
+        {/* Left Panel - Candidate Info */}
+        <div className="lg:col-span-4">
+          <CandidateInfoPanel />
         </div>
 
-        {/* Center Panel - Full width on mobile, 6 columns on desktop */}
-        <div className="lg:col-span-6">
-          <CenterPanel />
-        </div>
-
-        {/* Right Panel - Full width on mobile, 3 columns on desktop */}
-        <div className="lg:col-span-3">
-          <RightPanel />
+        {/* Center Panel - Jobs and Progress */}
+        <div className="lg:col-span-8">
+          <JobsPanel />
         </div>
       </div>
 
@@ -1573,6 +1548,29 @@ export default function CandidateDetail() {
               </Button>
               <Button onClick={() => handleSaveProfile()}>Save Changes</Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Email Dialog */}
+      <Dialog
+        open={!!selectedEmail}
+        onOpenChange={() => setSelectedEmail(null)}
+      >
+        <DialogContent className="sm:max-w-xl">
+          <DialogHeader>
+            <DialogTitle>{selectedEmail?.subject}</DialogTitle>
+            <DialogDescription>
+              Sent on {selectedEmail?.timestamp}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <p className="text-sm text-slate-600">
+              <strong>From:</strong> {selectedEmail?.from}
+            </p>
+            <p className="text-sm text-slate-600 whitespace-pre-line">
+              {selectedEmail?.content}
+            </p>
           </div>
         </DialogContent>
       </Dialog>
