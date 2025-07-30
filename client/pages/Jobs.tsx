@@ -184,7 +184,7 @@ const JobCard = memo(
             <div className="flex items-center gap-2 mb-2 min-w-0">
               <Link
                 to={`/jobs/${job.id}`}
-                className="font-semibold text-slate-900 hover:text-blue-600 transition-colors text-wrap-safe min-w-0 flex-1 truncate"
+                className="font-semibold text-slate-900 hover:text-blue-600 transition-colors text-wrap-safe min-w-0 flex-1 break-words"
               >
                 {job.position}
               </Link>
@@ -192,17 +192,17 @@ const JobCard = memo(
                 {getPriorityBadge(job.priority)}
               </div>
             </div>
-            <p className="text-responsive-sm text-slate-600 mb-2 text-wrap-safe truncate">
+            <p className="text-responsive-sm text-slate-600 mb-2 text-wrap-safe break-words">
               {job.department}
             </p>
             <div className="flex items-center gap-4 text-responsive-sm text-slate-500 min-w-0">
               <span className="flex items-center gap-1 text-wrap-safe min-w-0 flex-1">
                 <MapPin className="icon-mobile flex-shrink-0" />
-                <span className="truncate">{job.location}</span>
+                <span className="break-words">{job.location}</span>
               </span>
               <span className="flex items-center gap-1 text-wrap-safe min-w-0 flex-1">
                 <Calendar className="icon-mobile flex-shrink-0" />
-                <span className="truncate">{job.deadline}</span>
+                <span className="break-words">{job.deadline}</span>
               </span>
             </div>
           </div>
@@ -314,7 +314,7 @@ const JobCard = memo(
         <div className="flex items-center justify-between pt-3 border-t border-slate-100">
           <div className="flex items-center gap-2 min-w-0 flex-1">
             <div className="flex-shrink-0">{getStatusBadge(job.status)}</div>
-            <span className="text-responsive-sm text-slate-500 text-wrap-safe truncate">
+            <span className="text-responsive-sm text-slate-500 text-wrap-safe break-words">
               by {job.recruiter}
             </span>
           </div>
@@ -843,6 +843,11 @@ export default function Jobs() {
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(
     null,
   );
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [jobsPerPage] = useState(10);
+  
   const { toast } = useToast();
 
   // Mock candidates data for the apply functionality
@@ -917,6 +922,18 @@ export default function Jobs() {
       matchesRecruiter
     );
   });
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredJobs.length / jobsPerPage);
+  const indexOfLastJob = currentPage * jobsPerPage;
+  const indexOfFirstJob = indexOfLastJob - jobsPerPage;
+  const currentJobs = filteredJobs.slice(indexOfFirstJob, indexOfLastJob);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, departmentFilter, statusFilter, priorityFilter, recruiterFilter]);
+
   const applyJob = filteredJobs.find((job) => job.id === applyJobId);
 
   const stats = [
@@ -1101,25 +1118,25 @@ export default function Jobs() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredJobs.map((job) => (
+              {currentJobs.map((job) => (
                 <TableRow key={job.id} className="hover:bg-slate-50">
                   {visibleFields.position && (
                     <TableCell>
                       <Link
                         to={`/jobs/${job.id}`}
-                        className="font-medium hover:text-blue-600 truncate max-w-48 block"
+                        className="font-medium hover:text-blue-600 break-words max-w-48 block"
                       >
                         {job.position}
                       </Link>
                     </TableCell>
                   )}
                   {visibleFields.department && (
-                    <TableCell className="truncate max-w-32">
+                    <TableCell className="break-words max-w-32">
                       {job.department}
                     </TableCell>
                   )}
                   {visibleFields.recruiter && (
-                    <TableCell className="truncate max-w-32">
+                    <TableCell className="break-words max-w-32">
                       {job.recruiter}
                     </TableCell>
                   )}
@@ -1184,22 +1201,22 @@ export default function Jobs() {
                     </TableCell>
                   )}
                   {visibleFields.openDate && (
-                    <TableCell className="truncate max-w-32">
+                    <TableCell className="break-words max-w-32">
                       {job.openDate}
                     </TableCell>
                   )}
                   {visibleFields.deadline && (
-                    <TableCell className="truncate max-w-32">
+                    <TableCell className="break-words max-w-32">
                       {job.deadline}
                     </TableCell>
                   )}
                   {visibleFields.estimatedCost && (
-                    <TableCell className="truncate max-w-32">
+                    <TableCell className="break-words max-w-32">
                       {job.estimatedCost}
                     </TableCell>
                   )}
                   {visibleFields.actualCost && (
-                    <TableCell className="truncate max-w-32">
+                    <TableCell className="break-words max-w-32">
                       {job.actualCost}
                     </TableCell>
                   )}
@@ -1334,7 +1351,7 @@ export default function Jobs() {
 
   const GridView = memo(() => (
     <div className="grid-responsive">
-      {filteredJobs.map((job) => (
+      {currentJobs.map((job) => (
         <JobCard
           key={job.id}
           job={job}
@@ -1431,7 +1448,7 @@ export default function Jobs() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm" className="btn-mobile">
                       <Settings className="icon-mobile mr-2" />
-                      Columns
+                      Fields
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56 dropdown-mobile">
@@ -1554,29 +1571,60 @@ export default function Jobs() {
       {viewMode === "list" ? <ListView /> : <GridView />}
 
       {/* Pagination */}
-      <div className="flex justify-center">
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" disabled className="btn-mobile">
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="bg-blue-50 text-blue-600 btn-mobile"
-          >
-            1
-          </Button>
-          <Button variant="outline" size="sm" className="btn-mobile">
-            2
-          </Button>
-          <Button variant="outline" size="sm" className="btn-mobile">
-            3
-          </Button>
-          <Button variant="outline" size="sm" className="btn-mobile">
-            Next
-          </Button>
+      {totalPages > 1 && (
+        <div className="flex justify-center">
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(currentPage - 1)}
+              className="btn-mobile"
+            >
+              Previous
+            </Button>
+            
+            {/* Page numbers */}
+            {Array.from({ length: totalPages }, (_, index) => {
+              const pageNumber = index + 1;
+              // Show first page, last page, current page, and pages around current
+              if (
+                pageNumber === 1 ||
+                pageNumber === totalPages ||
+                (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+              ) {
+                return (
+                  <Button
+                    key={pageNumber}
+                    variant={currentPage === pageNumber ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCurrentPage(pageNumber)}
+                    className="btn-mobile"
+                  >
+                    {pageNumber}
+                  </Button>
+                );
+              } else if (
+                pageNumber === currentPage - 2 ||
+                pageNumber === currentPage + 2
+              ) {
+                return <span key={pageNumber} className="px-2 py-1">...</span>;
+              }
+              return null;
+            })}
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(currentPage + 1)}
+              className="btn-mobile"
+            >
+              Next
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
 
       <AddJobForm
         open={showAddJobDialog}

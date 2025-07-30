@@ -136,11 +136,11 @@ export function JobSelector({
                   <div className="space-y-2 text-xs text-gray-600">
                     <div className="flex items-center gap-2">
                       <Building2 className="w-3 h-3" />
-                      <span className="truncate">{job.department}</span>
+                      <span className="break-words">{job.department}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <User className="w-3 h-3" />
-                      <span className="truncate">{job.recruiter}</span>
+                      <span className="break-words">{job.recruiter}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Calendar className="w-3 h-3" />
@@ -229,7 +229,7 @@ export function JobSelector({
                 className="flex flex-col items-start p-3 h-auto data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
                 <div className="flex items-center justify-between w-full mb-1">
-                  <span className="font-medium text-sm truncate pr-2">
+                  <span className="font-medium text-sm break-words pr-2">
                     {job.jobTitle}
                   </span>
                   <div
@@ -238,7 +238,7 @@ export function JobSelector({
                 </div>
                 <div className="flex items-center gap-2 text-xs opacity-80">
                   <Building2 className="w-3 h-3" />
-                  <span className="truncate">{job.department}</span>
+                  <span className="break-words">{job.department}</span>
                 </div>
                 <div className="flex items-center justify-between w-full mt-1">
                   <span className="text-xs opacity-80">{job.currentStage}</span>

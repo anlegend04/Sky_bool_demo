@@ -129,7 +129,7 @@ interface UploadProgress {
 export default function Candidates() {
   const { t } = useLanguage();
   const { toast } = useToast();
-  const [candidates] = useState<CandidateData[]>(HARDCODED_CANDIDATES);
+  const [candidates, setCandidates] = useState<CandidateData[]>(HARDCODED_CANDIDATES);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const [searchTerm, setSearchTerm] = useState("");
   const [positionFilter, setPositionFilter] = useState("all");
@@ -138,6 +138,13 @@ export default function Candidates() {
   const [departmentFilter, setDepartmentFilter] = useState("all");
   const [recruiterFilter, setRecruiterFilter] = useState("all");
   const [showMoreFilters, setShowMoreFilters] = useState(false);
+
+  // Grid view pagination state
+  const [candidatesPerStage, setCandidatesPerStage] = useState<Record<string, number>>({});
+
+  // List view pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [candidatesPerPage] = useState(10);
 
   // CV Upload States
   const [showCVUpload, setShowCVUpload] = useState(false);
@@ -164,8 +171,6 @@ export default function Candidates() {
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
 
   // Manual entry form states
-  const [source, setSource] = useState<string | undefined>();
-  const [customSource, setCustomSource] = useState("");
   const [showManualEntry, setShowManualEntry] = useState(false);
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
   const [formData, setFormData] = useState({
@@ -454,18 +459,174 @@ export default function Candidates() {
 
   // Pre-fill form with sample data
   const preFillSampleData = () => {
-    setFormData({
-      name: "Alex Johnson",
-      email: "alex.johnson@email.com",
-      phone: "+1 (555) 987-6543",
-      location: "San Francisco, CA",
-      position: "software-engineer",
-      department: "engineering",
-      source: "linkedin",
-      experience: "5",
-      salary: "$120,000 - $140,000",
-      skills: "React, TypeScript, Node.js, Python",
+    // Create multiple demo scenarios to showcase different features
+    const demoScenarios = [
+      {
+        name: "Demo 1: Standard Candidate",
+        data: {
+          name: "Alex Johnson",
+          email: "alex.johnson@email.com",
+          phone: "+1 (555) 987-6543",
+          location: "San Francisco, CA",
+          position: "software-engineer",
+          department: "engineering",
+          source: "linkedin",
+          experience: "5",
+          salary: "$120,000 - $140,000",
+          skills: "React, TypeScript, Node.js, Python",
+        }
+      },
+      {
+        name: "Demo 2: Custom Position",
+        data: {
+          name: "Sarah Chen",
+          email: "sarah.chen@techstartup.com",
+          phone: "+1 (555) 123-4567",
+          location: "New York, NY",
+          position: "customize",
+          department: "product",
+          source: "indeed",
+          experience: "3",
+          salary: "$90,000 - $110,000",
+          skills: "Product Strategy, User Research, Figma, Analytics",
+        }
+      },
+      {
+        name: "Demo 3: Custom Department",
+        data: {
+          name: "Mike Rodriguez",
+          email: "mike.rodriguez@innovate.com",
+          phone: "+1 (555) 456-7890",
+          location: "Austin, TX",
+          position: "data-analyst",
+          department: "customize",
+          source: "referral",
+          experience: "4",
+          salary: "$85,000 - $105,000",
+          skills: "SQL, Python, Tableau, Machine Learning",
+        }
+      },
+      {
+        name: "Demo 4: Custom Source",
+        data: {
+          name: "Emily Watson",
+          email: "emily.watson@creative.com",
+          phone: "+1 (555) 789-0123",
+          location: "Los Angeles, CA",
+          position: "ux-designer",
+          department: "design",
+          source: "customize",
+          experience: "6",
+          salary: "$100,000 - $130,000",
+          skills: "UI/UX Design, Prototyping, User Testing, Adobe Creative Suite",
+        }
+      },
+      {
+        name: "Demo 5: Multiple Custom Fields",
+        data: {
+          name: "David Kim",
+          email: "david.kim@startup.com",
+          phone: "+1 (555) 321-6540",
+          location: "Seattle, WA",
+          position: "customize",
+          department: "customize",
+          source: "customize",
+          experience: "7",
+          salary: "$130,000 - $160,000",
+          skills: "Leadership, Strategic Planning, Team Management, Technical Architecture",
+        }
+      }
+    ];
+
+    // Randomly select a demo scenario
+    const randomScenario = demoScenarios[Math.floor(Math.random() * demoScenarios.length)];
+    
+    setFormData(randomScenario.data);
+    
+    // Show toast with demo info
+    toast({
+      title: "Demo Data Loaded",
+      description: `${randomScenario.name} - Try editing the customize fields!`,
     });
+
+    // If custom fields are selected, focus on them after a delay
+    setTimeout(() => {
+      if (randomScenario.data.position === "customize") {
+        const customInput = document.getElementById("custom-position");
+        if (customInput) {
+          (customInput as HTMLInputElement).focus();
+        }
+      } else if (randomScenario.data.department === "customize") {
+        const customInput = document.getElementById("custom-department");
+        if (customInput) {
+          (customInput as HTMLInputElement).focus();
+        }
+      } else if (randomScenario.data.source === "customize") {
+        const customInput = document.getElementById("custom-source-manual");
+        if (customInput) {
+          (customInput as HTMLInputElement).focus();
+        }
+      }
+    }, 200);
+  };
+
+  // Pre-fill bulk upload with demo data
+  const preFillBulkDemoData = () => {
+    const bulkDemoScenarios = [
+      {
+        name: "Demo 1: Standard Bulk Settings",
+        data: {
+          jobPosition: "software-engineer",
+          source: "linkedin"
+        }
+      },
+      {
+        name: "Demo 2: Custom Job Position",
+        data: {
+          jobPosition: "customize",
+          source: "indeed"
+        }
+      },
+      {
+        name: "Demo 3: Custom Source",
+        data: {
+          jobPosition: "data-analyst",
+          source: "customize"
+        }
+      },
+      {
+        name: "Demo 4: Both Custom",
+        data: {
+          jobPosition: "customize",
+          source: "customize"
+        }
+      }
+    ];
+
+    const randomScenario = bulkDemoScenarios[Math.floor(Math.random() * bulkDemoScenarios.length)];
+    
+    setBulkJobPosition(randomScenario.data.jobPosition);
+    setBulkSource(randomScenario.data.source);
+    
+    toast({
+      title: "Bulk Demo Data Loaded",
+      description: `${randomScenario.name} - Try the customize fields!`,
+    });
+
+    // Focus on custom inputs if they're selected
+    setTimeout(() => {
+      if (randomScenario.data.jobPosition === "customize") {
+        const customInput = document.getElementById("custom-job-position");
+        if (customInput) {
+          (customInput as HTMLInputElement).focus();
+        }
+      } else if (randomScenario.data.source === "customize") {
+        const customInput = document.getElementById("custom-source");
+        if (customInput) {
+          (customInput as HTMLInputElement).focus();
+        }
+      }
+    }, 200);
   };
 
   // Handle bulk file upload
@@ -626,6 +787,17 @@ export default function Candidates() {
     setSelectedCandidates([]);
   };
 
+  const showMoreCandidates = (stage: string) => {
+    setCandidatesPerStage(prev => ({
+      ...prev,
+      [stage]: (prev[stage] || 5) + 5
+    }));
+  };
+
+  const resetGridPagination = () => {
+    setCandidatesPerStage({});
+  };
+
   // Create all candidates
   const createAllCandidates = () => {
     const candidatesToCreate =
@@ -694,6 +866,17 @@ export default function Candidates() {
       matchesRecruiter
     );
   });
+
+  // Pagination logic for list view
+  const totalPages = Math.ceil(filteredCandidates.length / candidatesPerPage);
+  const indexOfLastCandidate = currentPage * candidatesPerPage;
+  const indexOfFirstCandidate = indexOfLastCandidate - candidatesPerPage;
+  const currentCandidates = filteredCandidates.slice(indexOfFirstCandidate, indexOfLastCandidate);
+
+  // Reset pagination when filters or search change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, positionFilter, stageFilter, locationFilter, departmentFilter, recruiterFilter]);
 
   // Skeleton loader component
   const CandidateSkeleton = () => (
@@ -969,9 +1152,88 @@ export default function Candidates() {
 
   // Handle stage change with email trigger
   const handleStageChange = (candidate: CandidateData, newStage: string) => {
+    // Update the candidate's stage in the main candidates list
+    setCandidates((prevCandidates) =>
+      prevCandidates.map((c) =>
+        c.id === candidate.id ? { ...c, stage: newStage as CandidateData['stage'] } : c
+      )
+    );
+    
+    // In a real app, this would be an API call
+    console.log(`Moving candidate ${candidate.name} from ${candidate.stage} to ${newStage}`);
+    
+    // Show success message
+    toast({
+      title: "Stage updated",
+      description: `${candidate.name} moved to ${newStage} stage.`,
+    });
+    
+    // Trigger email dialog for notification
     setSelectedCandidateForEmail(candidate);
     setNewStageForEmail(newStage);
     setEmailTriggerOpen(true);
+  };
+
+  // Handle candidate editing
+  const handleEditCandidate = (candidate: CandidateData) => {
+    // In a real app, this would open an edit modal or navigate to edit page
+    console.log("Editing candidate:", candidate);
+    toast({
+      title: "Edit mode",
+      description: `Editing ${candidate.name}'s profile.`,
+    });
+  };
+
+  // Handle CV download
+  const handleDownloadCV = (candidate: CandidateData) => {
+    // In a real app, this would download the actual CV file
+    console.log("Downloading CV for:", candidate.name);
+    toast({
+      title: "CV Download",
+      description: `Downloading CV for ${candidate.name}.`,
+    });
+  };
+
+  // Handle candidate deletion
+  const handleDeleteCandidate = (candidate: CandidateData) => {
+    // Remove candidate from the main candidates list
+    setCandidates((prevCandidates) =>
+      prevCandidates.filter((c) => c.id !== candidate.id)
+    );
+    
+    // In a real app, this would show a confirmation dialog and then delete
+    console.log("Deleting candidate:", candidate.name);
+    toast({
+      title: "Candidate deleted",
+      description: `${candidate.name} has been removed from the system.`,
+    });
+  };
+
+  // Handle send email
+  const handleSendEmail = (candidate: CandidateData) => {
+    console.log("Sending email to:", candidate.name);
+    toast({
+      title: "Email sent",
+      description: `Email sent to ${candidate.name}.`,
+    });
+  };
+
+  // Handle schedule call
+  const handleScheduleCall = (candidate: CandidateData) => {
+    console.log("Scheduling call with:", candidate.name);
+    toast({
+      title: "Call scheduled",
+      description: `Call scheduled with ${candidate.name}.`,
+    });
+  };
+
+  // Handle add note
+  const handleAddNote = (candidate: CandidateData) => {
+    console.log("Adding note for:", candidate.name);
+    toast({
+      title: "Note added",
+      description: `Note added for ${candidate.name}.`,
+    });
   };
 
   // Handle email sent callback
@@ -1005,10 +1267,10 @@ export default function Candidates() {
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0 flex-1">
-              <h3 className="font-semibold text-sm text-slate-900 truncate">
+              <h3 className="font-semibold text-sm text-slate-900 break-words">
                 {candidate.name}
               </h3>
-              <p className="text-xs text-slate-600 truncate">
+              <p className="text-xs text-slate-600 break-words">
                 {candidate.position}
               </p>
             </div>
@@ -1026,13 +1288,25 @@ export default function Candidates() {
                   View Profile
                 </DropdownMenuItem>
               </Link>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleEditCandidate(candidate)}>
                 <Edit className="w-4 h-4 mr-2" />
                 Edit Candidate
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleDownloadCV(candidate)}>
                 <Download className="w-4 h-4 mr-2" />
                 Download CV
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleSendEmail(candidate)}>
+                <Mail className="w-4 h-4 mr-2" />
+                Send Email
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleScheduleCall(candidate)}>
+                <Phone className="w-4 h-4 mr-2" />
+                Schedule Call
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleAddNote(candidate)}>
+                <Edit3 className="w-4 h-4 mr-2" />
+                Add Note
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
@@ -1050,6 +1324,13 @@ export default function Candidates() {
                 <Mail className="w-4 h-4 mr-2" />
                 Move to Next Stage
               </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => handleDeleteCandidate(candidate)}
+                className="text-red-600 focus:text-red-600"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete Candidate
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -1057,7 +1338,7 @@ export default function Candidates() {
       <CardContent className="space-y-2">
         <div className="flex items-center text-xs text-slate-600 min-w-0">
           <Building className="w-3 h-3 mr-1 flex-shrink-0" />
-          <span className="truncate">{candidate.department}</span>
+          <span className="break-words">{candidate.department}</span>
         </div>
         <div className="flex items-center text-xs text-slate-600 min-w-0">
           <Clock className="w-3 h-3 mr-1 flex-shrink-0" />
@@ -1067,16 +1348,7 @@ export default function Candidates() {
         </div>
         <div className="flex items-center justify-between pt-2 border-t border-slate-100">
           <div className="flex items-center space-x-1">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                className={`w-3 h-3 ${
-                  i < candidate.rating
-                    ? "text-yellow-400 fill-current"
-                    : "text-slate-300"
-                }`}
-              />
-            ))}
+            {/* Rating removed */}
           </div>
           <Badge
             variant="outline"
@@ -1132,7 +1404,7 @@ export default function Candidates() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredCandidates.map((candidate) => (
+              {currentCandidates.map((candidate) => (
                 <TableRow key={candidate.id} className="hover:bg-slate-50">
                   {visibleFields.name && (
                     <TableCell>
@@ -1157,43 +1429,34 @@ export default function Candidates() {
                             {candidate.name}
                           </div>
                           <div className="flex items-center space-x-1 mt-1">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                className={`w-3 h-3 ${
-                                  i < candidate.rating
-                                    ? "text-yellow-400 fill-current"
-                                    : "text-slate-300"
-                                }`}
-                              />
-                            ))}
+                            {/* Rating removed */}
                           </div>
                         </div>
                       </Link>
                     </TableCell>
                   )}
                   {visibleFields.appliedDate && (
-                    <TableCell className="truncate max-w-32">
+                    <TableCell className="break-words max-w-32">
                       {candidate.appliedDate}
                     </TableCell>
                   )}
                   {visibleFields.email && (
-                    <TableCell className="truncate max-w-48">
+                    <TableCell className="break-words max-w-48">
                       {candidate.email}
                     </TableCell>
                   )}
                   {visibleFields.phone && (
-                    <TableCell className="truncate max-w-32">
+                    <TableCell className="break-words max-w-32">
                       {candidate.phone}
                     </TableCell>
                   )}
                   {visibleFields.position && (
-                    <TableCell className="truncate max-w-40">
+                    <TableCell className="break-words max-w-40">
                       {candidate.position}
                     </TableCell>
                   )}
                   {visibleFields.recruiter && (
-                    <TableCell className="truncate max-w-32">
+                    <TableCell className="break-words max-w-32">
                       {candidate.recruiter}
                     </TableCell>
                   )}
@@ -1215,29 +1478,29 @@ export default function Candidates() {
                                       ? "outline"
                                       : "destructive"
                         }
-                        className="truncate max-w-24"
+                        className="break-words max-w-24"
                       >
                         {candidate.stage}
                       </Badge>
                     </TableCell>
                   )}
                   {visibleFields.source && (
-                    <TableCell className="truncate max-w-32">
+                    <TableCell className="break-words max-w-32">
                       {candidate.source}
                     </TableCell>
                   )}
                   {visibleFields.salary && (
-                    <TableCell className="truncate max-w-32">
+                    <TableCell className="break-words max-w-32">
                       {candidate.salary}
                     </TableCell>
                   )}
                   {visibleFields.location && (
-                    <TableCell className="truncate max-w-40">
+                    <TableCell className="break-words max-w-40">
                       {candidate.location}
                     </TableCell>
                   )}
                   {visibleFields.department && (
-                    <TableCell className="truncate max-w-40">
+                    <TableCell className="break-words max-w-40">
                       {candidate.department}
                     </TableCell>
                   )}
@@ -1332,41 +1595,134 @@ export default function Candidates() {
           </Dialog>
         </div>
       </CardContent>
+      
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200">
+          <div className="flex items-center space-x-2">
+            <p className="text-sm text-slate-600">
+              Showing {indexOfFirstCandidate + 1} to {Math.min(indexOfLastCandidate, filteredCandidates.length)} of {filteredCandidates.length} candidates
+            </p>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </Button>
+            <div className="flex items-center space-x-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <Button
+                  key={page}
+                  variant={currentPage === page ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setCurrentPage(page)}
+                  className="w-8 h-8 p-0"
+                >
+                  {page}
+                </Button>
+              ))}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      )}
     </Card>
   );
 
-  const GridView = () => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-      {stages.map((stage) => {
-        const stageCandidates = filteredCandidates.filter(
-          (candidate) => candidate.stage === stage,
-        );
-        return (
-          <div
-            key={stage}
-            className="border border-slate-300 bg-slate-50 rounded-lg shadow-sm"
-          >
-            <div className="flex items-center justify-between p-3 border-b border-slate-200 bg-slate-100 rounded-t-lg">
-              <h3 className="font-semibold text-sm text-slate-900">{stage}</h3>
-              <Badge variant="outline" className="text-xs">
-                {stageCandidates.length}
-              </Badge>
+  const GridView = () => {
+    const getStageColor = (stage: string) => {
+      switch (stage) {
+        case "Applied":
+          return "bg-blue-50 border-blue-200";
+        case "Screening":
+          return "bg-yellow-50 border-yellow-200";
+        case "Interview":
+          return "bg-purple-50 border-purple-200";
+        case "Technical":
+          return "bg-orange-50 border-orange-200";
+        case "Offer":
+          return "bg-green-50 border-green-200";
+        case "Hired":
+          return "bg-emerald-50 border-emerald-200";
+        case "Rejected":
+          return "bg-red-50 border-red-200";
+        default:
+          return "bg-slate-50 border-slate-200";
+      }
+    };
+
+    return (
+      <div className="flex gap-4 overflow-x-auto pb-2">
+        {stages.map((stage) => {
+          const stageCandidates = filteredCandidates.filter(
+            (candidate) => candidate.stage === stage,
+          );
+          const displayedCount = candidatesPerStage[stage] || 5;
+          const hasMoreCandidates = stageCandidates.length > displayedCount;
+          
+          return (
+            <div
+              key={stage}
+              className={`rounded-xl border shadow-sm min-w-[260px] flex-1 flex flex-col transition-all ${getStageColor(stage)}`}
+              style={{ maxWidth: 340 }}
+            >
+              <div className="flex items-center justify-between mb-4 p-4 pb-2 border-b border-slate-100">
+                <h3 className="font-semibold text-base text-slate-900 break-words flex-1">{stage}</h3>
+                <Badge variant="outline" className="text-xs flex-shrink-0 ml-2">{stageCandidates.length}</Badge>
+              </div>
+              <div className="space-y-3 px-4 pb-4 pt-2 min-h-[180px] relative flex-1">
+                {stageCandidates.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-slate-400 text-xs py-8">
+                    <svg
+                      className="w-8 h-8 mb-2 opacity-30"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M12 8v4l3 3m6 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    No candidates
+                  </div>
+                ) : (
+                  <>
+                    {stageCandidates.slice(0, displayedCount).map((candidate) => (
+                      <CandidateCard key={candidate.id} candidate={candidate} />
+                    ))}
+                    {hasMoreCandidates && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full text-xs h-8"
+                        onClick={() => showMoreCandidates(stage)}
+                      >
+                        Show {stageCandidates.length - displayedCount} More
+                      </Button>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
-            <div className="space-y-3 p-3 min-h-[250px]">
-              {stageCandidates.map((candidate) => (
-                <CandidateCard key={candidate.id} candidate={candidate} />
-              ))}
-              {stageCandidates.length === 0 && (
-                <div className="text-center text-slate-400 text-xs py-8">
-                  No candidates
-                </div>
-              )}
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
+          );
+        })}
+      </div>
+    );
+  };
 
   return (
     <div className="p-3 sm:p-4 lg:p-6 space-y-4 sm:space-y-6">
@@ -1462,7 +1818,23 @@ export default function Candidates() {
                 <label className="text-sm font-medium text-slate-700">
                   Job Position
                 </label>
-                <Select>
+                <Select
+                  value={formData.position}
+                  onValueChange={(value) => {
+                    if (value === "customize") {
+                      setFormData(prev => ({ ...prev, position: "customize" }));
+                      // Focus on custom input after a brief delay
+                      setTimeout(() => {
+                        const customInput = document.getElementById("custom-position");
+                        if (customInput) {
+                          (customInput as HTMLInputElement).focus();
+                        }
+                      }, 100);
+                    } else {
+                      setFormData(prev => ({ ...prev, position: value }));
+                    }
+                  }}
+                >
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Select position" />
                   </SelectTrigger>
@@ -1489,12 +1861,37 @@ export default function Candidates() {
                     </SelectItem>
                   </SelectContent>
                 </Select>
+                {formData.position === "customize" && (
+                  <Input
+                    id="custom-position"
+                    className="mt-2"
+                    placeholder="Enter custom job position"
+                    value=""
+                    onChange={(e) => setFormData(prev => ({ ...prev, position: e.target.value }))}
+                  />
+                )}
               </div>
               <div>
                 <label className="text-sm font-medium text-slate-700">
                   Department
                 </label>
-                <Select>
+                <Select
+                  value={formData.department}
+                  onValueChange={(value) => {
+                    if (value === "customize") {
+                      setFormData(prev => ({ ...prev, department: "customize" }));
+                      // Focus on custom input after a brief delay
+                      setTimeout(() => {
+                        const customInput = document.getElementById("custom-department");
+                        if (customInput) {
+                          (customInput as HTMLInputElement).focus();
+                        }
+                      }, 100);
+                    } else {
+                      setFormData(prev => ({ ...prev, department: value }));
+                    }
+                  }}
+                >
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Select department" />
                   </SelectTrigger>
@@ -1515,12 +1912,37 @@ export default function Candidates() {
                     </SelectItem>
                   </SelectContent>
                 </Select>
+                {formData.department === "customize" && (
+                  <Input
+                    id="custom-department"
+                    className="mt-2"
+                    placeholder="Enter custom department"
+                    value=""
+                    onChange={(e) => setFormData(prev => ({ ...prev, department: e.target.value }))}
+                  />
+                )}
               </div>
               <div>
                 <label className="text-sm font-medium text-slate-700">
                   Source
                 </label>
-                <Select onValueChange={setSource}>
+                <Select 
+                  value={formData.source}
+                  onValueChange={(value) => {
+                    if (value === "customize") {
+                      setFormData(prev => ({ ...prev, source: "customize" }));
+                      // Focus on custom input after a brief delay
+                      setTimeout(() => {
+                        const customInput = document.getElementById("custom-source-manual");
+                        if (customInput) {
+                          (customInput as HTMLInputElement).focus();
+                        }
+                      }, 100);
+                    } else {
+                      setFormData(prev => ({ ...prev, source: value }));
+                    }
+                  }}
+                >
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Select source" />
                   </SelectTrigger>
@@ -1540,12 +1962,13 @@ export default function Candidates() {
                     </SelectItem>
                   </SelectContent>
                 </Select>
-                {source === "customize" && (
+                {formData.source === "customize" && (
                   <Input
+                    id="custom-source-manual"
                     className="mt-2"
                     placeholder="Enter custom source"
-                    value={customSource}
-                    onChange={(e) => setCustomSource(e.target.value)}
+                    value=""
+                    onChange={(e) => setFormData(prev => ({ ...prev, source: e.target.value }))}
                   />
                 )}
               </div>
@@ -1777,7 +2200,20 @@ export default function Candidates() {
                       <Label>Default Job Position</Label>
                       <Select
                         value={bulkJobPosition}
-                        onValueChange={setBulkJobPosition}
+                        onValueChange={(value) => {
+                          if (value === "customize") {
+                            setBulkJobPosition("customize");
+                            // Focus on custom input after a brief delay
+                            setTimeout(() => {
+                              const customInput = document.getElementById("custom-job-position");
+                              if (customInput) {
+                                (customInput as HTMLInputElement).focus();
+                              }
+                            }, 100);
+                          } else {
+                            setBulkJobPosition(value);
+                          }
+                        }}
                       >
                         <SelectTrigger className="mt-1">
                           <SelectValue placeholder="Select position for all CVs" />
@@ -1806,10 +2242,35 @@ export default function Candidates() {
                           </SelectItem>
                         </SelectContent>
                       </Select>
+                      {bulkJobPosition === "customize" && (
+                        <Input
+                          id="custom-job-position"
+                          placeholder="Enter custom job position"
+                          className="mt-2"
+                          value=""
+                          onChange={(e) => setBulkJobPosition(e.target.value)}
+                        />
+                      )}
                     </div>
                     <div>
                       <Label>Default Source</Label>
-                      <Select value={bulkSource} onValueChange={setBulkSource}>
+                      <Select 
+                        value={bulkSource} 
+                        onValueChange={(value) => {
+                          if (value === "customize") {
+                            setBulkSource("customize");
+                            // Focus on custom input after a brief delay
+                            setTimeout(() => {
+                              const customInput = document.getElementById("custom-source");
+                              if (customInput) {
+                                (customInput as HTMLInputElement).focus();
+                              }
+                            }, 100);
+                          } else {
+                            setBulkSource(value);
+                          }
+                        }}
+                      >
                         <SelectTrigger className="mt-1">
                           <SelectValue placeholder="Select source (optional)" />
                         </SelectTrigger>
@@ -1829,6 +2290,15 @@ export default function Candidates() {
                           </SelectItem>
                         </SelectContent>
                       </Select>
+                      {bulkSource === "customize" && (
+                        <Input
+                          id="custom-source"
+                          placeholder="Enter custom source"
+                          className="mt-2"
+                          value=""
+                          onChange={(e) => setBulkSource(e.target.value)}
+                        />
+                      )}
                     </div>
                   </div>
 
@@ -1844,7 +2314,7 @@ export default function Candidates() {
                         {uploadProgress.map((progress) => (
                           <div key={progress.fileName} className="space-y-2">
                             <div className="flex items-center justify-between text-sm">
-                              <span className="font-medium truncate">
+                              <span className="font-medium break-words">
                                 {progress.fileName}
                               </span>
                               <div className="flex items-center space-x-2">
@@ -2051,7 +2521,10 @@ export default function Candidates() {
                 <Button
                   variant={viewMode === "list" ? "default" : "ghost"}
                   size="sm"
-                  onClick={() => setViewMode("list")}
+                  onClick={() => {
+                    setViewMode("list");
+                    setCurrentPage(1);
+                  }}
                 >
                   <List className="w-4 h-4 mr-2" />
                   List
@@ -2059,7 +2532,10 @@ export default function Candidates() {
                 <Button
                   variant={viewMode === "grid" ? "default" : "ghost"}
                   size="sm"
-                  onClick={() => setViewMode("grid")}
+                  onClick={() => {
+                    setViewMode("grid");
+                    resetGridPagination();
+                  }}
                 >
                   <Grid3X3 className="w-4 h-4 mr-2" />
                   Grid
@@ -2105,14 +2581,20 @@ export default function Candidates() {
                     placeholder="Search candidates by name, position, skills..."
                     className="pl-10"
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value);
+                      resetGridPagination();
+                    }}
                   />
                 </div>
               </div>
               <div className="flex gap-3">
                 <Select
                   value={departmentFilter}
-                  onValueChange={setDepartmentFilter}
+                  onValueChange={(value) => {
+                    setDepartmentFilter(value);
+                    resetGridPagination();
+                  }}
                 >
                   <SelectTrigger className="w-32">
                     <SelectValue placeholder="Department" />
@@ -2126,7 +2608,10 @@ export default function Candidates() {
                     <SelectItem value="data">Data</SelectItem>
                   </SelectContent>
                 </Select>
-                <Select value={stageFilter} onValueChange={setStageFilter}>
+                <Select value={stageFilter} onValueChange={(value) => {
+                  setStageFilter(value);
+                  resetGridPagination();
+                }}>
                   <SelectTrigger className="w-32">
                     <SelectValue placeholder="Stage" />
                   </SelectTrigger>
@@ -2141,7 +2626,10 @@ export default function Candidates() {
                 </Select>
                 <Select
                   value={recruiterFilter}
-                  onValueChange={setRecruiterFilter}
+                  onValueChange={(value) => {
+                    setRecruiterFilter(value);
+                    resetGridPagination();
+                  }}
                 >
                   <SelectTrigger className="w-32">
                     <SelectValue placeholder="Recruiter" />
@@ -2216,18 +2704,8 @@ export default function Candidates() {
                         </div>
                         <div>
                           <label className="text-sm font-medium text-slate-700">
-                            Rating
+                            {/* Rating filter removed */}
                           </label>
-                          <Select>
-                            <SelectTrigger className="mt-1">
-                              <SelectValue placeholder="Any rating" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="5">5 Stars</SelectItem>
-                              <SelectItem value="4+">4+ Stars</SelectItem>
-                              <SelectItem value="3+">3+ Stars</SelectItem>
-                            </SelectContent>
-                          </Select>
                         </div>
                         <div>
                           <label className="text-sm font-medium text-slate-700">
@@ -2270,6 +2748,7 @@ export default function Candidates() {
                         <Button
                           onClick={() => {
                             setShowMoreFilters(false);
+                            resetGridPagination();
                             toast({
                               title: "Filters Applied",
                               description:

@@ -72,14 +72,14 @@ export default function Dashboard() {
       icon: Clock,
       color: "orange",
     },
-    {
-      titleKey: "dashboard.avgTimeToHire",
-      value: `${DASHBOARD_STATS.avgTimeToHire} days`,
-      change: "-2 days",
-      changeType: "positive" as const,
-      icon: Target,
-      color: "purple",
-    },
+    // {
+    //   titleKey: "dashboard.avgTimeToHire",
+    //   value: `${DASHBOARD_STATS.avgTimeToHire} days`,
+    //   change: "-2 days",
+    //   changeType: "positive" as const,
+    //   icon: Target,
+    //   color: "purple",
+    // },
   ];
 
   const recentJobs = HARDCODED_JOBS.slice(0, 4).map((job) => ({
@@ -249,7 +249,7 @@ export default function Dashboard() {
                 >
                   <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
                     <div className="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0"></div>
-                    <span className="font-medium text-slate-700 text-responsive-base truncate-mobile text-wrap-safe">
+                    <span className="font-medium text-slate-700 text-responsive-base break-words text-wrap-safe">
                       {t(stage.stageKey)}
                     </span>
                     <Badge
@@ -363,7 +363,7 @@ export default function Dashboard() {
                 <div className="flex justify-between items-start min-w-0">
                   <Link
                     to={`/jobs/${job.id}`}
-                    className="font-medium text-slate-900 hover:text-blue-600 text-responsive-base text-wrap-safe min-w-0 flex-1 truncate"
+                    className="font-medium text-slate-900 hover:text-blue-600 text-responsive-base text-wrap-safe min-w-0 flex-1 break-words"
                   >
                     {job.title}
                   </Link>
@@ -375,7 +375,7 @@ export default function Dashboard() {
                   </Badge>
                 </div>
                 <div className="flex justify-between items-center text-responsive-sm text-slate-600 min-w-0">
-                  <span className="text-wrap-safe truncate flex-1">
+                  <span className="text-wrap-safe break-words flex-1">
                     {job.department}
                   </span>
                   <span className="text-wrap-safe flex-shrink-0 ml-2">
@@ -431,12 +431,12 @@ export default function Dashboard() {
                     <td className="py-3">
                       <Link
                         to={`/jobs/${job.id}`}
-                        className="font-medium text-slate-900 hover:text-blue-600 text-wrap-safe truncate max-w-48 block"
+                        className="font-medium text-slate-900 hover:text-blue-600 text-wrap-safe break-words max-w-48 block"
                       >
                         {job.title}
                       </Link>
                     </td>
-                    <td className="py-3 text-slate-600 text-wrap-safe truncate max-w-32">
+                    <td className="py-3 text-slate-600 text-wrap-safe break-words max-w-32">
                       {job.department}
                     </td>
                     <td className="py-3">

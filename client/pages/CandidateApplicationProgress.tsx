@@ -58,6 +58,7 @@ import {
   getJobApplication,
 } from "@/data/enhanced-mock-data";
 import { JobApplication } from "@/types/enhanced-candidate";
+import { CandidateData } from "@/data/hardcoded-data";
 import { EmailTrigger } from "@/components/EmailTrigger";
 
 type StageData = {
@@ -208,7 +209,7 @@ export default function CandidateApplicationProgress() {
           <div className="flex flex-col gap-3">
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
               <div className="flex-1 min-w-0">
-                <h3 className="text-lg sm:text-xl font-semibold text-slate-900 truncate">
+                <h3 className="text-lg sm:text-xl font-semibold text-slate-900 break-words">
                   {jobApplication.jobTitle}
                 </h3>
               </div>
@@ -229,27 +230,27 @@ export default function CandidateApplicationProgress() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 text-sm text-slate-600">
               <div className="flex items-center gap-1 min-w-0">
                 <Calendar className="w-4 h-4 flex-shrink-0" />
-                <span className="truncate">
+                <span className="break-words">
                   Applied:{" "}
                   {new Date(jobApplication.appliedDate).toLocaleDateString()}
                 </span>
               </div>
               <div className="flex items-center gap-1 min-w-0">
                 <User className="w-4 h-4 flex-shrink-0" />
-                <span className="truncate">
+                <span className="break-words">
                   Recruiter: {jobApplication.recruiter}
                 </span>
               </div>
               {jobApplication.salary && (
                 <div className="flex items-center gap-1 min-w-0">
                   <DollarSign className="w-4 h-4 flex-shrink-0" />
-                  <span className="truncate">{jobApplication.salary}</span>
+                  <span className="break-words">{jobApplication.salary}</span>
                 </div>
               )}
               {jobApplication.location && (
                 <div className="flex items-center gap-1 min-w-0">
                   <MapPin className="w-4 h-4 flex-shrink-0" />
-                  <span className="truncate">{jobApplication.location}</span>
+                  <span className="break-words">{jobApplication.location}</span>
                 </div>
               )}
             </div>
@@ -279,7 +280,7 @@ export default function CandidateApplicationProgress() {
               <Circle className="w-5 h-5 fill-current text-white" />
             </div>
             <div className="flex-1 min-w-0">
-              <h4 className="font-medium text-blue-900 truncate">
+              <h4 className="font-medium text-blue-900 break-words">
                 Current: {jobApplication.currentStage}
               </h4>
               <p className="text-sm text-blue-700 text-wrap">
@@ -326,7 +327,7 @@ export default function CandidateApplicationProgress() {
               </div>
 
               {/* Stage name */}
-              <div className="text-xs font-medium text-slate-700 truncate px-1">
+              <div className="text-xs font-medium text-slate-700 break-words px-1">
                 {stage.name}
               </div>
 
@@ -334,7 +335,7 @@ export default function CandidateApplicationProgress() {
               {stage.duration > 0 && (
                 <div className="text-xs text-slate-500 flex items-center justify-center gap-1 mt-1">
                   <Clock className="w-3 h-3" />
-                  <span className="truncate">{stage.duration}d</span>
+                  <span className="break-words">{stage.duration}d</span>
                 </div>
               )}
             </div>
@@ -346,7 +347,7 @@ export default function CandidateApplicationProgress() {
           <div className="flex items-center space-x-2 p-3 bg-slate-50 rounded-lg">
             <Clock className="w-4 h-4 text-slate-500 flex-shrink-0" />
             <div className="min-w-0 flex-1">
-              <span className="text-sm text-slate-600 truncate block">
+              <span className="text-sm text-slate-600 break-words block">
                 Total Time:{" "}
                 {stages.reduce((acc, stage) => acc + stage.duration, 0)} days
               </span>
@@ -355,7 +356,7 @@ export default function CandidateApplicationProgress() {
           <div className="flex items-center space-x-2 p-3 bg-slate-50 rounded-lg">
             <Target className="w-4 h-4 text-slate-500 flex-shrink-0" />
             <div className="min-w-0 flex-1">
-              <span className="text-sm text-slate-600 truncate block">
+              <span className="text-sm text-slate-600 break-words block">
                 Current: {jobApplication.currentStage} (
                 {stages.find((s) => s.name === jobApplication.currentStage)
                   ?.duration || 0}{" "}
@@ -366,7 +367,7 @@ export default function CandidateApplicationProgress() {
           <div className="flex items-center space-x-2 p-3 bg-slate-50 rounded-lg sm:col-span-2 lg:col-span-1">
             <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
             <div className="min-w-0 flex-1">
-              <span className="text-sm text-slate-600 truncate block">
+              <span className="text-sm text-slate-600 break-words block">
                 {completedStages} of {totalStages} completed
               </span>
             </div>
@@ -551,10 +552,10 @@ export default function CandidateApplicationProgress() {
                               {activity.content}
                             </p>
                           )}
-                          {activity.reason && (
+                          {(activity as any).reason && (
                             <p className="text-sm text-slate-600 mt-1">
                               <span className="font-medium">Reason:</span>{" "}
-                              {activity.reason}
+                              {(activity as any).reason}
                             </p>
                           )}
                         </div>
@@ -578,7 +579,7 @@ export default function CandidateApplicationProgress() {
                         className="p-3 border border-slate-200 rounded-lg hover:bg-slate-50"
                       >
                         <div className="flex items-center justify-between mb-2">
-                          <h4 className="font-medium text-sm text-slate-900 truncate flex-1">
+                          <h4 className="font-medium text-sm text-slate-900 break-words flex-1">
                             {email.subject}
                           </h4>
                           <DropdownMenu>
@@ -706,7 +707,7 @@ export default function CandidateApplicationProgress() {
         <EmailTrigger
           isOpen={showEmailTrigger}
           onClose={() => setShowEmailTrigger(false)}
-          candidate={candidate}
+          candidate={candidate as unknown as CandidateData}
           newStage={jobApplication.currentStage}
           jobTitle={jobApplication.jobTitle}
           onEmailSent={() => {

@@ -55,7 +55,6 @@ export interface CandidateData {
   skills: string[];
   status: string;
   stage: string;
-  rating: number;
   appliedDate: string;
   resume: string;
   avatar: string;
@@ -554,9 +553,8 @@ class StorageManager {
       experience: "5+ years",
       skills: ["React", "TypeScript", "Node.js", "GraphQL", "JavaScript", "CSS"],
       status: "Active",
-      stage: "Interview",
-      rating: 5,
-      appliedDate: "2024-01-15",
+          stage: "Interview",
+    appliedDate: "2024-01-15",
       resume: "sarah_johnson_resume.pdf",
       avatar: "",
       salary: "$120k - $140k",
@@ -723,7 +721,6 @@ class StorageManager {
         skills: ["Product Strategy", "Agile", "Data Analysis", "UX Design"],
         status: "Active",
         stage: "Offer",
-        rating: 4,
         appliedDate: "2024-01-12",
         resume: "michael_chen_resume.pdf",
         avatar: "",
@@ -748,7 +745,6 @@ class StorageManager {
         skills: ["Figma", "Sketch", "User Research", "Prototyping"],
         status: "Active",
         stage: "Applied",
-        rating: 4,
         appliedDate: "2024-01-10",
         resume: "emily_davis_resume.pdf",
         avatar: "",
@@ -773,7 +769,6 @@ class StorageManager {
         skills: ["Python", "Machine Learning", "SQL", "TensorFlow"],
         status: "Active",
         stage: "Technical",
-        rating: 5,
         appliedDate: "2024-01-08",
         resume: "david_kim_resume.pdf",
         avatar: "",
@@ -798,7 +793,6 @@ class StorageManager {
         skills: ["AWS", "Docker", "Kubernetes", "Terraform"],
         status: "Active",
         stage: "Hired",
-        rating: 4,
         appliedDate: "2024-01-05",
         resume: "lisa_garcia_resume.pdf",
         avatar: "",
@@ -823,7 +817,6 @@ class StorageManager {
         skills: ["Digital Marketing", "SEO", "Content Strategy", "Analytics"],
         status: "Inactive",
         stage: "Rejected",
-        rating: 2,
         appliedDate: "2024-01-03",
         resume: "robert_taylor_resume.pdf",
         avatar: "",

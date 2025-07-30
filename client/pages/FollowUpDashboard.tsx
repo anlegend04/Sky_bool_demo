@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -240,6 +240,10 @@ export default function FollowUpDashboard() {
   );
   const [filterStage, setFilterStage] = useState("all");
   const [filterJob, setFilterJob] = useState("all");
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [candidatesPerPage] = useState(10);
   const [filterUrgency, setFilterUrgency] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCandidate, setSelectedCandidate] =
@@ -248,6 +252,33 @@ export default function FollowUpDashboard() {
   const [showNoteDialog, setShowNoteDialog] = useState(false);
   const [emailTemplate, setEmailTemplate] = useState("");
   const [bulkAction, setBulkAction] = useState("");
+
+  // Handle send email
+  const handleSendEmail = (candidate: FollowUpCandidate) => {
+    console.log("Sending email to:", candidate.name);
+    toast({
+      title: "Email sent",
+      description: `Email sent to ${candidate.name}.`,
+    });
+  };
+
+  // Handle schedule call
+  const handleScheduleCall = (candidate: FollowUpCandidate) => {
+    console.log("Scheduling call with:", candidate.name);
+    toast({
+      title: "Call scheduled",
+      description: `Call scheduled with ${candidate.name}.`,
+    });
+  };
+
+  // Handle add note
+  const handleAddNote = (candidate: FollowUpCandidate) => {
+    console.log("Adding note for:", candidate.name);
+    toast({
+      title: "Note added",
+      description: `Note added for ${candidate.name}.`,
+    });
+  };
 
   // Email templates (giữ nguyên)
   const emailTemplates: EmailTemplate[] = [
@@ -297,6 +328,17 @@ export default function FollowUpDashboard() {
       return matchesSearch && matchesStage && matchesJob && matchesUrgency;
     });
   }, [candidates, searchTerm, filterStage, filterJob, filterUrgency]);
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredCandidates.length / candidatesPerPage);
+  const indexOfLastCandidate = currentPage * candidatesPerPage;
+  const indexOfFirstCandidate = indexOfLastCandidate - candidatesPerPage;
+  const currentCandidates = filteredCandidates.slice(indexOfFirstCandidate, indexOfLastCandidate);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterStage, filterJob, filterUrgency]);
 
   // Statistics (giữ nguyên)
   const stats = useMemo(() => {
@@ -468,15 +510,15 @@ export default function FollowUpDashboard() {
                 <Eye className="w-4 h-4 mr-2" />
                 View Profile
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleSendEmail(candidate)}>
                 <Mail className="w-4 h-4 mr-2" />
                 Send Email
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleScheduleCall(candidate)}>
                 <Phone className="w-4 h-4 mr-2" />
                 Schedule Call
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleAddNote(candidate)}>
                 <Edit3 className="w-4 h-4 mr-2" />
                 Add Note
               </DropdownMenuItem>
@@ -497,6 +539,15 @@ export default function FollowUpDashboard() {
       "Offer",
       "Hired",
     ];
+
+    const [candidatesPerStage, setCandidatesPerStage] = useState<Record<string, number>>({});
+
+    const showMoreCandidates = (stage: string) => {
+      setCandidatesPerStage(prev => ({
+        ...prev,
+        [stage]: (prev[stage] || 5) + 5
+      }));
+    };
 
     const getStageColor = (stage: string) => {
       switch (stage) {
@@ -523,6 +574,10 @@ export default function FollowUpDashboard() {
           const stageCandidates = filteredCandidates.filter(
             (c) => c.stage === stage,
           );
+          const maxVisible = candidatesPerStage[stage] || 5;
+          const visibleCandidates = stageCandidates.slice(0, maxVisible);
+          const hasMore = stageCandidates.length > maxVisible;
+
           return (
             <div
               key={stage}
@@ -530,12 +585,8 @@ export default function FollowUpDashboard() {
               style={{ maxWidth: 340 }}
             >
               <div className="flex items-center justify-between mb-4 p-4 pb-2 border-b border-slate-100">
-                <h3 className="font-semibold text-base text-slate-900 truncate flex-1">
-                  {stage}
-                </h3>
-                <Badge variant="outline" className="text-xs flex-shrink-0 ml-2">
-                  {stageCandidates.length}
-                </Badge>
+                <h3 className="font-semibold text-base text-slate-900 break-words flex-1">{stage}</h3>
+                <Badge variant="outline" className="text-xs flex-shrink-0 ml-2">{stageCandidates.length}</Badge>
               </div>
               <div className="space-y-3 px-4 pb-4 pt-2 min-h-[180px] relative flex-1">
                 {stageCandidates.length === 0 ? (
@@ -556,9 +607,21 @@ export default function FollowUpDashboard() {
                     No candidates
                   </div>
                 ) : (
-                  stageCandidates.map((candidate) => (
-                    <CandidateCard key={candidate.id} candidate={candidate} />
-                  ))
+                  <>
+                    {visibleCandidates.map((candidate) => (
+                      <CandidateCard key={candidate.id} candidate={candidate} />
+                    ))}
+                    {hasMore && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full text-xs h-8"
+                        onClick={() => showMoreCandidates(stage)}
+                      >
+                        Show {stageCandidates.length - maxVisible} More
+                      </Button>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -612,7 +675,7 @@ export default function FollowUpDashboard() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredCandidates.map((candidate) => (
+                {currentCandidates.map((candidate) => (
                   <TableRow key={candidate.id} className="hover:bg-slate-50">
                     {visibleFields.name && (
                       <TableCell>
@@ -630,20 +693,11 @@ export default function FollowUpDashboard() {
                             </AvatarFallback>
                           </Avatar>
                           <div className="min-w-0 flex-1">
-                            <div className="font-medium truncate">
+                            <div className="font-medium break-words">
                               {candidate.name}
                             </div>
                             <div className="flex items-center space-x-1 mt-1">
-                              {[...Array(5)].map((_, i) => (
-                                <Star
-                                  key={i}
-                                  className={`w-3 h-3 ${
-                                    i < candidate.rating
-                                      ? "text-yellow-400 fill-current"
-                                      : "text-slate-300"
-                                  }`}
-                                />
-                              ))}
+                              {/* Rating removed */}
                             </div>
                           </div>
                         </Link>
@@ -667,31 +721,31 @@ export default function FollowUpDashboard() {
                                         ? "outline"
                                         : "destructive"
                           }
-                          className="truncate max-w-24"
+                          className="break-words max-w-24"
                         >
                           {candidate.stage}
                         </Badge>
                       </TableCell>
                     )}
                     {visibleFields.daysInStage && (
-                      <TableCell className="truncate max-w-32">
+                      <TableCell className="break-words max-w-32">
                         {candidate.daysInStage} days
                       </TableCell>
                     )}
                     {visibleFields.lastInteraction && (
-                      <TableCell className="truncate max-w-32">
+                      <TableCell className="break-words max-w-32">
                         {formatTimeAgo(candidate.lastInteraction)}
                       </TableCell>
                     )}
                     {visibleFields.nextFollowUp && (
-                      <TableCell className="truncate max-w-32">
+                      <TableCell className="break-words max-w-32">
                         {formatTimeAgo(candidate.nextFollowUp)}
                       </TableCell>
                     )}
                     {visibleFields.urgencyLevel && (
                       <TableCell>
                         <Badge
-                          className={`truncate max-w-24 ${getUrgencyColor(
+                          className={`break-words max-w-24 ${getUrgencyColor(
                             candidate.urgencyLevel,
                           )}`}
                         >
@@ -700,47 +754,47 @@ export default function FollowUpDashboard() {
                       </TableCell>
                     )}
                     {visibleFields.appliedDate && (
-                      <TableCell className="truncate max-w-32">
+                      <TableCell className="break-words max-w-32">
                         {new Date(candidate.appliedDate).toLocaleDateString()}
                       </TableCell>
                     )}
                     {visibleFields.email && (
-                      <TableCell className="truncate max-w-48">
+                      <TableCell className="break-words max-w-48">
                         {candidate.email}
                       </TableCell>
                     )}
                     {visibleFields.phone && (
-                      <TableCell className="truncate max-w-32">
+                      <TableCell className="break-words max-w-32">
                         {candidate.phone}
                       </TableCell>
                     )}
                     {visibleFields.position && (
-                      <TableCell className="truncate max-w-40">
+                      <TableCell className="break-words max-w-40">
                         {candidate.position}
                       </TableCell>
                     )}
                     {visibleFields.recruiter && (
-                      <TableCell className="truncate max-w-32">
+                      <TableCell className="break-words max-w-32">
                         {candidate.recruiter}
                       </TableCell>
                     )}
                     {visibleFields.source && (
-                      <TableCell className="truncate max-w-32">
+                      <TableCell className="break-words max-w-32">
                         {candidate.source}
                       </TableCell>
                     )}
                     {visibleFields.salary && (
-                      <TableCell className="truncate max-w-32">
+                      <TableCell className="break-words max-w-32">
                         {candidate.salary}
                       </TableCell>
                     )}
                     {visibleFields.location && (
-                      <TableCell className="truncate max-w-40">
+                      <TableCell className="break-words max-w-40">
                         {candidate.location}
                       </TableCell>
                     )}
                     {visibleFields.department && (
-                      <TableCell className="truncate max-w-40">
+                      <TableCell className="break-words max-w-40">
                         {candidate.department}
                       </TableCell>
                     )}
@@ -1080,7 +1134,7 @@ export default function FollowUpDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {filteredCandidates.slice(0, 10).map((candidate) => (
+              {currentCandidates.map((candidate) => (
                 <div
                   key={candidate.id}
                   className="flex items-center space-x-4 p-3 border rounded-lg"
@@ -1115,6 +1169,59 @@ export default function FollowUpDashboard() {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center">
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(currentPage - 1)}
+            >
+              Previous
+            </Button>
+            
+            {/* Page numbers */}
+            {Array.from({ length: totalPages }, (_, index) => {
+              const pageNumber = index + 1;
+              // Show first page, last page, current page, and pages around current
+              if (
+                pageNumber === 1 ||
+                pageNumber === totalPages ||
+                (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+              ) {
+                return (
+                  <Button
+                    key={pageNumber}
+                    variant={currentPage === pageNumber ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCurrentPage(pageNumber)}
+                  >
+                    {pageNumber}
+                  </Button>
+                );
+              } else if (
+                pageNumber === currentPage - 2 ||
+                pageNumber === currentPage + 2
+              ) {
+                return <span key={pageNumber} className="px-2 py-1">...</span>;
+              }
+              return null;
+            })}
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(currentPage + 1)}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
       )}
 
       {/* Email Dialog */}

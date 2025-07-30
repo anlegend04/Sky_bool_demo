@@ -196,7 +196,7 @@ export default function CandidateDetailEnhanced() {
                 <Circle className="w-5 h-5 fill-current text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-green-900 truncate">
+                <h4 className="font-medium text-green-900 break-words">
                   Current: {selectedJobApplication.currentStage}
                 </h4>
                 <p className="text-sm text-green-700 text-wrap">
@@ -253,7 +253,7 @@ export default function CandidateDetailEnhanced() {
                   </div>
 
                   {/* Stage name */}
-                  <div className="text-xs font-medium text-slate-700 truncate px-1">
+                  <div className="text-xs font-medium text-slate-700 break-words px-1">
                     {stageName}
                   </div>
 
@@ -261,7 +261,7 @@ export default function CandidateDetailEnhanced() {
                   {stageData && stageData.duration > 0 && (
                     <div className="text-xs text-slate-500 flex items-center justify-center gap-1 mt-1">
                       <Clock className="w-3 h-3" />
-                      <span className="truncate">{stageData.duration}d</span>
+                      <span className="break-words">{stageData.duration}d</span>
                     </div>
                   )}
                 </div>
@@ -274,7 +274,7 @@ export default function CandidateDetailEnhanced() {
             <div className="flex items-center space-x-2 p-3 bg-slate-50 rounded-lg">
               <Clock className="w-4 h-4 text-slate-500 flex-shrink-0" />
               <div className="min-w-0 flex-1">
-                <span className="text-sm text-slate-600 truncate block">
+                <span className="text-sm text-slate-600 break-words block">
                   Total Time:{" "}
                   {selectedJobApplication.stageHistory.reduce(
                     (acc, stage) => acc + stage.duration,
@@ -287,7 +287,7 @@ export default function CandidateDetailEnhanced() {
             <div className="flex items-center space-x-2 p-3 bg-slate-50 rounded-lg">
               <Target className="w-4 h-4 text-slate-500 flex-shrink-0" />
               <div className="min-w-0 flex-1">
-                <span className="text-sm text-slate-600 truncate block">
+                <span className="text-sm text-slate-600 break-words block">
                   Status: {selectedJobApplication.status}
                 </span>
               </div>
@@ -295,7 +295,7 @@ export default function CandidateDetailEnhanced() {
             <div className="flex items-center space-x-2 p-3 bg-slate-50 rounded-lg sm:col-span-2 lg:col-span-1">
               <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
               <div className="min-w-0 flex-1">
-                <span className="text-sm text-slate-600 truncate block">
+                <span className="text-sm text-slate-600 break-words block">
                   {completedStages} of {totalStages} completed
                 </span>
               </div>
@@ -323,23 +323,14 @@ export default function CandidateDetailEnhanced() {
                 </AvatarFallback>
               </Avatar>
               <div className="text-center sm:text-left min-w-0 flex-1">
-                <h2 className="text-lg sm:text-xl font-bold text-slate-900 truncate">
+                <h2 className="text-lg sm:text-xl font-bold text-slate-900 break-words">
                   {candidate.name}
                 </h2>
                 <p className="text-sm sm:text-base text-slate-600 text-wrap">
                   {candidate.jobApplications.length} Job Applications
                 </p>
                 <div className="flex items-center justify-center sm:justify-start space-x-1 mt-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`w-4 h-4 ${
-                        i < candidate.rating
-                          ? "text-yellow-400 fill-current"
-                          : "text-slate-300"
-                      }`}
-                    />
-                  ))}
+                  {/* Rating removed */}
                 </div>
               </div>
             </div>
@@ -349,19 +340,19 @@ export default function CandidateDetailEnhanced() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="flex items-center space-x-3 min-w-0">
               <Mail className="w-4 h-4 text-slate-500 flex-shrink-0" />
-              <span className="text-sm truncate">{candidate.email}</span>
+              <span className="text-sm break-words">{candidate.email}</span>
             </div>
             <div className="flex items-center space-x-3 min-w-0">
               <Phone className="w-4 h-4 text-slate-500 flex-shrink-0" />
-              <span className="text-sm truncate">{candidate.phone}</span>
+              <span className="text-sm break-words">{candidate.phone}</span>
             </div>
             <div className="flex items-center space-x-3 min-w-0 sm:col-span-2">
               <MapPin className="w-4 h-4 text-slate-500 flex-shrink-0" />
-              <span className="text-sm truncate">{candidate.location}</span>
+              <span className="text-sm break-words">{candidate.location}</span>
             </div>
             <div className="flex items-center space-x-3 min-w-0">
               <GraduationCap className="w-4 h-4 text-slate-500 flex-shrink-0" />
-              <span className="text-sm truncate">
+              <span className="text-sm break-words">
                 Experience: {candidate.experience}
               </span>
             </div>
@@ -374,7 +365,7 @@ export default function CandidateDetailEnhanced() {
                 <Badge
                   key={skill}
                   variant="secondary"
-                  className="truncate max-w-full"
+                  className="break-words max-w-full"
                 >
                   {skill}
                 </Badge>
@@ -389,7 +380,7 @@ export default function CandidateDetailEnhanced() {
                 <Badge
                   key={tag}
                   variant="outline"
-                  className="truncate max-w-full"
+                  className="break-words max-w-full"
                 >
                   {tag}
                 </Badge>
@@ -416,7 +407,7 @@ export default function CandidateDetailEnhanced() {
                     onClick={() => handleJobSelect(job.id)}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-medium text-sm truncate">
+                      <span className="font-medium text-sm break-words">
                         {job.jobTitle}
                       </span>
                       <Badge

@@ -33,7 +33,6 @@ export interface EnhancedCandidateData {
   experience: string;
   skills: string[];
   status: "Active" | "Inactive" | "Blacklisted";
-  rating: number;
   resume: string;
   avatar: string;
   source: string;

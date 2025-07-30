@@ -63,7 +63,6 @@ export interface CandidateData {
     | "Offer"
     | "Hired"
     | "Rejected";
-  rating: number;
   appliedDate: string;
   resume: string;
   avatar: string;
@@ -983,7 +982,6 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
     ],
     status: "Active",
     stage: "Hired",
-    rating: 4,
     appliedDate: getRandomDate(45),
     resume: "marissa_torres_resume.pdf",
     avatar:
@@ -1291,7 +1289,6 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
     ],
     status: "Active",
     stage: "Offer",
-    rating: 5,
     appliedDate: getRandomDate(30),
     resume: "james_chen_resume.pdf",
     avatar:
@@ -1497,7 +1494,6 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
     ],
     status: "Active",
     stage: "Hired",
-    rating: 5,
     appliedDate: getRandomDate(35),
     resume: "lisa_wang_resume.pdf",
     avatar:
@@ -1655,7 +1651,6 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
     skills: ["Python", "Django", "PostgreSQL", "Docker", "AWS"],
     status: "Active",
     stage: "Rejected",
-    rating: 2,
     appliedDate: getRandomDate(28),
     resume: "robert_smith_resume.pdf",
     avatar:
@@ -2175,7 +2170,6 @@ const generateMoreCandidates = (): CandidateData[] => {
               | "Active"
               | "Inactive"),
       stage: stage as any,
-      rating: Math.floor(Math.random() * 5) + 1,
       appliedDate,
       resume: `${name.toLowerCase().replace(" ", "_")}_resume.pdf`,
       avatar: `https://images.unsplash.com/photo-${Math.floor(Math.random() * 1000000000000) + 1500000000000}?w=150&h=150&fit=crop&crop=face`,

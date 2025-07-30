@@ -449,7 +449,7 @@ export default function Calendar() {
                           {dayEvents.map((event) => (
                             <div
                               key={event.id}
-                              className={`text-xs p-1 rounded truncate ${getEventTypeColor(event.type)}`}
+                              className={`text-xs p-1 rounded break-words ${getEventTypeColor(event.type)}`}
                             >
                               {event.startTime} {event.title}
                             </div>
@@ -571,7 +571,7 @@ export default function Calendar() {
                       {getMeetingIcon(event.meetingType)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-slate-900 truncate">
+                      <h4 className="font-medium text-slate-900 break-words">
                         {event.title}
                       </h4>
                       <div className="flex items-center text-sm text-slate-600 mt-1">

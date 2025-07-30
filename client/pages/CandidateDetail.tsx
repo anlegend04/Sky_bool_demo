@@ -492,7 +492,7 @@ export default function CandidateDetail() {
                 <Circle className="w-5 h-5 fill-current text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <h4 className="font-medium text-blue-900 truncate">
+                <h4 className="font-medium text-blue-900 break-words">
                   Current: {currentStage}
                 </h4>
                 <p className="text-sm text-blue-700 text-wrap">
@@ -556,7 +556,7 @@ export default function CandidateDetail() {
                 </div>
 
                 {/* Stage name */}
-                <div className="text-xs font-medium text-slate-700 truncate px-1">
+                <div className="text-xs font-medium text-slate-700 break-words px-1">
                   {stage.name}
                 </div>
 
@@ -564,7 +564,7 @@ export default function CandidateDetail() {
                 {stage.duration > 0 && (
                   <div className="text-xs text-slate-500 flex items-center justify-center gap-1 mt-1">
                     <Clock className="w-3 h-3" />
-                    <span className="truncate">{stage.duration}d</span>
+                    <span className="break-words">{stage.duration}d</span>
                   </div>
                 )}
               </div>
@@ -576,7 +576,7 @@ export default function CandidateDetail() {
             <div className="flex items-center space-x-2 p-3 bg-slate-50 rounded-lg">
               <Clock className="w-4 h-4 text-slate-500 flex-shrink-0" />
               <div className="min-w-0 flex-1">
-                <span className="text-sm text-slate-600 truncate block">
+                <span className="text-sm text-slate-600 break-words block">
                   Total Time:{" "}
                   {stages.reduce((acc, stage) => acc + stage.duration, 0)} days
                 </span>
@@ -585,7 +585,7 @@ export default function CandidateDetail() {
             <div className="flex items-center space-x-2 p-3 bg-slate-50 rounded-lg">
               <Target className="w-4 h-4 text-slate-500 flex-shrink-0" />
               <div className="min-w-0 flex-1">
-                <span className="text-sm text-slate-600 truncate block">
+                <span className="text-sm text-slate-600 break-words block">
                   Current: {currentStage} (
                   {stages.find((s) => s.name === currentStage)?.duration || 0}{" "}
                   days)
@@ -595,7 +595,7 @@ export default function CandidateDetail() {
             <div className="flex items-center space-x-2 p-3 bg-slate-50 rounded-lg sm:col-span-2 lg:col-span-1">
               <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
               <div className="min-w-0 flex-1">
-                <span className="text-sm text-slate-600 truncate block">
+                <span className="text-sm text-slate-600 break-words block">
                   {completedStages} of {totalStages} completed
                 </span>
               </div>
@@ -623,23 +623,14 @@ export default function CandidateDetail() {
                 </AvatarFallback>
               </Avatar>
               <div className="text-center sm:text-left min-w-0 flex-1">
-                <h2 className="text-lg sm:text-xl font-bold text-slate-900 truncate">
+                <h2 className="text-lg sm:text-xl font-bold text-slate-900 break-words">
                   {candidate.name}
                 </h2>
                 <p className="text-sm sm:text-base text-slate-600 text-wrap">
                   {candidate.experience} Experience
                 </p>
                 <div className="flex items-center justify-center sm:justify-start space-x-1 mt-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`w-4 h-4 ${
-                        i < candidate.rating
-                          ? "text-yellow-400 fill-current"
-                          : "text-slate-300"
-                      }`}
-                    />
-                  ))}
+                  {/* Rating removed */}
                 </div>
               </div>
             </div>
@@ -672,25 +663,25 @@ export default function CandidateDetail() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="flex items-center space-x-3 min-w-0">
               <Mail className="w-4 h-4 text-slate-500 flex-shrink-0" />
-              <span className="text-sm truncate">{candidate.email}</span>
+              <span className="text-sm break-words">{candidate.email}</span>
             </div>
             <div className="flex items-center space-x-3 min-w-0">
               <Phone className="w-4 h-4 text-slate-500 flex-shrink-0" />
-              <span className="text-sm truncate">{candidate.phone}</span>
+              <span className="text-sm break-words">{candidate.phone}</span>
             </div>
             <div className="flex items-center space-x-3 min-w-0 sm:col-span-2">
               <MapPin className="w-4 h-4 text-slate-500 flex-shrink-0" />
-              <span className="text-sm truncate">{candidate.location}</span>
+              <span className="text-sm break-words">{candidate.location}</span>
             </div>
             <div className="flex items-center space-x-3 min-w-0">
               <GraduationCap className="w-4 h-4 text-slate-500 flex-shrink-0" />
-              <span className="text-sm truncate">
+              <span className="text-sm break-words">
                 Experience: {candidate.experience}
               </span>
             </div>
             <div className="flex items-center space-x-3 min-w-0">
               <User className="w-4 h-4 text-slate-500 flex-shrink-0" />
-              <span className="text-sm truncate">
+              <span className="text-sm break-words">
                 Recruiter: {candidate.recruiter}
               </span>
             </div>
@@ -703,7 +694,7 @@ export default function CandidateDetail() {
                 <Badge
                   key={skill}
                   variant="secondary"
-                  className="truncate max-w-full"
+                  className="break-words max-w-full"
                 >
                   {skill}
                 </Badge>
@@ -718,7 +709,7 @@ export default function CandidateDetail() {
                 <Badge
                   key={tag}
                   variant="outline"
-                  className="truncate max-w-full"
+                  className="break-words max-w-full"
                 >
                   {tag}
                 </Badge>
@@ -737,10 +728,10 @@ export default function CandidateDetail() {
                 <div className="flex items-center gap-3 min-w-0 flex-1">
                   <FileText className="w-8 h-8 text-slate-500 flex-shrink-0" />
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-sm truncate">
+                    <p className="font-medium text-sm break-words">
                       {candidate.resume}
                     </p>
-                    <p className="text-xs text-slate-500 truncate">
+                    <p className="text-xs text-slate-500 break-words">
                       PDF Document
                     </p>
                   </div>
@@ -841,7 +832,7 @@ export default function CandidateDetail() {
             onClick={() => setShowEmailTrigger(true)}
           >
             <Mail className="w-4 h-4 mr-2 flex-shrink-0" />
-            <span className="truncate">Compose Email</span>
+            <span className="break-words">Compose Email</span>
           </Button>
 
           <div className="pt-3 sm:pt-4 border-t">
@@ -862,7 +853,7 @@ export default function CandidateDetail() {
                   setShowEmailTrigger(true);
                 }}
               >
-                <span className="truncate">Interview Invitation</span>
+                <span className="break-words">Interview Invitation</span>
               </Button>
               <Button
                 variant="outline"
@@ -874,7 +865,7 @@ export default function CandidateDetail() {
                   setShowEmailTrigger(true);
                 }}
               >
-                <span className="truncate">Offer Letter</span>
+                <span className="break-words">Offer Letter</span>
               </Button>
               <Button
                 variant="outline"
@@ -888,7 +879,7 @@ export default function CandidateDetail() {
                   setShowEmailTrigger(true);
                 }}
               >
-                <span className="truncate">Rejection Notice</span>
+                <span className="break-words">Rejection Notice</span>
               </Button>
             </div>
           </div>
@@ -955,10 +946,10 @@ export default function CandidateDetail() {
                         <User className="w-3 h-3" />
                         <span>{job.recruiter}</span>
                       </div>
-                      <div className="flex items-center gap-1">
+                      {/* <div className="flex items-center gap-1">
                         <DollarSign className="w-3 h-3" />
                         <span>{job.salary}</span>
-                      </div>
+                      </div> */}
                     </div>
                   </div>
                 );
@@ -1145,7 +1136,7 @@ export default function CandidateDetail() {
                        className="p-3 border border-slate-200 rounded-lg hover:bg-slate-50"
                      >
                        <div className="flex items-center justify-between mb-2 min-w-0">
-                         <h4 className="font-medium text-sm text-slate-900 truncate flex items-center gap-2 min-w-0 flex-1">
+                         <h4 className="font-medium text-sm text-slate-900 break-words flex items-center gap-2 min-w-0 flex-1">
                            <span className="text-wrap">{email.subject}</span>
                          </h4>
                          <DropdownMenu>
@@ -1166,7 +1157,7 @@ export default function CandidateDetail() {
                            </DropdownMenuContent>
                          </DropdownMenu>
                        </div>
-                       <p className="text-xs text-slate-600 mb-1 truncate">
+                       <p className="text-xs text-slate-600 mb-1 break-words">
                          From: {email.from}
                        </p>
                        <p className="text-xs text-slate-600 mb-2">{email.timestamp}</p>
@@ -1438,7 +1429,7 @@ export default function CandidateDetail() {
                           skill.hasSkill ? "bg-green-500" : "bg-red-500"
                         }`}
                       />
-                      <span className="text-sm truncate">{skill.skill}</span>
+                      <span className="text-sm break-words">{skill.skill}</span>
                       {skill.hasSkill && skill.level && (
                         <Badge variant="outline" className="text-xs">
                           {skill.level}

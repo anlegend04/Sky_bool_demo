@@ -31,9 +31,20 @@ import {
   Save,
   Eye,
   Send,
+  GripVertical,
+  Trash,
 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
 
 export default function JobCreate() {
   const [skills, setSkills] = useState<string[]>([]);
@@ -41,6 +52,48 @@ export default function JobCreate() {
   const [newSkill, setNewSkill] = useState("");
   const [newBenefit, setNewBenefit] = useState("");
   const [isImportOpen, setIsImportOpen] = useState(false);
+  const [recruitmentStages, setRecruitmentStages] = useState([
+    { id: "1", name: "Applied", duration: "" },
+    { id: "2", name: "Screening", duration: "" },
+    { id: "3", name: "Interview", duration: "" },
+    { id: "4", name: "Offer", duration: "" },
+    { id: "5", name: "Hired", duration: "" },
+  ]);
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    
+    if (active.id !== over?.id) {
+      setRecruitmentStages((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over?.id);
+        
+        const newItems = [...items];
+        const [movedItem] = newItems.splice(oldIndex, 1);
+        newItems.splice(newIndex, 0, movedItem);
+        return newItems;
+      });
+    }
+  };
+
+  const updateStage = (index: number, field: string, value: string) => {
+    setRecruitmentStages((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
+
+  const addStage = () => {
+    setRecruitmentStages((prev) => [
+      ...prev,
+      { id: Date.now().toString(), name: "", duration: "" },
+    ]);
+  };
+
+  const removeStage = (index: number) => {
+    setRecruitmentStages((prev) => prev.filter((_, i) => i !== index));
+  };
 
   const addSkill = () => {
     if (newSkill.trim() && !skills.includes(newSkill.trim())) {
@@ -170,11 +223,12 @@ export default function JobCreate() {
         {/* Main Form */}
         <div className="lg:col-span-2 space-y-6">
           <Tabs defaultValue="basic" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="basic">Basic Info</TabsTrigger>
               <TabsTrigger value="details">Job Details</TabsTrigger>
               <TabsTrigger value="requirements">Requirements</TabsTrigger>
               <TabsTrigger value="benefits">Benefits</TabsTrigger>
+              <TabsTrigger value="stages">Recruitment Stages</TabsTrigger>
             </TabsList>
 
             <TabsContent value="basic" className="space-y-6">
@@ -503,6 +557,61 @@ export default function JobCreate() {
                       className="mt-1 min-h-[100px]"
                     />
                   </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="stages" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Recruitment Stages</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-sm text-slate-600">
+                    Define the stages that candidates will go through during the recruitment process. 
+                    You can drag and drop to reorder stages.
+                  </p>
+                  
+                  <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                    <div className="space-y-2">
+                      {recruitmentStages.map((stage, index) => (
+                        <div
+                          key={stage.id}
+                          className="flex items-center gap-2 p-3 border border-slate-200 rounded-lg bg-slate-50"
+                        >
+                          <GripVertical className="w-4 h-4 text-slate-400 cursor-move" />
+                          <Input
+                            value={stage.name}
+                            onChange={(e) => updateStage(index, "name", e.target.value)}
+                            placeholder="Stage name"
+                            className="flex-1"
+                          />
+                          <Input
+                            type="number"
+                            value={stage.duration}
+                            onChange={(e) => updateStage(index, "duration", e.target.value)}
+                            placeholder="Duration (days)"
+                            className="w-32"
+                          />
+                          {!["Applied", "Screening", "Interview", "Offer", "Hired"].includes(stage.name) && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => removeStage(index)}
+                              className="text-red-500"
+                            >
+                              <Trash className="w-4 h-4" />
+                            </Button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </DndContext>
+                  
+                  <Button variant="outline" onClick={addStage} className="w-full">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Stage
+                  </Button>
                 </CardContent>
               </Card>
             </TabsContent>

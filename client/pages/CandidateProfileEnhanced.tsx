@@ -183,17 +183,21 @@ export default function CandidateProfileEnhanced() {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 sm:gap-2 mt-2 text-xs sm:text-sm text-slate-600">
                   <div className="flex items-center gap-1 min-w-0">
                     <Building2 className="w-3 h-3 flex-shrink-0" />
-                    <span className="truncate">{application.department}</span>
+                    <span className="break-words">
+                      {application.department}
+                    </span>
                   </div>
                   <div className="flex items-center gap-1 min-w-0">
                     <Calendar className="w-3 h-3 flex-shrink-0" />
-                    <span className="truncate">
+                    <span className="break-words">
                       {new Date(application.appliedDate).toLocaleDateString()}
                     </span>
                   </div>
                   <div className="flex items-center gap-1 min-w-0">
                     <User className="w-3 h-3 flex-shrink-0" />
-                    <span className="truncate">{application.recruiter}</span>
+                    <span className="break-words">
+                      {application.recruiter}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -275,7 +279,7 @@ export default function CandidateProfileEnhanced() {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                   <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-600">
                     <Clock className="w-3 h-3 flex-shrink-0" />
-                    <span className="truncate">
+                    <span className="break-words">
                       Last updated:{" "}
                       {new Date(
                         application.stageHistory[
@@ -316,26 +320,14 @@ export default function CandidateProfileEnhanced() {
               </AvatarFallback>
             </Avatar>
             <div className="text-center sm:text-left min-w-0 flex-1">
-              <h2 className="text-2xl font-bold text-slate-900 truncate">
+              <h2 className="text-2xl font-bold text-slate-900 break-words">
                 {candidate.name}
               </h2>
               <p className="text-lg text-slate-600 mt-1">
                 {primaryApplication?.jobTitle || "Multiple Positions"}
               </p>
               <div className="flex items-center justify-center sm:justify-start space-x-1 mt-2">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`w-5 h-5 ${
-                      i < candidate.rating
-                        ? "text-yellow-400 fill-current"
-                        : "text-slate-300"
-                    }`}
-                  />
-                ))}
-                <span className="ml-2 text-sm text-slate-600">
-                  ({candidate.rating}/5)
-                </span>
+                {/* Rating removed */}
               </div>
             </div>
           </div>
@@ -343,7 +335,6 @@ export default function CandidateProfileEnhanced() {
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
                 <MoreHorizontal className="w-4 h-4 mr-2" />
-                Actions
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -857,7 +848,7 @@ export default function CandidateProfileEnhanced() {
                             skill.hasSkill ? "bg-green-500" : "bg-red-500"
                           }`}
                         />
-                        <span className="text-sm truncate">{skill.skill}</span>
+                        <span className="text-sm break-words">{skill.skill}</span>
                         {skill.hasSkill && skill.level && (
                           <Badge variant="outline" className="text-xs">
                             {skill.level}

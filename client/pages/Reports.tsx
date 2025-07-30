@@ -310,7 +310,6 @@ export default function Reports() {
         "Recruiter",
         "Source",
         "Applied Date",
-        "Rating",
       ];
       const csvData = filteredData.map((candidate) => [
         candidate.name,
@@ -319,7 +318,6 @@ export default function Reports() {
         candidate.recruiter,
         candidate.source,
         candidate.appliedDate,
-        candidate.rating.toString(),
       ]);
 
       const csvContent = [

@@ -158,53 +158,40 @@ export default function JobDetail() {
 
   const handleDrop = (e: React.DragEvent, newStage: string) => {
     e.preventDefault();
+    if (draggedCandidate) {
+      // Update the candidate's stage
+      setCandidates((prevCandidates) =>
+        prevCandidates.map((c) =>
+          c.id === draggedCandidate.id ? { ...c, stage: newStage as CandidateData['stage'] } : c
+        )
+      );
 
-    if (draggedCandidate && draggedCandidate.stage !== newStage) {
-      // Simulate API update with loading state
-      const candidateId = draggedCandidate.id;
-      const oldStage = draggedCandidate.stage;
+      toast({
+        title: "Candidate moved",
+        description: `${draggedCandidate.name} moved to ${newStage} stage.`,
+      });
 
-      // Update candidate stage in storage
-      const updatedCandidate: CandidateData = {
-        ...draggedCandidate,
-        stage: newStage as CandidateData["stage"],
-        duration: 0, // Reset duration for new stage
-      };
-
-      if (updatedCandidate) {
-        // Update local candidates state
-        setCandidates((prev) =>
-          prev.map((c) => (c.id === candidateId ? updatedCandidate : c)),
-        );
-
-        // Show success toast with API simulation
-        toast({
-          title: "Stage Updated",
-          description: `${draggedCandidate.name} moved from ${oldStage} to ${newStage}`,
-        });
-
-        // Update job pipeline summary
-        if (job) {
-          const updatedPipeline = { ...job.pipelineSummary };
-          if (oldStage.toLowerCase() in updatedPipeline) {
-            updatedPipeline[
-              oldStage.toLowerCase() as keyof typeof updatedPipeline
-            ]--;
-          }
-          if (newStage.toLowerCase() in updatedPipeline) {
-            updatedPipeline[
-              newStage.toLowerCase() as keyof typeof updatedPipeline
-            ]++;
-          }
-
-          // In a real app, this would update the job in the backend
-          setJob({ ...job, pipelineSummary: updatedPipeline });
-        }
-      }
+      setDraggedCandidate(null);
+      setDragOverStage(null);
     }
+  };
 
-    setDraggedCandidate(null);
-    setDragOverStage(null);
+  // Handle send email
+  const handleSendEmail = (candidate: CandidateData) => {
+    console.log("Sending email to:", candidate.name);
+    toast({
+      title: "Email sent",
+      description: `Email sent to ${candidate.name}.`,
+    });
+  };
+
+  // Handle schedule interview
+  const handleScheduleInterview = (candidate: CandidateData) => {
+    console.log("Scheduling interview with:", candidate.name);
+    toast({
+      title: "Interview scheduled",
+      description: `Interview scheduled with ${candidate.name}.`,
+    });
   };
 
   const getStageColor = (stage: string) => {
@@ -262,11 +249,11 @@ export default function JobDetail() {
             <div className="min-w-0 flex-1">
               <Link
                 to={`/candidates/${candidate.id}`}
-                className="font-medium text-slate-900 hover:text-blue-600 text-sm sm:text-base truncate block"
+                className="font-medium text-slate-900 hover:text-blue-600 text-sm sm:text-base break-words block"
               >
                 {candidate.name}
               </Link>
-              <p className="text-xs text-slate-600 truncate">
+              <p className="text-xs text-slate-600 break-words">
                 {candidate.experience}
               </p>
             </div>
@@ -284,11 +271,11 @@ export default function JobDetail() {
                   View Profile
                 </DropdownMenuItem>
               </Link>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleSendEmail(candidate)}>
                 <Mail className="w-4 h-4 mr-2" />
                 Send Email
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleScheduleInterview(candidate)}>
                 <Calendar className="w-4 h-4 mr-2" />
                 Schedule Interview
               </DropdownMenuItem>
@@ -299,15 +286,15 @@ export default function JobDetail() {
         <div className="space-y-2 text-xs text-slate-600">
           <div className="flex items-center gap-2 min-w-0">
             <Mail className="w-3 h-3 flex-shrink-0" />
-            <span className="truncate">{candidate.email}</span>
+            <span className="break-words">{candidate.email}</span>
           </div>
           <div className="flex items-center gap-2 min-w-0">
             <MapPin className="w-3 h-3 flex-shrink-0" />
-            <span className="truncate">{candidate.location}</span>
+            <span className="break-words">{candidate.location}</span>
           </div>
           <div className="flex items-center gap-2 min-w-0">
             <Clock className="w-3 h-3 flex-shrink-0" />
-            <span className="text-xs truncate">
+            <span className="text-xs break-words">
               {candidate.duration} days in stage
             </span>
           </div>
@@ -315,20 +302,11 @@ export default function JobDetail() {
 
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100">
           <div className="flex items-center space-x-1">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                className={`w-3 h-3 ${
-                  i < candidate.rating
-                    ? "text-yellow-400 fill-current"
-                    : "text-slate-300"
-                }`}
-              />
-            ))}
+            {/* Rating removed */}
           </div>
           <Badge
             variant="outline"
-            className="text-xs flex-shrink-0 truncate max-w-20"
+            className="text-xs flex-shrink-0 break-words max-w-20"
           >
             {candidate.source}
           </Badge>
@@ -359,25 +337,14 @@ export default function JobDetail() {
         </AvatarFallback>
       </Avatar>
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium text-slate-900 truncate">
+        <p className="text-sm font-medium text-slate-900 break-words">
           {candidate.name}
         </p>
-        <p className="text-xs text-slate-500 truncate">
+        <p className="text-xs text-slate-500 break-words">
           {candidate.duration} days
         </p>
       </div>
-      {/* <div className="flex items-center space-x-1">
-        {[...Array(5)].map((_, i) => (
-          <Star
-            key={i}
-            className={`w-2.5 h-2.5 ${
-              i < candidate.rating
-                ? "text-yellow-400 fill-current"
-                : "text-slate-300"
-            }`}
-          />
-        ))}
-      </div> */}
+      {/* Rating removed */}
     </div>
   );
 
@@ -461,6 +428,21 @@ export default function JobDetail() {
     handleDrop,
   }) => {
     const [expandedStage, setExpandedStage] = useState(null);
+    const [candidatesPerStage, setCandidatesPerStage] = useState<Record<string, number>>({});
+
+    const showMoreCandidates = (stage: string) => {
+      setCandidatesPerStage(prev => ({
+        ...prev,
+        [stage]: (prev[stage] || 5) + 5
+      }));
+    };
+
+    const resetStagePagination = (stage: string) => {
+      setCandidatesPerStage(prev => ({
+        ...prev,
+        [stage]: 5
+      }));
+    };
 
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2 overflow-x-auto p-2">
@@ -468,6 +450,9 @@ export default function JobDetail() {
           const stageCandidates = candidates.filter((c) => c.stage === stage);
           const isDropTarget = dragOverStage === stage;
           const isExpanded = expandedStage === stage;
+          const maxVisible = candidatesPerStage[stage] || 5;
+          const visibleCandidates = stageCandidates.slice(0, maxVisible);
+          const hasMore = stageCandidates.length > maxVisible;
 
           return (
             <div
@@ -476,10 +461,15 @@ export default function JobDetail() {
               onDragOver={(e) => handleDragOver(e, stage)}
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, stage)}
-              onClick={() => setExpandedStage(isExpanded ? null : stage)}
+              onClick={() => {
+                setExpandedStage(isExpanded ? null : stage);
+                if (!isExpanded) {
+                  resetStagePagination(stage);
+                }
+              }}
             >
               <div className="flex items-center justify-between">
-                <h3 className="font-medium text-xs text-gray-800 truncate">
+                <h3 className="font-medium text-xs text-gray-800 break-words">
                   {stage}
                 </h3>
                 <Badge variant="outline" className="text-xs">
@@ -489,12 +479,27 @@ export default function JobDetail() {
               {isExpanded && (
                 <div className="mt-2 space-y-1">
                   {stageCandidates.length > 0 ? (
-                    stageCandidates.map((candidate) => (
-                      <CompactCandidateCard
-                        key={candidate.id}
-                        candidate={candidate}
-                      />
-                    ))
+                    <>
+                      {visibleCandidates.map((candidate) => (
+                        <CompactCandidateCard
+                          key={candidate.id}
+                          candidate={candidate}
+                        />
+                      ))}
+                      {hasMore && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="w-full text-xs h-6"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            showMoreCandidates(stage);
+                          }}
+                        >
+                          Show {stageCandidates.length - maxVisible} More
+                        </Button>
+                      )}
+                    </>
                   ) : (
                     <div className="text-xs text-gray-400 text-center py-2">
                       No candidates
@@ -521,7 +526,7 @@ export default function JobDetail() {
                 <th className="px-4 py-2">Location</th>
                 <th className="px-4 py-2">Stage</th>
                 <th className="px-4 py-2">Days in Stage</th>
-                <th className="px-4 py-2">Rating</th>
+                                    <th className="px-4 py-2">Actions</th>
                 <th className="px-4 py-2">Source</th>
                 <th className="px-4 py-2">Actions</th>
               </tr>
@@ -555,18 +560,7 @@ export default function JobDetail() {
                     <td className="px-4 py-2">{candidate.stage}</td>
                     <td className="px-4 py-2">{candidate.duration} days</td>
                     <td className="px-4 py-2">
-                      <div className="flex space-x-1">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`w-3 h-3 ${
-                              i < candidate.rating
-                                ? "text-yellow-400 fill-current"
-                                : "text-slate-300"
-                            }`}
-                          />
-                        ))}
-                      </div>
+                      {/* Rating removed */}
                     </td>
                     <td className="px-4 py-2">
                       <Badge variant="outline" className="text-xs">

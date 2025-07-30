@@ -372,7 +372,7 @@ export default function Schedule() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center space-x-2">
-                            <h3 className="font-semibold text-slate-900 truncate">
+                            <h3 className="font-semibold text-slate-900 break-words">
                               {event.title}
                             </h3>
                             <Badge variant="outline">{event.type}</Badge>
@@ -463,7 +463,7 @@ export default function Schedule() {
                     <div key={event.id} className="flex items-center space-x-3">
                       {getTypeIcon(event.type)}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-slate-900 truncate">
+                        <p className="text-sm font-medium text-slate-900 break-words">
                           {event.title}
                         </p>
                         <p className="text-xs text-slate-500">

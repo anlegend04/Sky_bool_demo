@@ -307,7 +307,6 @@ export const ENHANCED_CANDIDATE_SAMPLE: EnhancedCandidateData = {
     "JavaScript",
   ],
   status: "Active",
-  rating: 4,
   resume: "Marissa_Torres_Resume.pdf",
   avatar: "/avatars/marissa-torres.jpg",
   source: "LinkedIn",
