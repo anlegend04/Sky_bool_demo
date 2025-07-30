@@ -1321,7 +1321,7 @@ export const getUser = (id: string): UserData | undefined => {
 };
 
 export const getUnreadNotificationCount = (): number => {
-  return 5;
+  return HARDCODED_NOTIFICATIONS.filter(notification => !notification.read).length;
 };
 
 export const getUserNotifications = (userId: string): NotificationData[] => {
