@@ -88,6 +88,7 @@ import {
   getCandidateInterviews,
 } from "@/data/hardcoded-data";
 import { useLanguage } from "@/hooks/use-language";
+import { EmailTrigger } from "@/components/EmailTrigger";
 
 type StageData = {
   name: string;
@@ -99,6 +100,17 @@ type StageData = {
   reason?: string;
   mailSent?: boolean;
   mailConfirmed?: boolean;
+};
+
+type ActivityData = {
+  id: string;
+  type: "stage_change" | "note" | "email" | "call" | "interview";
+  action: string;
+  user: string;
+  timestamp: string;
+  content?: string;
+  reason?: string;
+  duration?: string;
 };
 
 // Utility function to convert status
@@ -125,6 +137,20 @@ export default function CandidateDetail() {
   const { t } = useLanguage();
   const { toast } = useToast();
 
+  // State variables
+  const [showStageChangeDialog, setShowStageChangeDialog] = useState(false);
+  const [showEmailTrigger, setShowEmailTrigger] = useState(false);
+  const [showResumePreview, setShowResumePreview] = useState(false);
+  const [showEditProfileDialog, setShowEditProfileDialog] = useState(false);
+  const [selectedCVEvaluation, setSelectedCVEvaluation] = useState<CVEvaluationData | null>(null);
+  const [selectedEmail, setSelectedEmail] = useState<any>(null);
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+  const [showJobProgress, setShowJobProgress] = useState(false);
+  const [newStage, setNewStage] = useState("");
+  const [pendingStage, setPendingStage] = useState("");
+  const [stageChangeReason, setStageChangeReason] = useState("");
+  const [newNote, setNewNote] = useState("");
+
   // Get candidate data
   const candidate = HARDCODED_CANDIDATES.find((c) => c.id === id);
 
@@ -145,6 +171,88 @@ export default function CandidateDetail() {
 
   // Get the primary job application for display
   const primaryJob = candidate.jobApplications[0];
+
+  // Define stages based on the primary job
+  const stages: StageData[] = [
+    {
+      name: "Applied",
+      completed: primaryJob?.stageHistory?.some(s => s.stage === "Applied") || false,
+      duration: primaryJob?.stageHistory?.find(s => s.stage === "Applied")?.duration || 0,
+      startDate: primaryJob?.appliedDate || "",
+      mailSent: primaryJob?.emails?.some(e => e.template === "application_confirmation") || false,
+      mailConfirmed: primaryJob?.emails?.some(e => e.template === "application_confirmation" && e.repliedAt) || false,
+    },
+    {
+      name: "Screening",
+      completed: primaryJob?.stageHistory?.some(s => s.stage === "Screening") || false,
+      duration: primaryJob?.stageHistory?.find(s => s.stage === "Screening")?.duration || 0,
+      startDate: primaryJob?.stageHistory?.find(s => s.stage === "Screening")?.startDate || "",
+      mailSent: primaryJob?.emails?.some(e => e.template === "screening_invitation") || false,
+      mailConfirmed: primaryJob?.emails?.some(e => e.template === "screening_invitation" && e.repliedAt) || false,
+    },
+    {
+      name: "Interview",
+      completed: primaryJob?.stageHistory?.some(s => s.stage === "Interview") || false,
+      duration: primaryJob?.stageHistory?.find(s => s.stage === "Interview")?.duration || 0,
+      startDate: primaryJob?.stageHistory?.find(s => s.stage === "Interview")?.startDate || "",
+      mailSent: primaryJob?.emails?.some(e => e.template === "interview_invitation") || false,
+      mailConfirmed: primaryJob?.emails?.some(e => e.template === "interview_invitation" && e.repliedAt) || false,
+    },
+    {
+      name: "Technical",
+      completed: primaryJob?.stageHistory?.some(s => s.stage === "Technical") || false,
+      duration: primaryJob?.stageHistory?.find(s => s.stage === "Technical")?.duration || 0,
+      startDate: primaryJob?.stageHistory?.find(s => s.stage === "Technical")?.startDate || "",
+      mailSent: primaryJob?.emails?.some(e => e.template === "technical_interview") || false,
+      mailConfirmed: primaryJob?.emails?.some(e => e.template === "technical_interview" && e.repliedAt) || false,
+    },
+    {
+      name: "Offer",
+      completed: primaryJob?.stageHistory?.some(s => s.stage === "Offer") || false,
+      duration: primaryJob?.stageHistory?.find(s => s.stage === "Offer")?.duration || 0,
+      startDate: primaryJob?.stageHistory?.find(s => s.stage === "Offer")?.startDate || "",
+      mailSent: primaryJob?.emails?.some(e => e.template === "offer_letter") || false,
+      mailConfirmed: primaryJob?.emails?.some(e => e.template === "offer_letter" && e.repliedAt) || false,
+    },
+    {
+      name: "Hired",
+      completed: primaryJob?.stageHistory?.some(s => s.stage === "Hired") || false,
+      duration: primaryJob?.stageHistory?.find(s => s.stage === "Hired")?.duration || 0,
+      startDate: primaryJob?.stageHistory?.find(s => s.stage === "Hired")?.startDate || "",
+      mailSent: primaryJob?.emails?.some(e => e.template === "welcome_email") || false,
+      mailConfirmed: primaryJob?.emails?.some(e => e.template === "welcome_email" && e.repliedAt) || false,
+    },
+  ];
+
+  const currentStage = primaryJob?.currentStage || "Applied";
+
+  // Mock activities data
+  const activities: ActivityData[] = [
+    {
+      id: "1",
+      type: "stage_change",
+      action: "Moved to Technical stage",
+      user: "Sarah Johnson",
+      timestamp: "2 hours ago",
+      reason: "Passed initial screening",
+    },
+    {
+      id: "2",
+      type: "email",
+      action: "Interview invitation sent",
+      user: "Sarah Johnson",
+      timestamp: "1 day ago",
+      content: "Technical interview scheduled for next week",
+    },
+    {
+      id: "3",
+      type: "note",
+      action: "Recruiter note added",
+      user: "Sarah Johnson",
+      timestamp: "2 days ago",
+      content: "Candidate shows strong technical skills",
+    },
+  ];
 
   const stats = [
     {
@@ -232,6 +340,7 @@ export default function CandidateDetail() {
     template: email.template,
     openedAt: email.openedAt,
     repliedAt: email.repliedAt,
+    content: email.content || "",
   }));
 
   // Use candidate notes from centralized data
@@ -317,24 +426,19 @@ export default function CandidateDetail() {
     switch (stage) {
       case "Interview":
         template = "interview_invitation";
-        subject = `Interview Invitation - ${candidate.position}`;
+        subject = `Interview Invitation - ${primaryJob?.jobTitle || "Position"}`;
         break;
       case "Offer":
         template = "offer_letter";
-        subject = `Job Offer - ${candidate.position}`;
+        subject = `Job Offer - ${primaryJob?.jobTitle || "Position"}`;
         break;
       case "Rejected":
         template = "rejection_notice";
-        subject = `Thank you for your application - ${candidate.position}`;
+        subject = `Thank you for your application - ${primaryJob?.jobTitle || "Position"}`;
         break;
     }
 
     if (template) {
-      // setSelectedTemplate(template); // No longer needed
-      // setEmailSubject(subject); // No longer needed
-      // setEmailContent(emailTemplates[template] || ""); // No longer needed
-      // setShowEmailDialog(true); // No longer needed
-
       toast({
         title: "Email Suggested",
         description: `Would you like to send a ${stage.toLowerCase()} email to ${candidate.name}?`,
@@ -603,7 +707,7 @@ export default function CandidateDetail() {
             <div className="flex items-center space-x-3 min-w-0">
               <User className="w-4 h-4 text-slate-500 flex-shrink-0" />
               <span className="text-sm break-words">
-                Recruiter: {candidate.recruiter}
+                Recruiter: {primaryJob?.recruiter || "Unknown"}
               </span>
             </div>
           </div>
@@ -768,9 +872,6 @@ export default function CandidateDetail() {
                 className="w-full justify-start text-sm"
                 onClick={() => {
                   handleTemplateSelect("interview_invitation");
-                  setEmailSubject(
-                    `Interview Invitation - ${candidate.position}`,
-                  );
                   setShowEmailTrigger(true);
                 }}
               >
@@ -782,7 +883,6 @@ export default function CandidateDetail() {
                 className="w-full justify-start text-sm"
                 onClick={() => {
                   handleTemplateSelect("offer_letter");
-                  setEmailSubject(`Job Offer - ${candidate.position}`);
                   setShowEmailTrigger(true);
                 }}
               >
@@ -794,9 +894,6 @@ export default function CandidateDetail() {
                 className="w-full justify-start text-sm"
                 onClick={() => {
                   handleTemplateSelect("rejection_notice");
-                  setEmailSubject(
-                    `Thank you for your application - ${candidate.position}`,
-                  );
                   setShowEmailTrigger(true);
                 }}
               >
@@ -846,7 +943,7 @@ export default function CandidateDetail() {
                         <Briefcase className="w-5 h-5 text-slate-500" />
                         <div>
                           <h4 className="font-medium text-slate-900">
-                            {job.title}
+                            {job.jobTitle}
                           </h4>
                           <p className="text-sm text-slate-600">
                             {job.department}
@@ -884,7 +981,7 @@ export default function CandidateDetail() {
           <>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-slate-900">
-                Progress for {selectedJob.title}
+                Progress for {selectedJob.jobTitle}
               </h3>
               <Button
                 variant="outline"
@@ -916,7 +1013,7 @@ export default function CandidateDetail() {
                     <CardTitle className="flex items-center gap-2">
                       <FileText className="w-5 h-5" />
                       Job-Specific Notes
-                      <Badge variant="outline">{selectedJob.title}</Badge>
+                      <Badge variant="outline">{selectedJob.jobTitle}</Badge>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -1102,29 +1199,18 @@ export default function CandidateDetail() {
     // Called when user clicks 'Update Stage' in dialog
     setShowStageChangeDialog(false);
     setPendingStage(newStage);
-    setPendingReason(stageChangeReason);
     setShowEmailTrigger(true); // Open EmailTrigger for double check
   };
 
   const handleEmailSentOrSkipped = () => {
-    // Actually update stage after email is sent or skipped
-    if (!candidate) return;
-    const updatedCandidate = storage.updateCandidate(candidate.id, {
-      stage: pendingStage,
+    // Simplified email sent handler
+    setPendingStage("");
+    setShowEmailTrigger(false);
+    setStageChangeReason("");
+    toast({
+      title: "Email Sent",
+      description: `Email has been sent to ${candidate.name}.`,
     });
-    if (updatedCandidate) {
-      setCandidate(convertCandidateStatus(updatedCandidate));
-      setCurrentStage(pendingStage);
-      setPendingStage("");
-      setPendingReason("");
-      setShowEmailTrigger(false);
-      setStageChangeReason("");
-      // Toast
-      toast({
-        title: "Stage Updated",
-        description: `${candidate.name} has been moved to ${pendingStage} stage.`,
-      });
-    }
   };
 
   const handleDownloadResume = () => {
@@ -1445,7 +1531,7 @@ export default function CandidateDetail() {
             </div>
             <div>
               <label className="text-sm font-medium">Position</label>
-              <Input defaultValue={candidate.position} />
+              <Input defaultValue={primaryJob?.jobTitle || "No Position"} />
             </div>
             <div>
               <label className="text-sm font-medium">Experience</label>
@@ -1494,7 +1580,7 @@ export default function CandidateDetail() {
           onClose={() => setShowEmailTrigger(false)}
           candidate={candidate}
           newStage={pendingStage}
-          jobTitle={candidate.position}
+          jobTitle={primaryJob?.jobTitle || "Unknown Position"}
           onEmailSent={handleEmailSentOrSkipped}
         />
       )}
