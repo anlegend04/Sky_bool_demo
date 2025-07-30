@@ -93,13 +93,7 @@ const App = () => (
   </QueryClientProvider>
 );
 
-// Prevent multiple createRoot calls in development
+// Initialize React root
 const rootElement = document.getElementById("root")!;
-
-// Check if we've already initialized the root
-const isAlreadyRendered = rootElement.hasChildNodes();
-
-if (!isAlreadyRendered) {
-  const root = createRoot(rootElement);
-  root.render(<App />);
-}
+const root = createRoot(rootElement);
+root.render(<App />);
