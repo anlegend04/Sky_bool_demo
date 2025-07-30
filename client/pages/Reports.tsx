@@ -68,6 +68,7 @@ import {
 import { useLanguage } from "@/hooks/use-language";
 import { useToast } from "@/hooks/use-toast";
 import { RechartsWarningSuppress } from "@/components/RechartsWarningSuppress";
+import { suppressRechartsWarnings, restoreWarnings } from "@/lib/suppress-recharts-warnings";
 
 export default function Reports() {
   const { t } = useLanguage();
@@ -1212,7 +1213,7 @@ export default function Reports() {
                   {(costData.avgCostPerHire / 1000).toFixed(0)}K VND
                 </div>
                 <p className="text-sm text-slate-600 mt-2">
-                  Giảm 5% so với tháng trước
+                  Giảm 5% so với tháng tr��ớc
                 </p>
               </CardContent>
             </Card>
