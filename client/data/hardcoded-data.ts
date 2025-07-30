@@ -202,7 +202,7 @@ export interface EmailData {
   from: string;
   to: string;
   timestamp: string;
-  status: "sent" | "pending" | "failed";
+  status: "sent" | "draft" | "failed";
   template: string;
   openedAt?: string;
   clickedAt?: string;
@@ -334,6 +334,7 @@ export interface ActivityData {
   userName: string;
   timestamp: string;
   metadata?: any;
+
 }
 
 export interface DashboardStatsData {

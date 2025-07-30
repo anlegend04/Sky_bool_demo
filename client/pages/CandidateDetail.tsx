@@ -145,7 +145,7 @@ export default function CandidateDetail() {
           emails: hardcodedCandidate.emails.map((email) => ({
             ...email,
             status:
-              (email.status as any) === "draft" ? "pending" : email.status,
+              (email.status as any) === "draft" ? "failed" : email.status,
           })),
         };
 
@@ -307,7 +307,15 @@ export default function CandidateDetail() {
   ];
 
   // Use candidate timeline from centralized data
-  const candidateTimeline = getCandidateTimeline(candidate.id);
+  type CandidateTimelineItem = {
+    type: string;
+    date: string;
+    description: string;
+    details: string;
+    reason?: string;
+    duration?: number;
+  };
+  const candidateTimeline: CandidateTimelineItem[] = getCandidateTimeline(candidate.id);
   const activities = candidateTimeline.map((item, index) => ({
     id: index + 1,
     type: item.type,
@@ -325,6 +333,8 @@ export default function CandidateDetail() {
             : "System",
     timestamp: new Date(item.date).toLocaleString(),
     content: item.details,
+    reason: item.reason, // Add this line to include the reason property
+    duration: item.duration, // Optionally add duration if used elsewhere
   }));
 
   // Use candidate emails from centralized data
