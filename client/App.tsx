@@ -95,5 +95,10 @@ const App = () => (
 
 // Initialize React root
 const rootElement = document.getElementById("root")!;
-const root = createRoot(rootElement);
-root.render(<App />);
+
+// Check if root is already initialized (for HMR)
+if (!rootElement.hasAttribute('data-root-initialized')) {
+  const root = createRoot(rootElement);
+  root.render(<App />);
+  rootElement.setAttribute('data-root-initialized', 'true');
+}
