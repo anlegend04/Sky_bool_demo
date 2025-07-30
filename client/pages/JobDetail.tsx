@@ -77,6 +77,9 @@ export default function JobDetail() {
   const [draggedCandidate, setDraggedCandidate] =
     useState<CandidateData | null>(null);
   const [dragOverStage, setDragOverStage] = useState<string | null>(null);
+  const [showEditJobDialog, setShowEditJobDialog] = useState(false);
+  const [selectedCandidatePopup, setSelectedCandidatePopup] = useState<CandidateData | null>(null);
+  const [showMoreCandidates, setShowMoreCandidates] = useState<{[key: string]: boolean}>({});
   const { toast } = useToast();
 
   const stages = [
@@ -331,11 +334,55 @@ export default function JobDetail() {
     </Card>
   );
 
+  const CompactCandidateCard = ({ candidate }: { candidate: CandidateData }) => (
+    <div
+      className="flex items-center gap-2 p-2 hover:bg-slate-50 rounded cursor-pointer transition-colors"
+      onClick={() => setSelectedCandidatePopup(candidate)}
+      draggable
+      onDragStart={() => handleDragStart(candidate)}
+      onDragEnd={handleDragEnd}
+    >
+      <Avatar className="w-8 h-8 flex-shrink-0">
+        <AvatarImage src={candidate.avatar} />
+        <AvatarFallback className="text-xs">
+          {candidate.name
+            .split(" ")
+            .map((n) => n[0])
+            .join("")}
+        </AvatarFallback>
+      </Avatar>
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-medium text-slate-900 truncate">
+          {candidate.name}
+        </p>
+        <p className="text-xs text-slate-500 truncate">
+          {candidate.duration} days
+        </p>
+      </div>
+      <div className="flex items-center space-x-1">
+        {[...Array(5)].map((_, i) => (
+          <Star
+            key={i}
+            className={`w-2.5 h-2.5 ${
+              i < candidate.rating
+                ? "text-yellow-400 fill-current"
+                : "text-slate-300"
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+
   const PipelineGridView = () => (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 overflow-x-auto">
       {stages.map((stage) => {
         const stageCandidates = candidates.filter((c) => c.stage === stage);
         const isDropTarget = dragOverStage === stage;
+        const maxVisible = 5;
+        const showingMore = showMoreCandidates[stage] || false;
+        const visibleCandidates = showingMore ? stageCandidates : stageCandidates.slice(0, maxVisible);
+        const hasMore = stageCandidates.length > maxVisible;
 
         return (
           <div
@@ -357,14 +404,24 @@ export default function JobDetail() {
                 {stageCandidates.length}
               </Badge>
             </div>
-            <div className="space-y-3 min-h-[200px] relative">
-              {stageCandidates.map((candidate) => (
-                <CandidateCard key={candidate.id} candidate={candidate} />
+            <div className="space-y-2 min-h-[200px] relative">
+              {visibleCandidates.map((candidate) => (
+                <CompactCandidateCard key={candidate.id} candidate={candidate} />
               ))}
               {stageCandidates.length === 0 && (
                 <div className="text-center text-slate-400 text-xs py-8">
                   {isDropTarget ? "Drop candidate here" : "No candidates"}
                 </div>
+              )}
+              {hasMore && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full text-xs"
+                  onClick={() => setShowMoreCandidates(prev => ({...prev, [stage]: !showingMore}))}
+                >
+                  {showingMore ? `Show Less` : `Show ${stageCandidates.length - maxVisible} More`}
+                </Button>
               )}
               {isDropTarget && (
                 <div className="absolute inset-0 border-2 border-dashed border-blue-400 rounded-lg pointer-events-none opacity-50" />
@@ -648,7 +705,7 @@ export default function JobDetail() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 Job Summary
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" onClick={() => setShowEditJobDialog(true)}>
                   <Edit className="w-4 h-4" />
                 </Button>
               </CardTitle>
@@ -875,6 +932,153 @@ export default function JobDetail() {
         {/* Budget Panel */}
         <BudgetPanel job={job} onJobUpdate={setJob} />
       </div>
+
+      {/* Edit Job Dialog */}
+      <Dialog open={showEditJobDialog} onOpenChange={setShowEditJobDialog}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Job Details</DialogTitle>
+            <DialogDescription>
+              Update job information and requirements
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium">Position</label>
+                <Input defaultValue={job.position} />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Department</label>
+                <Input defaultValue={job.department} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium">Location</label>
+                <Input defaultValue={job.location} />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Job Type</label>
+                <Select defaultValue={job.type}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Full-time">Full-time</SelectItem>
+                    <SelectItem value="Part-time">Part-time</SelectItem>
+                    <SelectItem value="Contract">Contract</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium">Description</label>
+              <Textarea defaultValue={job.description} rows={3} />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium">Salary Min</label>
+                <Input defaultValue={job.salaryMin} type="number" />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Salary Max</label>
+                <Input defaultValue={job.salaryMax} type="number" />
+              </div>
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={() => setShowEditJobDialog(false)}>
+                Cancel
+              </Button>
+              <Button onClick={() => {
+                toast({
+                  title: "Job Updated",
+                  description: "Job details have been successfully updated",
+                });
+                setShowEditJobDialog(false);
+              }}>
+                Save Changes
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Candidate Details Popup */}
+      <Dialog open={!!selectedCandidatePopup} onOpenChange={() => setSelectedCandidatePopup(null)}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Avatar className="w-8 h-8">
+                <AvatarImage src={selectedCandidatePopup?.avatar} />
+                <AvatarFallback>
+                  {selectedCandidatePopup?.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
+                </AvatarFallback>
+              </Avatar>
+              {selectedCandidatePopup?.name}
+            </DialogTitle>
+            <DialogDescription>
+              {selectedCandidatePopup?.position}
+            </DialogDescription>
+          </DialogHeader>
+          {selectedCandidatePopup && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-slate-700">Email</label>
+                  <p className="text-sm text-slate-600">{selectedCandidatePopup.email}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-700">Phone</label>
+                  <p className="text-sm text-slate-600">{selectedCandidatePopup.phone}</p>
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-slate-700">Location</label>
+                <p className="text-sm text-slate-600">{selectedCandidatePopup.location}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-slate-700">Experience</label>
+                <p className="text-sm text-slate-600">{selectedCandidatePopup.experience}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-slate-700">Current Stage</label>
+                <Badge className="mt-1">{selectedCandidatePopup.stage}</Badge>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-slate-700">Skills</label>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {selectedCandidatePopup.skills.slice(0, 6).map((skill) => (
+                    <Badge key={skill} variant="secondary" className="text-xs">
+                      {skill}
+                    </Badge>
+                  ))}
+                  {selectedCandidatePopup.skills.length > 6 && (
+                    <Badge variant="outline" className="text-xs">
+                      +{selectedCandidatePopup.skills.length - 6}
+                    </Badge>
+                  )}
+                </div>
+              </div>
+              <div className="flex gap-2 pt-4">
+                <Link to={`/candidates/${selectedCandidatePopup.id}`} className="flex-1">
+                  <Button className="w-full">
+                    <User className="w-4 h-4 mr-2" />
+                    View Full Profile
+                  </Button>
+                </Link>
+                <Button variant="outline">
+                  <Mail className="w-4 h-4 mr-2" />
+                  Send Email
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Add Custom Stage Dialog */}
       <Dialog open={showAddStageDialog} onOpenChange={setShowAddStageDialog}>
