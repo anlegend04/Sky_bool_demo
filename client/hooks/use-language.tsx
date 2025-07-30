@@ -44,7 +44,7 @@ const useTranslations = (language: Language) => {
   const translations: Record<Language, Record<string, string>> = {
     en: {
       // Navigation
-      "nav.dashboard": "Dashboard",
+      "nav.dashboard": "Home",
       "nav.jobs": "Jobs",
       "nav.candidates": "Candidates",
       "nav.calendar": "Calendar",
@@ -61,7 +61,7 @@ const useTranslations = (language: Language) => {
       "header.language": "Language",
 
       // Dashboard
-      "dashboard.title": "Dashboard",
+      "dashboard.title": "Home",
       "dashboard.subtitle":
         "Welcome back! Here's an overview of your recruitment activities.",
       "dashboard.activeJobs": "Active Jobs",

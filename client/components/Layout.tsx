@@ -75,7 +75,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   const navItems = [
     {
-      name: t("nav.dashboard"),
+      name: "Home",
       path: "/",
       icon: Home,
     },
@@ -133,14 +133,24 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   const quickActions = [
     {
-      name: t("header.addJob"),
+      name: "Add Job",
       path: "/jobs/create",
       icon: Briefcase,
     },
     {
-      name: t("header.addCandidate"),
-      path: "/candidates/create",
+      name: "Add Candidate",
+      path: "/candidates",
       icon: Users,
+    },
+    {
+      name: "View Reports",
+      path: "/reports",
+      icon: BarChart3,
+    },
+    {
+      name: "CV Evaluation",
+      path: "/cv-evaluation",
+      icon: FileText,
     },
   ];
 

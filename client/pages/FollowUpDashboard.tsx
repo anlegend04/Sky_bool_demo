@@ -1251,14 +1251,14 @@ export default function FollowUpDashboard() {
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
-          <Button variant="outline" size="sm">
+          {/* <Button variant="outline" size="sm">
             <Calendar className="w-4 h-4 mr-2" />
             Sync Calendar
           </Button>
           <Button variant="outline" size="sm">
             <Mail className="w-4 h-4 mr-2" />
             Email Settings
-          </Button>
+          </Button> */}
           {/* <Button size="sm">
             <Plus className="w-4 h-4 mr-2" />
             Add Follow-up

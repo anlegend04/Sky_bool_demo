@@ -2,9 +2,9 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
@@ -1026,7 +1026,7 @@ export default function Reports() {
                       ) /
                         Math.max(
                           HARDCODED_JOBS.reduce(
-                            (count, job) => count + (job.hires ? job.hires : 0),
+                            (count, job) => count + job.hired,
                             0,
                           ),
                           1,
@@ -1092,7 +1092,7 @@ export default function Reports() {
             </Card>
 
             {/* Recruitment Pipeline */}
-            <Card className="lg:col-span-2">
+            {/* <Card className="lg:col-span-2">
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
                   <span className="text-responsive-lg text-wrap-safe">
@@ -1135,7 +1135,7 @@ export default function Reports() {
                   ))}
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
         </TabsContent>
 

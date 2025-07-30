@@ -27,7 +27,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "@/components/Layout";
-import Dashboard from "./pages/Dashboard";
+import Home from "./pages/Home";
 import Jobs from "./pages/Jobs";
 import JobDetail from "./pages/JobDetail";
 import JobCreate from "./pages/JobCreate";
@@ -69,7 +69,7 @@ const App = () => (
         <BrowserRouter>
           <Layout>
             <Routes>
-              <Route path="/" element={<Dashboard />} />
+              <Route path="/" element={<Home />} />
               <Route path="/jobs" element={<Jobs />} />
               <Route path="/jobs/create" element={<JobCreate />} />
               <Route path="/jobs/:id" element={<JobDetail />} />
