@@ -54,8 +54,9 @@ export class RechartsWarningSuppress extends Component<Props, State> {
   private suppressWarnings() {
     const isRechartsDefaultPropsWarning = (message: string) => {
       return (
-        message.includes("Support for defaultProps will be removed") &&
-        (message.includes("XAxis") ||
+        message.includes("Support for defaultProps will be removed") ||
+        (message.includes("defaultProps") &&
+         (message.includes("XAxis") ||
           message.includes("YAxis") ||
           message.includes("XAxis2") ||
           message.includes("YAxis2") ||
@@ -66,7 +67,11 @@ export class RechartsWarningSuppress extends Component<Props, State> {
           message.includes("BarChart") ||
           message.includes("LineChart") ||
           message.includes("PieChart") ||
-          message.includes("recharts"))
+          message.includes("FunnelChart") ||
+          message.includes("Funnel") ||
+          message.includes("RadarChart") ||
+          message.includes("Radar") ||
+          message.includes("recharts")))
       );
     };
 
