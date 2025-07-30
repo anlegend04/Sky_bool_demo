@@ -367,25 +367,25 @@ export default function Reports() {
     // Cost breakdown by category
     const costBreakdown = [
       {
-        category: "Quảng cáo & Đăng tin",
+        category: "Advertising & Marketing",
         amount: baseCostPerHire * totalHires * 0.25,
         percentage: 25,
         color: "#3b82f6",
       },
       {
-        category: "Thời gian Recruiter",
+        category: "Recruiter Time",
         amount: baseCostPerHire * totalHires * 0.35,
         percentage: 35,
         color: "#10b981",
       },
       {
-        category: "Công cụ & Phần mềm",
+        category: "Tools & Software",
         amount: baseCostPerHire * totalHires * 0.15,
         percentage: 15,
         color: "#f59e0b",
       },
       {
-        category: "Phỏng vấn & Đánh giá",
+        category: "Interview & Assessment",
         amount: baseCostPerHire * totalHires * 0.15,
         percentage: 15,
         color: "#8b5cf6",
@@ -415,25 +415,25 @@ export default function Reports() {
     // Monthly cost trend
     const monthlyCostTrend = [
       {
-        month: "Tháng 1",
+        month: "January",
         totalCost: baseCostPerHire * totalHires * 0.2,
         hires: Math.max(1, Math.round(totalHires * 0.2)),
         costPerHire: baseCostPerHire * 0.9,
       },
       {
-        month: "Tháng 2",
+        month: "February",
         totalCost: baseCostPerHire * totalHires * 0.3,
         hires: Math.max(1, Math.round(totalHires * 0.3)),
         costPerHire: baseCostPerHire * 1.1,
       },
       {
-        month: "Tháng 3",
+        month: "March",
         totalCost: baseCostPerHire * totalHires * 0.5,
         hires: Math.max(1, Math.round(totalHires * 0.5)),
         costPerHire: baseCostPerHire,
       },
       {
-        month: "Tháng 4",
+        month: "April",
         totalCost: baseCostPerHire * totalHires,
         hires: totalHires,
         costPerHire: baseCostPerHire * 0.95,
@@ -488,7 +488,7 @@ export default function Reports() {
       color: "orange",
     },
     {
-      title: "Chi phí trung bình mỗi tuyển dụng",
+      title: "Avg Cost per Hire",
       value: `${(costData.avgCostPerHire / 1000).toFixed(0)}K VND`,
       change: "-5%",
       trend: "up",
@@ -496,7 +496,7 @@ export default function Reports() {
       color: "green",
     },
     {
-      title: "Tổng chi phí tuyển dụng",
+      title: "Total cost",
       value: `${(costData.totalCost / 1000000).toFixed(1)}M VND`,
       change: "+12%",
       trend: "up",
@@ -1219,7 +1219,7 @@ export default function Reports() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">
-                  Chi phí trung bình/tuyển dụng
+                  avgCostPerHire
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -1227,7 +1227,7 @@ export default function Reports() {
                   {(costData.avgCostPerHire / 1000).toFixed(0)}K VND
                 </div>
                 <p className="text-sm text-slate-600 mt-2">
-                  Giảm 5% so với tháng trước
+                  Decrease of 5% compared to last month
                 </p>
               </CardContent>
             </Card>
@@ -1235,7 +1235,7 @@ export default function Reports() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">
-                  Tổng chi phí tuyển dụng
+                 Total cost of Recruitment
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -1243,19 +1243,19 @@ export default function Reports() {
                   {(costData.totalCost / 1000000).toFixed(1)}M VND
                 </div>
                 <p className="text-sm text-slate-600 mt-2">
-                  Cho {costData.totalHires} lần tuyển dụng thành công
+                  Cho {costData.totalHires} successful hires
                 </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">ROI Tuyển dụng</CardTitle>
+                <CardTitle className="text-lg">ROI Recruitment</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-purple-600">275%</div>
                 <p className="text-sm text-slate-600 mt-2">
-                  Hiệu quả đầu tư tuyển dụng
+                  Effective cost management and hiring strategy
                 </p>
               </CardContent>
             </Card>
@@ -1265,7 +1265,7 @@ export default function Reports() {
             {/* Cost Breakdown Pie Chart */}
             <Card>
               <CardHeader>
-                <CardTitle>Phân bổ chi phí tuyển dụng</CardTitle>
+                <CardTitle>Distribution of Cost Breakdown</CardTitle>
               </CardHeader>
               <CardContent>
                 {isLoading ? (
@@ -1291,7 +1291,7 @@ export default function Reports() {
                       </Pie>
                       <Tooltip
                         formatter={(value) => [
-                          `${(value / 1000).toFixed(0)}K VND`,
+                          `${(Number(value) / 1000).toFixed(0)}K VND`,
                           "Chi phí",
                         ]}
                         labelFormatter={(label) => `Loại: ${label}`}
@@ -1303,9 +1303,17 @@ export default function Reports() {
                         }}
                       />
                       <Legend
-                        formatter={(value, entry) =>
-                          `${value} (${(entry.payload.amount / 1000).toFixed(0)}K)`
-                        }
+                        formatter={(value, entry) => {
+                          if (
+                            entry &&
+                            entry.payload &&
+                            typeof (entry.payload as { amount?: number })
+                              .amount === "number"
+                          ) {
+                            return `${value} (${((entry.payload as unknown as { amount: number }).amount / 1000).toFixed(0)}K)`;
+                          }
+                          return value;
+                        }}
                         wrapperStyle={{ paddingTop: "20px" }}
                       />
                     </PieChart>
@@ -1317,7 +1325,7 @@ export default function Reports() {
             {/* Cost by Position */}
             <Card>
               <CardHeader>
-                <CardTitle>Chi phí theo vị trí</CardTitle>
+                <CardTitle>Cost by Position</CardTitle>
               </CardHeader>
               <CardContent>
                 {isLoading ? (
@@ -1326,7 +1334,7 @@ export default function Reports() {
                   <div className="h-64 flex items-center justify-center text-slate-500">
                     <div className="text-center">
                       <AlertCircle className="w-12 h-12 mx-auto mb-2" />
-                      <p>Không có dữ liệu cho bộ lọc đã chọn</p>
+                      <p>No data available</p>
                     </div>
                   </div>
                 ) : (
@@ -1350,13 +1358,13 @@ export default function Reports() {
                         formatter={(value, name) => {
                           if (name === "avgCostPerHire") {
                             return [
-                              `${(value / 1000).toFixed(0)}K VND`,
-                              "Chi phí TB/người",
+                              `${(Number(value) / 1000).toFixed(0)}K VND`,
+                              "avgCostPerHire",
                             ];
                           }
                           return [
-                            `${(value / 1000).toFixed(0)}K VND`,
-                            "Tổng chi phí",
+                            `${(Number(value) / 1000).toFixed(0)}K VND`,
+                            "Total Cost",
                           ];
                         }}
                         labelFormatter={(label) => `Vị trí: ${label}`}
@@ -1370,8 +1378,8 @@ export default function Reports() {
                       <Legend
                         formatter={(value) => {
                           return value === "avgCostPerHire"
-                            ? "Chi phí TB/người"
-                            : "Tổng chi phí";
+                            ? "avgCostPerHire"
+                            : "Total Cost";
                         }}
                       />
                       <Bar
@@ -1396,7 +1404,7 @@ export default function Reports() {
           {/* Monthly Cost Trend */}
           <Card>
             <CardHeader>
-              <CardTitle>Xu hướng chi phí theo tháng</CardTitle>
+              <CardTitle>Trend cost months</CardTitle>
             </CardHeader>
             <CardContent>
               {isLoading ? (
@@ -1413,15 +1421,15 @@ export default function Reports() {
                     <Tooltip
                       formatter={(value, name) => {
                         const labels = {
-                          totalCost: "Tổng chi phí",
-                          costPerHire: "Chi phí/người",
-                          hires: "Số người tuyển",
+                          totalCost: "Total cost",
+                          costPerHire: "Cost per hire",
+                          hires: "Hires",
                         };
                         if (name === "hires") {
                           return [value, labels[name]];
                         }
                         return [
-                          `${(value / 1000).toFixed(0)}K VND`,
+                          `${(Number(value) / 1000).toFixed(0)}K VND`,
                           labels[name],
                         ];
                       }}
@@ -1436,8 +1444,8 @@ export default function Reports() {
                     <Legend
                       formatter={(value) => {
                         const labels = {
-                          totalCost: "Tổng chi phí",
-                          costPerHire: "Chi phí/người",
+                          totalCost: "Total cost",
+                          costPerHire: "Cost per hire",
                         };
                         return labels[value] || value;
                       }}
@@ -1468,7 +1476,7 @@ export default function Reports() {
           {/* Cost Breakdown Details Table */}
           <Card>
             <CardHeader>
-              <CardTitle>Chi tiết phân bổ chi phí</CardTitle>
+              <CardTitle>Cost Breakdown Details</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -1487,7 +1495,7 @@ export default function Reports() {
                           {item.category}
                         </h4>
                         <p className="text-sm text-gray-600">
-                          {item.percentage}% tổng chi phí
+                          {item.percentage}% total cost
                         </p>
                       </div>
                     </div>
