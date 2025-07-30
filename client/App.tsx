@@ -1,37 +1,40 @@
 // MUST BE FIRST - Suppress Recharts warnings before any imports
-(function() {
+(function () {
   const originalWarn = console.warn;
   const originalError = console.error;
 
   // Aggressive suppression of defaultProps warnings
-  console.warn = function(...args) {
-    const message = args.join(' ');
+  console.warn = function (...args) {
+    const message = args.join(" ");
 
     // Multiple detection patterns for different warning formats
     const isRechartsWarning =
       // Pattern 1: Direct message check
-      (message.includes('Support for defaultProps will be removed') &&
-       (message.includes('XAxis') || message.includes('YAxis'))) ||
-
+      (message.includes("Support for defaultProps will be removed") &&
+        (message.includes("XAxis") || message.includes("YAxis"))) ||
       // Pattern 2: Check individual arguments
-      (args.some(arg => String(arg).includes('Support for defaultProps will be removed')) &&
-       args.some(arg => String(arg).match(/\b(XAxis|YAxis|XAxis2|YAxis2)\b/))) ||
-
+      (args.some((arg) =>
+        String(arg).includes("Support for defaultProps will be removed"),
+      ) &&
+        args.some((arg) =>
+          String(arg).match(/\b(XAxis|YAxis|XAxis2|YAxis2)\b/),
+        )) ||
       // Pattern 3: Template string format
-      (args[0] && typeof args[0] === 'string' &&
-       args[0].includes('Support for defaultProps will be removed') &&
-       args.slice(1).some(arg => String(arg).match(/\b(XAxis|YAxis)\b/)));
+      (args[0] &&
+        typeof args[0] === "string" &&
+        args[0].includes("Support for defaultProps will be removed") &&
+        args.slice(1).some((arg) => String(arg).match(/\b(XAxis|YAxis)\b/)));
 
     if (!isRechartsWarning) {
       originalWarn.apply(console, args);
     }
   };
 
-  console.error = function(...args) {
-    const message = args.join(' ');
+  console.error = function (...args) {
+    const message = args.join(" ");
     const isRechartsWarning =
-      message.includes('Support for defaultProps will be removed') &&
-      (message.includes('XAxis') || message.includes('YAxis'));
+      message.includes("Support for defaultProps will be removed") &&
+      (message.includes("XAxis") || message.includes("YAxis"));
 
     if (!isRechartsWarning) {
       originalError.apply(console, args);
