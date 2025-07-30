@@ -51,7 +51,10 @@ import {
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { ENHANCED_CANDIDATE_SAMPLE, getCurrentJobApplication } from "@/data/enhanced-mock-data";
+import {
+  ENHANCED_CANDIDATE_SAMPLE,
+  getCurrentJobApplication,
+} from "@/data/enhanced-mock-data";
 import { JobApplication } from "@/types/enhanced-candidate";
 
 export default function CandidateProfileEnhanced() {
@@ -83,34 +86,53 @@ export default function CandidateProfileEnhanced() {
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
-      case "Active": return "default";
-      case "Completed": return "default";
-      case "On Hold": return "secondary";
-      case "Withdrawn": return "destructive";
-      default: return "outline";
+      case "Active":
+        return "default";
+      case "Completed":
+        return "default";
+      case "On Hold":
+        return "secondary";
+      case "Withdrawn":
+        return "destructive";
+      default:
+        return "outline";
     }
   };
 
   const getStageBadgeVariant = (stage: string) => {
     switch (stage) {
-      case "Hired": return "default";
-      case "Rejected": return "destructive";
-      case "Offer": return "default";
-      case "Technical": case "Interview": return "secondary";
-      default: return "outline";
+      case "Hired":
+        return "default";
+      case "Rejected":
+        return "destructive";
+      case "Offer":
+        return "default";
+      case "Technical":
+      case "Interview":
+        return "secondary";
+      default:
+        return "outline";
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "High": return "text-red-600 bg-red-50 border-red-200";
-      case "Medium": return "text-yellow-600 bg-yellow-50 border-yellow-200";
-      case "Low": return "text-blue-600 bg-blue-50 border-blue-200";
-      default: return "text-slate-600 bg-slate-50 border-slate-200";
+      case "High":
+        return "text-red-600 bg-red-50 border-red-200";
+      case "Medium":
+        return "text-yellow-600 bg-yellow-50 border-yellow-200";
+      case "Low":
+        return "text-blue-600 bg-blue-50 border-blue-200";
+      default:
+        return "text-slate-600 bg-slate-50 border-slate-200";
     }
   };
 
-  const JobApplicationCard = ({ application }: { application: JobApplication }) => {
+  const JobApplicationCard = ({
+    application,
+  }: {
+    application: JobApplication;
+  }) => {
     const completedStages = application.stageHistory.length;
     const totalStages = 6; // Applied, Screening, Interview, Technical, Offer, Hired
     const progressPercentage = (completedStages / totalStages) * 100;
@@ -129,13 +151,19 @@ export default function CandidateProfileEnhanced() {
                   <div className="sm:hidden">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0"
+                        >
                           <MoreHorizontal className="w-4 h-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem asChild>
-                          <Link to={`/candidates/${candidate.id}/jobs/${application.id}/progress`}>
+                          <Link
+                            to={`/candidates/${candidate.id}/jobs/${application.id}/progress`}
+                          >
                             <Eye className="w-4 h-4 mr-2" />
                             View Progress
                           </Link>
@@ -159,7 +187,9 @@ export default function CandidateProfileEnhanced() {
                   </div>
                   <div className="flex items-center gap-1 min-w-0">
                     <Calendar className="w-3 h-3 flex-shrink-0" />
-                    <span className="truncate">{new Date(application.appliedDate).toLocaleDateString()}</span>
+                    <span className="truncate">
+                      {new Date(application.appliedDate).toLocaleDateString()}
+                    </span>
                   </div>
                   <div className="flex items-center gap-1 min-w-0">
                     <User className="w-3 h-3 flex-shrink-0" />
@@ -181,7 +211,9 @@ export default function CandidateProfileEnhanced() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem asChild>
-                      <Link to={`/candidates/${candidate.id}/jobs/${application.id}/progress`}>
+                      <Link
+                        to={`/candidates/${candidate.id}/jobs/${application.id}/progress`}
+                      >
                         <Eye className="w-4 h-4 mr-2" />
                         View Progress
                       </Link>
@@ -230,7 +262,9 @@ export default function CandidateProfileEnhanced() {
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-slate-600">Progress</span>
-                <span className="text-slate-500">{completedStages}/{totalStages} stages</span>
+                <span className="text-slate-500">
+                  {completedStages}/{totalStages} stages
+                </span>
               </div>
               <Progress value={progressPercentage} className="h-2" />
             </div>
@@ -242,7 +276,12 @@ export default function CandidateProfileEnhanced() {
                   <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-600">
                     <Clock className="w-3 h-3 flex-shrink-0" />
                     <span className="truncate">
-                      Last updated: {new Date(application.stageHistory[application.stageHistory.length - 1]?.startDate || '').toLocaleDateString()}
+                      Last updated:{" "}
+                      {new Date(
+                        application.stageHistory[
+                          application.stageHistory.length - 1
+                        ]?.startDate || "",
+                      ).toLocaleDateString()}
                     </span>
                   </div>
                   <Link
@@ -270,7 +309,10 @@ export default function CandidateProfileEnhanced() {
             <Avatar className="w-20 h-20 mx-auto sm:mx-0">
               <AvatarImage src={candidate.avatar} />
               <AvatarFallback className="text-xl">
-                {candidate.name.split(" ").map((n) => n[0]).join("")}
+                {candidate.name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")}
               </AvatarFallback>
             </Avatar>
             <div className="text-center sm:text-left min-w-0 flex-1">
@@ -278,7 +320,7 @@ export default function CandidateProfileEnhanced() {
                 {candidate.name}
               </h2>
               <p className="text-lg text-slate-600 mt-1">
-                {primaryApplication?.jobTitle || 'Multiple Positions'}
+                {primaryApplication?.jobTitle || "Multiple Positions"}
               </p>
               <div className="flex items-center justify-center sm:justify-start space-x-1 mt-2">
                 {[...Array(5)].map((_, i) => (
@@ -291,7 +333,9 @@ export default function CandidateProfileEnhanced() {
                     }`}
                   />
                 ))}
-                <span className="ml-2 text-sm text-slate-600">({candidate.rating}/5)</span>
+                <span className="ml-2 text-sm text-slate-600">
+                  ({candidate.rating}/5)
+                </span>
               </div>
             </div>
           </div>
@@ -326,7 +370,9 @@ export default function CandidateProfileEnhanced() {
       <CardContent className="space-y-6">
         {/* Contact Information */}
         <div>
-          <h3 className="font-semibold text-slate-900 mb-3">Contact Information</h3>
+          <h3 className="font-semibold text-slate-900 mb-3">
+            Contact Information
+          </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="flex items-center space-x-3">
               <Mail className="w-4 h-4 text-slate-500" />
@@ -345,11 +391,15 @@ export default function CandidateProfileEnhanced() {
 
         {/* Professional Information */}
         <div>
-          <h3 className="font-semibold text-slate-900 mb-3">Professional Information</h3>
+          <h3 className="font-semibold text-slate-900 mb-3">
+            Professional Information
+          </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="flex items-center space-x-3">
               <GraduationCap className="w-4 h-4 text-slate-500" />
-              <span className="text-sm">Experience: {candidate.experience}</span>
+              <span className="text-sm">
+                Experience: {candidate.experience}
+              </span>
             </div>
             <div className="flex items-center space-x-3">
               <Briefcase className="w-4 h-4 text-slate-500" />
@@ -357,7 +407,9 @@ export default function CandidateProfileEnhanced() {
             </div>
             <div className="flex items-center space-x-3">
               <Calendar className="w-4 h-4 text-slate-500" />
-              <span className="text-sm">Availability: {candidate.availability}</span>
+              <span className="text-sm">
+                Availability: {candidate.availability}
+              </span>
             </div>
             <div className="flex items-center space-x-3">
               <Clock className="w-4 h-4 text-slate-500" />
@@ -367,13 +419,21 @@ export default function CandidateProfileEnhanced() {
         </div>
 
         {/* External Links */}
-        {(candidate.linkedInProfile || candidate.githubProfile || candidate.portfolioUrl) && (
+        {(candidate.linkedInProfile ||
+          candidate.githubProfile ||
+          candidate.portfolioUrl) && (
           <div>
-            <h3 className="font-semibold text-slate-900 mb-3">External Links</h3>
+            <h3 className="font-semibold text-slate-900 mb-3">
+              External Links
+            </h3>
             <div className="flex flex-wrap gap-2">
               {candidate.linkedInProfile && (
                 <Button variant="outline" size="sm" asChild>
-                  <a href={candidate.linkedInProfile} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={candidate.linkedInProfile}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     LinkedIn
                     <ExternalLink className="w-3 h-3 ml-1" />
                   </a>
@@ -381,7 +441,11 @@ export default function CandidateProfileEnhanced() {
               )}
               {candidate.githubProfile && (
                 <Button variant="outline" size="sm" asChild>
-                  <a href={candidate.githubProfile} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={candidate.githubProfile}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     GitHub
                     <ExternalLink className="w-3 h-3 ml-1" />
                   </a>
@@ -389,7 +453,11 @@ export default function CandidateProfileEnhanced() {
               )}
               {candidate.portfolioUrl && (
                 <Button variant="outline" size="sm" asChild>
-                  <a href={candidate.portfolioUrl} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={candidate.portfolioUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     Portfolio
                     <ExternalLink className="w-3 h-3 ml-1" />
                   </a>
@@ -443,7 +511,8 @@ export default function CandidateProfileEnhanced() {
                 Candidate Profile
               </h1>
               <p className="text-slate-600">
-                Comprehensive view of {candidate.name}'s applications and progress
+                Comprehensive view of {candidate.name}'s applications and
+                progress
               </p>
             </div>
           </div>
@@ -453,7 +522,8 @@ export default function CandidateProfileEnhanced() {
               <HelpTooltip content="Source where the candidate was found" />
             </Badge>
             <Badge variant="default" className="flex items-center gap-1">
-              {candidate.jobApplications.length} Application{candidate.jobApplications.length !== 1 ? 's' : ''}
+              {candidate.jobApplications.length} Application
+              {candidate.jobApplications.length !== 1 ? "s" : ""}
             </Badge>
           </div>
         </div>
@@ -471,15 +541,26 @@ export default function CandidateProfileEnhanced() {
           <div className="lg:col-span-2 order-1 lg:order-2">
             <Tabs defaultValue="applications" className="w-full">
               <TabsList className="grid w-full grid-cols-3 h-auto">
-                <TabsTrigger value="applications" className="text-xs sm:text-sm px-2 py-2">
+                <TabsTrigger
+                  value="applications"
+                  className="text-xs sm:text-sm px-2 py-2"
+                >
                   <span className="hidden sm:inline">Job Applications</span>
                   <span className="sm:hidden">Jobs</span>
                 </TabsTrigger>
-                <TabsTrigger value="education" className="text-xs sm:text-sm px-2 py-2">
-                  <span className="hidden sm:inline">Education & Experience</span>
+                <TabsTrigger
+                  value="education"
+                  className="text-xs sm:text-sm px-2 py-2"
+                >
+                  <span className="hidden sm:inline">
+                    Education & Experience
+                  </span>
                   <span className="sm:hidden">Experience</span>
                 </TabsTrigger>
-                <TabsTrigger value="evaluations" className="text-xs sm:text-sm px-2 py-2">
+                <TabsTrigger
+                  value="evaluations"
+                  className="text-xs sm:text-sm px-2 py-2"
+                >
                   <span className="hidden sm:inline">CV Evaluations</span>
                   <span className="sm:hidden">CV Eval</span>
                 </TabsTrigger>
@@ -489,7 +570,9 @@ export default function CandidateProfileEnhanced() {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">
-                      <span>Active Applications ({candidate.jobApplications.length})</span>
+                      <span>
+                        Active Applications ({candidate.jobApplications.length})
+                      </span>
                       <Button size="sm">
                         <Plus className="w-4 h-4 mr-2" />
                         Apply to New Job
@@ -499,7 +582,10 @@ export default function CandidateProfileEnhanced() {
                   <CardContent>
                     <div className="space-y-4">
                       {candidate.jobApplications.map((application) => (
-                        <JobApplicationCard key={application.id} application={application} />
+                        <JobApplicationCard
+                          key={application.id}
+                          application={application}
+                        />
                       ))}
                     </div>
                   </CardContent>
@@ -515,13 +601,19 @@ export default function CandidateProfileEnhanced() {
                   <CardContent>
                     <div className="space-y-4">
                       {candidate.education.map((edu) => (
-                        <div key={edu.id} className="border-l-4 border-l-primary pl-4">
+                        <div
+                          key={edu.id}
+                          className="border-l-4 border-l-primary pl-4"
+                        >
                           <h4 className="font-medium text-slate-900">
                             {edu.degree} in {edu.field}
                           </h4>
-                          <p className="text-sm text-slate-600">{edu.institution}</p>
+                          <p className="text-sm text-slate-600">
+                            {edu.institution}
+                          </p>
                           <p className="text-sm text-slate-500">
-                            Graduated: {edu.graduationYear} {edu.gpa && `• GPA: ${edu.gpa}`}
+                            Graduated: {edu.graduationYear}{" "}
+                            {edu.gpa && `• GPA: ${edu.gpa}`}
                           </p>
                         </div>
                       ))}
@@ -537,20 +629,30 @@ export default function CandidateProfileEnhanced() {
                   <CardContent>
                     <div className="space-y-4">
                       {candidate.workExperience.map((work) => (
-                        <div key={work.id} className="border-l-4 border-l-secondary pl-4">
-                          <h4 className="font-medium text-slate-900">{work.position}</h4>
-                          <p className="text-sm text-slate-600">{work.company}</p>
-                          <p className="text-sm text-slate-500">
-                            {work.startDate} - {work.endDate || 'Present'}
+                        <div
+                          key={work.id}
+                          className="border-l-4 border-l-secondary pl-4"
+                        >
+                          <h4 className="font-medium text-slate-900">
+                            {work.position}
+                          </h4>
+                          <p className="text-sm text-slate-600">
+                            {work.company}
                           </p>
-                          <p className="text-sm text-slate-600 mt-2">{work.description}</p>
-                          {work.achievements && work.achievements.length > 0 && (
-                            <ul className="text-sm text-slate-600 mt-2 list-disc list-inside">
-                              {work.achievements.map((achievement, index) => (
-                                <li key={index}>{achievement}</li>
-                              ))}
-                            </ul>
-                          )}
+                          <p className="text-sm text-slate-500">
+                            {work.startDate} - {work.endDate || "Present"}
+                          </p>
+                          <p className="text-sm text-slate-600 mt-2">
+                            {work.description}
+                          </p>
+                          {work.achievements &&
+                            work.achievements.length > 0 && (
+                              <ul className="text-sm text-slate-600 mt-2 list-disc list-inside">
+                                {work.achievements.map((achievement, index) => (
+                                  <li key={index}>{achievement}</li>
+                                ))}
+                              </ul>
+                            )}
                         </div>
                       ))}
                     </div>
@@ -564,7 +666,8 @@ export default function CandidateProfileEnhanced() {
                     <CardTitle>CV Evaluations</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {candidate.cvEvaluations && candidate.cvEvaluations.length > 0 ? (
+                    {candidate.cvEvaluations &&
+                    candidate.cvEvaluations.length > 0 ? (
                       <div className="space-y-4">
                         {candidate.cvEvaluations.map((evaluation) => (
                           <div
@@ -577,12 +680,15 @@ export default function CandidateProfileEnhanced() {
                                   className={`w-3 h-3 rounded-full ${
                                     evaluation.finalVerdict === "Good Fit"
                                       ? "bg-green-500"
-                                      : evaluation.finalVerdict === "Needs Improvement"
+                                      : evaluation.finalVerdict ===
+                                          "Needs Improvement"
                                         ? "bg-yellow-500"
                                         : "bg-red-500"
                                   }`}
                                 />
-                                <span className="font-medium">{evaluation.finalVerdict}</span>
+                                <span className="font-medium">
+                                  {evaluation.finalVerdict}
+                                </span>
                                 <Badge variant="outline">
                                   {evaluation.jobFitScore}% match
                                 </Badge>
@@ -590,7 +696,9 @@ export default function CandidateProfileEnhanced() {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => setSelectedCVEvaluation(evaluation)}
+                                onClick={() =>
+                                  setSelectedCVEvaluation(evaluation)
+                                }
                               >
                                 <Eye className="w-4 h-4 mr-1" />
                                 View Details
@@ -600,11 +708,17 @@ export default function CandidateProfileEnhanced() {
                               {evaluation.summary}
                             </p>
                             <div className="mt-3 flex flex-wrap gap-1">
-                              {evaluation.strengths.slice(0, 3).map((strength, index) => (
-                                <Badge key={index} variant="secondary" className="text-xs">
-                                  {strength}
-                                </Badge>
-                              ))}
+                              {evaluation.strengths
+                                .slice(0, 3)
+                                .map((strength, index) => (
+                                  <Badge
+                                    key={index}
+                                    variant="secondary"
+                                    className="text-xs"
+                                  >
+                                    {strength}
+                                  </Badge>
+                                ))}
                               {evaluation.strengths.length > 3 && (
                                 <Badge variant="outline" className="text-xs">
                                   +{evaluation.strengths.length - 3} more
@@ -617,7 +731,9 @@ export default function CandidateProfileEnhanced() {
                     ) : (
                       <div className="text-center py-8">
                         <FileText className="w-12 h-12 mx-auto text-slate-300 mb-4" />
-                        <p className="text-slate-500">No CV evaluations available</p>
+                        <p className="text-slate-500">
+                          No CV evaluations available
+                        </p>
                         <Button className="mt-4" size="sm">
                           Start CV Evaluation
                         </Button>
@@ -653,7 +769,10 @@ export default function CandidateProfileEnhanced() {
       </Dialog>
 
       {/* CV Evaluation Dialog */}
-      <Dialog open={!!selectedCVEvaluation} onOpenChange={() => setSelectedCVEvaluation(null)}>
+      <Dialog
+        open={!!selectedCVEvaluation}
+        onOpenChange={() => setSelectedCVEvaluation(null)}
+      >
         <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -679,31 +798,47 @@ export default function CandidateProfileEnhanced() {
             <div className="space-y-6">
               <div>
                 <h4 className="font-semibold mb-2">Summary</h4>
-                <p className="text-sm text-slate-600">{selectedCVEvaluation.summary}</p>
+                <p className="text-sm text-slate-600">
+                  {selectedCVEvaluation.summary}
+                </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <h4 className="font-semibold mb-2 text-green-700">Strengths</h4>
+                  <h4 className="font-semibold mb-2 text-green-700">
+                    Strengths
+                  </h4>
                   <ul className="space-y-1">
-                    {selectedCVEvaluation.strengths.map((strength: string, index: number) => (
-                      <li key={index} className="text-sm text-slate-600 flex items-start gap-2">
-                        <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                        {strength}
-                      </li>
-                    ))}
+                    {selectedCVEvaluation.strengths.map(
+                      (strength: string, index: number) => (
+                        <li
+                          key={index}
+                          className="text-sm text-slate-600 flex items-start gap-2"
+                        >
+                          <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                          {strength}
+                        </li>
+                      ),
+                    )}
                   </ul>
                 </div>
 
                 <div>
-                  <h4 className="font-semibold mb-2 text-orange-700">Areas for Improvement</h4>
+                  <h4 className="font-semibold mb-2 text-orange-700">
+                    Areas for Improvement
+                  </h4>
                   <ul className="space-y-1">
-                    {selectedCVEvaluation.weaknesses.map((weakness: string, index: number) => (
-                      <li key={index} className="text-sm text-slate-600 flex items-start gap-2">
-                        <AlertCircle className="w-4 h-4 text-orange-500 mt-0.5 flex-shrink-0" />
-                        {weakness}
-                      </li>
-                    ))}
+                    {selectedCVEvaluation.weaknesses.map(
+                      (weakness: string, index: number) => (
+                        <li
+                          key={index}
+                          className="text-sm text-slate-600 flex items-start gap-2"
+                        >
+                          <AlertCircle className="w-4 h-4 text-orange-500 mt-0.5 flex-shrink-0" />
+                          {weakness}
+                        </li>
+                      ),
+                    )}
                   </ul>
                 </div>
               </div>
@@ -711,33 +846,43 @@ export default function CandidateProfileEnhanced() {
               <div>
                 <h4 className="font-semibold mb-2">Skills Match</h4>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {selectedCVEvaluation.skillsMatch.map((skill: any, index: number) => (
-                    <div key={index} className="flex items-center gap-2 p-2 bg-slate-50 rounded">
+                  {selectedCVEvaluation.skillsMatch.map(
+                    (skill: any, index: number) => (
                       <div
-                        className={`w-2 h-2 rounded-full ${
-                          skill.hasSkill ? "bg-green-500" : "bg-red-500"
-                        }`}
-                      />
-                      <span className="text-sm truncate">{skill.skill}</span>
-                      {skill.hasSkill && skill.level && (
-                        <Badge variant="outline" className="text-xs">
-                          {skill.level}
-                        </Badge>
-                      )}
-                    </div>
-                  ))}
+                        key={index}
+                        className="flex items-center gap-2 p-2 bg-slate-50 rounded"
+                      >
+                        <div
+                          className={`w-2 h-2 rounded-full ${
+                            skill.hasSkill ? "bg-green-500" : "bg-red-500"
+                          }`}
+                        />
+                        <span className="text-sm truncate">{skill.skill}</span>
+                        {skill.hasSkill && skill.level && (
+                          <Badge variant="outline" className="text-xs">
+                            {skill.level}
+                          </Badge>
+                        )}
+                      </div>
+                    ),
+                  )}
                 </div>
               </div>
 
               <div>
                 <h4 className="font-semibold mb-2">Recommendations</h4>
                 <ul className="space-y-1">
-                  {selectedCVEvaluation.recommendations.map((rec: string, index: number) => (
-                    <li key={index} className="text-sm text-slate-600 flex items-start gap-2">
-                      <Target className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                      {rec}
-                    </li>
-                  ))}
+                  {selectedCVEvaluation.recommendations.map(
+                    (rec: string, index: number) => (
+                      <li
+                        key={index}
+                        className="text-sm text-slate-600 flex items-start gap-2"
+                      >
+                        <Target className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                        {rec}
+                      </li>
+                    ),
+                  )}
                 </ul>
               </div>
 

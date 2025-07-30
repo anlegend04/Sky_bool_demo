@@ -75,7 +75,9 @@ type StageData = {
 export default function CandidateApplicationProgress() {
   const { candidateId, jobId } = useParams();
   const [candidate] = useState(ENHANCED_CANDIDATE_SAMPLE);
-  const [jobApplication, setJobApplication] = useState<JobApplication | null>(null);
+  const [jobApplication, setJobApplication] = useState<JobApplication | null>(
+    null,
+  );
   const [selectedEmail, setSelectedEmail] = useState<any>(null);
   const [showEmailTrigger, setShowEmailTrigger] = useState(false);
   const [newNote, setNewNote] = useState("");
@@ -109,13 +111,15 @@ export default function CandidateApplicationProgress() {
   // Convert stage history to StageData format
   const stages: StageData[] = [
     "Applied",
-    "Screening", 
+    "Screening",
     "Interview",
     "Technical",
     "Offer",
-    "Hired"
-  ].map(stageName => {
-    const stageData = jobApplication.stageHistory.find(s => s.stage === stageName);
+    "Hired",
+  ].map((stageName) => {
+    const stageData = jobApplication.stageHistory.find(
+      (s) => s.stage === stageName,
+    );
     return {
       name: stageName,
       completed: !!stageData,
@@ -129,8 +133,10 @@ export default function CandidateApplicationProgress() {
     };
   });
 
-  const currentStageIndex = stages.findIndex(stage => stage.name === jobApplication.currentStage);
-  const completedStages = stages.filter(s => s.completed).length;
+  const currentStageIndex = stages.findIndex(
+    (stage) => stage.name === jobApplication.currentStage,
+  );
+  const completedStages = stages.filter((s) => s.completed).length;
   const totalStages = stages.length;
 
   // Activity timeline combining stage changes, notes, and emails
@@ -161,7 +167,9 @@ export default function CandidateApplicationProgress() {
       timestamp: new Date(email.timestamp).toLocaleString(),
       content: email.content,
     })),
-  ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  ].sort(
+    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+  );
 
   const StatusTracker = () => (
     <Card className="mb-4 sm:mb-6">
@@ -176,11 +184,15 @@ export default function CandidateApplicationProgress() {
               <Building2 className="w-3 h-3" />
               {jobApplication.department}
             </Badge>
-            <Badge 
+            <Badge
               variant={
-                jobApplication.status === "Active" ? "default" :
-                jobApplication.status === "On Hold" ? "secondary" :
-                jobApplication.status === "Completed" ? "default" : "destructive"
+                jobApplication.status === "Active"
+                  ? "default"
+                  : jobApplication.status === "On Hold"
+                    ? "secondary"
+                    : jobApplication.status === "Completed"
+                      ? "default"
+                      : "destructive"
               }
               className="flex items-center gap-1"
             >
@@ -202,8 +214,11 @@ export default function CandidateApplicationProgress() {
               </div>
               <Badge
                 variant={
-                  jobApplication.priority === "High" ? "destructive" :
-                  jobApplication.priority === "Medium" ? "secondary" : "outline"
+                  jobApplication.priority === "High"
+                    ? "destructive"
+                    : jobApplication.priority === "Medium"
+                      ? "secondary"
+                      : "outline"
                 }
                 className="flex items-center gap-1 w-fit self-start sm:self-center"
               >
@@ -214,11 +229,16 @@ export default function CandidateApplicationProgress() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 text-sm text-slate-600">
               <div className="flex items-center gap-1 min-w-0">
                 <Calendar className="w-4 h-4 flex-shrink-0" />
-                <span className="truncate">Applied: {new Date(jobApplication.appliedDate).toLocaleDateString()}</span>
+                <span className="truncate">
+                  Applied:{" "}
+                  {new Date(jobApplication.appliedDate).toLocaleDateString()}
+                </span>
               </div>
               <div className="flex items-center gap-1 min-w-0">
                 <User className="w-4 h-4 flex-shrink-0" />
-                <span className="truncate">Recruiter: {jobApplication.recruiter}</span>
+                <span className="truncate">
+                  Recruiter: {jobApplication.recruiter}
+                </span>
               </div>
               {jobApplication.salary && (
                 <div className="flex items-center gap-1 min-w-0">
@@ -263,8 +283,8 @@ export default function CandidateApplicationProgress() {
                 Current: {jobApplication.currentStage}
               </h4>
               <p className="text-sm text-blue-700 text-wrap">
-                {stages.find((s) => s.name === jobApplication.currentStage)?.notes ||
-                  "Stage in progress"}
+                {stages.find((s) => s.name === jobApplication.currentStage)
+                  ?.notes || "Stage in progress"}
               </p>
             </div>
           </div>
@@ -327,7 +347,8 @@ export default function CandidateApplicationProgress() {
             <Clock className="w-4 h-4 text-slate-500 flex-shrink-0" />
             <div className="min-w-0 flex-1">
               <span className="text-sm text-slate-600 truncate block">
-                Total Time: {stages.reduce((acc, stage) => acc + stage.duration, 0)} days
+                Total Time:{" "}
+                {stages.reduce((acc, stage) => acc + stage.duration, 0)} days
               </span>
             </div>
           </div>
@@ -336,7 +357,9 @@ export default function CandidateApplicationProgress() {
             <div className="min-w-0 flex-1">
               <span className="text-sm text-slate-600 truncate block">
                 Current: {jobApplication.currentStage} (
-                {stages.find((s) => s.name === jobApplication.currentStage)?.duration || 0} days)
+                {stages.find((s) => s.name === jobApplication.currentStage)
+                  ?.duration || 0}{" "}
+                days)
               </span>
             </div>
           </div>
@@ -378,12 +401,17 @@ export default function CandidateApplicationProgress() {
             <Avatar className="w-10 h-10">
               <AvatarImage src={candidate.avatar} />
               <AvatarFallback>
-                {candidate.name.split(" ").map((n) => n[0]).join("")}
+                {candidate.name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")}
               </AvatarFallback>
             </Avatar>
             <div className="text-right">
               <p className="font-medium text-slate-900">{candidate.name}</p>
-              <p className="text-sm text-slate-600">{jobApplication.jobTitle}</p>
+              <p className="text-sm text-slate-600">
+                {jobApplication.jobTitle}
+              </p>
             </div>
           </div>
         </div>
@@ -394,29 +422,40 @@ export default function CandidateApplicationProgress() {
         {/* Left Panel - Status & Quick Actions */}
         <div className="lg:col-span-4 space-y-6">
           <StatusTracker />
-          
+
           {/* Quick Actions */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg sm:text-xl">Quick Actions</CardTitle>
+              <CardTitle className="text-lg sm:text-xl">
+                Quick Actions
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Button 
-                className="w-full justify-start text-sm" 
+              <Button
+                className="w-full justify-start text-sm"
                 onClick={() => setShowEmailTrigger(true)}
               >
                 <Mail className="w-4 h-4 mr-2" />
                 Send Email
               </Button>
-              <Button className="w-full justify-start text-sm" variant="outline">
+              <Button
+                className="w-full justify-start text-sm"
+                variant="outline"
+              >
                 <Video className="w-4 h-4 mr-2" />
                 Schedule Interview
               </Button>
-              <Button className="w-full justify-start text-sm" variant="outline">
+              <Button
+                className="w-full justify-start text-sm"
+                variant="outline"
+              >
                 <Phone className="w-4 h-4 mr-2" />
                 Schedule Call
               </Button>
-              <Button className="w-full justify-start text-sm" variant="outline">
+              <Button
+                className="w-full justify-start text-sm"
+                variant="outline"
+              >
                 <FileText className="w-4 h-4 mr-2" />
                 Add Assessment
               </Button>
@@ -428,15 +467,24 @@ export default function CandidateApplicationProgress() {
         <div className="lg:col-span-8">
           <Tabs defaultValue="timeline" className="w-full">
             <TabsList className="grid w-full grid-cols-3 h-auto">
-              <TabsTrigger value="timeline" className="text-xs sm:text-sm px-2 py-2">
+              <TabsTrigger
+                value="timeline"
+                className="text-xs sm:text-sm px-2 py-2"
+              >
                 <span className="hidden sm:inline">Timeline & Notes</span>
                 <span className="sm:hidden">Timeline</span>
               </TabsTrigger>
-              <TabsTrigger value="emails" className="text-xs sm:text-sm px-2 py-2">
+              <TabsTrigger
+                value="emails"
+                className="text-xs sm:text-sm px-2 py-2"
+              >
                 <span className="hidden sm:inline">Email History</span>
                 <span className="sm:hidden">Emails</span>
               </TabsTrigger>
-              <TabsTrigger value="stages" className="text-xs sm:text-sm px-2 py-2">
+              <TabsTrigger
+                value="stages"
+                className="text-xs sm:text-sm px-2 py-2"
+              >
                 <span className="hidden sm:inline">Stage Details</span>
                 <span className="sm:hidden">Stages</span>
               </TabsTrigger>
@@ -505,7 +553,8 @@ export default function CandidateApplicationProgress() {
                           )}
                           {activity.reason && (
                             <p className="text-sm text-slate-600 mt-1">
-                              <span className="font-medium">Reason:</span> {activity.reason}
+                              <span className="font-medium">Reason:</span>{" "}
+                              {activity.reason}
                             </p>
                           )}
                         </div>
@@ -539,7 +588,9 @@ export default function CandidateApplicationProgress() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
-                              <DropdownMenuItem onClick={() => setSelectedEmail(email)}>
+                              <DropdownMenuItem
+                                onClick={() => setSelectedEmail(email)}
+                              >
                                 <Eye className="w-4 h-4 mr-2" />
                                 View Full
                               </DropdownMenuItem>
@@ -600,7 +651,8 @@ export default function CandidateApplicationProgress() {
                               </span>
                             </div>
                             <p className="text-sm text-slate-600 mt-1">
-                              {stage.startDate} {stage.endDate && `- ${stage.endDate}`}
+                              {stage.startDate}{" "}
+                              {stage.endDate && `- ${stage.endDate}`}
                             </p>
                             {stage.notes && (
                               <p className="text-sm text-slate-600 mt-2 bg-slate-50 p-2 rounded">
@@ -609,7 +661,8 @@ export default function CandidateApplicationProgress() {
                             )}
                             {stage.reason && (
                               <p className="text-sm text-slate-600 mt-1">
-                                <span className="font-medium">Reason:</span> {stage.reason}
+                                <span className="font-medium">Reason:</span>{" "}
+                                {stage.reason}
                               </p>
                             )}
                           </div>
@@ -624,12 +677,17 @@ export default function CandidateApplicationProgress() {
       </div>
 
       {/* Email Dialog */}
-      <Dialog open={!!selectedEmail} onOpenChange={() => setSelectedEmail(null)}>
+      <Dialog
+        open={!!selectedEmail}
+        onOpenChange={() => setSelectedEmail(null)}
+      >
         <DialogContent className="sm:max-w-xl">
           <DialogHeader>
             <DialogTitle>{selectedEmail?.subject}</DialogTitle>
             <DialogDescription>
-              Sent on {selectedEmail?.timestamp && new Date(selectedEmail.timestamp).toLocaleString()}
+              Sent on{" "}
+              {selectedEmail?.timestamp &&
+                new Date(selectedEmail.timestamp).toLocaleString()}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-2">
