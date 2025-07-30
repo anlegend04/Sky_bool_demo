@@ -95,6 +95,70 @@ export default function Reports() {
     avgTimeToHire: 25, // Mock average
   };
 
+  // Calculate pipeline data from actual candidates
+  const totalCandidates = HARDCODED_CANDIDATES.length;
+  const appliedCount = HARDCODED_CANDIDATES.filter(
+    (c) => c.jobApplications.some(app => app.currentStage === "Applied"),
+  ).length;
+  const screeningCount = HARDCODED_CANDIDATES.filter(
+    (c) => c.jobApplications.some(app => app.currentStage === "Screening"),
+  ).length;
+  const interviewCount = HARDCODED_CANDIDATES.filter(
+    (c) => c.jobApplications.some(app => app.currentStage === "Interview"),
+  ).length;
+  const technicalCount = HARDCODED_CANDIDATES.filter(
+    (c) => c.jobApplications.some(app => app.currentStage === "Technical"),
+  ).length;
+  const offerCount = HARDCODED_CANDIDATES.filter(
+    (c) => c.jobApplications.some(app => app.currentStage === "Offer"),
+  ).length;
+  const hiredCount = HARDCODED_CANDIDATES.filter(
+    (c) => c.jobApplications.some(app => app.currentStage === "Hired"),
+  ).length;
+
+  const pipeline = [
+    { stageKey: "dashboard.applied", count: totalCandidates, percentage: 100 },
+    {
+      stageKey: "dashboard.screening",
+      count:
+        screeningCount +
+        interviewCount +
+        technicalCount +
+        offerCount +
+        hiredCount,
+      percentage: Math.round(
+        ((screeningCount +
+          interviewCount +
+          technicalCount +
+          offerCount +
+          hiredCount) /
+          totalCandidates) *
+          100,
+      ),
+    },
+    {
+      stageKey: "dashboard.interview",
+      count: interviewCount + technicalCount + offerCount + hiredCount,
+      percentage: Math.round(
+        ((interviewCount + technicalCount + offerCount + hiredCount) /
+          totalCandidates) *
+          100,
+      ),
+    },
+    {
+      stageKey: "dashboard.offer",
+      count: offerCount + hiredCount,
+      percentage: Math.round(
+        ((offerCount + hiredCount) / totalCandidates) * 100,
+      ),
+    },
+    {
+      stageKey: "dashboard.hired",
+      count: hiredCount,
+      percentage: Math.round((hiredCount / totalCandidates) * 100),
+    },
+  ];
+
   // Get unique values for filters
   const recruiters = Array.from(
     new Set(
