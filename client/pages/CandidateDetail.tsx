@@ -77,9 +77,9 @@ import {
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { storage, EmailData, StageHistoryData } from "@/lib/storage";
-import { CandidateData } from "@/data/hardcoded-data";
+import { CandidateData, CVEvaluationData } from "@/data/hardcoded-data";
 import { useToast } from "@/hooks/use-toast";
-import { HARDCODED_CANDIDATES, EMAIL_TEMPLATES } from "@/data/hardcoded-data";
+import { HARDCODED_CANDIDATES, EMAIL_TEMPLATES, getCandidate, getCandidateTimeline } from "@/data/hardcoded-data";
 import { EmailTrigger } from "@/components/EmailTrigger";
 
 type StageData = {
