@@ -1,13 +1,16 @@
-import { EnhancedCandidateData, JobApplication } from "@/types/enhanced-candidate";
-import { 
-  StageHistoryData, 
-  NoteData, 
+import {
+  EnhancedCandidateData,
+  JobApplication,
+} from "@/types/enhanced-candidate";
+import {
+  StageHistoryData,
+  NoteData,
   EmailData,
   EducationData,
   WorkExperienceData,
   CVEvaluationData,
-  AttachmentData
-} from '@/data/hardcoded-data';
+  AttachmentData,
+} from "@/data/hardcoded-data";
 
 // Mock Job Applications for a candidate applying to multiple positions
 const mockJobApplications: JobApplication[] = [
@@ -35,7 +38,7 @@ const mockJobApplications: JobApplication[] = [
         userId: "user-1",
         userName: "Alice Johnson",
         mailSent: true,
-        mailConfirmed: true
+        mailConfirmed: true,
       },
       {
         id: "sh-2",
@@ -48,7 +51,7 @@ const mockJobApplications: JobApplication[] = [
         userId: "user-1",
         userName: "Alice Johnson",
         mailSent: true,
-        mailConfirmed: true
+        mailConfirmed: true,
       },
       {
         id: "sh-3",
@@ -61,7 +64,7 @@ const mockJobApplications: JobApplication[] = [
         userId: "user-2",
         userName: "Bob Wilson",
         mailSent: true,
-        mailConfirmed: true
+        mailConfirmed: true,
       },
       {
         id: "sh-4",
@@ -74,7 +77,7 @@ const mockJobApplications: JobApplication[] = [
         userId: "user-3",
         userName: "Charlie Davis",
         mailSent: true,
-        mailConfirmed: true
+        mailConfirmed: true,
       },
       {
         id: "sh-5",
@@ -87,7 +90,7 @@ const mockJobApplications: JobApplication[] = [
         userId: "user-1",
         userName: "Alice Johnson",
         mailSent: true,
-        mailConfirmed: true
+        mailConfirmed: true,
       },
       {
         id: "sh-6",
@@ -99,41 +102,44 @@ const mockJobApplications: JobApplication[] = [
         userId: "user-1",
         userName: "Alice Johnson",
         mailSent: true,
-        mailConfirmed: true
-      }
+        mailConfirmed: true,
+      },
     ],
     notes: [
       {
         id: "note-1",
-        content: "Candidate showed exceptional React and TypeScript skills during technical interview",
+        content:
+          "Candidate showed exceptional React and TypeScript skills during technical interview",
         userId: "user-2",
         userName: "Bob Wilson",
         timestamp: "2024-01-25T10:30:00Z",
         type: "note",
-        tags: ["technical", "positive"]
+        tags: ["technical", "positive"],
       },
       {
         id: "note-2",
-        content: "Great cultural fit, very collaborative approach to problem solving",
+        content:
+          "Great cultural fit, very collaborative approach to problem solving",
         userId: "user-3",
         userName: "Charlie Davis",
         timestamp: "2024-01-26T14:15:00Z",
         type: "note",
-        tags: ["culture", "teamwork"]
-      }
+        tags: ["culture", "teamwork"],
+      },
     ],
     emails: [
       {
         id: "email-1",
         subject: "Welcome to the team - Senior Frontend Developer",
-        content: "Dear Marissa,\n\nWe're thrilled to welcome you to our Engineering team as Senior Frontend Developer...",
+        content:
+          "Dear Marissa,\n\nWe're thrilled to welcome you to our Engineering team as Senior Frontend Developer...",
         from: "alice.johnson@company.com",
         to: "marissa.torres@email.com",
         timestamp: "2024-02-12T09:00:00Z",
         status: "sent",
-        type: "offer_acceptance"
-      }
-    ]
+        type: "offer_acceptance",
+      },
+    ],
   },
   {
     id: "job-app-2",
@@ -159,7 +165,7 @@ const mockJobApplications: JobApplication[] = [
         userId: "user-4",
         userName: "Sarah Chen",
         mailSent: true,
-        mailConfirmed: true
+        mailConfirmed: true,
       },
       {
         id: "sh-8",
@@ -168,11 +174,12 @@ const mockJobApplications: JobApplication[] = [
         endDate: "2024-01-30",
         duration: 7,
         reason: "Portfolio review and initial screening",
-        notes: "Impressive design work, good understanding of user experience principles",
+        notes:
+          "Impressive design work, good understanding of user experience principles",
         userId: "user-4",
         userName: "Sarah Chen",
         mailSent: true,
-        mailConfirmed: true
+        mailConfirmed: true,
       },
       {
         id: "sh-9",
@@ -184,32 +191,34 @@ const mockJobApplications: JobApplication[] = [
         userId: "user-4",
         userName: "Sarah Chen",
         mailSent: true,
-        mailConfirmed: false
-      }
+        mailConfirmed: false,
+      },
     ],
     notes: [
       {
         id: "note-3",
-        content: "Design challenge shows strong understanding of user-centered design principles",
+        content:
+          "Design challenge shows strong understanding of user-centered design principles",
         userId: "user-5",
         userName: "Emma Rodriguez",
         timestamp: "2024-02-02T11:20:00Z",
         type: "note",
-        tags: ["design", "challenge"]
-      }
+        tags: ["design", "challenge"],
+      },
     ],
     emails: [
       {
         id: "email-2",
         subject: "Design Challenge - Lead UI/UX Developer",
-        content: "Hi Marissa,\n\nThank you for your interest in the Lead UI/UX Developer position...",
+        content:
+          "Hi Marissa,\n\nThank you for your interest in the Lead UI/UX Developer position...",
         from: "sarah.chen@company.com",
         to: "marissa.torres@email.com",
         timestamp: "2024-01-30T15:30:00Z",
         status: "sent",
-        type: "interview_invitation"
-      }
-    ]
+        type: "interview_invitation",
+      },
+    ],
   },
   {
     id: "job-app-3",
@@ -235,7 +244,7 @@ const mockJobApplications: JobApplication[] = [
         userId: "user-6",
         userName: "Mike Johnson",
         mailSent: true,
-        mailConfirmed: true
+        mailConfirmed: true,
       },
       {
         id: "sh-11",
@@ -243,37 +252,40 @@ const mockJobApplications: JobApplication[] = [
         startDate: "2024-02-05",
         duration: 10,
         reason: "Initial screening in progress",
-        notes: "On hold due to other priorities, will resume after decision on primary role",
+        notes:
+          "On hold due to other priorities, will resume after decision on primary role",
         userId: "user-6",
         userName: "Mike Johnson",
         mailSent: false,
-        mailConfirmed: false
-      }
+        mailConfirmed: false,
+      },
     ],
     notes: [
       {
         id: "note-4",
-        content: "Put on hold since candidate is progressing well with Senior Frontend role",
+        content:
+          "Put on hold since candidate is progressing well with Senior Frontend role",
         userId: "user-6",
         userName: "Mike Johnson",
         timestamp: "2024-02-08T09:45:00Z",
         type: "system",
-        tags: ["hold", "priority"]
-      }
+        tags: ["hold", "priority"],
+      },
     ],
     emails: [
       {
         id: "email-3",
         subject: "Application Received - Full Stack Engineer",
-        content: "Dear Marissa,\n\nThank you for applying to the Full Stack Engineer position...",
+        content:
+          "Dear Marissa,\n\nThank you for applying to the Full Stack Engineer position...",
         from: "mike.johnson@company.com",
         to: "marissa.torres@email.com",
         timestamp: "2024-02-01T16:20:00Z",
         status: "sent",
-        type: "application_received"
-      }
-    ]
-  }
+        type: "application_received",
+      },
+    ],
+  },
 ];
 
 // Enhanced candidate data with multiple job applications
@@ -284,7 +296,16 @@ export const ENHANCED_CANDIDATE_SAMPLE: EnhancedCandidateData = {
   phone: "+1 (555) 987-6543",
   location: "San Francisco, CA",
   experience: "5+ years",
-  skills: ["React", "TypeScript", "Node.js", "GraphQL", "Redux", "CSS3", "HTML5", "JavaScript"],
+  skills: [
+    "React",
+    "TypeScript",
+    "Node.js",
+    "GraphQL",
+    "Redux",
+    "CSS3",
+    "HTML5",
+    "JavaScript",
+  ],
   status: "Active",
   rating: 4,
   resume: "Marissa_Torres_Resume.pdf",
@@ -298,7 +319,7 @@ export const ENHANCED_CANDIDATE_SAMPLE: EnhancedCandidateData = {
       url: "/files/marissa-torres-resume.pdf",
       type: "application/pdf",
       size: 245760,
-      uploadedAt: "2024-01-15T08:30:00Z"
+      uploadedAt: "2024-01-15T08:30:00Z",
     },
     {
       id: "att-2",
@@ -306,8 +327,8 @@ export const ENHANCED_CANDIDATE_SAMPLE: EnhancedCandidateData = {
       url: "/files/marissa-torres-portfolio.pdf",
       type: "application/pdf",
       size: 1048576,
-      uploadedAt: "2024-01-15T08:31:00Z"
-    }
+      uploadedAt: "2024-01-15T08:31:00Z",
+    },
   ],
   linkedInProfile: "https://linkedin.com/in/marissa-torres",
   githubProfile: "https://github.com/marissa-torres",
@@ -319,8 +340,8 @@ export const ENHANCED_CANDIDATE_SAMPLE: EnhancedCandidateData = {
       degree: "Bachelor of Science",
       field: "Computer Science",
       graduationYear: "2019",
-      gpa: "3.8"
-    }
+      gpa: "3.8",
+    },
   ],
   workExperience: [
     {
@@ -330,7 +351,10 @@ export const ENHANCED_CANDIDATE_SAMPLE: EnhancedCandidateData = {
       startDate: "2019-06",
       endDate: "2022-03",
       description: "Developed and maintained React applications",
-      achievements: ["Led migration to TypeScript", "Improved performance by 40%"]
+      achievements: [
+        "Led migration to TypeScript",
+        "Improved performance by 40%",
+      ],
     },
     {
       id: "work-2",
@@ -339,8 +363,8 @@ export const ENHANCED_CANDIDATE_SAMPLE: EnhancedCandidateData = {
       startDate: "2022-03",
       endDate: "2024-01",
       description: "Lead frontend development for B2B SaaS platform",
-      achievements: ["Built design system", "Mentored junior developers"]
-    }
+      achievements: ["Built design system", "Mentored junior developers"],
+    },
   ],
   lastActivity: "2024-02-15T10:30:00Z",
   communicationPreference: "email",
@@ -350,13 +374,14 @@ export const ENHANCED_CANDIDATE_SAMPLE: EnhancedCandidateData = {
   globalNotes: [
     {
       id: "global-note-1",
-      content: "Excellent candidate with strong technical and communication skills. Applying to multiple roles to find best fit.",
+      content:
+        "Excellent candidate with strong technical and communication skills. Applying to multiple roles to find best fit.",
       userId: "user-1",
       userName: "Alice Johnson",
       timestamp: "2024-01-15T09:00:00Z",
       type: "note",
-      tags: ["summary", "multi-role"]
-    }
+      tags: ["summary", "multi-role"],
+    },
   ],
   cvEvaluations: [
     {
@@ -364,8 +389,13 @@ export const ENHANCED_CANDIDATE_SAMPLE: EnhancedCandidateData = {
       candidateId: "cand-001",
       jobId: "job-001",
       fileName: "Marissa_Torres_Resume.pdf",
-      summary: "Strong frontend developer with excellent React and TypeScript skills",
-      strengths: ["React expertise", "TypeScript proficiency", "Strong portfolio"],
+      summary:
+        "Strong frontend developer with excellent React and TypeScript skills",
+      strengths: [
+        "React expertise",
+        "TypeScript proficiency",
+        "Strong portfolio",
+      ],
       weaknesses: ["Limited backend experience", "No DevOps experience"],
       jobFitScore: 92,
       suggestedImprovements: ["Consider learning backend technologies"],
@@ -373,7 +403,7 @@ export const ENHANCED_CANDIDATE_SAMPLE: EnhancedCandidateData = {
       skillsMatch: [
         { skill: "React", hasSkill: true, level: "Expert" },
         { skill: "TypeScript", hasSkill: true, level: "Advanced" },
-        { skill: "Node.js", hasSkill: true, level: "Intermediate" }
+        { skill: "Node.js", hasSkill: true, level: "Intermediate" },
       ],
       experienceMatch: 85,
       educationMatch: 95,
@@ -384,33 +414,47 @@ export const ENHANCED_CANDIDATE_SAMPLE: EnhancedCandidateData = {
         phone: "+1 (555) 987-6543",
         location: "San Francisco, CA",
         education: ["Stanford University - BS Computer Science"],
-        workExperience: ["TechStart Inc. - Frontend Developer", "Innovation Labs - Senior Frontend Developer"],
-        skills: ["React", "TypeScript", "Node.js", "GraphQL", "Redux"]
+        workExperience: [
+          "TechStart Inc. - Frontend Developer",
+          "Innovation Labs - Senior Frontend Developer",
+        ],
+        skills: ["React", "TypeScript", "Node.js", "GraphQL", "Redux"],
       },
       notes: "Top candidate for senior frontend position",
       savedAt: "2024-01-15T10:00:00Z",
       createdBy: "alice.johnson@company.com",
       isShared: true,
-      shareUrl: "https://app.company.com/cv-eval/cv-eval-1"
-    }
+      shareUrl: "https://app.company.com/cv-eval/cv-eval-1",
+    },
   ],
   createdAt: "2024-01-15T08:00:00Z",
-  updatedAt: "2024-02-15T10:30:00Z"
+  updatedAt: "2024-02-15T10:30:00Z",
 };
 
 // Helper function to get job application by ID
-export function getJobApplication(candidateData: EnhancedCandidateData, jobApplicationId: string): JobApplication | undefined {
-  return candidateData.jobApplications.find(app => app.id === jobApplicationId);
+export function getJobApplication(
+  candidateData: EnhancedCandidateData,
+  jobApplicationId: string,
+): JobApplication | undefined {
+  return candidateData.jobApplications.find(
+    (app) => app.id === jobApplicationId,
+  );
 }
 
 // Helper function to get current job application (most recently updated or highest priority active)
-export function getCurrentJobApplication(candidateData: EnhancedCandidateData): JobApplication | undefined {
-  const activeApps = candidateData.jobApplications.filter(app => app.status === "Active");
+export function getCurrentJobApplication(
+  candidateData: EnhancedCandidateData,
+): JobApplication | undefined {
+  const activeApps = candidateData.jobApplications.filter(
+    (app) => app.status === "Active",
+  );
   if (activeApps.length === 0) return candidateData.jobApplications[0];
-  
+
   // Return highest priority active application
   return activeApps.reduce((prev, current) => {
-    const priorityOrder = { "High": 3, "Medium": 2, "Low": 1 };
-    return priorityOrder[current.priority] > priorityOrder[prev.priority] ? current : prev;
+    const priorityOrder = { High: 3, Medium: 2, Low: 1 };
+    return priorityOrder[current.priority] > priorityOrder[prev.priority]
+      ? current
+      : prev;
   });
 }

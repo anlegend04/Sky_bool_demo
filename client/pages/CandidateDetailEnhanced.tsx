@@ -35,14 +35,14 @@ import { useToast } from "@/hooks/use-toast";
 
 // Enhanced imports
 import { JobSelector } from "@/components/JobSelector";
-import { 
-  EnhancedCandidateData, 
-  JobApplication 
+import {
+  EnhancedCandidateData,
+  JobApplication,
 } from "@/types/enhanced-candidate";
-import { 
-  ENHANCED_CANDIDATE_SAMPLE, 
-  getJobApplication, 
-  getCurrentJobApplication 
+import {
+  ENHANCED_CANDIDATE_SAMPLE,
+  getJobApplication,
+  getCurrentJobApplication,
 } from "@/data/enhanced-mock-data";
 
 // Temporary - use enhanced mock data
@@ -50,9 +50,13 @@ const MOCK_ENHANCED_CANDIDATES = [ENHANCED_CANDIDATE_SAMPLE];
 
 export default function CandidateDetailEnhanced() {
   const { id } = useParams();
-  const [candidate, setCandidate] = useState<EnhancedCandidateData | null>(null);
-  const [selectedJobApplicationId, setSelectedJobApplicationId] = useState<string>("");
-  const [selectedJobApplication, setSelectedJobApplication] = useState<JobApplication | null>(null);
+  const [candidate, setCandidate] = useState<EnhancedCandidateData | null>(
+    null,
+  );
+  const [selectedJobApplicationId, setSelectedJobApplicationId] =
+    useState<string>("");
+  const [selectedJobApplication, setSelectedJobApplication] =
+    useState<JobApplication | null>(null);
   const [showAllJobs, setShowAllJobs] = useState(false);
   const { toast } = useToast();
 
@@ -60,7 +64,7 @@ export default function CandidateDetailEnhanced() {
   useEffect(() => {
     if (id) {
       // For demo, use mock data
-      const mockCandidate = MOCK_ENHANCED_CANDIDATES.find(c => c.id === id);
+      const mockCandidate = MOCK_ENHANCED_CANDIDATES.find((c) => c.id === id);
       if (mockCandidate) {
         setCandidate(mockCandidate);
         // Set initial job application (highest priority active or first one)
@@ -108,8 +112,17 @@ export default function CandidateDetailEnhanced() {
   const StatusTracker = () => {
     if (!selectedJobApplication) return null;
 
-    const stages = ["Applied", "Screening", "Interview", "Technical", "Offer", "Hired"];
-    const currentStageIndex = stages.findIndex(stage => stage === selectedJobApplication.currentStage);
+    const stages = [
+      "Applied",
+      "Screening",
+      "Interview",
+      "Technical",
+      "Offer",
+      "Hired",
+    ];
+    const currentStageIndex = stages.findIndex(
+      (stage) => stage === selectedJobApplication.currentStage,
+    );
     const completedStages = selectedJobApplication.stageHistory.length;
     const totalStages = stages.length;
 
@@ -135,19 +148,27 @@ export default function CandidateDetailEnhanced() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
               <div className="flex items-center gap-2">
                 <Building2 className="w-4 h-4 text-blue-600" />
-                <span className="text-blue-900">{selectedJobApplication.department}</span>
+                <span className="text-blue-900">
+                  {selectedJobApplication.department}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <User className="w-4 h-4 text-blue-600" />
-                <span className="text-blue-900">{selectedJobApplication.recruiter}</span>
+                <span className="text-blue-900">
+                  {selectedJobApplication.recruiter}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <DollarSign className="w-4 h-4 text-blue-600" />
-                <span className="text-blue-900">{selectedJobApplication.salary}</span>
+                <span className="text-blue-900">
+                  {selectedJobApplication.salary}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <Star className="w-4 h-4 text-blue-600" />
-                <span className="text-blue-900">{selectedJobApplication.priority} Priority</span>
+                <span className="text-blue-900">
+                  {selectedJobApplication.priority} Priority
+                </span>
               </div>
             </div>
           </div>
@@ -179,8 +200,9 @@ export default function CandidateDetailEnhanced() {
                   Current: {selectedJobApplication.currentStage}
                 </h4>
                 <p className="text-sm text-green-700 text-wrap">
-                  {selectedJobApplication.stageHistory[selectedJobApplication.stageHistory.length - 1]?.notes || 
-                   "Stage in progress"}
+                  {selectedJobApplication.stageHistory[
+                    selectedJobApplication.stageHistory.length - 1
+                  ]?.notes || "Stage in progress"}
                 </p>
               </div>
             </div>
@@ -189,10 +211,13 @@ export default function CandidateDetailEnhanced() {
           {/* Stages Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             {stages.map((stageName, index) => {
-              const stageData = selectedJobApplication.stageHistory.find(s => s.stage === stageName);
+              const stageData = selectedJobApplication.stageHistory.find(
+                (s) => s.stage === stageName,
+              );
               const isCompleted = !!stageData;
-              const isCurrent = stageName === selectedJobApplication.currentStage;
-              
+              const isCurrent =
+                stageName === selectedJobApplication.currentStage;
+
               return (
                 <div key={stageName} className="text-center relative">
                   {/* Email status indicator */}
@@ -250,7 +275,12 @@ export default function CandidateDetailEnhanced() {
               <Clock className="w-4 h-4 text-slate-500 flex-shrink-0" />
               <div className="min-w-0 flex-1">
                 <span className="text-sm text-slate-600 truncate block">
-                  Total Time: {selectedJobApplication.stageHistory.reduce((acc, stage) => acc + stage.duration, 0)} days
+                  Total Time:{" "}
+                  {selectedJobApplication.stageHistory.reduce(
+                    (acc, stage) => acc + stage.duration,
+                    0,
+                  )}{" "}
+                  days
                 </span>
               </div>
             </div>
@@ -369,7 +399,9 @@ export default function CandidateDetailEnhanced() {
 
           {/* Job Applications Summary */}
           <div className="pt-4 border-t">
-            <h4 className="font-medium text-slate-900 mb-3">Job Applications Overview</h4>
+            <h4 className="font-medium text-slate-900 mb-3">
+              Job Applications Overview
+            </h4>
             <div className="space-y-2">
               {candidate.jobApplications.map((job) => {
                 const isSelected = job.id === selectedJobApplicationId;
@@ -377,16 +409,20 @@ export default function CandidateDetailEnhanced() {
                   <div
                     key={job.id}
                     className={`p-3 rounded-lg border cursor-pointer transition-all ${
-                      isSelected 
-                        ? 'border-primary bg-primary/5' 
-                        : 'border-slate-200 hover:border-slate-300'
+                      isSelected
+                        ? "border-primary bg-primary/5"
+                        : "border-slate-200 hover:border-slate-300"
                     }`}
                     onClick={() => handleJobSelect(job.id)}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-medium text-sm truncate">{job.jobTitle}</span>
-                      <Badge 
-                        variant={job.status === "Active" ? "default" : "secondary"}
+                      <span className="font-medium text-sm truncate">
+                        {job.jobTitle}
+                      </span>
+                      <Badge
+                        variant={
+                          job.status === "Active" ? "default" : "secondary"
+                        }
                         className="text-xs"
                       >
                         {job.currentStage}
@@ -472,14 +508,18 @@ export default function CandidateDetailEnhanced() {
                   <CardTitle className="flex items-center gap-2">
                     <FileText className="w-5 h-5" />
                     Job-Specific Notes & Timeline
-                    <Badge variant="outline">{selectedJobApplication.jobTitle}</Badge>
+                    <Badge variant="outline">
+                      {selectedJobApplication.jobTitle}
+                    </Badge>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Tabs defaultValue="timeline" className="w-full">
                     <TabsList className="grid w-full grid-cols-2">
                       <TabsTrigger value="timeline">Stage Timeline</TabsTrigger>
-                      <TabsTrigger value="notes">Notes ({selectedJobApplication.notes.length})</TabsTrigger>
+                      <TabsTrigger value="notes">
+                        Notes ({selectedJobApplication.notes.length})
+                      </TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="timeline" className="space-y-4">
@@ -501,7 +541,8 @@ export default function CandidateDetailEnhanced() {
                                 </span>
                               </div>
                               <p className="text-sm text-slate-600 mt-1">
-                                {stage.startDate} {stage.endDate && `- ${stage.endDate}`}
+                                {stage.startDate}{" "}
+                                {stage.endDate && `- ${stage.endDate}`}
                               </p>
                               <p className="text-sm text-slate-600 mt-1">
                                 by {stage.userName}
@@ -525,16 +566,24 @@ export default function CandidateDetailEnhanced() {
                             className="p-3 bg-slate-50 rounded-lg"
                           >
                             <div className="flex items-center justify-between mb-2">
-                              <span className="font-medium text-sm">{note.userName}</span>
+                              <span className="font-medium text-sm">
+                                {note.userName}
+                              </span>
                               <span className="text-xs text-slate-500">
                                 {new Date(note.timestamp).toLocaleDateString()}
                               </span>
                             </div>
-                            <p className="text-sm text-slate-600">{note.content}</p>
+                            <p className="text-sm text-slate-600">
+                              {note.content}
+                            </p>
                             {note.tags && (
                               <div className="flex gap-1 mt-2">
                                 {note.tags.map((tag) => (
-                                  <Badge key={tag} variant="outline" className="text-xs">
+                                  <Badge
+                                    key={tag}
+                                    variant="outline"
+                                    className="text-xs"
+                                  >
                                     {tag}
                                   </Badge>
                                 ))}

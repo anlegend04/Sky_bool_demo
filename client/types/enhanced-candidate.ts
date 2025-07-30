@@ -6,7 +6,14 @@ export interface JobApplication {
   jobTitle: string;
   department: string;
   appliedDate: string;
-  currentStage: "Applied" | "Screening" | "Interview" | "Technical" | "Offer" | "Hired" | "Rejected";
+  currentStage:
+    | "Applied"
+    | "Screening"
+    | "Interview"
+    | "Technical"
+    | "Offer"
+    | "Hired"
+    | "Rejected";
   stageHistory: StageHistoryData[];
   notes: NoteData[];
   emails: EmailData[];
@@ -51,12 +58,12 @@ export interface EnhancedCandidateData {
 }
 
 // Import existing types
-import { 
-  StageHistoryData, 
-  NoteData, 
-  EmailData, 
-  AttachmentData, 
-  EducationData, 
-  WorkExperienceData, 
-  CVEvaluationData 
-} from '@/data/hardcoded-data';
+import {
+  StageHistoryData,
+  NoteData,
+  EmailData,
+  AttachmentData,
+  EducationData,
+  WorkExperienceData,
+  CVEvaluationData,
+} from "@/data/hardcoded-data";
