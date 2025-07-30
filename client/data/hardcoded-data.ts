@@ -2058,8 +2058,7 @@ const generateMoreCandidates = (): CandidateData[] => {
         mailConfirmed: Math.random() > 0.2,
       });
       currentStageDate =
-        endDate ||
-        getRandomDate(Math.floor(Math.random() * 5) + 1);
+        endDate || getRandomDate(Math.floor(Math.random() * 5) + 1);
     }
 
     const notes = [
@@ -2083,14 +2082,10 @@ const generateMoreCandidates = (): CandidateData[] => {
       timestamp: stage.startDate,
       status: "sent" as "sent",
       template: `${stage.stage.toLowerCase()}_template`,
-        openedAt: getRandomDateTime(
-        Math.floor(Math.random() * 2) + 1
-      ),
+      openedAt: getRandomDateTime(Math.floor(Math.random() * 2) + 1),
       repliedAt:
         Math.random() > 0.5
-          ? getRandomDateTime(
-              Math.floor(Math.random() * 2) + 1
-            )
+          ? getRandomDateTime(Math.floor(Math.random() * 2) + 1)
           : undefined,
     }));
 
@@ -2123,7 +2118,10 @@ const generateMoreCandidates = (): CandidateData[] => {
             ? "Good Fit"
             : stage === "Rejected"
               ? "Not Suitable"
-              : "Needs Improvement" as "Good Fit" | "Needs Improvement" | "Not Suitable",
+              : ("Needs Improvement" as
+                  | "Good Fit"
+                  | "Needs Improvement"
+                  | "Not Suitable"),
         suggestedImprovements: [
           `Consider additional training in ${skillSets[position][Math.floor(Math.random() * skillSets[position].length)]}`,
         ],
