@@ -1325,8 +1325,7 @@ export const getUnreadNotificationCount = (): number => {
 };
 
 export const getUserNotifications = (userId: string): NotificationData[] => {
-  // This would be implemented with actual notification data
-  return [];
+  return HARDCODED_NOTIFICATIONS.filter(notification => notification.recipientId === userId);
 };
 
 export const getUpcomingSchedule = (days: number = 7): ScheduleData[] => {
