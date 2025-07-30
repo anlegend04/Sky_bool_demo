@@ -82,9 +82,8 @@ export function convertCandidateToEnhanced(
 
 // Get enhanced candidate data from the main hardcoded data
 export function getEnhancedCandidate(candidateId: string): EnhancedCandidateData | null {
-  const { getCandidate } = require("@/data/hardcoded-data");
   const candidate = getCandidate(candidateId);
-  
+
   if (!candidate) {
     return null;
   }
