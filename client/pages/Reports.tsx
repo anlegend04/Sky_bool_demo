@@ -479,14 +479,14 @@ export default function Reports() {
       icon: Clock,
       color: "purple",
     },
-    {
-      title: "Active Recruiters",
-      value: recruiters.length.toString(),
-      change: "+2",
-      trend: "up",
-      icon: Award,
-      color: "orange",
-    },
+    // {
+    //   title: "Active Recruiters",
+    //   value: recruiters.length.toString(),
+    //   change: "+2",
+    //   trend: "up",
+    //   icon: Award,
+    //   color: "orange",
+    // },
     {
       title: "Avg Cost per Hire",
       value: `${(costData.avgCostPerHire / 1000).toFixed(0)}K VND`,
@@ -707,7 +707,7 @@ export default function Reports() {
       </Card>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
         {dynamicStats.map((stat, index) => (
           <Card key={index}>
             <CardContent className="pt-6">
@@ -1219,7 +1219,7 @@ export default function Reports() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">
-                  avgCostPerHire
+                  Avg Cost per Hire
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -1292,7 +1292,7 @@ export default function Reports() {
                       <Tooltip
                         formatter={(value) => [
                           `${(Number(value) / 1000).toFixed(0)}K VND`,
-                          "Chi phí",
+                          "Cost",
                         ]}
                         labelFormatter={(label) => `Loại: ${label}`}
                         contentStyle={{
@@ -1505,7 +1505,7 @@ export default function Reports() {
                       </div>
                       <div className="text-sm text-gray-600">
                         ~{(item.amount / costData.totalHires / 1000).toFixed(0)}
-                        K/người
+                        K/hire
                       </div>
                     </div>
                   </div>
