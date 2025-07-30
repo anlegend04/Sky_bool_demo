@@ -373,7 +373,7 @@ const generateId = () => Math.random().toString(36).substr(2, 9);
 const getRandomDate = (daysBack: number) => {
   const date = new Date();
   date.setDate(date.getDate() - daysBack);
-  return date.toISOString().split('T')[0];
+  return date.toISOString().split("T")[0];
 };
 
 const getRandomDateTime = (daysBack: number) => {
@@ -388,27 +388,35 @@ const createJobApplication = (
   jobId: string,
   jobTitle: string,
   department: string,
-  currentStage: JobApplicationData['currentStage'],
-  status: JobApplicationData['status'],
-  priority: JobApplicationData['priority'],
+  currentStage: JobApplicationData["currentStage"],
+  status: JobApplicationData["status"],
+  priority: JobApplicationData["priority"],
   recruiter: string,
   appliedDate: string,
   salary?: string,
-  location?: string
+  location?: string,
 ): JobApplicationData => {
   const stageHistory: StageHistoryData[] = [];
   const notes: NoteData[] = [];
   const emails: EmailData[] = [];
 
   // Create stage history based on current stage
-  const stages = ["Applied", "Screening", "Interview", "Technical", "Offer", "Hired"];
-  const currentStageIndex = stages.findIndex(stage => stage === currentStage);
-  
+  const stages = [
+    "Applied",
+    "Screening",
+    "Interview",
+    "Technical",
+    "Offer",
+    "Hired",
+  ];
+  const currentStageIndex = stages.findIndex((stage) => stage === currentStage);
+
   for (let i = 0; i <= currentStageIndex; i++) {
     const stage = stages[i];
     const startDate = getRandomDate(30 - i * 5);
-    const endDate = i < currentStageIndex ? getRandomDate(25 - i * 5) : undefined;
-    
+    const endDate =
+      i < currentStageIndex ? getRandomDate(25 - i * 5) : undefined;
+
     stageHistory.push({
       id: `stage_${id}_${i}`,
       stage,
@@ -434,7 +442,8 @@ const createJobApplication = (
       status: "sent",
       template: `${stage.toLowerCase()}_notification`,
       openedAt: Math.random() > 0.2 ? getRandomDateTime(15 - i * 3) : undefined,
-      repliedAt: Math.random() > 0.5 ? getRandomDateTime(10 - i * 3) : undefined,
+      repliedAt:
+        Math.random() > 0.5 ? getRandomDateTime(10 - i * 3) : undefined,
     });
   }
 
@@ -487,7 +496,8 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
     ],
     status: "Active",
     resume: "marissa_torres_resume.pdf",
-    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b077?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1494790108755-2616b612b077?w=150&h=150&fit=crop&crop=face",
     source: "LinkedIn",
     tags: ["Strong Technical Skills", "Cultural Fit", "Fast Learner"],
     attachments: [
@@ -521,7 +531,8 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         position: "Frontend Developer",
         startDate: "2019-06",
         endDate: "2022-12",
-        description: "Developed responsive web applications using React and TypeScript",
+        description:
+          "Developed responsive web applications using React and TypeScript",
         achievements: [
           "Reduced page load time by 40%",
           "Led UI/UX redesign project",
@@ -555,13 +566,14 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         "Alex Chen",
         getRandomDate(45),
         "$125,000 - $140,000",
-        "San Francisco, CA"
+        "San Francisco, CA",
       ),
     ],
     globalNotes: [
       {
         id: "global_note_1",
-        content: "Excellent candidate with strong technical skills and cultural fit",
+        content:
+          "Excellent candidate with strong technical skills and cultural fit",
         userId: "user_1",
         userName: "Alex Chen",
         timestamp: getRandomDateTime(30),
@@ -574,8 +586,13 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         candidateId: "candidate_1",
         jobId: "job_1",
         fileName: "marissa_torres_resume.pdf",
-        summary: "Strong frontend developer with excellent React and TypeScript skills",
-        strengths: ["React expertise", "TypeScript proficiency", "Strong portfolio"],
+        summary:
+          "Strong frontend developer with excellent React and TypeScript skills",
+        strengths: [
+          "React expertise",
+          "TypeScript proficiency",
+          "Strong portfolio",
+        ],
         weaknesses: ["Limited backend experience"],
         jobFitScore: 85,
         suggestedImprovements: ["Gain more backend experience"],
@@ -593,7 +610,10 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
           phone: "+1 (555) 987-6543",
           location: "San Francisco, CA",
           education: ["UC Berkeley - Computer Science"],
-          workExperience: ["StartupCo - Frontend Developer", "TechFirm - Senior Frontend Developer"],
+          workExperience: [
+            "StartupCo - Frontend Developer",
+            "TechFirm - Senior Frontend Developer",
+          ],
           skills: ["React", "TypeScript", "Node.js"],
         },
         savedAt: getRandomDateTime(30),
@@ -622,7 +642,8 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
     ],
     status: "Active",
     resume: "david_kim_resume.pdf",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
     source: "Indeed",
     tags: ["Backend Developer", "Cloud Experience", "Team Player"],
     attachments: [
@@ -655,7 +676,8 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         position: "Backend Developer",
         startDate: "2021-06",
         endDate: "2023-12",
-        description: "Developed scalable backend services using Python and Django",
+        description:
+          "Developed scalable backend services using Python and Django",
         achievements: [
           "Improved API response time by 60%",
           "Implemented microservices architecture",
@@ -678,7 +700,7 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         "Sarah Johnson",
         getRandomDate(20),
         "$100,000 - $120,000",
-        "New York, NY"
+        "New York, NY",
       ),
       createJobApplication(
         "app_3",
@@ -691,7 +713,7 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         "Mike Wilson",
         getRandomDate(15),
         "$110,000 - $130,000",
-        "Remote"
+        "Remote",
       ),
     ],
     globalNotes: [
@@ -725,7 +747,8 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
     ],
     status: "Active",
     resume: "emily_chen_resume.pdf",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
     source: "Referral",
     tags: ["Senior Developer", "System Architecture", "Leadership"],
     attachments: [
@@ -781,7 +804,7 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         "Lisa Wang",
         getRandomDate(25),
         "$150,000 - $180,000",
-        "Seattle, WA"
+        "Seattle, WA",
       ),
       createJobApplication(
         "app_5",
@@ -794,7 +817,7 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         "John Smith",
         getRandomDate(30),
         "$160,000 - $200,000",
-        "Seattle, WA"
+        "Seattle, WA",
       ),
       createJobApplication(
         "app_6",
@@ -807,7 +830,7 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
         "Tom Brown",
         getRandomDate(5),
         "$140,000 - $170,000",
-        "Remote"
+        "Remote",
       ),
     ],
     globalNotes: [
@@ -843,7 +866,8 @@ export const HARDCODED_JOBS: JobData[] = [
     status: "Open",
     location: "San Francisco, CA",
     type: "Full-time",
-    description: "We're looking for a Senior Frontend Developer to join our engineering team...",
+    description:
+      "We're looking for a Senior Frontend Developer to join our engineering team...",
     priority: "High",
     emailAlias: "frontend-hiring@company.com",
     expectedSkills: ["React", "TypeScript", "Node.js", "GraphQL"],
@@ -972,7 +996,8 @@ export const HARDCODED_JOBS: JobData[] = [
     status: "Open",
     location: "Seattle, WA",
     type: "Full-time",
-    description: "Join our core engineering team to build high-scale systems...",
+    description:
+      "Join our core engineering team to build high-scale systems...",
     priority: "High",
     emailAlias: "senior-hiring@company.com",
     expectedSkills: ["Java", "Spring Boot", "Microservices", "Kafka"],
@@ -1289,30 +1314,34 @@ export const HARDCODED_NOTIFICATIONS: NotificationData[] = [
     recipientId: "user_2",
     senderId: "user_4",
     priority: "Medium",
-  }
+  },
 ];
 
 // Export utility functions
 export const getJob = (id: string): JobData | undefined => {
-  return HARDCODED_JOBS.find(job => job.id === id);
+  return HARDCODED_JOBS.find((job) => job.id === id);
 };
 
 export const getCandidate = (id: string): CandidateData | undefined => {
-  return HARDCODED_CANDIDATES.find(candidate => candidate.id === id);
+  return HARDCODED_CANDIDATES.find((candidate) => candidate.id === id);
 };
 
 export const getJobCandidates = (jobId: string): CandidateData[] => {
-  return HARDCODED_CANDIDATES.filter(candidate =>
-    candidate.jobApplications.some(app => app.jobId === jobId)
+  return HARDCODED_CANDIDATES.filter((candidate) =>
+    candidate.jobApplications.some((app) => app.jobId === jobId),
   );
 };
 
 export const getInterview = (id: string): InterviewData | undefined => {
-  return HARDCODED_INTERVIEWS.find(interview => interview.id === id);
+  return HARDCODED_INTERVIEWS.find((interview) => interview.id === id);
 };
 
-export const getCandidateInterviews = (candidateId: string): InterviewData[] => {
-  return HARDCODED_INTERVIEWS.filter(interview => interview.candidateId === candidateId);
+export const getCandidateInterviews = (
+  candidateId: string,
+): InterviewData[] => {
+  return HARDCODED_INTERVIEWS.filter(
+    (interview) => interview.candidateId === candidateId,
+  );
 };
 
 export const getUser = (id: string): UserData | undefined => {
@@ -1321,19 +1350,22 @@ export const getUser = (id: string): UserData | undefined => {
 };
 
 export const getUnreadNotificationCount = (): number => {
-  return HARDCODED_NOTIFICATIONS.filter(notification => !notification.read).length;
+  return HARDCODED_NOTIFICATIONS.filter((notification) => !notification.read)
+    .length;
 };
 
 export const getUserNotifications = (userId: string): NotificationData[] => {
-  return HARDCODED_NOTIFICATIONS.filter(notification => notification.recipientId === userId);
+  return HARDCODED_NOTIFICATIONS.filter(
+    (notification) => notification.recipientId === userId,
+  );
 };
 
 export const getUpcomingSchedule = (days: number = 7): ScheduleData[] => {
   const now = new Date();
   const futureDate = new Date();
   futureDate.setDate(now.getDate() + days);
-  
-  return HARDCODED_SCHEDULE.filter(schedule => {
+
+  return HARDCODED_SCHEDULE.filter((schedule) => {
     const scheduleDate = new Date(schedule.startDate);
     return scheduleDate >= now && scheduleDate <= futureDate;
   });
@@ -1356,8 +1388,10 @@ export const getJobStats = (jobId: string) => {
   }
 
   const candidates = getJobCandidates(jobId);
-  const activeCandidates = candidates.filter(c => 
-    c.jobApplications.some(app => app.jobId === jobId && app.status === "Active")
+  const activeCandidates = candidates.filter((c) =>
+    c.jobApplications.some(
+      (app) => app.jobId === jobId && app.status === "Active",
+    ),
   );
 
   return {
@@ -1373,9 +1407,9 @@ export const getCandidateTimeline = (candidateId: string) => {
   if (!candidate) return [];
 
   const timeline = [];
-  
+
   // Add application events
-  candidate.jobApplications.forEach(app => {
+  candidate.jobApplications.forEach((app) => {
     timeline.push({
       id: `app_${app.id}`,
       type: "application_received",
@@ -1385,7 +1419,7 @@ export const getCandidateTimeline = (candidateId: string) => {
     });
 
     // Add stage changes
-    app.stageHistory.forEach(stage => {
+    app.stageHistory.forEach((stage) => {
       timeline.push({
         id: `stage_${stage.id}`,
         type: "stage_change",
@@ -1396,7 +1430,7 @@ export const getCandidateTimeline = (candidateId: string) => {
     });
 
     // Add emails
-    app.emails.forEach(email => {
+    app.emails.forEach((email) => {
       timeline.push({
         id: `email_${email.id}`,
         type: "email_sent",
@@ -1408,5 +1442,7 @@ export const getCandidateTimeline = (candidateId: string) => {
   });
 
   // Sort by timestamp
-  return timeline.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  return timeline.sort(
+    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+  );
 };

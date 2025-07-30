@@ -5,12 +5,12 @@ const originalWarn = console.warn;
 
 console.warn = (...args: any[]) => {
   const message = args.join(" ");
-  
+
   // Only suppress specific Recharts defaultProps warnings
-  const isRechartsDefaultPropsWarning = 
+  const isRechartsDefaultPropsWarning =
     message.includes("Support for defaultProps will be removed") &&
     (message.includes("XAxis") || message.includes("YAxis"));
-    
+
   if (!isRechartsDefaultPropsWarning) {
     originalWarn.apply(console, args);
   }
