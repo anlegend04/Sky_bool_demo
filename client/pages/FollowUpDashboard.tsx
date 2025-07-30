@@ -235,7 +235,7 @@ export default function FollowUpDashboard() {
   );
 
   const [selectedCandidates, setSelectedCandidates] = useState<string[]>([]);
-  const [viewMode, setViewMode] = useState<"pipeline" | "list" >(
+  const [viewMode, setViewMode] = useState<"pipeline" | "list">(
     "list",
   );
   const [filterStage, setFilterStage] = useState("all");
@@ -1043,7 +1043,6 @@ export default function FollowUpDashboard() {
                 >
                   List
                 </Button>
-               
               </div>
               {viewMode === "list" && (
                 <DropdownMenu>
@@ -1264,7 +1263,7 @@ export default function FollowUpDashboard() {
                 </DialogTitle>
               </DialogHeader>
               <Tabs defaultValue="overview" className="w-full">
-                <TabsList className="grid w-full grid-cols-4">
+                <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="overview">Overview</TabsTrigger>
                   <TabsTrigger value="emails">Emails</TabsTrigger>
                   <TabsTrigger value="actions">Actions</TabsTrigger>
