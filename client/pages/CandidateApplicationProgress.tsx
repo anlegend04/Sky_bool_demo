@@ -424,15 +424,18 @@ export default function CandidateApplicationProgress() {
         {/* Right Panel - Timeline & Communications */}
         <div className="lg:col-span-8">
           <Tabs defaultValue="timeline" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="timeline" className="text-sm">
-                Timeline & Notes
+            <TabsList className="grid w-full grid-cols-3 h-auto">
+              <TabsTrigger value="timeline" className="text-xs sm:text-sm px-2 py-2">
+                <span className="hidden sm:inline">Timeline & Notes</span>
+                <span className="sm:hidden">Timeline</span>
               </TabsTrigger>
-              <TabsTrigger value="emails" className="text-sm">
-                Email History
+              <TabsTrigger value="emails" className="text-xs sm:text-sm px-2 py-2">
+                <span className="hidden sm:inline">Email History</span>
+                <span className="sm:hidden">Emails</span>
               </TabsTrigger>
-              <TabsTrigger value="stages" className="text-sm">
-                Stage Details
+              <TabsTrigger value="stages" className="text-xs sm:text-sm px-2 py-2">
+                <span className="hidden sm:inline">Stage Details</span>
+                <span className="sm:hidden">Stages</span>
               </TabsTrigger>
             </TabsList>
 
