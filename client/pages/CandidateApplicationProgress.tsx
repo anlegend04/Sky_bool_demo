@@ -193,43 +193,47 @@ export default function CandidateApplicationProgress() {
       </CardHeader>
       <CardContent>
         {/* Job Application Header */}
-        <div className="mb-6 p-4 bg-gradient-to-r from-primary/5 to-secondary/5 border border-primary/20 rounded-lg">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div>
-              <h3 className="text-lg font-semibold text-slate-900">{jobApplication.jobTitle}</h3>
-              <div className="flex flex-wrap items-center gap-3 mt-2 text-sm text-slate-600">
-                <div className="flex items-center gap-1">
-                  <Calendar className="w-4 h-4" />
-                  Applied: {new Date(jobApplication.appliedDate).toLocaleDateString()}
-                </div>
-                <div className="flex items-center gap-1">
-                  <User className="w-4 h-4" />
-                  Recruiter: {jobApplication.recruiter}
-                </div>
-                {jobApplication.salary && (
-                  <div className="flex items-center gap-1">
-                    <DollarSign className="w-4 h-4" />
-                    {jobApplication.salary}
-                  </div>
-                )}
-                {jobApplication.location && (
-                  <div className="flex items-center gap-1">
-                    <MapPin className="w-4 h-4" />
-                    {jobApplication.location}
-                  </div>
-                )}
+        <div className="mb-6 p-3 sm:p-4 bg-gradient-to-r from-primary/5 to-secondary/5 border border-primary/20 rounded-lg">
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+              <div className="flex-1 min-w-0">
+                <h3 className="text-lg sm:text-xl font-semibold text-slate-900 truncate">
+                  {jobApplication.jobTitle}
+                </h3>
               </div>
+              <Badge
+                variant={
+                  jobApplication.priority === "High" ? "destructive" :
+                  jobApplication.priority === "Medium" ? "secondary" : "outline"
+                }
+                className="flex items-center gap-1 w-fit self-start sm:self-center"
+              >
+                <TrendingUp className="w-3 h-3" />
+                {jobApplication.priority} Priority
+              </Badge>
             </div>
-            <Badge 
-              variant={
-                jobApplication.priority === "High" ? "destructive" :
-                jobApplication.priority === "Medium" ? "secondary" : "outline"
-              }
-              className="flex items-center gap-1 w-fit"
-            >
-              <TrendingUp className="w-3 h-3" />
-              {jobApplication.priority} Priority
-            </Badge>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 text-sm text-slate-600">
+              <div className="flex items-center gap-1 min-w-0">
+                <Calendar className="w-4 h-4 flex-shrink-0" />
+                <span className="truncate">Applied: {new Date(jobApplication.appliedDate).toLocaleDateString()}</span>
+              </div>
+              <div className="flex items-center gap-1 min-w-0">
+                <User className="w-4 h-4 flex-shrink-0" />
+                <span className="truncate">Recruiter: {jobApplication.recruiter}</span>
+              </div>
+              {jobApplication.salary && (
+                <div className="flex items-center gap-1 min-w-0">
+                  <DollarSign className="w-4 h-4 flex-shrink-0" />
+                  <span className="truncate">{jobApplication.salary}</span>
+                </div>
+              )}
+              {jobApplication.location && (
+                <div className="flex items-center gap-1 min-w-0">
+                  <MapPin className="w-4 h-4 flex-shrink-0" />
+                  <span className="truncate">{jobApplication.location}</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
