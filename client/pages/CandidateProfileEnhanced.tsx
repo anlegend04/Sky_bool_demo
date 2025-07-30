@@ -469,10 +469,19 @@ export default function CandidateProfileEnhanced() {
           {/* Right Panel - Job Applications */}
           <div className="lg:col-span-2 order-1 lg:order-2">
             <Tabs defaultValue="applications" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="applications">Job Applications</TabsTrigger>
-                <TabsTrigger value="education">Education & Experience</TabsTrigger>
-                <TabsTrigger value="evaluations">CV Evaluations</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-3 h-auto">
+                <TabsTrigger value="applications" className="text-xs sm:text-sm px-2 py-2">
+                  <span className="hidden sm:inline">Job Applications</span>
+                  <span className="sm:hidden">Jobs</span>
+                </TabsTrigger>
+                <TabsTrigger value="education" className="text-xs sm:text-sm px-2 py-2">
+                  <span className="hidden sm:inline">Education & Experience</span>
+                  <span className="sm:hidden">Experience</span>
+                </TabsTrigger>
+                <TabsTrigger value="evaluations" className="text-xs sm:text-sm px-2 py-2">
+                  <span className="hidden sm:inline">CV Evaluations</span>
+                  <span className="sm:hidden">CV Eval</span>
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="applications" className="space-y-4">
