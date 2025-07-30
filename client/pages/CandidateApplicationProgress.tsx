@@ -483,7 +483,37 @@ export default function CandidateApplicationProgress(
         <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
           <div className="flex items-center gap-2">
             <span className="text-lg sm:text-xl">Application Progress</span>
-            <HelpTooltip content="Track the candidate's progress through different stages for this specific job application" />
+            <HelpTooltip content={
+              <div className="space-y-3 max-w-md">
+                <div className="font-medium text-sm">How to read this interface:</div>
+                <div className="space-y-2 text-xs">
+                  <div>
+                    <div className="font-medium mb-1">📧 Email Icons (above each stage):</div>
+                    <div className="space-y-1 ml-2">
+                      <div>• <span className="text-slate-300">Gray mail</span> = Email not sent yet</div>
+                      <div>• <span className="text-blue-500">Blue mail</span> = Email sent to candidate</div>
+                      <div>• <span className="text-green-500">Green check</span> = Candidate confirmed</div>
+                      <div>• <span className="text-orange-500">Orange clock</span> = Waiting for confirmation</div>
+                      <div>• <span className="text-red-500">Red alert</span> = Auto-rejected (missed deadline)</div>
+                      <div>• <span className="text-yellow-500">Yellow dot</span> = Needs candidate confirmation</div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="font-medium mb-1">⭕ Stage Circles:</div>
+                    <div className="space-y-1 ml-2">
+                      <div>• <span className="text-slate-400">Gray circle</span> = Stage not started</div>
+                      <div>• <span className="text-blue-500">Blue circle</span> = Current stage</div>
+                      <div>• <span className="text-green-500">Green check</span> = Stage completed</div>
+                      <div>• <span className="text-orange-500">Orange clock</span> = Stage overdue</div>
+                      <div>• <span className="text-red-500">Red alert</span> = Stage auto-rejected</div>
+                    </div>
+                  </div>
+                  <div className="text-slate-600 border-t pt-2">
+                    💡 <strong>Tip:</strong> Hover over any icon or stage circle for detailed information
+                  </div>
+                </div>
+              </div>
+            } />
           </div>
           <div className="flex flex-col sm:flex-row gap-2">
             <Badge variant="outline" className="flex items-center gap-1">
