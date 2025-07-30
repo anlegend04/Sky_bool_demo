@@ -87,6 +87,7 @@ export interface CandidateData {
   timezone: string;
   availability: string;
   jobId?: string; // Link to the job they applied for
+  cvEvaluations?: CVEvaluationData[]; // CV evaluations for this candidate
   createdAt: string;
   updatedAt: string;
 }
