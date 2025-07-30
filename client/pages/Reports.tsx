@@ -58,6 +58,7 @@ import {
   Zap,
   RefreshCw,
   AlertCircle,
+  MoreHorizontal,
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import { HARDCODED_JOBS, HARDCODED_CANDIDATES, HARDCODED_INTERVIEWS } from "@/data/hardcoded-data";
