@@ -622,15 +622,15 @@ export default function CandidateDetail() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setShowEditProfileDialog(true)}>
                   <Edit className="w-4 h-4 mr-2" />
                   Edit Profile
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleDownloadResume()}>
                   <Download className="w-4 h-4 mr-2" />
                   Download Resume
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleShareProfile()}>
                   <Share className="w-4 h-4 mr-2" />
                   Share Profile
                 </DropdownMenuItem>
