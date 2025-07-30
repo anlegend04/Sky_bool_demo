@@ -236,7 +236,7 @@ export default function FollowUpDashboard() {
 
   const [selectedCandidates, setSelectedCandidates] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<"pipeline" | "list" | "timeline">(
-    "pipeline",
+    "list",
   );
   const [filterStage, setFilterStage] = useState("all");
   const [filterJob, setFilterJob] = useState("all");
@@ -1128,47 +1128,7 @@ export default function FollowUpDashboard() {
       {viewMode === "pipeline" && <PipelineView />}
       {viewMode === "list" && <PipelineListView />}
       {viewMode === "timeline" && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Activity Timeline</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {currentCandidates.map((candidate) => (
-                <div
-                  key={candidate.id}
-                  className="flex items-center space-x-4 p-3 border rounded-lg"
-                >
-                  <Avatar className="w-8 h-8">
-                    <AvatarFallback>
-                      {candidate.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2">
-                      <span className="font-medium text-sm">
-                        {candidate.name}
-                      </span>
-                      <Badge variant="outline" className="text-xs">
-                        {candidate.stage}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-gray-600">
-                      Last contact {formatTimeAgo(candidate.lastInteraction)} •
-                      Next follow-up {formatTimeAgo(candidate.nextFollowUp)}
-                    </p>
-                  </div>
-                  <Button size="sm" variant="outline">
-                    <Mail className="w-4 h-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+       
       )}
 
       {/* Pagination */}
