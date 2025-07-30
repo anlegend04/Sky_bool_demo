@@ -1,48 +1,4 @@
-// MUST BE FIRST - Suppress Recharts warnings before any imports
-(function () {
-  const originalWarn = console.warn;
-  const originalError = console.error;
-
-  // Aggressive suppression of defaultProps warnings
-  console.warn = function (...args) {
-    const message = args.join(" ");
-
-    // Multiple detection patterns for different warning formats
-    const isRechartsWarning =
-      // Pattern 1: Direct message check
-      (message.includes("Support for defaultProps will be removed") &&
-        (message.includes("XAxis") || message.includes("YAxis"))) ||
-      // Pattern 2: Check individual arguments
-      (args.some((arg) =>
-        String(arg).includes("Support for defaultProps will be removed"),
-      ) &&
-        args.some((arg) =>
-          String(arg).match(/\b(XAxis|YAxis|XAxis2|YAxis2)\b/),
-        )) ||
-      // Pattern 3: Template string format
-      (args[0] &&
-        typeof args[0] === "string" &&
-        args[0].includes("Support for defaultProps will be removed") &&
-        args.slice(1).some((arg) => String(arg).match(/\b(XAxis|YAxis)\b/)));
-
-    if (!isRechartsWarning) {
-      originalWarn.apply(console, args);
-    }
-  };
-
-  console.error = function (...args) {
-    const message = args.join(" ");
-    const isRechartsWarning =
-      message.includes("Support for defaultProps will be removed") &&
-      (message.includes("XAxis") || message.includes("YAxis"));
-
-    if (!isRechartsWarning) {
-      originalError.apply(console, args);
-    }
-  };
-})();
-
-import "@/lib/suppress-warnings";
+import React, { Component, ErrorInfo, ReactNode } from "react";
 import "./global.css";
 
 import { Toaster } from "@/components/ui/toaster";
@@ -72,7 +28,18 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import { LanguageProvider } from "@/hooks/use-language";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    },
+    mutations: {
+      retry: 1,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -126,13 +93,12 @@ const App = () => (
   </QueryClientProvider>
 );
 
-// Prevent multiple createRoot calls in development
+// Initialize React root
 const rootElement = document.getElementById("root")!;
 
-// Check if we've already initialized the root
-const isAlreadyRendered = rootElement.hasChildNodes();
-
-if (!isAlreadyRendered) {
+// Check if root is already initialized (for HMR)
+if (!rootElement.hasAttribute("data-root-initialized")) {
   const root = createRoot(rootElement);
   root.render(<App />);
+  rootElement.setAttribute("data-root-initialized", "true");
 }
