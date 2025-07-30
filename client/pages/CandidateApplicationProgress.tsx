@@ -344,25 +344,28 @@ export default function CandidateApplicationProgress(props: CandidateApplication
   };
 
   // Convert stage history to StageData format with improved logic
-  const stages: StageData[] = [
+  const stageNames = [
     "Applied",
-    "Screening", 
+    "Screening",
     "Interview",
     "Technical",
     "Offer",
     "Hired",
-  ].map((stageName) => {
+  ];
+
+  const currentStageIndex = stageNames.findIndex(s => s === jobApplication.currentStage);
+
+  const stages: StageData[] = stageNames.map((stageName, index) => {
     const stageData = jobApplication.stageHistory.find(
       (s) => s.stage === stageName,
     );
-    
+
     // Tính toán trạng thái completion dựa trên stage history và current stage
-    const currentStageIndex = stages.findIndex(s => s.name === jobApplication.currentStage);
-    const thisStageIndex = stages.findIndex(s => s.name === stageName);
+    const thisStageIndex = index;
     const isCompleted = stageData && stageData.endDate;
     const isCurrentStage = stageName === jobApplication.currentStage;
     const isPastStage = thisStageIndex < currentStageIndex;
-    
+
     // Xác định trạng thái completion
     let completionStatus: 'completed' | 'current' | 'pending' | 'not_started';
     if (isCompleted) {
@@ -374,7 +377,7 @@ export default function CandidateApplicationProgress(props: CandidateApplication
     } else {
       completionStatus = 'not_started';
     }
-    
+
     return {
       name: stageName,
       completed: completionStatus === 'completed',
