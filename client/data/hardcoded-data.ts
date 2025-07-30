@@ -1181,6 +1181,117 @@ export const HARDCODED_SCHEDULE: ScheduleData[] = [
   },
 ];
 
+// Notification Data
+export const HARDCODED_NOTIFICATIONS: NotificationData[] = [
+  {
+    id: "notif_1",
+    title: "New Application Received",
+    message: "Marissa Torres applied for Senior Frontend Developer position",
+    type: "application_received",
+    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
+    read: false,
+    actionUrl: "/candidates/candidate_1",
+    entityType: "candidate",
+    entityId: "candidate_1",
+    recipientId: "user_1",
+    senderId: "system",
+    priority: "Medium",
+  },
+  {
+    id: "notif_2",
+    title: "Interview Reminder",
+    message: "Upcoming interview with James Chen in 1 hour",
+    type: "interview_scheduled",
+    timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(), // 30 minutes ago
+    read: false,
+    actionUrl: "/schedule",
+    entityType: "interview",
+    entityId: "interview_2",
+    recipientId: "user_2",
+    priority: "High",
+  },
+  {
+    id: "notif_3",
+    title: "Candidate Hired!",
+    message: "Lisa Wang has been successfully hired for UX Designer position",
+    type: "candidate_moved",
+    timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(), // 4 hours ago
+    read: true,
+    actionUrl: "/candidates/candidate_3",
+    entityType: "candidate",
+    entityId: "candidate_3",
+    recipientId: "user_1",
+    senderId: "user_5",
+    priority: "High",
+  },
+  {
+    id: "notif_4",
+    title: "Budget Alert",
+    message: "Job budget for Backend Engineer position is 80% utilized",
+    type: "budget_exceeded",
+    timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(), // 6 hours ago
+    read: false,
+    actionUrl: "/jobs/job_4",
+    entityType: "budget",
+    entityId: "job_4",
+    recipientId: "user_2",
+    priority: "High",
+  },
+  {
+    id: "notif_5",
+    title: "Application Deadline Approaching",
+    message: "Product Manager position deadline is in 5 days",
+    type: "deadline_approaching",
+    timestamp: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(), // 12 hours ago
+    read: false,
+    actionUrl: "/jobs/job_2",
+    entityType: "deadline",
+    entityId: "job_2",
+    recipientId: "user_5",
+    priority: "Medium",
+  },
+  {
+    id: "notif_6",
+    title: "System Update",
+    message: "New features have been added to the recruitment dashboard",
+    type: "system",
+    timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
+    read: true,
+    actionUrl: "/dashboard",
+    entityType: "other",
+    recipientId: "user_1",
+    senderId: "system",
+    priority: "Low",
+  },
+  {
+    id: "notif_7",
+    title: "Meeting Reminder",
+    message: "Weekly recruitment review meeting starts in 30 minutes",
+    type: "reminder",
+    timestamp: new Date(Date.now() - 15 * 60 * 1000).toISOString(), // 15 minutes ago
+    read: false,
+    actionUrl: "/schedule",
+    entityType: "schedule",
+    entityId: "schedule_3",
+    recipientId: "user_1",
+    priority: "Medium",
+  },
+  {
+    id: "notif_8",
+    title: "Interview Completed",
+    message: "Technical interview with Marissa Torres has been completed",
+    type: "interview_scheduled",
+    timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(), // 8 hours ago
+    read: true,
+    actionUrl: "/candidates/candidate_1",
+    entityType: "interview",
+    entityId: "interview_1",
+    recipientId: "user_2",
+    senderId: "user_4",
+    priority: "Medium",
+  }
+];
+
 // Export utility functions
 export const getJob = (id: string): JobData | undefined => {
   return HARDCODED_JOBS.find(job => job.id === id);
@@ -1299,4 +1410,4 @@ export const getCandidateTimeline = (candidateId: string) => {
 
   // Sort by timestamp
   return timeline.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-}; 
+};
