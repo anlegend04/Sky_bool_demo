@@ -1,23 +1,49 @@
 import "@/lib/suppress-warnings";
 import "./global.css";
 
-// Additional aggressive React warning suppression
+// Enhanced React warning suppression
 (() => {
   const originalReactWarn = console.warn;
   console.warn = function (format: any, ...args: any[]) {
-    // Specifically target React's warning format
-    if (
-      typeof format === "string" &&
-      format.includes("%s") &&
-      args.some(
-        (arg: any) =>
-          typeof arg === "string" &&
-          (arg.includes("XAxis") || arg.includes("YAxis")) &&
-          format.includes("defaultProps"),
-      )
-    ) {
-      return; // Suppress Recharts defaultProps warnings
+    // Handle React's warning format with %s placeholders
+    if (typeof format === "string") {
+      // Check for defaultProps warning pattern
+      if (format.includes("Support for defaultProps will be removed")) {
+        // Check if any argument contains Recharts component names
+        const hasRechartsComponent = args.some((arg: any) => {
+          const argStr = String(arg);
+          return (
+            argStr.includes("XAxis") ||
+            argStr.includes("YAxis") ||
+            argStr.includes("XAxis2") ||
+            argStr.includes("YAxis2") ||
+            argStr.includes("CartesianGrid") ||
+            argStr.includes("Tooltip") ||
+            argStr.includes("Legend") ||
+            argStr.includes("ResponsiveContainer") ||
+            argStr.includes("BarChart") ||
+            argStr.includes("LineChart") ||
+            argStr.includes("PieChart")
+          );
+        });
+
+        if (hasRechartsComponent) {
+          return; // Suppress this warning
+        }
+      }
+
+      // Also check the full formatted message
+      const fullMessage = format.replace(/%s/g, () => String(args.shift() || ""));
+      if (
+        fullMessage.includes("Support for defaultProps will be removed") &&
+        (fullMessage.includes("XAxis") ||
+          fullMessage.includes("YAxis") ||
+          fullMessage.includes("recharts"))
+      ) {
+        return; // Suppress this warning
+      }
     }
+
     return originalReactWarn.apply(console, [format, ...args]);
   };
 })();
