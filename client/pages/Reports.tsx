@@ -346,6 +346,100 @@ export default function Reports() {
     }, 1000);
   };
 
+  // Cost data - Mock data for cost per hire analysis
+  const costData = useMemo(() => {
+    const baseCostPerHire = 15000; // Base cost in VND (thousands)
+    const totalHires = filteredData.filter((c) => c.stage === "Hired").length || 1;
+
+    // Cost breakdown by category
+    const costBreakdown = [
+      {
+        category: "Quảng cáo & Đăng tin",
+        amount: baseCostPerHire * totalHires * 0.25,
+        percentage: 25,
+        color: "#3b82f6",
+      },
+      {
+        category: "Thời gian Recruiter",
+        amount: baseCostPerHire * totalHires * 0.35,
+        percentage: 35,
+        color: "#10b981",
+      },
+      {
+        category: "Công cụ & Phần mềm",
+        amount: baseCostPerHire * totalHires * 0.15,
+        percentage: 15,
+        color: "#f59e0b",
+      },
+      {
+        category: "Phỏng vấn & Đánh giá",
+        amount: baseCostPerHire * totalHires * 0.15,
+        percentage: 15,
+        color: "#8b5cf6",
+      },
+      {
+        category: "Onboarding",
+        amount: baseCostPerHire * totalHires * 0.1,
+        percentage: 10,
+        color: "#ef4444",
+      },
+    ];
+
+    // Cost by position
+    const costByPosition = HARDCODED_JOBS.map((job) => {
+      const positionHires = filteredData.filter(
+        (c) => c.position === job.position && c.stage === "Hired"
+      ).length;
+      const avgCost = baseCostPerHire + (Math.random() * 5000 - 2500); // Add variation
+      return {
+        position: job.position,
+        hires: positionHires,
+        totalCost: avgCost * positionHires,
+        avgCostPerHire: avgCost,
+      };
+    }).filter(item => item.hires > 0);
+
+    // Monthly cost trend
+    const monthlyCostTrend = [
+      {
+        month: "Tháng 1",
+        totalCost: baseCostPerHire * totalHires * 0.2,
+        hires: Math.max(1, Math.round(totalHires * 0.2)),
+        costPerHire: baseCostPerHire * 0.9,
+      },
+      {
+        month: "Tháng 2",
+        totalCost: baseCostPerHire * totalHires * 0.3,
+        hires: Math.max(1, Math.round(totalHires * 0.3)),
+        costPerHire: baseCostPerHire * 1.1,
+      },
+      {
+        month: "Tháng 3",
+        totalCost: baseCostPerHire * totalHires * 0.5,
+        hires: Math.max(1, Math.round(totalHires * 0.5)),
+        costPerHire: baseCostPerHire,
+      },
+      {
+        month: "Tháng 4",
+        totalCost: baseCostPerHire * totalHires,
+        hires: totalHires,
+        costPerHire: baseCostPerHire * 0.95,
+      },
+    ];
+
+    const totalCost = costBreakdown.reduce((sum, item) => sum + item.amount, 0);
+    const avgCostPerHire = totalHires > 0 ? totalCost / totalHires : 0;
+
+    return {
+      costBreakdown,
+      costByPosition,
+      monthlyCostTrend,
+      totalCost,
+      avgCostPerHire,
+      totalHires,
+    };
+  }, [filteredData]);
+
   // Dynamic stats based on filtered data
   const dynamicStats = [
     {
@@ -379,6 +473,22 @@ export default function Reports() {
       trend: "up",
       icon: Award,
       color: "orange",
+    },
+    {
+      title: "Chi phí trung bình mỗi tuyển dụng",
+      value: `${(costData.avgCostPerHire / 1000).toFixed(0)}K VND`,
+      change: "-5%",
+      trend: "up",
+      icon: DollarSign,
+      color: "green",
+    },
+    {
+      title: "Tổng chi phí tuyển dụng",
+      value: `${(costData.totalCost / 1000000).toFixed(1)}M VND`,
+      change: "+12%",
+      trend: "up",
+      icon: Briefcase,
+      color: "blue",
     },
   ];
 
@@ -584,7 +694,7 @@ export default function Reports() {
       </Card>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
         {dynamicStats.map((stat, index) => (
           <Card key={index}>
             <CardContent className="pt-6">
@@ -626,11 +736,12 @@ export default function Reports() {
 
       {/* Charts */}
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           {/* <TabsTrigger value="pipeline">Pipeline</TabsTrigger> */}
           <TabsTrigger value="performance">Performance</TabsTrigger>
           <TabsTrigger value="sources">Sources</TabsTrigger>
+          <TabsTrigger value="cost">Cost Analysis</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -1087,6 +1198,275 @@ export default function Reports() {
               </CardContent>
             </Card>
           )}
+        </TabsContent>
+
+        <TabsContent value="cost" className="space-y-6">
+          {/* Cost Overview Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Chi phí trung bình/tuyển dụng</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-green-600">
+                  {(costData.avgCostPerHire / 1000).toFixed(0)}K VND
+                </div>
+                <p className="text-sm text-slate-600 mt-2">
+                  Giảm 5% so với tháng trước
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Tổng chi phí tuyển dụng</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-blue-600">
+                  {(costData.totalCost / 1000000).toFixed(1)}M VND
+                </div>
+                <p className="text-sm text-slate-600 mt-2">
+                  Cho {costData.totalHires} lần tuyển dụng thành công
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">ROI Tuyển dụng</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-purple-600">275%</div>
+                <p className="text-sm text-slate-600 mt-2">
+                  Hiệu quả đầu tư tuyển dụng
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Cost Breakdown Pie Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Phân bổ chi phí tuyển dụng</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <Skeleton className="h-64 w-full" />
+                ) : (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={costData.costBreakdown}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={100}
+                        dataKey="amount"
+                        label={({ category, percentage }) =>
+                          `${category}\n${percentage}%`
+                        }
+                        labelLine={false}
+                        fontSize={11}
+                      >
+                        {costData.costBreakdown.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        formatter={(value) => [
+                          `${(value / 1000).toFixed(0)}K VND`,
+                          "Chi phí",
+                        ]}
+                        labelFormatter={(label) => `Loại: ${label}`}
+                        contentStyle={{
+                          backgroundColor: "white",
+                          border: "1px solid #e5e7eb",
+                          borderRadius: "6px",
+                          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                        }}
+                      />
+                      <Legend
+                        formatter={(value, entry) =>
+                          `${value} (${(entry.payload.amount / 1000).toFixed(0)}K)`
+                        }
+                        wrapperStyle={{ paddingTop: "20px" }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Cost by Position */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Chi phí theo vị trí</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isLoading ? (
+                  <Skeleton className="h-64 w-full" />
+                ) : costData.costByPosition.length === 0 ? (
+                  <div className="h-64 flex items-center justify-center text-slate-500">
+                    <div className="text-center">
+                      <AlertCircle className="w-12 h-12 mx-auto mb-2" />
+                      <p>Không có dữ liệu cho bộ lọc đã chọn</p>
+                    </div>
+                  </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={costData.costByPosition}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis
+                        dataKey="position"
+                        angle={-45}
+                        textAnchor="end"
+                        height={80}
+                        fontSize={12}
+                      />
+                      <YAxis
+                        fontSize={12}
+                        tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
+                      />
+                      <Tooltip
+                        formatter={(value, name) => {
+                          if (name === "avgCostPerHire") {
+                            return [`${(value / 1000).toFixed(0)}K VND`, "Chi phí TB/người"];
+                          }
+                          return [`${(value / 1000).toFixed(0)}K VND`, "Tổng chi phí"];
+                        }}
+                        labelFormatter={(label) => `Vị trí: ${label}`}
+                        contentStyle={{
+                          backgroundColor: "white",
+                          border: "1px solid #e5e7eb",
+                          borderRadius: "6px",
+                          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                        }}
+                      />
+                      <Legend
+                        formatter={(value) => {
+                          return value === "avgCostPerHire" ? "Chi phí TB/người" : "Tổng chi phí";
+                        }}
+                      />
+                      <Bar
+                        dataKey="totalCost"
+                        fill="#3b82f6"
+                        name="totalCost"
+                        radius={[4, 4, 0, 0]}
+                      />
+                      <Bar
+                        dataKey="avgCostPerHire"
+                        fill="#10b981"
+                        name="avgCostPerHire"
+                        radius={[4, 4, 0, 0]}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Monthly Cost Trend */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Xu hướng chi phí theo tháng</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <Skeleton className="h-64 w-full" />
+              ) : (
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={costData.monthlyCostTrend}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" fontSize={12} />
+                    <YAxis
+                      fontSize={12}
+                      tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
+                    />
+                    <Tooltip
+                      formatter={(value, name) => {
+                        const labels = {
+                          totalCost: "Tổng chi phí",
+                          costPerHire: "Chi phí/người",
+                          hires: "Số người tuyển",
+                        };
+                        if (name === "hires") {
+                          return [value, labels[name]];
+                        }
+                        return [`${(value / 1000).toFixed(0)}K VND`, labels[name]];
+                      }}
+                      labelFormatter={(label) => `${label}`}
+                      contentStyle={{
+                        backgroundColor: "white",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: "6px",
+                        boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                      }}
+                    />
+                    <Legend
+                      formatter={(value) => {
+                        const labels = {
+                          totalCost: "Tổng chi phí",
+                          costPerHire: "Chi phí/người",
+                        };
+                        return labels[value] || value;
+                      }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="totalCost"
+                      stroke="#3b82f6"
+                      strokeWidth={3}
+                      dot={{ fill: "#3b82f6", strokeWidth: 2, r: 6 }}
+                      activeDot={{ r: 8, stroke: "#3b82f6", strokeWidth: 2 }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="costPerHire"
+                      stroke="#10b981"
+                      strokeWidth={2}
+                      dot={{ fill: "#10b981", strokeWidth: 2, r: 4 }}
+                      activeDot={{ r: 6, stroke: "#10b981", strokeWidth: 2 }}
+                      strokeDasharray="5 5"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Cost Breakdown Details Table */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Chi tiết phân bổ chi phí</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {costData.costBreakdown.map((item, index) => (
+                  <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <div
+                        className="w-4 h-4 rounded-full"
+                        style={{ backgroundColor: item.color }}
+                      />
+                      <div>
+                        <h4 className="font-medium text-gray-900">{item.category}</h4>
+                        <p className="text-sm text-gray-600">{item.percentage}% tổng chi phí</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-lg font-semibold text-gray-900">
+                        {(item.amount / 1000).toFixed(0)}K VND
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        ~{(item.amount / costData.totalHires / 1000).toFixed(0)}K/người
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
