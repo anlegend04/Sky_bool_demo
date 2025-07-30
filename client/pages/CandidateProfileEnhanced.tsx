@@ -48,21 +48,32 @@ import {
   AlertCircle,
   Plus,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import {
-  ENHANCED_CANDIDATE_SAMPLE,
   getCurrentJobApplication,
+  getEnhancedCandidate,
 } from "@/data/enhanced-mock-data";
 import { JobApplication } from "@/types/enhanced-candidate";
+import { EnhancedCandidateData } from "@/types/enhanced-candidate";
 
 export default function CandidateProfileEnhanced() {
   const { id } = useParams();
-  const [candidate] = useState(ENHANCED_CANDIDATE_SAMPLE);
+  const [candidate, setCandidate] = useState<EnhancedCandidateData | null>(null);
   const [selectedCVEvaluation, setSelectedCVEvaluation] = useState<any>(null);
   const [showResumePreview, setShowResumePreview] = useState(false);
   const { toast } = useToast();
+
+  // Load candidate data
+  useEffect(() => {
+    if (id) {
+      const enhancedCandidate = getEnhancedCandidate(id);
+      if (enhancedCandidate) {
+        setCandidate(enhancedCandidate);
+      }
+    }
+  }, [id]);
 
   if (!candidate) {
     return (

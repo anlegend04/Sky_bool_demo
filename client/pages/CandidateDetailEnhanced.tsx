@@ -40,13 +40,10 @@ import {
   JobApplication,
 } from "@/types/enhanced-candidate";
 import {
-  ENHANCED_CANDIDATE_SAMPLE,
   getJobApplication,
   getCurrentJobApplication,
+  getEnhancedCandidate,
 } from "@/data/enhanced-mock-data";
-
-// Temporary - use enhanced mock data
-const MOCK_ENHANCED_CANDIDATES = [ENHANCED_CANDIDATE_SAMPLE];
 
 export default function CandidateDetailEnhanced() {
   const { id } = useParams();
@@ -63,12 +60,12 @@ export default function CandidateDetailEnhanced() {
   // Load candidate data
   useEffect(() => {
     if (id) {
-      // For demo, use mock data
-      const mockCandidate = MOCK_ENHANCED_CANDIDATES.find((c) => c.id === id);
-      if (mockCandidate) {
-        setCandidate(mockCandidate);
+      // Get candidate from hardcoded data
+      const enhancedCandidate = getEnhancedCandidate(id);
+      if (enhancedCandidate) {
+        setCandidate(enhancedCandidate);
         // Set initial job application (highest priority active or first one)
-        const currentJob = getCurrentJobApplication(mockCandidate);
+        const currentJob = getCurrentJobApplication(enhancedCandidate);
         if (currentJob) {
           setSelectedJobApplicationId(currentJob.id);
           setSelectedJobApplication(currentJob);

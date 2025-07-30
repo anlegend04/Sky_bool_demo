@@ -63,7 +63,6 @@ import { useState, useEffect, useMemo } from "react";
 import {
   HARDCODED_JOBS,
   HARDCODED_CANDIDATES,
-  DASHBOARD_STATS,
 } from "@/data/hardcoded-data";
 import { useLanguage } from "@/hooks/use-language";
 import { useToast } from "@/hooks/use-toast";
@@ -86,15 +85,27 @@ export default function Reports() {
   const [customSources, setCustomSources] = useState<string[]>([]);
   const [customStages, setCustomStages] = useState<string[]>([]);
 
+  // Create dashboard stats data inline
+  const dashboardStats = {
+    activeJobs: HARDCODED_JOBS.filter(job => job.status === "Open").length,
+    totalCandidates: HARDCODED_CANDIDATES.length,
+    interviewsThisWeek: HARDCODED_CANDIDATES.filter(c => 
+      c.jobApplications.some(app => 
+        ["Interview", "Technical"].includes(app.currentStage)
+      )
+    ).length,
+    avgTimeToHire: 25, // Mock average
+  };
+
   // Get unique values for filters
   const recruiters = Array.from(
-    new Set(HARDCODED_CANDIDATES.map((c) => c.recruiter)),
+    new Set(HARDCODED_CANDIDATES.flatMap(c => c.jobApplications.map(app => app.recruiter))),
   );
   const sources = Array.from(
     new Set([...HARDCODED_CANDIDATES.map((c) => c.source), ...customSources]),
   );
   const stages = Array.from(
-    new Set([...HARDCODED_CANDIDATES.map((c) => c.stage), ...customStages]),
+    new Set([...HARDCODED_CANDIDATES.flatMap(c => c.jobApplications.map(app => app.currentStage)), ...customStages]),
   );
 
   // Prepare options for enhanced dropdowns
@@ -184,12 +195,16 @@ export default function Reports() {
     if (selectedJob !== "all") {
       const job = HARDCODED_JOBS.find((j) => j.id === selectedJob);
       if (job) {
-        filtered = filtered.filter((c) => c.position === job.position);
+        filtered = filtered.filter((c) => 
+          c.jobApplications.some(app => app.jobTitle === job.position)
+        );
       }
     }
 
     if (selectedRecruiter !== "all") {
-      filtered = filtered.filter((c) => c.recruiter === selectedRecruiter);
+      filtered = filtered.filter((c) => 
+        c.jobApplications.some(app => app.recruiter === selectedRecruiter)
+      );
     }
 
     if (selectedSource !== "all") {
@@ -197,7 +212,9 @@ export default function Reports() {
     }
 
     if (selectedStage !== "all") {
-      filtered = filtered.filter((c) => c.stage === selectedStage);
+      filtered = filtered.filter((c) => 
+        c.jobApplications.some(app => app.currentStage === selectedStage)
+      );
     }
 
     // Date filtering
@@ -218,7 +235,9 @@ export default function Reports() {
         break;
     }
 
-    filtered = filtered.filter((c) => new Date(c.appliedDate) >= startDate);
+    filtered = filtered.filter((c) => 
+      c.jobApplications.some(app => new Date(app.appliedDate) >= startDate)
+    );
 
     return filtered;
   }, [
@@ -233,14 +252,16 @@ export default function Reports() {
   const chartData = useMemo(() => {
     const stageDistribution = stages.map((stage) => ({
       name: stage,
-      value: filteredData.filter((c) => c.stage === stage).length,
+      value: filteredData.filter((c) => 
+        c.jobApplications.some(app => app.currentStage === stage)
+      ).length,
       fill: getStageColor(stage),
     }));
 
     const sourceDistribution = sources.map((source) => {
       const sourceCandidates = filteredData.filter((c) => c.source === source);
-      const sourceHired = sourceCandidates.filter(
-        (c) => c.stage === "Hired",
+      const sourceHired = sourceCandidates.filter((c) =>
+        c.jobApplications.some(app => app.currentStage === "Hired")
       ).length;
       const effectiveness =
         sourceCandidates.length > 0
@@ -256,14 +277,16 @@ export default function Reports() {
     });
 
     const recruiterPerformance = recruiters.map((recruiter) => {
-      const recruiterCandidates = filteredData.filter(
-        (c) => c.recruiter === recruiter,
+      const recruiterCandidates = filteredData.filter((c) =>
+        c.jobApplications.some(app => app.recruiter === recruiter)
       );
       const interviews = recruiterCandidates.filter((c) =>
-        ["Interview", "Technical", "Offer", "Hired"].includes(c.stage),
+        c.jobApplications.some(app => 
+          ["Interview", "Technical", "Offer", "Hired"].includes(app.currentStage)
+        )
       ).length;
-      const hires = recruiterCandidates.filter(
-        (c) => c.stage === "Hired",
+      const hires = recruiterCandidates.filter((c) =>
+        c.jobApplications.some(app => app.currentStage === "Hired")
       ).length;
       const effectiveness =
         recruiterCandidates.length > 0
@@ -323,14 +346,16 @@ export default function Reports() {
         "Source",
         "Applied Date",
       ];
-      const csvData = filteredData.map((candidate) => [
-        candidate.name,
-        candidate.position,
-        candidate.stage,
-        candidate.recruiter,
-        candidate.source,
-        candidate.appliedDate,
-      ]);
+      const csvData = filteredData.flatMap((candidate) => 
+        candidate.jobApplications.map(app => [
+          candidate.name,
+          app.jobTitle,
+          app.currentStage,
+          app.recruiter,
+          candidate.source,
+          app.appliedDate,
+        ])
+      );
 
       const csvContent = [
         headers.join(","),
@@ -353,7 +378,7 @@ export default function Reports() {
       setIsLoading(false);
       toast({
         title: "Export Complete",
-        description: `Downloaded report with ${filteredData.length} candidates.`,
+        description: `Downloaded report with ${csvData.length} applications.`,
       });
     }, 1000);
   };
@@ -362,7 +387,7 @@ export default function Reports() {
   const costData = useMemo(() => {
     const baseCostPerHire = 15000; // Base cost in VND (thousands)
     const totalHires =
-      filteredData.filter((c) => c.stage === "Hired").length || 1;
+      filteredData.filter((c) => c.jobApplications.some(app => app.currentStage === "Hired")).length || 1;
 
     // Cost breakdown by category
     const costBreakdown = [
@@ -401,7 +426,7 @@ export default function Reports() {
     // Cost by position
     const costByPosition = HARDCODED_JOBS.map((job) => {
       const positionHires = filteredData.filter(
-        (c) => c.position === job.position && c.stage === "Hired",
+        (c) => c.jobApplications.some(app => app.jobTitle === job.position && app.currentStage === "Hired")
       ).length;
       const avgCost = baseCostPerHire + (Math.random() * 5000 - 2500); // Add variation
       return {
@@ -465,7 +490,7 @@ export default function Reports() {
     },
     {
       title: "Conversion Rate",
-      value: `${Math.round((filteredData.filter((c) => c.stage === "Hired").length / filteredData.length) * 100) || 0}%`,
+      value: `${Math.round((filteredData.filter((c) => c.jobApplications.some(app => app.currentStage === "Hired")).length / filteredData.length) * 100) || 0}%`,
       change: "+0.8%",
       trend: "up",
       icon: Target,
@@ -473,20 +498,15 @@ export default function Reports() {
     },
     {
       title: "Avg Time to Hire",
-      value: `${Math.round(filteredData.reduce((acc, c) => acc + c.duration, 0) / filteredData.length) || 0} days`,
+      value: `${Math.round(filteredData.reduce((acc, c) => 
+        acc + c.jobApplications.reduce((appAcc, app) => 
+          appAcc + app.stageHistory.reduce((stageAcc, stage) => stageAcc + stage.duration, 0), 0
+        ), 0) / Math.max(filteredData.length, 1)) || 0} days`,
       change: "-3 days",
       trend: "up",
       icon: Clock,
       color: "purple",
     },
-    // {
-    //   title: "Active Recruiters",
-    //   value: recruiters.length.toString(),
-    //   change: "+2",
-    //   trend: "up",
-    //   icon: Award,
-    //   color: "orange",
-    // },
     {
       title: "Avg Cost per Hire",
       value: `${(costData.avgCostPerHire / 1000).toFixed(0)}K VND`,
@@ -960,8 +980,7 @@ export default function Reports() {
                         hires: Math.max(
                           0,
                           Math.round(
-                            filteredData.filter((c) => c.stage === "Hired")
-                              .length * 0.2,
+                            filteredData.filter((c) => c.jobApplications.some(app => app.currentStage === "Hired")).length * 0.2,
                           ),
                         ),
                         interviews: Math.max(
@@ -978,8 +997,7 @@ export default function Reports() {
                         hires: Math.max(
                           0,
                           Math.round(
-                            filteredData.filter((c) => c.stage === "Hired")
-                              .length * 0.4,
+                            filteredData.filter((c) => c.jobApplications.some(app => app.currentStage === "Hired")).length * 0.4,
                           ),
                         ),
                         interviews: Math.max(
@@ -996,8 +1014,7 @@ export default function Reports() {
                         hires: Math.max(
                           0,
                           Math.round(
-                            filteredData.filter((c) => c.stage === "Hired")
-                              .length * 0.7,
+                            filteredData.filter((c) => c.jobApplications.some(app => app.currentStage === "Hired")).length * 0.7,
                           ),
                         ),
                         interviews: Math.max(
@@ -1008,8 +1025,7 @@ export default function Reports() {
                       {
                         month: "Apr",
                         applications: Math.max(1, filteredData.length),
-                        hires: filteredData.filter((c) => c.stage === "Hired")
-                          .length,
+                        hires: filteredData.filter((c) => c.jobApplications.some(app => app.currentStage === "Hired")).length,
                         interviews: Math.max(
                           0,
                           Math.round(filteredData.length * 0.5),
@@ -1138,7 +1154,7 @@ export default function Reports() {
                                       filteredData.filter(
                                         (c) =>
                                           c.source === label &&
-                                          c.stage === "Hired",
+                                          c.jobApplications.some(app => app.currentStage === "Hired")
                                       ).length
                                     }
                                   </span>
@@ -1191,7 +1207,7 @@ export default function Reports() {
                               filteredData.filter(
                                 (c) =>
                                   c.source === source.name &&
-                                  c.stage === "Hired",
+                                  c.jobApplications.some(app => app.currentStage === "Hired")
                               ).length
                             }
                           </div>

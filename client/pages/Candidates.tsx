@@ -245,14 +245,14 @@ export default function Candidates() {
     {
       title: "Interviews Scheduled",
       value: candidates
-        .filter((c) => c.stage === "Interview")
+        .filter((c) => c.jobApplications.some(app => app.currentStage === "Interview"))
         .length.toString(),
       change: "+15%",
       color: "orange",
     },
     {
       title: "Offers Extended",
-      value: candidates.filter((c) => c.stage === "Offer").length.toString(),
+      value: candidates.filter((c) => c.jobApplications.some(app => app.currentStage === "Offer")).length.toString(),
       change: "+3%",
       color: "purple",
     },
@@ -836,26 +836,26 @@ export default function Candidates() {
   const filteredCandidates = candidates.filter((candidate) => {
     const matchesSearch =
       candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      candidate.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      candidate.jobApplications.some(app => app.jobTitle.toLowerCase().includes(searchTerm.toLowerCase())) ||
       candidate.skills.some((skill) =>
         skill.toLowerCase().includes(searchTerm.toLowerCase()),
       );
 
     const matchesPosition =
       positionFilter === "all" ||
-      candidate.position.toLowerCase().includes(positionFilter.toLowerCase());
+      candidate.jobApplications.some(app => app.jobTitle.toLowerCase().includes(positionFilter.toLowerCase()));
     const matchesStage =
       stageFilter === "all" ||
-      candidate.stage.toLowerCase() === stageFilter.toLowerCase();
+      candidate.jobApplications.some(app => app.currentStage.toLowerCase() === stageFilter.toLowerCase());
     const matchesLocation =
       locationFilter === "all" ||
       candidate.location.toLowerCase().includes(locationFilter.toLowerCase());
     const matchesDepartment =
       departmentFilter === "all" ||
-      candidate.department.toLowerCase() === departmentFilter.toLowerCase();
+      candidate.jobApplications.some(app => app.department.toLowerCase() === departmentFilter.toLowerCase());
     const matchesRecruiter =
       recruiterFilter === "all" ||
-      candidate.recruiter.toLowerCase().includes(recruiterFilter.toLowerCase());
+      candidate.jobApplications.some(app => app.recruiter.toLowerCase().includes(recruiterFilter.toLowerCase()));
 
     return (
       matchesSearch &&
@@ -1155,12 +1155,19 @@ export default function Candidates() {
     // Update the candidate's stage in the main candidates list
     setCandidates((prevCandidates) =>
       prevCandidates.map((c) =>
-        c.id === candidate.id ? { ...c, stage: newStage as CandidateData['stage'] } : c
+        c.id === candidate.id ? {
+          ...c,
+          jobApplications: c.jobApplications.map(app => ({
+            ...app,
+            currentStage: newStage as any
+          }))
+        } : c
       )
     );
     
     // In a real app, this would be an API call
-    console.log(`Moving candidate ${candidate.name} from ${candidate.stage} to ${newStage}`);
+    const currentStage = candidate.jobApplications[0]?.currentStage || "Unknown";
+    console.log(`Moving candidate ${candidate.name} from ${currentStage} to ${newStage}`);
     
     // Show success message
     toast({
@@ -1249,135 +1256,141 @@ export default function Candidates() {
   };
 
   // Existing candidate components (simplified for space)
-  const CandidateCard = ({ candidate }: { candidate: CandidateData }) => (
-    <Card className="hover:shadow-md transition-shadow cursor-pointer">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between min-w-0">
-          <Link
-            to={`/candidates/${candidate.id}`}
-            className="flex items-center space-x-3 hover:bg-slate-100 p-2 rounded-md transition min-w-0 flex-1"
-          >
-            <Avatar className="w-10 h-10 flex-shrink-0">
-              <AvatarImage src={candidate.avatar} />
-              <AvatarFallback>
-                {candidate.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")}
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0 flex-1">
-              <h3 className="font-semibold text-sm text-slate-900 break-words">
-                {candidate.name}
-              </h3>
-              <p className="text-xs text-slate-600 break-words">
-                {candidate.position}
-              </p>
-            </div>
-          </Link>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="flex-shrink-0">
-                <MoreHorizontal className="w-4 h-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <Link to={`/candidates-profile/${candidate.id}`}>
-                <DropdownMenuItem>
-                  <Eye className="w-4 h-4 mr-2" />
-                  View Profile
+  const CandidateCard = ({ candidate }: { candidate: CandidateData }) => {
+    // Get the primary job application for display
+    const primaryJob = candidate.jobApplications[0];
+    
+    return (
+      <Card className="hover:shadow-md transition-shadow cursor-pointer">
+        <CardHeader className="pb-3">
+          <div className="flex items-start justify-between min-w-0">
+            <Link
+              to={`/candidates/${candidate.id}`}
+              className="flex items-center space-x-3 hover:bg-slate-100 p-2 rounded-md transition min-w-0 flex-1"
+            >
+              <Avatar className="w-10 h-10 flex-shrink-0">
+                <AvatarImage src={candidate.avatar} />
+                <AvatarFallback>
+                  {candidate.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0 flex-1">
+                <h3 className="font-semibold text-sm text-slate-900 break-words">
+                  {candidate.name}
+                </h3>
+                <p className="text-xs text-slate-600 break-words">
+                  {primaryJob?.jobTitle || "No Position"}
+                </p>
+              </div>
+            </Link>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="flex-shrink-0">
+                  <MoreHorizontal className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <Link to={`/candidates-profile/${candidate.id}`}>
+                  <DropdownMenuItem>
+                    <Eye className="w-4 h-4 mr-2" />
+                    View Profile
+                  </DropdownMenuItem>
+                </Link>
+                <DropdownMenuItem onClick={() => handleEditCandidate(candidate)}>
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit Candidate
                 </DropdownMenuItem>
-              </Link>
-              <DropdownMenuItem onClick={() => handleEditCandidate(candidate)}>
-                <Edit className="w-4 h-4 mr-2" />
-                Edit Candidate
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleDownloadCV(candidate)}>
-                <Download className="w-4 h-4 mr-2" />
-                Download CV
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleSendEmail(candidate)}>
-                <Mail className="w-4 h-4 mr-2" />
-                Send Email
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleScheduleCall(candidate)}>
-                <Phone className="w-4 h-4 mr-2" />
-                Schedule Call
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleAddNote(candidate)}>
-                <Edit3 className="w-4 h-4 mr-2" />
-                Add Note
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  const nextStageIndex =
-                    stages.findIndex((s) => s === candidate.stage) + 1;
-                  if (nextStageIndex < stages.length) {
-                    handleStageChange(candidate, stages[nextStageIndex]);
+                <DropdownMenuItem onClick={() => handleDownloadCV(candidate)}>
+                  <Download className="w-4 h-4 mr-2" />
+                  Download CV
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSendEmail(candidate)}>
+                  <Mail className="w-4 h-4 mr-2" />
+                  Send Email
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleScheduleCall(candidate)}>
+                  <Phone className="w-4 h-4 mr-2" />
+                  Schedule Call
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleAddNote(candidate)}>
+                  <Edit3 className="w-4 h-4 mr-2" />
+                  Add Note
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    const currentStage = primaryJob?.currentStage || "Applied";
+                    const nextStageIndex =
+                      stages.findIndex((s) => s === currentStage) + 1;
+                    if (nextStageIndex < stages.length) {
+                      handleStageChange(candidate, stages[nextStageIndex]);
+                    }
+                  }}
+                  disabled={
+                    stages.findIndex((s) => s === (primaryJob?.currentStage || "Applied")) ===
+                    stages.length - 1
                   }
-                }}
-                disabled={
-                  stages.findIndex((s) => s === candidate.stage) ===
-                  stages.length - 1
-                }
-              >
-                <Mail className="w-4 h-4 mr-2" />
-                Move to Next Stage
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => handleDeleteCandidate(candidate)}
-                className="text-red-600 focus:text-red-600"
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Delete Candidate
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        <div className="flex items-center text-xs text-slate-600 min-w-0">
-          <Building className="w-3 h-3 mr-1 flex-shrink-0" />
-          <span className="break-words">{candidate.department}</span>
-        </div>
-        <div className="flex items-center text-xs text-slate-600 min-w-0">
-          <Clock className="w-3 h-3 mr-1 flex-shrink-0" />
-          <span className="line-clamp-1">
-            {candidate.duration} days in stage
-          </span>
-        </div>
-        <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-          <div className="flex items-center space-x-1">
-            {/* Rating removed */}
+                >
+                  <Mail className="w-4 h-4 mr-2" />
+                  Move to Next Stage
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => handleDeleteCandidate(candidate)}
+                  className="text-red-600 focus:text-red-600"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete Candidate
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
-          <Badge
-            variant="outline"
-            className="text-xs line-clamp-1 max-w-20"
-            title={candidate.recruiter}
-          >
-            {candidate.recruiter}
-          </Badge>
-        </div>
-        <div className="flex space-x-1 mt-2">
-          <Select
-            value={candidate.stage}
-            onValueChange={(value) => handleStageChange(candidate, value)}
-          >
-            <SelectTrigger className="h-7 text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {stages.map((stage) => (
-                <SelectItem key={stage} value={stage} className="text-xs">
-                  {stage}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </CardContent>
-    </Card>
-  );
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <div className="flex items-center text-xs text-slate-600 min-w-0">
+            <Building className="w-3 h-3 mr-1 flex-shrink-0" />
+            <span className="break-words">{primaryJob?.department || "No Department"}</span>
+          </div>
+          <div className="flex items-center text-xs text-slate-600 min-w-0">
+            <Clock className="w-3 h-3 mr-1 flex-shrink-0" />
+            <span className="line-clamp-1">
+              {primaryJob?.stageHistory?.[primaryJob.stageHistory.length - 1]?.duration || 0} days in stage
+            </span>
+          </div>
+          <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+            <div className="flex items-center space-x-1">
+              {/* Rating removed */}
+            </div>
+            <Badge
+              variant="outline"
+              className="text-xs line-clamp-1 max-w-20"
+              title={primaryJob?.recruiter || "No Recruiter"}
+            >
+              {primaryJob?.recruiter || "No Recruiter"}
+            </Badge>
+          </div>
+          <div className="flex space-x-1 mt-2">
+            <Select
+              value={primaryJob?.currentStage || "Applied"}
+              onValueChange={(value) => handleStageChange(candidate, value)}
+            >
+              <SelectTrigger className="h-7 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {stages.map((stage) => (
+                  <SelectItem key={stage} value={stage} className="text-xs">
+                    {stage}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
 
   const ListView = () => (
     <Card>
@@ -1437,7 +1450,7 @@ export default function Candidates() {
                   )}
                   {visibleFields.appliedDate && (
                     <TableCell className="break-words max-w-32">
-                      {candidate.appliedDate}
+                      {candidate.jobApplications[0]?.appliedDate || "N/A"}
                     </TableCell>
                   )}
                   {visibleFields.email && (
@@ -1452,35 +1465,35 @@ export default function Candidates() {
                   )}
                   {visibleFields.position && (
                     <TableCell className="break-words max-w-40">
-                      {candidate.position}
+                      {candidate.jobApplications[0]?.jobTitle || "N/A"}
                     </TableCell>
                   )}
                   {visibleFields.recruiter && (
                     <TableCell className="break-words max-w-32">
-                      {candidate.recruiter}
+                      {candidate.jobApplications[0]?.recruiter || "N/A"}
                     </TableCell>
                   )}
                   {visibleFields.stage && (
                     <TableCell>
                       <Badge
                         variant={
-                          candidate.stage === "Offer"
+                          candidate.jobApplications[0]?.currentStage === "Offer"
                             ? "default"
-                            : candidate.stage === "Hired"
+                            : candidate.jobApplications[0]?.currentStage === "Hired"
                               ? "default"
-                              : candidate.stage === "Technical"
+                              : candidate.jobApplications[0]?.currentStage === "Technical"
                                 ? "secondary"
-                                : candidate.stage === "Interview"
+                                : candidate.jobApplications[0]?.currentStage === "Interview"
                                   ? "outline"
-                                  : candidate.stage === "Screening"
+                                  : candidate.jobApplications[0]?.currentStage === "Screening"
                                     ? "secondary"
-                                    : candidate.stage === "Applied"
+                                    : candidate.jobApplications[0]?.currentStage === "Applied"
                                       ? "outline"
                                       : "destructive"
                         }
                         className="break-words max-w-24"
                       >
-                        {candidate.stage}
+                        {candidate.jobApplications[0]?.currentStage || "N/A"}
                       </Badge>
                     </TableCell>
                   )}
@@ -1491,7 +1504,7 @@ export default function Candidates() {
                   )}
                   {visibleFields.salary && (
                     <TableCell className="break-words max-w-32">
-                      {candidate.salary}
+                      {candidate.jobApplications[0]?.salary || "N/A"}
                     </TableCell>
                   )}
                   {visibleFields.location && (
@@ -1501,7 +1514,7 @@ export default function Candidates() {
                   )}
                   {visibleFields.department && (
                     <TableCell className="break-words max-w-40">
-                      {candidate.department}
+                      {candidate.jobApplications[0]?.department || "N/A"}
                     </TableCell>
                   )}
                   <TableCell>
@@ -1666,7 +1679,7 @@ export default function Candidates() {
       <div className="flex gap-4 overflow-x-auto pb-2">
         {stages.map((stage) => {
           const stageCandidates = filteredCandidates.filter(
-            (candidate) => candidate.stage === stage,
+            (candidate) => candidate.jobApplications[0]?.currentStage === stage,
           );
           const displayedCount = candidatesPerStage[stage] || 5;
           const hasMoreCandidates = stageCandidates.length > displayedCount;
@@ -2782,7 +2795,7 @@ export default function Candidates() {
           }}
           candidate={selectedCandidateForEmail}
           newStage={newStageForEmail}
-          jobTitle={selectedCandidateForEmail.position}
+          jobTitle={selectedCandidateForEmail.jobApplications[0]?.jobTitle || "Unknown Position"}
           onEmailSent={handleEmailSent}
         />
       )}

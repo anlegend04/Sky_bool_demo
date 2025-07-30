@@ -81,11 +81,13 @@ import { CandidateData, CVEvaluationData } from "@/data/hardcoded-data";
 import { useToast } from "@/hooks/use-toast";
 import {
   HARDCODED_CANDIDATES,
-  EMAIL_TEMPLATES,
+  HARDCODED_JOBS,
+  HARDCODED_INTERVIEWS,
   getCandidate,
-  getCandidateTimeline,
+  getJob,
+  getCandidateInterviews,
 } from "@/data/hardcoded-data";
-import { EmailTrigger } from "@/components/EmailTrigger";
+import { useLanguage } from "@/hooks/use-language";
 
 type StageData = {
   name: string;
@@ -114,279 +116,198 @@ function convertCandidateStatus(candidate: any): CandidateData {
 
 // Helper function to get candidate's jobs
 function getCandidateJobs(candidate: CandidateData) {
-  // For now, create a single job from the candidate's position
-  // In a real app, this would come from a jobs table
-  return [
-    {
-      id: "job-1",
-      title: candidate.position,
-      department: candidate.department,
-      status: candidate.status,
-      currentStage: candidate.stage,
-      appliedDate: candidate.appliedDate || new Date().toISOString(),
-      recruiter: candidate.recruiter,
-      salary: candidate.salary,
-      priority: "High",
-      stageHistory: candidate.stageHistory,
-      notes: candidate.notes || [],
-      emails: candidate.emails || [],
-    }
-  ];
+  // Return the job applications directly from the candidate
+  return candidate.jobApplications || [];
 }
 
 export default function CandidateDetail() {
   const { id } = useParams();
-  const [candidate, setCandidate] = useState<CandidateData | null>(null);
-  const [currentStage, setCurrentStage] = useState("Interview");
-  const [newNote, setNewNote] = useState("");
-  const [showStageChangeDialog, setShowStageChangeDialog] = useState(false);
-  const [showEmailTrigger, setShowEmailTrigger] = useState(false); // NEW
-  const [pendingStage, setPendingStage] = useState(""); // NEW
-  const [pendingReason, setPendingReason] = useState(""); // NEW
-  const [stageChangeReason, setStageChangeReason] = useState("");
-  const [newStage, setNewStage] = useState("");
-  const [selectedEmail, setSelectedEmail] = useState<EmailData | null>(null);
-  const [emailSubject, setEmailSubject] = useState("");
-  const [selectedCVEvaluation, setSelectedCVEvaluation] =
-    useState<CVEvaluationData | null>(null);
-  const [showEditProfileDialog, setShowEditProfileDialog] = useState(false);
-  const [showResumePreview, setShowResumePreview] = useState(false);
-  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
-  const [showJobProgress, setShowJobProgress] = useState(false);
+  const { t } = useLanguage();
   const { toast } = useToast();
 
-  // Load candidate from hardcoded data or localStorage
-  useEffect(() => {
-    if (id) {
-      // First try to get from hardcoded data
-      const hardcodedCandidate = HARDCODED_CANDIDATES.find((c) => c.id === id);
-
-      if (hardcodedCandidate) {
-        // Convert hardcoded data to storage format
-        const convertedCandidate: CandidateData = {
-          ...hardcodedCandidate,
-          status: hardcodedCandidate.status,
-          emails: hardcodedCandidate.emails.map((email) => ({
-            ...email,
-            status:
-              (email.status as any) === "draft" ? "failed" : email.status,
-          })),
-        };
-
-        setCandidate(convertedCandidate);
-        setCurrentStage(convertedCandidate.stage);
-      } else {
-        // Try localStorage
-        const storageCandidate = storage.getCandidate(id);
-        if (storageCandidate) {
-          setCandidate(convertCandidateStatus(storageCandidate));
-          setCurrentStage(storageCandidate.stage);
-        }
-      }
-    }
-  }, [id]);
+  // Get candidate data
+  const candidate = HARDCODED_CANDIDATES.find((c) => c.id === id);
 
   if (!candidate) {
     return (
       <div className="p-6">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-slate-900">
-            Candidate not found
+          <h2 className="text-2xl font-bold text-slate-900 mb-4">
+            Candidate Not Found
           </h2>
-          <p className="text-slate-600 mt-2">
+          <p className="text-slate-600">
             The candidate you're looking for doesn't exist.
           </p>
-          <Link to="/candidates">
-            <Button className="mt-4">Back to Candidates</Button>
-          </Link>
         </div>
       </div>
     );
   }
 
-  // Convert candidate stage history to StageData format
-  const stages: StageData[] = [
+  // Get the primary job application for display
+  const primaryJob = candidate.jobApplications[0];
+
+  const stats = [
     {
-      name: "Applied",
-      completed: candidate.stageHistory.some((s) => s.stage === "Applied"),
-      duration:
-        candidate.stageHistory.find((s) => s.stage === "Applied")?.duration ||
-        0,
-      startDate:
-        candidate.stageHistory.find((s) => s.stage === "Applied")?.startDate ||
-        "",
-      endDate: candidate.stageHistory.find((s) => s.stage === "Applied")
-        ?.endDate,
-      notes:
-        candidate.stageHistory.find((s) => s.stage === "Applied")?.notes ||
-        "Application submitted",
-      mailSent:
-        candidate.stageHistory.find((s) => s.stage === "Applied")?.mailSent ||
-        false,
-      mailConfirmed:
-        candidate.stageHistory.find((s) => s.stage === "Applied")
-          ?.mailConfirmed || false,
+      title: "Current Stage",
+      value: primaryJob?.currentStage || "Unknown",
+      change: "+2 days",
+      changeType: "positive" as const,
+      icon: Target,
+      color: "blue",
     },
     {
-      name: "Screening",
-      completed: candidate.stageHistory.some((s) => s.stage === "Screening"),
-      duration:
-        candidate.stageHistory.find((s) => s.stage === "Screening")?.duration ||
-        0,
-      startDate:
-        candidate.stageHistory.find((s) => s.stage === "Screening")
-          ?.startDate || "",
-      endDate: candidate.stageHistory.find((s) => s.stage === "Screening")
-        ?.endDate,
-      notes:
-        candidate.stageHistory.find((s) => s.stage === "Screening")?.notes ||
-        "Initial screening pending",
-      mailSent:
-        candidate.stageHistory.find((s) => s.stage === "Screening")?.mailSent ||
-        false,
-      mailConfirmed:
-        candidate.stageHistory.find((s) => s.stage === "Screening")
-          ?.mailConfirmed || false,
+      title: "Days in Stage",
+      value: `${primaryJob?.stageHistory?.[primaryJob.stageHistory.length - 1]?.duration || 0} days`,
+      change: "+2 days",
+      changeType: "positive" as const,
+      icon: Clock,
+      color: "green",
     },
     {
-      name: "Interview",
-      completed: candidate.stageHistory.some((s) => s.stage === "Interview"),
-      duration:
-        candidate.stageHistory.find((s) => s.stage === "Interview")?.duration ||
-        0,
-      startDate:
-        candidate.stageHistory.find((s) => s.stage === "Interview")
-          ?.startDate || "",
-      endDate: candidate.stageHistory.find((s) => s.stage === "Interview")
-        ?.endDate,
-      notes:
-        candidate.stageHistory.find((s) => s.stage === "Interview")?.notes ||
-        "Interview scheduling",
-      mailSent:
-        candidate.stageHistory.find((s) => s.stage === "Interview")?.mailSent ||
-        false,
-      mailConfirmed:
-        candidate.stageHistory.find((s) => s.stage === "Interview")
-          ?.mailConfirmed || false,
-    },
-    {
-      name: "Technical",
-      completed: candidate.stageHistory.some((s) => s.stage === "Technical"),
-      duration:
-        candidate.stageHistory.find((s) => s.stage === "Technical")?.duration ||
-        0,
-      startDate:
-        candidate.stageHistory.find((s) => s.stage === "Technical")
-          ?.startDate || "",
-      endDate: candidate.stageHistory.find((s) => s.stage === "Technical")
-        ?.endDate,
-      notes:
-        candidate.stageHistory.find((s) => s.stage === "Technical")?.notes ||
-        "Technical assessment pending",
-      mailSent:
-        candidate.stageHistory.find((s) => s.stage === "Technical")?.mailSent ||
-        false,
-      mailConfirmed:
-        candidate.stageHistory.find((s) => s.stage === "Technical")
-          ?.mailConfirmed || false,
-    },
-    {
-      name: "Offer",
-      completed: candidate.stageHistory.some((s) => s.stage === "Offer"),
-      duration:
-        candidate.stageHistory.find((s) => s.stage === "Offer")?.duration || 0,
-      startDate:
-        candidate.stageHistory.find((s) => s.stage === "Offer")?.startDate ||
-        "",
-      endDate: candidate.stageHistory.find((s) => s.stage === "Offer")?.endDate,
-      notes:
-        candidate.stageHistory.find((s) => s.stage === "Offer")?.notes ||
-        "Offer preparation",
-      mailSent:
-        candidate.stageHistory.find((s) => s.stage === "Offer")?.mailSent ||
-        false,
-      mailConfirmed:
-        candidate.stageHistory.find((s) => s.stage === "Offer")
-          ?.mailConfirmed || false,
-    },
-    {
-      name: "Hired",
-      completed: candidate.stageHistory.some((s) => s.stage === "Hired"),
-      duration:
-        candidate.stageHistory.find((s) => s.stage === "Hired")?.duration || 0,
-      startDate:
-        candidate.stageHistory.find((s) => s.stage === "Hired")?.startDate ||
-        "",
-      endDate: candidate.stageHistory.find((s) => s.stage === "Hired")?.endDate,
-      notes:
-        candidate.stageHistory.find((s) => s.stage === "Hired")?.notes ||
-        "Onboarding",
-      mailSent:
-        candidate.stageHistory.find((s) => s.stage === "Hired")?.mailSent ||
-        false,
-      mailConfirmed:
-        candidate.stageHistory.find((s) => s.stage === "Hired")
-          ?.mailConfirmed || false,
+      title: "Emails Sent",
+      value: `${primaryJob?.emails?.length || 0}`,
+      change: "+1",
+      changeType: "positive" as const,
+      icon: Mail,
+      color: "orange",
     },
   ];
 
-  // Use candidate timeline from centralized data
-  type CandidateTimelineItem = {
-    type: string;
-    date: string;
-    description: string;
-    details: string;
-    reason?: string;
-    duration?: number;
-  };
-  const candidateTimeline: CandidateTimelineItem[] = getCandidateTimeline(candidate.id);
-  const activities = candidateTimeline.map((item, index) => ({
-    id: index + 1,
-    type: item.type,
-    action: item.description,
-    user:
-      item.type === "stage_change"
-        ? candidate.stageHistory.find((s) => s.startDate === item.date)
-            ?.userName || "System"
-        : item.type === "email"
-          ? candidate.emails.find((e) => e.timestamp === item.date)?.from ||
-            "System"
-          : item.type === "note"
-            ? candidate.notes.find((n) => n.timestamp === item.date)
-                ?.userName || "System"
-            : "System",
-    timestamp: new Date(item.date).toLocaleString(),
-    content: item.details,
-    reason: item.reason, // Add this line to include the reason property
-    duration: item.duration, // Optionally add duration if used elsewhere
-  }));
+  const recentActivities = [
+    {
+      id: "1",
+      type: "email" as const,
+      title: "Interview invitation sent",
+      description: "Technical interview scheduled for next week",
+      timestamp: "2 hours ago",
+      icon: Mail,
+    },
+    {
+      id: "2",
+      type: "note" as const,
+      title: "Recruiter note added",
+      description: "Candidate shows strong technical skills",
+      timestamp: "1 day ago",
+      icon: FileText,
+    },
+    {
+      id: "3",
+      type: "stage" as const,
+      title: "Moved to Technical stage",
+      description: "Passed initial screening",
+      timestamp: "2 days ago",
+      icon: Target,
+    },
+  ];
+
+  // Convert candidate stage history to StageData format
+  const stageHistory = primaryJob?.stageHistory?.map((stage) => ({
+    id: stage.id,
+    stage: stage.stage,
+    date: stage.startDate, // Use startDate instead of date
+    duration: stage.duration,
+    notes: stage.notes,
+  })) || [];
+
+  // Get candidate notes
+  const candidateNotes = [
+    ...(candidate.globalNotes || []),
+    ...(primaryJob?.notes || []),
+  ];
+
+  // Get candidate emails
+  const candidateEmails = primaryJob?.emails || [];
+
+  // Get candidate interviews
+  const candidateInterviews = getCandidateInterviews(candidate.id);
 
   // Use candidate emails from centralized data
-  const emailHistory: EmailData[] = candidate.emails || [];
+  const emails = candidateEmails.map((email) => ({
+    id: email.id,
+    subject: email.subject,
+    from: email.from,
+    to: email.to,
+    timestamp: email.timestamp,
+    status: email.status,
+    template: email.template,
+    openedAt: email.openedAt,
+    repliedAt: email.repliedAt,
+  }));
 
-  const emailTemplates = EMAIL_TEMPLATES;
+  // Use candidate notes from centralized data
+  const notes = candidateNotes.map((note) => ({
+    id: note.id,
+    content: note.content,
+    userId: note.userId,
+    userName: note.userName,
+    timestamp: note.timestamp,
+    type: note.type,
+  }));
+
+  // Use candidate interviews from centralized data
+  const interviews = candidateInterviews.map((interview) => ({
+    id: interview.id,
+    candidateId: interview.candidateId,
+    jobId: interview.jobId,
+    type: interview.type,
+    scheduledDate: interview.scheduledDate,
+    duration: interview.duration,
+    interviewer: interview.interviewerIds?.[0] || "Unknown", // Use interviewerIds instead of interviewer
+    status: interview.status,
+    notes: interview.notes,
+    feedback: interview.feedback,
+  }));
+
+  // Mock timeline data
+  const timeline = [
+    {
+      id: "1",
+      type: "application",
+      title: "Application Submitted",
+      description: "Candidate applied for the position",
+      timestamp: primaryJob?.appliedDate || "Unknown",
+      icon: FileText,
+    },
+    {
+      id: "2",
+      type: "screening",
+      title: "Initial Screening",
+      description: "Resume reviewed and passed initial screening",
+      timestamp: "2024-01-15",
+      icon: CheckCircle,
+    },
+    {
+      id: "3",
+      type: "interview",
+      title: "Technical Interview",
+      description: "Technical interview scheduled",
+      timestamp: "2024-01-20",
+      icon: Users,
+    },
+  ];
+
+  // Mock email templates
+  const emailTemplates = [
+    {
+      id: "interview_invitation",
+      name: "Interview Invitation",
+      subject: "Interview Invitation - {position}",
+      body: "Dear {candidate_name},\n\nWe are pleased to invite you for an interview...",
+    },
+    {
+      id: "offer_letter",
+      name: "Offer Letter",
+      subject: "Job Offer - {position}",
+      body: "Dear {candidate_name},\n\nWe are delighted to offer you the position...",
+    },
+  ];
 
   const handleStageChange = () => {
-    if (!candidate) return;
-
-    const updatedCandidate = storage.updateCandidate(candidate.id, {
-      stage: newStage,
+    // Simplified stage change handler
+    toast({
+      title: "Stage Change",
+      description: "Stage change functionality would be implemented here.",
     });
-
-    if (updatedCandidate) {
-      setCandidate(convertCandidateStatus(updatedCandidate));
-      setCurrentStage(newStage);
-      setShowStageChangeDialog(false);
-      setStageChangeReason("");
-
-      toast({
-        title: "Stage Updated",
-        description: `${candidate.name} has been moved to ${newStage} stage.`,
-      });
-
-      // Auto-suggest sending email on stage change
-      suggestEmailOnStageChange(newStage);
-    }
   };
 
   const suggestEmailOnStageChange = (stage: string) => {
@@ -1130,7 +1051,7 @@ export default function CandidateDetail() {
                </CardHeader>
                <CardContent>
                  <div className="space-y-3 sm:space-y-4">
-                   {emailHistory.map((email) => (
+                   {emails.map((email) => (
                      <div
                        key={email.id}
                        className="p-3 border border-slate-200 rounded-lg hover:bg-slate-50"

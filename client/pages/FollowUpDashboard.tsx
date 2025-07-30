@@ -66,6 +66,7 @@ import {
   Edit,
   Download,
   UserPlus,
+  Activity,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
@@ -94,6 +95,13 @@ interface FollowUpCandidate extends CandidateData {
   upcomingActions: FollowUpAction[];
   interactions: Interaction[];
   emailHistory: EmailRecord[];
+  // Add computed properties for backward compatibility
+  position: string;
+  stage: string;
+  appliedDate: string;
+  recruiter: string;
+  salary: string;
+  department: string;
 }
 
 interface FollowUpAction {
@@ -173,70 +181,82 @@ export default function FollowUpDashboard() {
   const [applyCandidateId, setApplyCandidateId] = useState<string | null>(null);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
 
-  // Mock candidate data transformation (giữ nguyên)
+  // Transform candidates to FollowUpCandidate format
   const [candidates] = useState<FollowUpCandidate[]>(
-    HARDCODED_CANDIDATES.map((candidate, index) => ({
-      ...candidate,
-      lastInteraction: new Date(
-        Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000,
-      ).toISOString(),
-      nextFollowUp: new Date(
-        Date.now() + Math.random() * 3 * 24 * 60 * 60 * 1000,
-      ).toISOString(),
-      daysInStage: Math.floor(Math.random() * 14) + 1,
-      emailsSent: Math.floor(Math.random() * 5) + 1,
-      lastEmailSent:
-        Math.random() > 0.3
-          ? new Date(
-              Date.now() - Math.random() * 3 * 24 * 60 * 60 * 1000,
-            ).toISOString()
-          : undefined,
-      responseRate: Math.floor(Math.random() * 100),
-      urgencyLevel: ["low", "medium", "high", "critical"][
-        Math.floor(Math.random() * 4)
-      ] as any,
-      upcomingActions: [
-        {
-          id: `action-${index}-1`,
-          type: "email",
-          title: "Send interview confirmation",
-          dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-          priority: "high",
-          template: "interview_confirmation",
-          completed: false,
-        },
-      ],
-      interactions: [
-        {
-          id: `int-${index}-1`,
-          type: "call",
-          date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-          duration: 15,
-          summary: "Discussed role requirements and candidate expectations",
-          outcome: "positive",
-          nextAction: "Send technical assessment",
-        },
-      ],
-      emailHistory: [
-        {
-          id: `email-${index}-1`,
-          subject: "Interview Invitation - " + candidate.position,
-          template: "interview_invitation",
-          sentDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-          opened: Math.random() > 0.3,
-          responded: Math.random() > 0.5,
-          responseDate:
-            Math.random() > 0.5
-              ? new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString()
-              : undefined,
-        },
-      ],
-    })),
+    HARDCODED_CANDIDATES.map((candidate, index) => {
+      // Get the primary job application for this candidate
+      const primaryJob = candidate.jobApplications[0];
+      
+      return {
+        ...candidate,
+        // Add computed properties for backward compatibility
+        position: primaryJob?.jobTitle || "Unknown Position",
+        stage: primaryJob?.currentStage || "Applied",
+        appliedDate: primaryJob?.appliedDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        recruiter: primaryJob?.recruiter || "Unknown Recruiter",
+        salary: primaryJob?.salary || "$0 - $0",
+        department: primaryJob?.department || "Unknown Department",
+        lastInteraction: new Date(
+          Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000,
+        ).toISOString(),
+        nextFollowUp: new Date(
+          Date.now() + Math.random() * 3 * 24 * 60 * 60 * 1000,
+        ).toISOString(),
+        daysInStage: Math.floor(Math.random() * 14) + 1,
+        emailsSent: Math.floor(Math.random() * 5) + 1,
+        lastEmailSent:
+          Math.random() > 0.3
+            ? new Date(
+                Date.now() - Math.random() * 3 * 24 * 60 * 60 * 1000,
+              ).toISOString()
+            : undefined,
+        responseRate: Math.floor(Math.random() * 100),
+        urgencyLevel: ["low", "medium", "high", "critical"][
+          Math.floor(Math.random() * 4)
+        ] as any,
+        upcomingActions: [
+          {
+            id: `action-${index}-1`,
+            type: "email",
+            title: "Send interview confirmation",
+            dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+            priority: "high",
+            template: "interview_confirmation",
+            completed: false,
+          },
+        ],
+        interactions: [
+          {
+            id: `int-${index}-1`,
+            type: "call",
+            date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+            duration: 15,
+            summary: "Discussed role requirements and candidate expectations",
+            outcome: "positive",
+            nextAction: "Send technical assessment",
+          },
+        ],
+        emailHistory: [
+          {
+            id: `email-${index}-1`,
+            subject: "Interview Invitation - " + (primaryJob?.jobTitle || "Position"),
+            template: "interview_invitation",
+            sentDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+            opened: Math.random() > 0.3,
+            responded: Math.random() > 0.5,
+            responseDate:
+              Math.random() > 0.5
+                ? new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString()
+                : undefined,
+          },
+        ],
+      };
+    }),
   );
 
   const [selectedCandidates, setSelectedCandidates] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<"pipeline" | "list" | "timeline">(
-    "pipeline",
+    "list",
   );
   const [filterStage, setFilterStage] = useState("all");
   const [filterJob, setFilterJob] = useState("all");
@@ -513,6 +533,12 @@ export default function FollowUpDashboard() {
                 <Eye className="w-4 h-4 mr-2" />
                 View Profile
               </DropdownMenuItem>
+              <Link to={`/candidates/${candidate.id}/progress`}>
+                <DropdownMenuItem>
+                  <Activity className="w-4 h-4 mr-2" />
+                  View Process of Stage
+                </DropdownMenuItem>
+              </Link>
               <DropdownMenuItem onClick={() => handleSendEmail(candidate)}>
                 <Mail className="w-4 h-4 mr-2" />
                 Send Email
@@ -829,6 +855,12 @@ export default function FollowUpDashboard() {
                             <DropdownMenuItem>
                               <Eye className="w-4 h-4 mr-2" />
                               View Details
+                            </DropdownMenuItem>
+                          </Link>
+                          <Link to={`/candidates/${candidate.id}/progress`}>
+                            <DropdownMenuItem>
+                              <Activity className="w-4 h-4 mr-2" />
+                              View Process of Stage
                             </DropdownMenuItem>
                           </Link>
                           <DropdownMenuItem

@@ -101,6 +101,10 @@ const App = () => (
                 path="/candidates/:candidateId/jobs/:jobId/progress"
                 element={<CandidateApplicationProgress />}
               />
+              <Route
+                path="/candidates/:id/progress"
+                element={<CandidateApplicationProgress />}
+              />
               <Route path="/cv-evaluation" element={<CVEvaluation />} />
               <Route path="/follow-up" element={<FollowUpDashboard />} />
               <Route

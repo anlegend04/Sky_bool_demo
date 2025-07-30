@@ -321,7 +321,7 @@ export interface ScheduleData {
   location?: string;
   meetingLink?: string;
   status: "Scheduled" | "Completed" | "Cancelled";
-  relatedEntityType?: "job" | "candidate" | "interview" | "other";
+  relatedEntityType?: "job" | "candidate" | "interview";
   relatedEntityId?: string;
   createdBy: string;
   createdAt: string;
@@ -825,365 +825,10 @@ export const HARDCODED_CANDIDATES: CandidateData[] = [
   },
 ];
 
-// Hardcoded Jobs Data
-export const HARDCODED_JOBS: JobData[] = [
-  {
-    id: "job_1",
-    position: "Senior Frontend Developer",
-    department: "Engineering",
-    recruiter: "Alex Chen",
-    applications: 45,
-    target: 2,
-    hired: 1,
-    openDate: "2024-01-01",
-    deadline: "2024-03-31",
-    estimatedCost: "$15,000",
-    actualCost: "$12,500",
-    performance: 85,
-    status: "Open",
-    location: "San Francisco, CA",
-    type: "Full-time",
-    description: "We're looking for a Senior Frontend Developer to join our engineering team...",
-    priority: "High",
-    emailAlias: "frontend-hiring@company.com",
-    expectedSkills: ["React", "TypeScript", "Node.js", "GraphQL"],
-    salaryMin: "$125,000",
-    salaryMax: "$150,000",
-    domain: "Technology",
-    headcount: 2,
-    requester: "Engineering Manager",
-    interviewers: ["Alex Chen", "Bob Wilson", "Charlie Davis"],
-    pipelineSummary: {
-      applied: 45,
-      screening: 12,
-      interview: 8,
-      technical: 5,
-      offer: 2,
-      hired: 1,
-      rejected: 15,
-    },
-    budget: {
-      estimated: 15000,
-      actual: 12500,
-      expenses: [],
-    },
-    createdAt: "2024-01-01T00:00:00Z",
-    updatedAt: "2024-02-15T10:30:00Z",
-  },
-  {
-    id: "job_2",
-    position: "Backend Developer",
-    department: "Engineering",
-    recruiter: "Sarah Johnson",
-    applications: 32,
-    target: 1,
-    hired: 0,
-    openDate: "2024-01-15",
-    deadline: "2024-04-15",
-    estimatedCost: "$12,000",
-    actualCost: "$8,000",
-    performance: 75,
-    status: "Open",
-    location: "New York, NY",
-    type: "Full-time",
-    description: "Join our backend team to build scalable microservices...",
-    priority: "Medium",
-    emailAlias: "backend-hiring@company.com",
-    expectedSkills: ["Python", "Django", "PostgreSQL", "AWS"],
-    salaryMin: "$100,000",
-    salaryMax: "$130,000",
-    domain: "Technology",
-    headcount: 1,
-    requester: "Backend Team Lead",
-    interviewers: ["Sarah Johnson", "Mike Wilson"],
-    pipelineSummary: {
-      applied: 32,
-      screening: 8,
-      interview: 4,
-      technical: 2,
-      offer: 0,
-      hired: 0,
-      rejected: 10,
-    },
-    budget: {
-      estimated: 12000,
-      actual: 8000,
-      expenses: [],
-    },
-    createdAt: "2024-01-15T00:00:00Z",
-    updatedAt: "2024-02-15T10:30:00Z",
-  },
-  {
-    id: "job_3",
-    position: "DevOps Engineer",
-    department: "Engineering",
-    recruiter: "Mike Wilson",
-    applications: 28,
-    target: 1,
-    hired: 0,
-    openDate: "2024-01-20",
-    deadline: "2024-04-20",
-    estimatedCost: "$10,000",
-    actualCost: "$6,000",
-    performance: 70,
-    status: "Open",
-    location: "Remote",
-    type: "Full-time",
-    description: "Help us build and maintain our cloud infrastructure...",
-    priority: "Low",
-    emailAlias: "devops-hiring@company.com",
-    expectedSkills: ["AWS", "Docker", "Kubernetes", "Terraform"],
-    salaryMin: "$110,000",
-    salaryMax: "$140,000",
-    domain: "Technology",
-    headcount: 1,
-    requester: "DevOps Manager",
-    interviewers: ["Mike Wilson", "Alex Chen"],
-    pipelineSummary: {
-      applied: 28,
-      screening: 6,
-      interview: 3,
-      technical: 1,
-      offer: 0,
-      hired: 0,
-      rejected: 8,
-    },
-    budget: {
-      estimated: 10000,
-      actual: 6000,
-      expenses: [],
-    },
-    createdAt: "2024-01-20T00:00:00Z",
-    updatedAt: "2024-02-15T10:30:00Z",
-  },
-  {
-    id: "job_4",
-    position: "Senior Software Engineer",
-    department: "Engineering",
-    recruiter: "Lisa Wang",
-    applications: 38,
-    target: 1,
-    hired: 0,
-    openDate: "2024-01-10",
-    deadline: "2024-04-10",
-    estimatedCost: "$18,000",
-    actualCost: "$14,000",
-    performance: 80,
-    status: "Open",
-    location: "Seattle, WA",
-    type: "Full-time",
-    description: "Join our core engineering team to build high-scale systems...",
-    priority: "High",
-    emailAlias: "senior-hiring@company.com",
-    expectedSkills: ["Java", "Spring Boot", "Microservices", "Kafka"],
-    salaryMin: "$150,000",
-    salaryMax: "$180,000",
-    domain: "Technology",
-    headcount: 1,
-    requester: "Engineering Director",
-    interviewers: ["Lisa Wang", "John Smith", "Tom Brown"],
-    pipelineSummary: {
-      applied: 38,
-      screening: 10,
-      interview: 6,
-      technical: 3,
-      offer: 1,
-      hired: 0,
-      rejected: 12,
-    },
-    budget: {
-      estimated: 18000,
-      actual: 14000,
-      expenses: [],
-    },
-    createdAt: "2024-01-10T00:00:00Z",
-    updatedAt: "2024-02-15T10:30:00Z",
-  },
-  {
-    id: "job_5",
-    position: "Tech Lead",
-    department: "Engineering",
-    recruiter: "John Smith",
-    applications: 25,
-    target: 1,
-    hired: 0,
-    openDate: "2024-01-05",
-    deadline: "2024-04-05",
-    estimatedCost: "$20,000",
-    actualCost: "$16,000",
-    performance: 85,
-    status: "Open",
-    location: "Seattle, WA",
-    type: "Full-time",
-    description: "Lead technical initiatives and mentor junior developers...",
-    priority: "High",
-    emailAlias: "techlead-hiring@company.com",
-    expectedSkills: ["Leadership", "System Design", "Java", "Microservices"],
-    salaryMin: "$160,000",
-    salaryMax: "$200,000",
-    domain: "Technology",
-    headcount: 1,
-    requester: "VP Engineering",
-    interviewers: ["John Smith", "Lisa Wang", "VP Engineering"],
-    pipelineSummary: {
-      applied: 25,
-      screening: 8,
-      interview: 5,
-      technical: 2,
-      offer: 1,
-      hired: 0,
-      rejected: 8,
-    },
-    budget: {
-      estimated: 20000,
-      actual: 16000,
-      expenses: [],
-    },
-    createdAt: "2024-01-05T00:00:00Z",
-    updatedAt: "2024-02-15T10:30:00Z",
-  },
-  {
-    id: "job_6",
-    position: "Architecture Engineer",
-    department: "Engineering",
-    recruiter: "Tom Brown",
-    applications: 18,
-    target: 1,
-    hired: 0,
-    openDate: "2024-02-01",
-    deadline: "2024-05-01",
-    estimatedCost: "$16,000",
-    actualCost: "$4,000",
-    performance: 65,
-    status: "Open",
-    location: "Remote",
-    type: "Full-time",
-    description: "Design and implement scalable system architectures...",
-    priority: "Medium",
-    emailAlias: "arch-hiring@company.com",
-    expectedSkills: ["System Design", "Architecture", "Java", "Cloud"],
-    salaryMin: "$140,000",
-    salaryMax: "$170,000",
-    domain: "Technology",
-    headcount: 1,
-    requester: "Architecture Director",
-    interviewers: ["Tom Brown", "John Smith"],
-    pipelineSummary: {
-      applied: 18,
-      screening: 4,
-      interview: 2,
-      technical: 1,
-      offer: 0,
-      hired: 0,
-      rejected: 5,
-    },
-    budget: {
-      estimated: 16000,
-      actual: 4000,
-      expenses: [],
-    },
-    createdAt: "2024-02-01T00:00:00Z",
-    updatedAt: "2024-02-15T10:30:00Z",
-  },
-];
-
-// Hardcoded Interviews Data
-export const HARDCODED_INTERVIEWS: InterviewData[] = [
-  {
-    id: "interview_1",
-    candidateId: "candidate_2",
-    candidateName: "David Kim",
-    jobId: "job_2",
-    jobTitle: "Backend Developer",
-    interviewerIds: ["user_1", "user_2"],
-    interviewerNames: ["Sarah Johnson", "Mike Wilson"],
-    scheduledDate: "2024-02-20",
-    scheduledTime: "14:00",
-    duration: 60,
-    type: "Video",
-    status: "Scheduled",
-    location: "Zoom",
-    meetingLink: "https://zoom.us/j/123456789",
-    notes: "Technical interview focusing on Python and Django",
-    feedback: [
-      {
-        id: "feedback_1",
-        interviewId: "interview_1",
-        interviewerId: "user_1",
-        interviewerName: "Sarah Johnson",
-        overallRating: 4,
-        technicalSkills: 4,
-        communicationSkills: 5,
-        culturalFit: 4,
-        problemSolving: 4,
-        comments: "Strong technical background, good communication skills",
-        recommendation: "Hire",
-        createdAt: "2024-02-20T15:00:00Z",
-      },
-    ],
-    createdAt: "2024-02-15T10:00:00Z",
-    createdBy: "user_1",
-    updatedAt: "2024-02-15T10:00:00Z",
-  },
-  {
-    id: "interview_2",
-    candidateId: "candidate_3",
-    candidateName: "Emily Chen",
-    jobId: "job_4",
-    jobTitle: "Senior Software Engineer",
-    interviewerIds: ["user_3", "user_4"],
-    interviewerNames: ["Lisa Wang", "John Smith"],
-    scheduledDate: "2024-02-22",
-    scheduledTime: "10:00",
-    duration: 90,
-    type: "Technical",
-    status: "Scheduled",
-    location: "Office",
-    notes: "System design and technical deep dive",
-    feedback: [],
-    createdAt: "2024-02-16T09:00:00Z",
-    createdBy: "user_3",
-    updatedAt: "2024-02-16T09:00:00Z",
-  },
-];
-
-// Hardcoded Schedule Data
-export const HARDCODED_SCHEDULE: ScheduleData[] = [
-  {
-    id: "schedule_1",
-    title: "Weekly Hiring Team Meeting",
-    description: "Review current candidates and hiring progress",
-    startDate: "2024-02-19T10:00:00Z",
-    endDate: "2024-02-19T11:00:00Z",
-    type: "Meeting",
-    attendees: ["user_1", "user_2", "user_3"],
-    location: "Conference Room A",
-    status: "Scheduled",
-    relatedEntityType: "other",
-    createdBy: "user_1",
-    createdAt: "2024-02-15T08:00:00Z",
-  },
-  {
-    id: "schedule_2",
-    title: "David Kim - Backend Developer Interview",
-    description: "Technical interview for Backend Developer position",
-    startDate: "2024-02-20T14:00:00Z",
-    endDate: "2024-02-20T15:00:00Z",
-    type: "Interview",
-    attendees: ["user_1", "user_2"],
-    location: "Zoom",
-    meetingLink: "https://zoom.us/j/123456789",
-    status: "Scheduled",
-    relatedEntityType: "interview",
-    relatedEntityId: "interview_1",
-    createdBy: "user_1",
-    createdAt: "2024-02-15T10:00:00Z",
-  },
-];
-
 // Export utility functions
 export const getJob = (id: string): JobData | undefined => {
-  return HARDCODED_JOBS.find(job => job.id === id);
+  // This would be implemented with actual job data
+  return undefined;
 };
 
 export const getCandidate = (id: string): CandidateData | undefined => {
@@ -1197,11 +842,13 @@ export const getJobCandidates = (jobId: string): CandidateData[] => {
 };
 
 export const getInterview = (id: string): InterviewData | undefined => {
-  return HARDCODED_INTERVIEWS.find(interview => interview.id === id);
+  // This would be implemented with actual interview data
+  return undefined;
 };
 
 export const getCandidateInterviews = (candidateId: string): InterviewData[] => {
-  return HARDCODED_INTERVIEWS.filter(interview => interview.candidateId === candidateId);
+  // This would be implemented with actual interview data
+  return [];
 };
 
 export const getUser = (id: string): UserData | undefined => {
@@ -1219,14 +866,8 @@ export const getUserNotifications = (userId: string): NotificationData[] => {
 };
 
 export const getUpcomingSchedule = (days: number = 7): ScheduleData[] => {
-  const now = new Date();
-  const futureDate = new Date();
-  futureDate.setDate(now.getDate() + days);
-  
-  return HARDCODED_SCHEDULE.filter(schedule => {
-    const scheduleDate = new Date(schedule.startDate);
-    return scheduleDate >= now && scheduleDate <= futureDate;
-  });
+  // This would be implemented with actual schedule data
+  return [];
 };
 
 export const getRecentActivities = (limit: number = 10): ActivityData[] => {
@@ -1235,26 +876,12 @@ export const getRecentActivities = (limit: number = 10): ActivityData[] => {
 };
 
 export const getJobStats = (jobId: string) => {
-  const job = getJob(jobId);
-  if (!job) {
-    return {
-      totalApplications: 0,
-      activeCandidates: 0,
-      hiredCount: 0,
-      avgTimeToHire: 0,
-    };
-  }
-
-  const candidates = getJobCandidates(jobId);
-  const activeCandidates = candidates.filter(c => 
-    c.jobApplications.some(app => app.jobId === jobId && app.status === "Active")
-  );
-
+  // This would be implemented with actual job statistics
   return {
-    totalApplications: job.applications,
-    activeCandidates: activeCandidates.length,
-    hiredCount: job.hired,
-    avgTimeToHire: 25, // Mock average
+    totalApplications: 0,
+    activeCandidates: 0,
+    hiredCount: 0,
+    avgTimeToHire: 0,
   };
 };
 

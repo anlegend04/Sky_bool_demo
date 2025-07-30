@@ -28,16 +28,19 @@ export function generateEmailContent(
   candidate: CandidateData,
   additionalData?: Partial<EmailData>,
 ): { subject: string; content: string } {
+  // Get the primary job application for email data
+  const primaryJob = candidate.jobApplications[0];
+  
   const defaultData: EmailData = {
     candidateName: candidate.name,
-    jobTitle: candidate.position || "the position",
+    jobTitle: primaryJob?.jobTitle || "the position",
     companyName: "TechCorp Inc.",
-    stage: candidate.stage || "application",
+    stage: primaryJob?.currentStage || "application",
     interviewerName: "Sarah Johnson",
     interviewDate: "March 15, 2024",
     interviewTime: "2:00 PM EST",
-    salaryRange: "$80,000 - $120,000",
-    applicationDate: new Date().toLocaleDateString(),
+    salaryRange: primaryJob?.salary || "$80,000 - $120,000",
+    applicationDate: primaryJob?.appliedDate || new Date().toLocaleDateString(),
     ...additionalData,
   };
 
@@ -55,9 +58,9 @@ export function generateEmailContent(
 
   // Handle additional common variables
   const commonReplacements = {
-    "{{position_department}}": candidate.department || "Engineering",
-    "{{duration}}": candidate.duration || "5",
-    "{{recruiter_name}}": candidate.recruiter || "HR Team",
+    "{{position_department}}": primaryJob?.department || "Engineering",
+    "{{duration}}": primaryJob?.stageHistory?.[primaryJob.stageHistory.length - 1]?.duration?.toString() || "5",
+    "{{recruiter_name}}": primaryJob?.recruiter || "HR Team",
   };
 
   Object.entries(commonReplacements).forEach(([placeholder, value]) => {

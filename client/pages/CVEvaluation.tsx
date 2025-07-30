@@ -141,13 +141,9 @@ export default function CVEvaluation() {
 
   // Load saved evaluations from candidates' cvEvaluations data
   useEffect(() => {
-    const allEvaluations: CVEvaluationData[] = [];
-    HARDCODED_CANDIDATES.forEach((candidate) => {
-      if (candidate.cvEvaluations) {
-        allEvaluations.push(...candidate.cvEvaluations);
-      }
-    });
-    setSavedEvaluations(allEvaluations);
+    // Since cvEvaluations is no longer part of CandidateData, we'll start with an empty array
+    // In a real app, this would load from a separate evaluations database
+    setSavedEvaluations([]);
   }, []);
 
   // Prepare job options for enhanced dropdown

@@ -18,10 +18,8 @@ import {
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/hooks/use-language";
 import {
-  DASHBOARD_STATS,
   HARDCODED_JOBS,
   HARDCODED_CANDIDATES,
-  HARDCODED_ACTIVITIES,
   HARDCODED_INTERVIEWS,
   getUpcomingSchedule,
   getRecentActivities,
@@ -47,10 +45,22 @@ export default function Dashboard() {
     };
   }
 
+  // Create dashboard stats data inline since DASHBOARD_STATS doesn't exist
+  const dashboardStats = {
+    activeJobs: HARDCODED_JOBS.filter(job => job.status === "Open").length,
+    totalCandidates: HARDCODED_CANDIDATES.length,
+    interviewsThisWeek: HARDCODED_CANDIDATES.filter(c => 
+      c.jobApplications.some(app => 
+        ["Interview", "Technical"].includes(app.currentStage)
+      )
+    ).length,
+    avgTimeToHire: 25, // Mock average
+  };
+
   const stats = [
     {
       titleKey: "dashboard.activeJobs",
-      value: DASHBOARD_STATS.activeJobs.toString(),
+      value: dashboardStats.activeJobs.toString(),
       change: "+12%",
       changeType: "positive" as const,
       icon: Briefcase,
@@ -58,7 +68,7 @@ export default function Dashboard() {
     },
     {
       titleKey: "dashboard.totalCandidates",
-      value: DASHBOARD_STATS.totalCandidates.toString(),
+      value: dashboardStats.totalCandidates.toString(),
       change: "+8%",
       changeType: "positive" as const,
       icon: Users,
@@ -66,20 +76,12 @@ export default function Dashboard() {
     },
     {
       titleKey: "dashboard.interviewsThisWeek",
-      value: DASHBOARD_STATS.interviewsThisWeek.toString(),
+      value: dashboardStats.interviewsThisWeek.toString(),
       change: "-5%",
       changeType: "negative" as const,
       icon: Clock,
       color: "orange",
     },
-    // {
-    //   titleKey: "dashboard.avgTimeToHire",
-    //   value: `${DASHBOARD_STATS.avgTimeToHire} days`,
-    //   change: "-2 days",
-    //   changeType: "positive" as const,
-    //   icon: Target,
-    //   color: "purple",
-    // },
   ];
 
   const recentJobs = HARDCODED_JOBS.slice(0, 4).map((job) => ({
@@ -94,22 +96,22 @@ export default function Dashboard() {
   // Calculate realistic pipeline data from actual candidates
   const totalCandidates = HARDCODED_CANDIDATES.length;
   const appliedCount = HARDCODED_CANDIDATES.filter(
-    (c) => c.stage === "Applied",
+    (c) => c.jobApplications.some(app => app.currentStage === "Applied"),
   ).length;
   const screeningCount = HARDCODED_CANDIDATES.filter(
-    (c) => c.stage === "Screening",
+    (c) => c.jobApplications.some(app => app.currentStage === "Screening"),
   ).length;
   const interviewCount = HARDCODED_CANDIDATES.filter(
-    (c) => c.stage === "Interview",
+    (c) => c.jobApplications.some(app => app.currentStage === "Interview"),
   ).length;
   const technicalCount = HARDCODED_CANDIDATES.filter(
-    (c) => c.stage === "Technical",
+    (c) => c.jobApplications.some(app => app.currentStage === "Technical"),
   ).length;
   const offerCount = HARDCODED_CANDIDATES.filter(
-    (c) => c.stage === "Offer",
+    (c) => c.jobApplications.some(app => app.currentStage === "Offer"),
   ).length;
   const hiredCount = HARDCODED_CANDIDATES.filter(
-    (c) => c.stage === "Hired",
+    (c) => c.jobApplications.some(app => app.currentStage === "Hired"),
   ).length;
 
   const pipeline = [
@@ -308,11 +310,11 @@ export default function Dashboard() {
               <span className="text-slate-600 text-responsive-base text-wrap-safe">
                 {t("dashboard.sourceEffectiveness")}
               </span>
-              <span className="font-semibold text-responsive-base text-wrap-safe">
+              <span className="text-semibold text-responsive-base text-wrap-safe">
                 LinkedIn:{" "}
                 {Math.round(
                   (HARDCODED_CANDIDATES.filter(
-                    (c) => c.source === "LinkedIn" && c.stage === "Hired",
+                    (c) => c.source === "LinkedIn" && c.jobApplications.some(app => app.currentStage === "Hired"),
                   ).length /
                     Math.max(
                       HARDCODED_CANDIDATES.filter(

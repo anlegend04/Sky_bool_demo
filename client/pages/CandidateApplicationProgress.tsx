@@ -49,18 +49,19 @@ import {
   AlertCircle,
   TrendingUp,
   Users,
+  MessageSquare,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import {
-  ENHANCED_CANDIDATE_SAMPLE,
   getJobApplication,
 } from "@/data/enhanced-mock-data";
 import { JobApplication } from "@/types/enhanced-candidate";
-import { CandidateData } from "@/data/hardcoded-data";
+import { getCandidate } from "@/data/hardcoded-data";
 import { EmailTrigger } from "@/components/EmailTrigger";
 import { EnhancedCandidateData } from "@/types/enhanced-candidate";
+import { convertCandidateToEnhanced } from "@/data/enhanced-mock-data";
 
 interface CandidateApplicationProgressProps {
   candidate?: EnhancedCandidateData;
@@ -81,35 +82,133 @@ type StageData = {
 
 export default function CandidateApplicationProgress(props: CandidateApplicationProgressProps) {
   const params = useParams();
-  const candidate = props.candidate ?? ENHANCED_CANDIDATE_SAMPLE;
-  const jobId = props.jobId ?? params.jobId;
+  const candidateId = params.candidateId || params.id;
+  
+  // Get candidate from hardcoded data and convert to enhanced format
+  const hardcodedCandidate = candidateId ? getCandidate(candidateId) : null;
+  const candidate = props.candidate ?? (hardcodedCandidate ? convertCandidateToEnhanced(hardcodedCandidate) : null);
+  
+  const jobId = props.jobId ?? params.jobId ?? params.candidateId;
 
   const [jobApplication, setJobApplication] = useState<JobApplication | null>(null);
   const [selectedEmail, setSelectedEmail] = useState<any>(null);
   const [showEmailTrigger, setShowEmailTrigger] = useState(false);
   const [newNote, setNewNote] = useState("");
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(jobId);
   const { toast } = useToast();
 
-  useEffect(() => {
-    if (jobId) {
-      const app = getJobApplication(candidate, jobId);
-      setJobApplication(app || null);
-    }
-  }, [jobId, candidate]);
-
-  if (!jobApplication) {
+  // Handle case when no candidate is found
+  if (!candidate) {
     return (
       <div className="p-6">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-slate-900">
-            Application not found
+        <div className="max-w-2xl mx-auto text-center">
+          <h2 className="text-2xl font-bold text-slate-900 mb-4">
+            Candidate Not Found
           </h2>
-          <p className="text-slate-600 mt-2">
-            The job application you're looking for doesn't exist.
+          <p className="text-slate-600 mb-6">
+            The candidate you're looking for could not be found.
           </p>
-          <div className="flex gap-2 mt-4">
+          <div className="flex gap-2 justify-center">
             <Link to="/follow-up">
-              <Button>Back to Follow-up Dashboard</Button>
+              <Button variant="outline">Back to Follow-up Dashboard</Button>
+            </Link>
+            <Link to="/candidates">
+              <Button variant="outline">View All Candidates</Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  useEffect(() => {
+    if (selectedJobId) {
+      const app = getJobApplication(candidate, selectedJobId);
+      setJobApplication(app || null);
+    }
+  }, [selectedJobId, candidate]);
+
+  // Auto-select job if candidate has only one application
+  useEffect(() => {
+    const availableJobs = candidate.jobApplications || [];
+    
+    // If no job is selected and candidate has exactly one job application, auto-select it
+    if (!selectedJobId && availableJobs.length === 1) {
+      setSelectedJobId(availableJobs[0].id);
+    }
+  }, [candidate, selectedJobId]);
+
+  if (!jobApplication) {
+    // Get available job applications for this candidate
+    const availableJobs = candidate.jobApplications || [];
+    
+    // If candidate has only one job application, show loading while auto-selecting
+    if (availableJobs.length === 1) {
+      return (
+        <div className="p-6">
+          <div className="max-w-2xl mx-auto text-center">
+            <div className="animate-pulse">
+              <h2 className="text-2xl font-bold text-slate-900 mb-4">
+                Loading Application Progress...
+              </h2>
+              <p className="text-slate-600">
+                Redirecting to {availableJobs[0].jobTitle} application
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
+    return (
+      <div className="p-6">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-slate-900">
+              Select Job Application
+            </h2>
+            <p className="text-slate-600 mt-2">
+              Choose a job application to view the recruitment process for {candidate.name}
+            </p>
+          </div>
+          
+          {availableJobs.length > 0 ? (
+            <div className="space-y-4">
+              {availableJobs.map((job) => (
+                <Card key={job.id} className="cursor-pointer hover:shadow-md transition-shadow">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-slate-900">{job.jobTitle}</h3>
+                        <p className="text-sm text-slate-600">
+                          Current Stage: {job.currentStage}
+                        </p>
+                        <p className="text-sm text-slate-600">
+                          Applied: {new Date(job.appliedDate).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <Button 
+                        onClick={() => setSelectedJobId(job.id)}
+                        className="ml-4"
+                      >
+                        View Process
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center">
+              <p className="text-slate-600 mb-4">
+                No job applications found for this candidate.
+              </p>
+            </div>
+          )}
+          
+          <div className="flex gap-2 mt-6 justify-center">
+            <Link to="/follow-up">
+              <Button variant="outline">Back to Follow-up Dashboard</Button>
             </Link>
             <Link to={`/candidates/${candidate.id}`}>
               <Button variant="outline">View Candidate Profile</Button>
@@ -305,7 +404,7 @@ export default function CandidateApplicationProgress(props: CandidateApplication
         {/* Stages Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           {stages.map((stage, index) => (
-            <div key={stage.name} className="text-center relative">
+            <div key={stage.name} className="text-center relative group">
               <div className="flex justify-center mb-1">
                 {stage.mailSent ? (
                   stage.mailConfirmed ? (
@@ -349,12 +448,22 @@ export default function CandidateApplicationProgress(props: CandidateApplication
                   <span className="break-words">{stage.duration}d</span>
                 </div>
               )}
+
+              {/* Email status tooltip */}
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                {stage.mailSent 
+                  ? stage.mailConfirmed 
+                    ? "Email confirmed" 
+                    : "Email sent, pending confirmation"
+                  : "No email sent"
+                }
+              </div>
             </div>
           ))}
         </div>
 
         {/* Stage Details */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mt-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mt-6">
           <div className="flex items-center space-x-2 p-3 bg-slate-50 rounded-lg">
             <Clock className="w-4 h-4 text-slate-500 flex-shrink-0" />
             <div className="min-w-0 flex-1">
@@ -375,7 +484,15 @@ export default function CandidateApplicationProgress(props: CandidateApplication
               </span>
             </div>
           </div>
-          <div className="flex items-center space-x-2 p-3 bg-slate-50 rounded-lg sm:col-span-2 lg:col-span-1">
+          <div className="flex items-center space-x-2 p-3 bg-slate-50 rounded-lg">
+            <Mail className="w-4 h-4 text-slate-500 flex-shrink-0" />
+            <div className="min-w-0 flex-1">
+              <span className="text-sm text-slate-600 break-words block">
+                Emails Sent: {jobApplication.emails.length}
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center space-x-2 p-3 bg-slate-50 rounded-lg">
             <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
             <div className="min-w-0 flex-1">
               <span className="text-sm text-slate-600 break-words block">
@@ -610,29 +727,40 @@ export default function CandidateApplicationProgress(props: CandidateApplication
                           <h4 className="font-medium text-sm text-slate-900 break-words flex-1">
                             {email.subject}
                           </h4>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm">
-                                <MoreHorizontal className="w-4 h-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                              <DropdownMenuItem
-                                onClick={() => setSelectedEmail(email)}
-                              >
-                                <Eye className="w-4 h-4 mr-2" />
-                                View Full
-                              </DropdownMenuItem>
-                              <DropdownMenuItem>
-                                <Forward className="w-4 h-4 mr-2" />
-                                Forward
-                              </DropdownMenuItem>
-                              <DropdownMenuItem>
-                                <Copy className="w-4 h-4 mr-2" />
-                                Copy
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <div className="flex items-center space-x-2">
+                            {/* Email status indicators */}
+                            <div className="flex items-center space-x-1">
+                              {email.openedAt && (
+                                <CheckCircle className="w-4 h-4 text-green-500" />
+                              )}
+                              {email.repliedAt && (
+                                <MessageSquare className="w-4 h-4 text-blue-500" />
+                              )}
+                            </div>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm">
+                                  <MoreHorizontal className="w-4 h-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent>
+                                <DropdownMenuItem
+                                  onClick={() => setSelectedEmail(email)}
+                                >
+                                  <Eye className="w-4 h-4 mr-2" />
+                                  View Full
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <Forward className="w-4 h-4 mr-2" />
+                                  Forward
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <Copy className="w-4 h-4 mr-2" />
+                                  Copy
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
                         </div>
                         <p className="text-xs text-slate-600 mb-1">
                           From: {email.from}
@@ -643,6 +771,27 @@ export default function CandidateApplicationProgress(props: CandidateApplication
                         <p className="text-xs text-slate-600 line-clamp-2">
                           {email.content}
                         </p>
+                        {/* Email status badges */}
+                        <div className="flex items-center space-x-2 mt-2">
+                          <span
+                            className={`px-2 py-1 rounded text-xs ${
+                              email.openedAt 
+                                ? "bg-green-100 text-green-800" 
+                                : "bg-gray-100 text-gray-800"
+                            }`}
+                          >
+                            {email.openedAt ? "Opened" : "Not opened"}
+                          </span>
+                          <span
+                            className={`px-2 py-1 rounded text-xs ${
+                              email.repliedAt 
+                                ? "bg-blue-100 text-blue-800" 
+                                : "bg-gray-100 text-gray-800"
+                            }`}
+                          >
+                            {email.repliedAt ? "Responded" : "No response"}
+                          </span>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -735,7 +884,7 @@ export default function CandidateApplicationProgress(props: CandidateApplication
         <EmailTrigger
           isOpen={showEmailTrigger}
           onClose={() => setShowEmailTrigger(false)}
-          candidate={candidate as unknown as CandidateData}
+          candidate={candidate}
           newStage={jobApplication.currentStage}
           jobTitle={jobApplication.jobTitle}
           onEmailSent={() => {

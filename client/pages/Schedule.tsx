@@ -44,12 +44,10 @@ import { useLanguage } from "@/hooks/use-language";
 import {
   HARDCODED_SCHEDULE,
   HARDCODED_INTERVIEWS,
-  HARDCODED_USERS,
   HARDCODED_CANDIDATES,
   HARDCODED_JOBS,
   ScheduleData,
   InterviewData,
-  getUser,
   getCandidate,
   getJob,
 } from "@/data/hardcoded-data";
@@ -140,9 +138,8 @@ export default function Schedule() {
   const getAttendeeNames = (attendeeIds: string[]) => {
     return attendeeIds
       .map((id) => {
-        const user = getUser(id);
         const candidate = getCandidate(id);
-        return user?.name || candidate?.name || "Unknown";
+        return candidate?.name || "Unknown";
       })
       .join(", ");
   };
@@ -357,7 +354,7 @@ export default function Schedule() {
                       : null;
                   const job =
                     event.eventType === "interview" && candidate
-                      ? getJob(candidate.jobId!)
+                      ? getJob(candidate.jobApplications?.[0]?.jobId || "")
                       : null;
 
                   return (
