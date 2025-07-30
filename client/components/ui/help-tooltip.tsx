@@ -1,11 +1,5 @@
 import * as React from "react";
 import { HelpCircle } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 interface HelpTooltipProps {
@@ -21,26 +15,31 @@ export function HelpTooltip({
   side = "right", 
   align = "center" 
 }: HelpTooltipProps) {
+  const [showContent, setShowContent] = React.useState(false);
+
   return (                      
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <button
-            type="button"
-            className={cn( 
-              "inline-flex items-center  justify-center w-5 h-5 rounded-full hover:bg-slate-100  text-slate-500 hover:text-slate-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
-              className
-            )}
-            aria-label="Help"
-          >
-            <HelpCircle className="w-3 h-3" /> 
-          </button>
-        </TooltipTrigger>
-        <TooltipContent side={side} align={align} className="max-w-xs">
-          <p className="text-xs leading-relaxed">{content}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <div className="inline-block">
+      <button
+        type="button"
+        onClick={() => setShowContent(!showContent)}
+        className={cn( 
+          "inline-flex items-center justify-center w-5 h-5 rounded-full hover:bg-slate-100 text-slate-500 hover:text-slate-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
+          className
+        )}
+        aria-label="Help"
+      >
+        <HelpCircle className="w-3 h-3" /> 
+      </button>
+      
+      {showContent && (
+        <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg max-w-sm">
+          <div className="flex items-start gap-2">
+            <HelpCircle className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-blue-900 leading-relaxed">{content}</p>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 

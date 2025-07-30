@@ -50,6 +50,7 @@ import {
   TrendingUp,
   Users,
   MessageSquare,
+  HelpCircle,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -336,9 +337,9 @@ export default function CandidateApplicationProgress(
     const stageTemplates = getTemplatesForStage(currentStage);
 
     stageTemplates.forEach((template) => {
-      // Tìm email đã gửi cho template này - cải thiện logic matching
+              // Find emails sent for this template - improved matching logic
       const existingEmail = jobApplication.emails.find((email) => {
-        // So sánh theo template name hoặc subject chứa template name hoặc stage name
+                  // Compare by template name or subject contains template name or stage name
         const templateNameMatch = email.template === template.name;
         const subjectMatch = email.subject
           .toLowerCase()
@@ -410,20 +411,20 @@ export default function CandidateApplicationProgress(
       (s) => s.stage === stageName,
     );
 
-    // Tính toán trạng thái completion dựa trên stage history và current stage
+            // Calculate completion status based on stage history and current stage
     const thisStageIndex = index;
     const isCompleted = stageData && stageData.endDate;
     const isCurrentStage = stageName === jobApplication.currentStage;
     const isPastStage = thisStageIndex < currentStageIndex;
 
-    // Xác định trạng thái completion
+            // Determine completion status
     let completionStatus: "completed" | "current" | "pending" | "not_started";
     if (isCompleted) {
       completionStatus = "completed";
     } else if (isCurrentStage) {
       completionStatus = "current";
     } else if (isPastStage) {
-      completionStatus = "completed"; // Nếu đã qua stage này nhưng không có endDate, coi như completed
+              completionStatus = "completed"; // If already passed this stage but no endDate, consider as completed
     } else {
       completionStatus = "not_started";
     }
@@ -577,6 +578,40 @@ export default function CandidateApplicationProgress(
           />
         </div>
 
+        {/* Interface Legend */}
+        <div className="mb-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
+          <div className="flex items-center gap-2 mb-3">
+            <HelpCircle className="w-4 h-4 text-slate-600" />
+            <span className="font-medium text-sm text-slate-900">How to read this interface:</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-700">
+            <div className="space-y-2">
+              <div className="font-medium">📧 Email Icons (above each stage):</div>
+              <div className="space-y-1 ml-2">
+                <div>• <span className="text-slate-300">Gray mail</span> = Email not sent yet</div>
+                <div>• <span className="text-blue-500">Blue mail</span> = Email sent to candidate</div>
+                <div>• <span className="text-green-500">Green check</span> = Candidate confirmed</div>
+                <div>• <span className="text-orange-500">Orange clock</span> = Waiting for confirmation</div>
+                <div>• <span className="text-red-500">Red alert</span> = Auto-rejected (missed deadline)</div>
+                <div>• <span className="text-yellow-500">Yellow dot</span> = Needs candidate confirmation</div>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="font-medium">⭕ Stage Circles:</div>
+              <div className="space-y-1 ml-2">
+                <div>• <span className="text-slate-400">Gray circle</span> = Stage not started</div>
+                <div>• <span className="text-blue-500">Blue circle</span> = Current stage</div>
+                <div>• <span className="text-green-500">Green check</span> = Stage completed</div>
+                <div>• <span className="text-orange-500">Orange clock</span> = Stage overdue</div>
+                <div>• <span className="text-red-500">Red alert</span> = Stage auto-rejected</div>
+              </div>
+            </div>
+          </div>
+          <div className="mt-3 text-xs text-slate-600">
+            💡 <strong>Tip:</strong> Hover over any icon or stage circle for detailed information
+          </div>
+        </div>
+
         {/* Current Stage Highlight */}
         <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <div className="flex items-center gap-3">
@@ -596,14 +631,20 @@ export default function CandidateApplicationProgress(
         </div>
 
         {/* Stages Grid */}
+        <div className="mb-4">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-sm font-medium text-slate-700">Recruitment Stages</span>
+            <HelpTooltip content="Each circle represents a stage in the recruitment process. The color indicates the status: Gray (not started), Blue (current), Green (completed), Orange (overdue), Red (auto-rejected). Email icons above show communication status." />
+          </div>
+        </div>
         <TooltipProvider>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             {stages.map((stage, index) => {
-              // Lấy tất cả template cho stage này
+              // Get all templates for this stage
               const stageTemplates = getTemplatesForStage(
                 stage.name.toLowerCase(),
               );
-              // Lấy tất cả email đã gửi cho stage này - cải thiện logic matching
+              // Get all emails sent for this stage - improved matching logic
               const emailsForStage = jobApplication.emails.filter((email) => {
                 return stageTemplates.some((tpl) => {
                   const templateNameMatch = email.template === tpl.name;
@@ -631,7 +672,7 @@ export default function CandidateApplicationProgress(
                   <div className="flex justify-center mb-1 gap-1">
                     {stageTemplates.length > 0 ? (
                       stageTemplates.map((template, templateIdx) => {
-                        // Tìm email đã gửi gần nhất cho template này
+                        // Find the most recent email sent for this template
                         const sentEmails = emailsForStage.filter((email) => {
                           const templateNameMatch =
                             email.template === template.name;
@@ -660,12 +701,12 @@ export default function CandidateApplicationProgress(
                                   : b,
                               )
                             : undefined;
-                        // Xác định trạng thái
+                        // Determine status
                         const sent = !!latestEmail;
                         const confirmed = latestEmail?.repliedAt ? true : false;
                         const sentDate = latestEmail?.timestamp;
                         const confirmedDate = latestEmail?.repliedAt;
-                        // Deadline xác nhận
+                        // Confirmation deadline
                         let deadline: string | undefined = undefined;
                         if (template.confirmationDeadline && sentDate) {
                           const sentTime = new Date(sentDate).getTime();
@@ -712,61 +753,187 @@ export default function CandidateApplicationProgress(
                                   )}
                               </div>
                             </TooltipTrigger>
-                            <TooltipContent side="top" className="max-w-xs">
-                              <div className="text-xs font-semibold mb-1">
-                                {template.name}
-                              </div>
-                              <div className="text-xs mb-2">
-                                {(() => {
-                                  // Provide specific descriptions for each email type
-                                  const emailDescriptions: { [key: string]: string } = {
-                                    "Application Received - Thank You": "Email cảm ơn khi nhận đơn ứng tuyển",
-                                    "application_received": "Email xác nhận đã nhận đơn ứng tuyển",
-                                    "Interview Invitation": "Email mời phỏng vấn với thông tin chi tiết",
-                                    "interview_scheduling": "Email lên lịch phỏng vấn",
-                                    "Post-Interview Thank You": "Email cảm ơn sau phỏng vấn và hẹn thời gian báo kết quả",
-                                    "Technical Test Assignment": "Email gửi bài test kỹ thuật",
-                                    "technical_assessment": "Email thông báo bài đánh giá kỹ thuật",
-                                    "Job Offer": "Email gửi offer công việc",
-                                    "offer_letter": "Email thư mời nhận việc",
-                                    "Onboarding Instructions": "Email hướng dẫn onboarding",
-                                    "welcome_onboard": "Email chào mừng và hướng dẫn onboarding",
-                                    "Application Confirmation": "Email xác nhận đơn ứng tuyển",
-                                    "Screening Invitation": "Email mời screening call",
-                                    "screening_invitation": "Email mời cuộc gọi screening"
-                                  };
-                                  return emailDescriptions[template.name] || template.subject;
-                                })()}
-                              </div>
-                              <div className="text-xs">
-                                Trạng thái:{" "}
-                                {autoRejected
-                                  ? "Auto-Rejected"
-                                  : overdue
-                                    ? "Overdue"
-                                    : confirmed
-                                      ? "Đã xác nhận"
-                                      : sent
-                                        ? "Đã gửi"
-                                        : "Chưa gửi"}
-                              </div>
-                              {sentDate && (
-                                <div className="text-xs">
-                                  Gửi lúc: {new Date(sentDate).toLocaleString()}
+                            <TooltipContent side="top" className="max-w-sm z-50 p-4">
+                              <div className="space-y-3">
+                                {/* Icon Legend */}
+                                <div className="border-b border-slate-200 pb-2">
+                                  <div className="font-semibold text-slate-900 text-sm mb-2">
+                                    Email Status Icons:
+                                  </div>
+                                  <div className="grid grid-cols-2 gap-2 text-xs">
+                                    <div className="flex items-center gap-2">
+                                      <Mail className="w-3 h-3 text-slate-300" />
+                                      <span>Not sent</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <MailCheck className="w-3 h-3 text-blue-500" />
+                                      <span>Sent</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <CheckCircle className="w-3 h-3 text-green-500" />
+                                      <span>Confirmed</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <Clock className="w-3 h-3 text-orange-500" />
+                                      <span>Overdue</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <AlertCircle className="w-3 h-3 text-red-500" />
+                                      <span>Auto-rejected</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <span className="w-3 h-3 bg-yellow-400 rounded-full border border-white"></span>
+                                      <span>Needs confirmation</span>
+                                    </div>
+                                  </div>
                                 </div>
-                              )}
-                              {template.requiresConfirmation && deadline && (
-                                <div className="text-xs">
-                                  Deadline xác nhận:{" "}
-                                  {new Date(deadline).toLocaleDateString()}
+
+                                {/* Stage Header */}
+                                <div className="border-b border-slate-200 pb-2">
+                                  <div className="font-semibold text-slate-900 text-sm mb-1">
+                                    {stage.name} Stage
+                                  </div>
+                                  <div className="text-xs text-slate-600">
+                                    {(() => {
+                                      // Stage descriptions based on stage name
+                                      const stageDescriptions: { [key: string]: string } = {
+                                        "Applied": "Initial application received and under review",
+                                        "Screening": "Phone screening to assess basic qualifications",
+                                        "Interview": "In-depth interview with hiring team",
+                                        "Technical": "Technical assessment and skills evaluation",
+                                        "Offer": "Job offer extended and under negotiation",
+                                        "Hired": "Candidate successfully hired and onboarded",
+                                        "Rejected": "Application not selected for this position"
+                                      };
+                                      return stageDescriptions[stage.name] || `${stage.name} stage in recruitment process`;
+                                    })()}
+                                  </div>
                                 </div>
-                              )}
-                              {confirmedDate && (
-                                <div className="text-xs">
-                                  Xác nhận:{" "}
-                                  {new Date(confirmedDate).toLocaleString()}
+
+                                {/* Stage Status */}
+                                <div className="space-y-2">
+                                  <div className="flex items-center justify-between text-xs">
+                                    <span className="text-slate-600">Stage Status:</span>
+                                    <span className={`font-medium ${
+                                      stage.completed
+                                        ? "text-green-600"
+                                        : index === currentStageIndex
+                                          ? "text-blue-600"
+                                          : "text-slate-500"
+                                    }`}>
+                                      {stage.completed
+                                        ? "Completed"
+                                        : index === currentStageIndex
+                                          ? "Current"
+                                          : "Pending"}
+                                    </span>
+                                  </div>
+
+                                  {stage.duration > 0 && (
+                                    <div className="flex items-center justify-between text-xs">
+                                      <span className="text-slate-600">Duration:</span>
+                                      <span className="text-slate-700">{stage.duration} days</span>
+                                    </div>
+                                  )}
+
+                                  {stage.startDate && (
+                                    <div className="flex items-center justify-between text-xs">
+                                      <span className="text-slate-600">Started:</span>
+                                      <span className="text-slate-700">
+                                        {new Date(stage.startDate).toLocaleDateString()}
+                                      </span>
+                                    </div>
+                                  )}
+
+                                  {stage.endDate && (
+                                    <div className="flex items-center justify-between text-xs">
+                                      <span className="text-slate-600">Completed:</span>
+                                      <span className="text-slate-700">
+                                        {new Date(stage.endDate).toLocaleDateString()}
+                                      </span>
+                                    </div>
+                                  )}
                                 </div>
-                              )}
+
+                                {/* Email Template Details */}
+                                <div className="border-t border-slate-200 pt-2">
+                                  <div className="text-xs font-medium text-slate-700 mb-2">
+                                    Email: {template.name}
+                                  </div>
+                                  <div className="bg-slate-50 rounded p-2">
+                                    <div className="flex items-center justify-between mb-1">
+                                      <div className="text-xs font-medium text-slate-800">
+                                        {(() => {
+                                          try {
+                                            // Provide specific descriptions for each email type
+                                            const emailDescriptions: { [key: string]: string } = {
+                                              "Application Received - Thank You": "Thank you email when application is received",
+                                              "Interview Invitation": "Interview invitation with detailed information",
+                                              "Interview Reminder": "Reminder email for interview confirmation",
+                                              "Post-Interview Thank You": "Thank you email after interview and result announcement time",
+                                              "Technical Test Assignment": "Technical test assignment email",
+                                              "Technical Results": "Technical assessment results with confirmation required",
+                                              "Job Offer": "Job offer email with acceptance confirmation required",
+                                              "Onboarding Instructions": "Onboarding instructions with confirmation required"
+                                            };
+                                            return emailDescriptions[template.name] || template.subject || "Email template";
+                                          } catch (error) {
+                                            return template.subject || "Email template";
+                                          }
+                                        })()}
+                                      </div>
+                                      <div className={`text-xs px-2 py-1 rounded-full ${
+                                        autoRejected
+                                          ? "bg-red-100 text-red-700"
+                                          : overdue
+                                            ? "bg-orange-100 text-orange-700"
+                                            : confirmed
+                                              ? "bg-green-100 text-green-700"
+                                              : sent
+                                                ? "bg-blue-100 text-blue-700"
+                                                : "bg-slate-100 text-slate-700"
+                                      }`}>
+                                        {autoRejected
+                                          ? "Auto-Rejected"
+                                          : overdue
+                                            ? "Overdue"
+                                            : confirmed
+                                              ? "Confirmed"
+                                              : sent
+                                                ? "Sent"
+                                                : "Required"}
+                                      </div>
+                                    </div>
+                                    {sentDate && (
+                                      <div className="text-xs text-slate-600">
+                                        Sent: {new Date(sentDate).toLocaleDateString()}
+                                      </div>
+                                    )}
+                                    {template.requiresConfirmation && deadline && (
+                                      <div className="text-xs text-slate-600">
+                                        Deadline: {new Date(deadline).toLocaleDateString()}
+                                      </div>
+                                    )}
+                                    {confirmedDate && (
+                                      <div className="text-xs text-slate-600">
+                                        Confirmed: {new Date(confirmedDate).toLocaleDateString()}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {/* Stage Notes */}
+                                {stage.notes && (
+                                  <div className="border-t border-slate-200 pt-2">
+                                    <div className="text-xs font-medium text-slate-700 mb-1">
+                                      Notes:
+                                    </div>
+                                    <div className="text-xs text-slate-600 bg-slate-50 p-2 rounded">
+                                      {stage.notes}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
                             </TooltipContent>
                           </Tooltip>
                         );
@@ -778,7 +945,7 @@ export default function CandidateApplicationProgress(
 
                   {/* Circle stage */}
                   {(() => {
-                    // Tính trạng thái tổng hợp cho stage
+                    // Calculate overall status for stage
                     let circleStatus:
                       | "autoRejected"
                       | "overdue"
@@ -786,7 +953,7 @@ export default function CandidateApplicationProgress(
                       | "current"
                       | "default" = "default";
                     if (stageTemplates.length > 0) {
-                      // Lặp qua từng template để xác định trạng thái
+                      // Loop through each template to determine status
                       let foundAutoRejected = false;
                       let foundOverdue = false;
                       let allConfirmed = true;
@@ -861,39 +1028,82 @@ export default function CandidateApplicationProgress(
                       else if (stage.completed) circleStatus = "completed";
                       else if (index === currentStageIndex)
                         circleStatus = "current";
-                      else if (hasSentEmails) circleStatus = "completed"; // Có email đã gửi nhưng chưa hoàn thành
+                      else if (hasSentEmails) circleStatus = "completed"; // Has sent emails but not completed
                     } else {
-                      // Không có template, dựa vào stage completion
+                      // No templates, rely on stage completion
                       if (stage.completed) circleStatus = "completed";
                       else if (index === currentStageIndex)
                         circleStatus = "current";
                     }
                     return (
-                      <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center border-2 mx-auto mb-2 ${
-                          circleStatus === "autoRejected"
-                            ? "bg-red-500 border-red-500 text-white"
-                            : circleStatus === "overdue"
-                              ? "bg-orange-500 border-orange-500 text-white"
-                              : circleStatus === "completed"
-                                ? "bg-green-500 border-green-500 text-white"
-                                : circleStatus === "current"
-                                  ? "bg-blue-500 border-blue-500 text-white"
-                                  : "bg-white border-slate-300 text-slate-400"
-                        }`}
-                      >
-                        {circleStatus === "autoRejected" ? (
-                          <AlertCircle className="w-4 h-4" />
-                        ) : circleStatus === "overdue" ? (
-                          <Clock className="w-4 h-4" />
-                        ) : circleStatus === "completed" ? (
-                          <CheckCircle className="w-4 h-4" />
-                        ) : circleStatus === "current" ? (
-                          <Circle className="w-4 h-4 fill-current" />
-                        ) : (
-                          <Circle className="w-4 h-4" />
-                        )}
-                      </div>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div
+                            className={`w-8 h-8 rounded-full flex items-center justify-center border-2 mx-auto mb-2 cursor-help ${
+                              circleStatus === "autoRejected"
+                                ? "bg-red-500 border-red-500 text-white"
+                                : circleStatus === "overdue"
+                                  ? "bg-orange-500 border-orange-500 text-white"
+                                  : circleStatus === "completed"
+                                    ? "bg-green-500 border-green-500 text-white"
+                                    : circleStatus === "current"
+                                      ? "bg-blue-500 border-blue-500 text-white"
+                                      : "bg-white border-slate-300 text-slate-400"
+                            }`}
+                          >
+                            {circleStatus === "autoRejected" ? (
+                              <AlertCircle className="w-4 h-4" />
+                            ) : circleStatus === "overdue" ? (
+                              <Clock className="w-4 h-4" />
+                            ) : circleStatus === "completed" ? (
+                              <CheckCircle className="w-4 h-4" />
+                            ) : circleStatus === "current" ? (
+                              <Circle className="w-4 h-4 fill-current" />
+                            ) : (
+                              <Circle className="w-4 h-4" />
+                            )}
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="max-w-xs">
+                          <div className="space-y-2">
+                            <div className="font-semibold text-sm">
+                              Stage Status: {stage.name}
+                            </div>
+                            <div className="text-xs space-y-1">
+                              {circleStatus === "autoRejected" && (
+                                <div className="flex items-center gap-2">
+                                  <AlertCircle className="w-3 h-3 text-red-500" />
+                                  <span>Auto-rejected: Candidate did not confirm within deadline</span>
+                                </div>
+                              )}
+                              {circleStatus === "overdue" && (
+                                <div className="flex items-center gap-2">
+                                  <Clock className="w-3 h-3 text-orange-500" />
+                                  <span>Overdue: Waiting for candidate confirmation</span>
+                                </div>
+                              )}
+                              {circleStatus === "completed" && (
+                                <div className="flex items-center gap-2">
+                                  <CheckCircle className="w-3 h-3 text-green-500" />
+                                  <span>Completed: Stage finished successfully</span>
+                                </div>
+                              )}
+                              {circleStatus === "current" && (
+                                <div className="flex items-center gap-2">
+                                  <Circle className="w-3 h-3 text-blue-500 fill-current" />
+                                  <span>Current: Currently in this stage</span>
+                                </div>
+                              )}
+                              {circleStatus === "default" && (
+                                <div className="flex items-center gap-2">
+                                  <Circle className="w-3 h-3 text-slate-400" />
+                                  <span>Pending: Stage not started yet</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </TooltipContent>
+                      </Tooltip>
                     );
                   })()}
 
@@ -910,108 +1120,7 @@ export default function CandidateApplicationProgress(
                     </div>
                   )}
 
-                  {/* Email status tooltip */}
-                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 max-w-xs">
-                    <div className="font-semibold mb-1">{stage.name} Stage</div>
-                    {stageTemplates.length > 0 ? (
-                      <div className="space-y-1">
-                        {stageTemplates.map((template) => {
-                          const sentEmails = emailsForStage.filter((email) => {
-                            const templateNameMatch =
-                              email.template === template.name;
-                            const subjectMatch = email.subject
-                              .toLowerCase()
-                              .includes(template.name.toLowerCase());
-                            const stageMatch = email.subject
-                              .toLowerCase()
-                              .includes(template.stage?.toLowerCase() || "");
-                            const genericStageMatch = email.subject
-                              .toLowerCase()
-                              .includes(stage.name.toLowerCase());
-
-                            return (
-                              templateNameMatch ||
-                              subjectMatch ||
-                              stageMatch ||
-                              genericStageMatch
-                            );
-                          });
-                          const latestEmail =
-                            sentEmails.length > 0
-                              ? sentEmails.reduce((a, b) =>
-                                  new Date(a.timestamp) > new Date(b.timestamp)
-                                    ? a
-                                    : b,
-                                )
-                              : undefined;
-                          const sent = !!latestEmail;
-                          const confirmed = latestEmail?.repliedAt
-                            ? true
-                            : false;
-                          const sentDate = latestEmail?.timestamp;
-                          const confirmedDate = latestEmail?.repliedAt;
-                          const deadline: string | undefined =
-                            template.confirmationDeadline && sentDate
-                              ? new Date(
-                                  new Date(sentDate).getTime() +
-                                    template.confirmationDeadline *
-                                      24 *
-                                      60 *
-                                      60 *
-                                      1000,
-                                ).toISOString()
-                              : undefined;
-                          const overdue =
-                            template.requiresConfirmation &&
-                            sent &&
-                            !confirmed &&
-                            deadline &&
-                            new Date() > new Date(deadline);
-                          const autoRejected =
-                            template.autoRejectOnOverdue && overdue;
-                          
-                          // Provide specific descriptions for each email type
-                          const emailDescriptions: { [key: string]: string } = {
-                            "Application Received - Thank You": "Email cảm ơn khi nhận đơn ứng tuyển",
-                            "application_received": "Email xác nhận đã nhận đơn ứng tuyển",
-                            "Interview Invitation": "Email mời phỏng vấn với thông tin chi tiết",
-                            "interview_scheduling": "Email lên lịch phỏng vấn",
-                            "Post-Interview Thank You": "Email cảm ơn sau phỏng vấn và hẹn thời gian báo kết quả",
-                            "Technical Test Assignment": "Email gửi bài test kỹ thuật",
-                            "technical_assessment": "Email thông báo bài đánh giá kỹ thuật",
-                            "Job Offer": "Email gửi offer công việc",
-                            "offer_letter": "Email thư mời nhận việc",
-                            "Onboarding Instructions": "Email hướng dẫn onboarding",
-                            "welcome_onboard": "Email chào mừng và hướng dẫn onboarding",
-                            "Application Confirmation": "Email xác nhận đơn ứng tuyển",
-                            "Screening Invitation": "Email mời screening call",
-                            "screening_invitation": "Email mời cuộc gọi screening"
-                          };
-                          
-                          return (
-                            <div key={template.id} className="border-l-2 border-slate-600 pl-2">
-                              <div className="font-medium">
-                                {emailDescriptions[template.name] || template.name}
-                              </div>
-                              <div className="text-slate-300">
-                                {autoRejected
-                                  ? "❌ Auto-Rejected"
-                                  : overdue
-                                    ? "⏰ Overdue"
-                                    : confirmed
-                                      ? "✅ Confirmed"
-                                      : sent
-                                        ? "📧 Sent"
-                                        : "📋 Required"}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    ) : (
-                      <div className="text-slate-300">Không có yêu cầu email</div>
-                    )}
-                  </div>
+                  
                 </div>
               );
             })}
@@ -1065,20 +1174,14 @@ export default function CandidateApplicationProgress(
                       {(() => {
                         // Provide specific descriptions for each email type
                         const emailDescriptions: { [key: string]: string } = {
-                          "Application Received - Thank You": "Email cảm ơn khi nhận đơn ứng tuyển",
-                          "application_received": "Email xác nhận đã nhận đơn ứng tuyển",
-                          "Interview Invitation": "Email mời phỏng vấn với thông tin chi tiết",
-                          "interview_scheduling": "Email lên lịch phỏng vấn",
-                          "Post-Interview Thank You": "Email cảm ơn sau phỏng vấn và hẹn thời gian báo kết quả",
-                          "Technical Test Assignment": "Email gửi bài test kỹ thuật",
-                          "technical_assessment": "Email thông báo bài đánh giá kỹ thuật",
-                          "Job Offer": "Email gửi offer công việc",
-                          "offer_letter": "Email thư mời nhận việc",
-                          "Onboarding Instructions": "Email hướng dẫn onboarding",
-                          "welcome_onboard": "Email chào mừng và hướng dẫn onboarding",
-                          "Application Confirmation": "Email xác nhận đơn ứng tuyển",
-                          "Screening Invitation": "Email mời screening call",
-                          "screening_invitation": "Email mời cuộc gọi screening"
+                          "Application Received - Thank You": "Thank you email when application is received",
+                          "Interview Invitation": "Interview invitation with detailed information",
+                          "Interview Reminder": "Reminder email for interview confirmation",
+                          "Post-Interview Thank You": "Thank you email after interview and result announcement time",
+                          "Technical Test Assignment": "Technical test assignment email",
+                          "Technical Results": "Technical assessment results with confirmation required",
+                          "Job Offer": "Job offer email with acceptance confirmation required",
+                          "Onboarding Instructions": "Onboarding instructions with confirmation required"
                         };
                         return emailDescriptions[status.template.name] || status.template.subject;
                       })()}
@@ -1280,60 +1383,6 @@ export default function CandidateApplicationProgress(
           <StatusTracker />
 
           {/* Email Tracking Summary */}
-          {emailStatuses.length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
-                  Email Tracking
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div className="text-center p-2 bg-green-50 rounded-lg">
-                    <div className="font-semibold text-green-700">
-                      {emailStatuses.filter((s) => s.sent).length}
-                    </div>
-                    <div className="text-xs text-green-600">Sent</div>
-                  </div>
-                  <div className="text-center p-2 bg-blue-50 rounded-lg">
-                    <div className="font-semibold text-blue-700">
-                      {emailStatuses.filter((s) => s.confirmed).length}
-                    </div>
-                    <div className="text-xs text-blue-600">Confirmed</div>
-                  </div>
-                  <div className="text-center p-2 bg-yellow-50 rounded-lg">
-                    <div className="font-semibold text-yellow-700">
-                      {
-                        emailStatuses.filter(
-                          (s) => s.overdue && !s.autoRejected,
-                        ).length
-                      }
-                    </div>
-                    <div className="text-xs text-yellow-600">Overdue</div>
-                  </div>
-                  <div className="text-center p-2 bg-red-50 rounded-lg">
-                    <div className="font-semibold text-red-700">
-                      {emailStatuses.filter((s) => s.autoRejected).length}
-                    </div>
-                    <div className="text-xs text-red-600">Auto-Rejected</div>
-                  </div>
-                </div>
-                {emailStatuses.some((s) => s.overdue || s.autoRejected) && (
-                  <div className="p-2 bg-red-50 border border-red-200 rounded-lg">
-                    <p className="text-xs text-red-700 font-medium">
-                      ⚠️ Action Required:{" "}
-                      {
-                        emailStatuses.filter((s) => s.overdue || s.autoRejected)
-                          .length
-                      }{" "}
-                      emails need attention
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          )}
 
           {/* Quick Actions */}
           <Card>
@@ -1629,20 +1678,14 @@ export default function CandidateApplicationProgress(
                                     {(() => {
                                       // Provide specific descriptions for each email type
                                       const emailDescriptions: { [key: string]: string } = {
-                                        "Application Received - Thank You": "Email cảm ơn khi nhận đơn ứng tuyển",
-                                        "application_received": "Email xác nhận đã nhận đơn ứng tuyển",
-                                        "Interview Invitation": "Email mời phỏng vấn với thông tin chi tiết",
-                                        "interview_scheduling": "Email lên lịch phỏng vấn",
-                                        "Post-Interview Thank You": "Email cảm ơn sau phỏng vấn và hẹn thời gian báo kết quả",
-                                        "Technical Test Assignment": "Email gửi bài test kỹ thuật",
-                                        "technical_assessment": "Email thông báo bài đánh giá kỹ thuật",
-                                        "Job Offer": "Email gửi offer công việc",
-                                        "offer_letter": "Email thư mời nhận việc",
-                                        "Onboarding Instructions": "Email hướng dẫn onboarding",
-                                        "welcome_onboard": "Email chào mừng và hướng dẫn onboarding",
-                                        "Application Confirmation": "Email xác nhận đơn ứng tuyển",
-                                        "Screening Invitation": "Email mời screening call",
-                                        "screening_invitation": "Email mời cuộc gọi screening"
+                                        "Application Received - Thank You": "Thank you email when application is received",
+                                        "Interview Invitation": "Interview invitation with detailed information",
+                                        "Interview Reminder": "Reminder email for interview confirmation",
+                                        "Post-Interview Thank You": "Thank you email after interview and result announcement time",
+                                        "Technical Test Assignment": "Technical test assignment email",
+                                        "Technical Results": "Technical assessment results with confirmation required",
+                                        "Job Offer": "Job offer email with acceptance confirmation required",
+                                        "Onboarding Instructions": "Onboarding instructions with confirmation required"
                                       };
                                       return emailDescriptions[status.template.name] || status.template.subject;
                                     })()}
@@ -1769,20 +1812,14 @@ export default function CandidateApplicationProgress(
                                 {templates.map((template) => {
                                   // Provide specific descriptions for each email type
                                   const emailDescriptions: { [key: string]: string } = {
-                                    "Application Received - Thank You": "Email cảm ơn khi nhận đơn ứng tuyển",
-                                    "application_received": "Email xác nhận đã nhận đơn ứng tuyển",
-                                    "Interview Invitation": "Email mời phỏng vấn với thông tin chi tiết",
-                                    "interview_scheduling": "Email lên lịch phỏng vấn",
-                                    "Post-Interview Thank You": "Email cảm ơn sau phỏng vấn và hẹn thời gian báo kết quả",
-                                    "Technical Test Assignment": "Email gửi bài test kỹ thuật",
-                                    "technical_assessment": "Email thông báo bài đánh giá kỹ thuật",
-                                    "Job Offer": "Email gửi offer công việc",
-                                    "offer_letter": "Email thư mời nhận việc",
-                                    "Onboarding Instructions": "Email hướng dẫn onboarding",
-                                    "welcome_onboard": "Email chào mừng và hướng dẫn onboarding",
-                                    "Application Confirmation": "Email xác nhận đơn ứng tuyển",
-                                    "Screening Invitation": "Email mời screening call",
-                                    "screening_invitation": "Email mời cuộc gọi screening"
+                                    "Application Received - Thank You": "Thank you email when application is received",
+                                    "Interview Invitation": "Interview invitation with detailed information",
+                                    "Interview Reminder": "Reminder email for interview confirmation",
+                                    "Post-Interview Thank You": "Thank you email after interview and result announcement time",
+                                    "Technical Test Assignment": "Technical test assignment email",
+                                    "Technical Results": "Technical assessment results with confirmation required",
+                                    "Job Offer": "Job offer email with acceptance confirmation required",
+                                    "Onboarding Instructions": "Onboarding instructions with confirmation required"
                                   };
                                   
                                   return (
