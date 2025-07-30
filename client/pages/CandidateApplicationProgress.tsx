@@ -522,88 +522,143 @@ export default function CandidateApplicationProgress(props: CandidateApplication
         <TooltipProvider>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           {stages.map((stage, index) => {
-            // Get email status for this stage
-            const stageEmailStatuses = emailStatuses.filter(status => 
-              status.template.stage?.toLowerCase() === stage.name.toLowerCase()
-            );
-            const hasOverdue = stageEmailStatuses.some(s => s.overdue);
-            const hasAutoRejected = stageEmailStatuses.some(s => s.autoRejected);
-            const hasConfirmationRequired = stageEmailStatuses.some(s => s.template.requiresConfirmation);
-            
+            // Lấy tất cả template cho stage này
+            const stageTemplates = getTemplatesForStage(stage.name.toLowerCase());
+            // Lấy tất cả email đã gửi cho stage này
+            const emailsForStage = jobApplication.emails.filter(email => {
+              // So sánh theo template name hoặc subject chứa template name
+              return stageTemplates.some(tpl => email.template === tpl.name || email.subject.includes(tpl.name));
+            });
             return (
               <div key={stage.name} className="text-center relative group">
                 {/* Email status indicators */}
                 <div className="flex justify-center mb-1 gap-1">
-                  {stageEmailStatuses.length > 0 ? (
-                    stageEmailStatuses.map((emailStatus, emailIndex) => (
-                      <Tooltip key={emailIndex}>
-                        <TooltipTrigger asChild>
-                          <div className="relative">
-                            {emailStatus.autoRejected ? (
-                              <AlertCircle className="w-4 h-4 text-red-500" />
-                            ) : emailStatus.overdue ? (
-                              <Clock className="w-4 h-4 text-orange-500" />
-                            ) : emailStatus.confirmed ? (
-                              <CheckCircle className="w-4 h-4 text-green-500" />
-                            ) : emailStatus.sent ? (
-                              <MailCheck className="w-4 h-4 text-blue-500" />
-                            ) : (
-                              <Mail className="w-4 h-4 text-slate-300" />
+                  {stageTemplates.length > 0 ? (
+                    stageTemplates.map((template, templateIdx) => {
+                      // Tìm email đã gửi gần nhất cho template này
+                      const sentEmails = emailsForStage.filter(email => email.template === template.name || email.subject.includes(template.name));
+                      const latestEmail = sentEmails.length > 0 ? sentEmails.reduce((a, b) => new Date(a.timestamp) > new Date(b.timestamp) ? a : b) : undefined;
+                      // Xác định trạng thái
+                      const sent = !!latestEmail;
+                      const confirmed = latestEmail?.repliedAt ? true : false;
+                      const sentDate = latestEmail?.timestamp;
+                      const confirmedDate = latestEmail?.repliedAt;
+                      // Deadline xác nhận
+                      let deadline: string | undefined = undefined;
+                      if (template.confirmationDeadline && sentDate) {
+                        const sentTime = new Date(sentDate).getTime();
+                        deadline = new Date(sentTime + template.confirmationDeadline * 24 * 60 * 60 * 1000).toISOString();
+                      }
+                      // Overdue
+                      const overdue = template.requiresConfirmation && sent && !confirmed && deadline && (new Date() > new Date(deadline));
+                      const autoRejected = template.autoRejectOnOverdue && overdue;
+                      return (
+                        <Tooltip key={templateIdx}>
+                          <TooltipTrigger asChild>
+                            <div className="relative">
+                              {autoRejected ? (
+                                <AlertCircle className="w-4 h-4 text-red-500" />
+                              ) : overdue ? (
+                                <Clock className="w-4 h-4 text-orange-500" />
+                              ) : confirmed ? (
+                                <CheckCircle className="w-4 h-4 text-green-500" />
+                              ) : sent ? (
+                                <MailCheck className="w-4 h-4 text-blue-500" />
+                              ) : (
+                                <Mail className="w-4 h-4 text-slate-300" />
+                              )}
+                              {/* Chấm vàng nếu cần xác nhận và chưa xác nhận */}
+                              {template.requiresConfirmation && sent && !confirmed && !autoRejected && !overdue && (
+                                <span className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full border border-white"></span>
+                              )}
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent side="top">
+                            <div className="text-xs font-semibold mb-1">{template.name}</div>
+                            <div className="text-xs">
+                              Trạng thái: {autoRejected ? "Auto-Rejected" : overdue ? "Overdue" : confirmed ? "Đã xác nhận" : sent ? "Đã gửi" : "Chưa gửi"}
+                            </div>
+                            {sentDate && (
+                              <div className="text-xs">Gửi lúc: {new Date(sentDate).toLocaleString()}</div>
                             )}
-                            {/* Chấm vàng nếu cần xác nhận và chưa xác nhận */}
-                            {emailStatus.template.requiresConfirmation && emailStatus.sent && !emailStatus.confirmed && !emailStatus.autoRejected && !emailStatus.overdue && (
-                              <span className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full border border-white"></span>
+                            {template.requiresConfirmation && deadline && (
+                              <div className="text-xs">Deadline xác nhận: {new Date(deadline).toLocaleDateString()}</div>
                             )}
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent side="top">
-                          <div className="text-xs font-semibold mb-1">{emailStatus.template.name}</div>
-                          <div className="text-xs">
-                            Trạng thái: {emailStatus.autoRejected ? "Auto-Rejected" : emailStatus.overdue ? "Overdue" : emailStatus.confirmed ? "Đã xác nhận" : emailStatus.sent ? "Đã gửi" : "Chưa gửi"}
-                          </div>
-                          {emailStatus.sentDate && (
-                            <div className="text-xs">Gửi lúc: {new Date(emailStatus.sentDate).toLocaleString()}</div>
-                          )}
-                          {emailStatus.template.requiresConfirmation && emailStatus.deadline && (
-                            <div className="text-xs">Deadline xác nhận: {new Date(emailStatus.deadline).toLocaleDateString()}</div>
-                          )}
-                          {emailStatus.confirmedDate && (
-                            <div className="text-xs">Xác nhận: {new Date(emailStatus.confirmedDate).toLocaleString()}</div>
-                          )}
-                        </TooltipContent>
-                      </Tooltip>
-                    ))
+                            {confirmedDate && (
+                              <div className="text-xs">Xác nhận: {new Date(confirmedDate).toLocaleString()}</div>
+                            )}
+                          </TooltipContent>
+                        </Tooltip>
+                      );
+                    })
                   ) : (
                     <Mail className="w-4 h-4 text-slate-300" />
                   )}
                 </div>
 
                 {/* Circle stage */}
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center border-2 mx-auto mb-2 ${
-                    hasAutoRejected
-                      ? "bg-red-500 border-red-500 text-white"
-                      : hasOverdue
-                        ? "bg-orange-500 border-orange-500 text-white"
-                        : stage.completed
-                          ? "bg-green-500 border-green-500 text-white"
-                          : index === currentStageIndex
-                            ? "bg-blue-500 border-blue-500 text-white"
-                            : "bg-white border-slate-300 text-slate-400"
-                  }`}
-                >
-                  {hasAutoRejected ? (
-                    <AlertCircle className="w-4 h-4" />
-                  ) : hasOverdue ? (
-                    <Clock className="w-4 h-4" />
-                  ) : stage.completed ? (
-                    <CheckCircle className="w-4 h-4" />
-                  ) : index === currentStageIndex ? (
-                    <Circle className="w-4 h-4 fill-current" />
-                  ) : (
-                    <Circle className="w-4 h-4" />
-                  )}
-                </div>
+                {(() => {
+                  // Tính trạng thái tổng hợp cho stage
+                  let circleStatus: 'autoRejected' | 'overdue' | 'completed' | 'current' | 'default' = 'default';
+                  if (stageTemplates.length > 0) {
+                    // Lặp qua từng template để xác định trạng thái
+                    let foundAutoRejected = false;
+                    let foundOverdue = false;
+                    let allConfirmed = true;
+                    stageTemplates.forEach((template) => {
+                      const sentEmails = emailsForStage.filter(email => email.template === template.name || email.subject.includes(template.name));
+                      const latestEmail = sentEmails.length > 0 ? sentEmails.reduce((a, b) => new Date(a.timestamp) > new Date(b.timestamp) ? a : b) : undefined;
+                      const sent = !!latestEmail;
+                      const confirmed = latestEmail?.repliedAt ? true : false;
+                      const sentDate = latestEmail?.timestamp;
+                      let deadline: string | undefined = undefined;
+                      if (template.confirmationDeadline && sentDate) {
+                        const sentTime = new Date(sentDate).getTime();
+                        deadline = new Date(sentTime + template.confirmationDeadline * 24 * 60 * 60 * 1000).toISOString();
+                      }
+                      const overdue = template.requiresConfirmation && sent && !confirmed && deadline && (new Date() > new Date(deadline));
+                      const autoRejected = template.autoRejectOnOverdue && overdue;
+                      if (autoRejected) foundAutoRejected = true;
+                      if (overdue) foundOverdue = true;
+                      if (!confirmed) allConfirmed = false;
+                    });
+                    if (foundAutoRejected) circleStatus = 'autoRejected';
+                    else if (foundOverdue) circleStatus = 'overdue';
+                    else if (allConfirmed && stage.completed) circleStatus = 'completed';
+                    else if (index === currentStageIndex) circleStatus = 'current';
+                  } else {
+                    // Không có template, giữ logic cũ
+                    if (stage.completed) circleStatus = 'completed';
+                    else if (index === currentStageIndex) circleStatus = 'current';
+                  }
+                  return (
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center border-2 mx-auto mb-2 ${
+                        circleStatus === 'autoRejected'
+                          ? 'bg-red-500 border-red-500 text-white'
+                          : circleStatus === 'overdue'
+                            ? 'bg-orange-500 border-orange-500 text-white'
+                            : circleStatus === 'completed'
+                              ? 'bg-green-500 border-green-500 text-white'
+                              : circleStatus === 'current'
+                                ? 'bg-blue-500 border-blue-500 text-white'
+                                : 'bg-white border-slate-300 text-slate-400'
+                      }`}
+                    >
+                      {circleStatus === 'autoRejected' ? (
+                        <AlertCircle className="w-4 h-4" />
+                      ) : circleStatus === 'overdue' ? (
+                        <Clock className="w-4 h-4" />
+                      ) : circleStatus === 'completed' ? (
+                        <CheckCircle className="w-4 h-4" />
+                      ) : circleStatus === 'current' ? (
+                        <Circle className="w-4 h-4 fill-current" />
+                      ) : (
+                        <Circle className="w-4 h-4" />
+                      )}
+                    </div>
+                  );
+                })()}
 
                 {/* Stage name */}
                 <div className="text-xs font-medium text-slate-700 break-words px-1">
@@ -620,18 +675,29 @@ export default function CandidateApplicationProgress(props: CandidateApplication
 
                 {/* Email status tooltip */}
                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                  {stageEmailStatuses.length > 0 ? (
+                  {stageTemplates.length > 0 ? (
                     <div>
-                      {stageEmailStatuses.map((emailStatus, emailIndex) => (
-                        <div key={emailIndex}>
-                          {emailStatus.template.name}: {
-                            emailStatus.autoRejected ? "Auto-Rejected" :
-                            emailStatus.overdue ? "Overdue" :
-                            emailStatus.confirmed ? "Confirmed" :
-                            emailStatus.sent ? "Sent" : "Required"
-                          }
-                        </div>
-                      ))}
+                      {stageTemplates.map((template) => {
+                        const sentEmails = emailsForStage.filter(email => email.template === template.name || email.subject.includes(template.name));
+                        const latestEmail = sentEmails.length > 0 ? sentEmails.reduce((a, b) => new Date(a.timestamp) > new Date(b.timestamp) ? a : b) : undefined;
+                        const sent = !!latestEmail;
+                        const confirmed = latestEmail?.repliedAt ? true : false;
+                        const sentDate = latestEmail?.timestamp;
+                        const confirmedDate = latestEmail?.repliedAt;
+                        const deadline: string | undefined = template.confirmationDeadline && sentDate ? new Date(Date.now() + template.confirmationDeadline * 24 * 60 * 60 * 1000).toISOString() : undefined;
+                        const overdue = template.requiresConfirmation && sent && !confirmed && deadline && (new Date() > new Date(deadline));
+                        const autoRejected = template.autoRejectOnOverdue && overdue;
+                        return (
+                          <div key={template.id}>
+                            {template.name}: {
+                              autoRejected ? "Auto-Rejected" :
+                              overdue ? "Overdue" :
+                              confirmed ? "Confirmed" :
+                              sent ? "Sent" : "Required"
+                            }
+                          </div>
+                        );
+                      })}
                     </div>
                   ) : (
                     "No email requirements"
