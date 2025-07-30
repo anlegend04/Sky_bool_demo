@@ -162,7 +162,7 @@ export default function CandidateProfileEnhanced() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem asChild>
                           <Link
-                            to={`/candidates/${candidate.id}/jobs/${application.id}/progress`}
+                            to={`/follow-up-dashboard/applicant-progress/${candidate.id}/${application.id}`}
                           >
                             <Eye className="w-4 h-4 mr-2" />
                             View Progress
@@ -216,7 +216,7 @@ export default function CandidateProfileEnhanced() {
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem asChild>
                       <Link
-                        to={`/candidates/${candidate.id}/jobs/${application.id}/progress`}
+                        to={`/follow-up-dashboard/applicant-progress/${candidate.id}/${application.id}`}
                       >
                         <Eye className="w-4 h-4 mr-2" />
                         View Progress
@@ -289,7 +289,7 @@ export default function CandidateProfileEnhanced() {
                     </span>
                   </div>
                   <Link
-                    to={`/candidates/${candidate.id}/jobs/${application.id}/progress`}
+                    to={`/follow-up-dashboard/applicant-progress/${candidate.id}/${application.id}`}
                     className="text-xs sm:text-sm text-primary hover:text-primary/80 font-medium flex items-center gap-1 group w-fit"
                   >
                     <span className="hidden sm:inline">View Details</span>
