@@ -3,50 +3,88 @@
 
 (function() {
   'use strict';
-  
-  // Store original console.warn immediately
+
+  // Store original console methods immediately
   const originalWarn = console.warn;
-  
-  // Override console.warn to intercept React warnings
-  console.warn = function(format, ...args) {
-    // React warnings often use format strings with %s placeholders
+  const originalError = console.error;
+  const originalLog = console.log;
+
+  // More aggressive suppression function
+  function shouldSuppressWarning(format, ...args) {
+    // Handle React's specific warning format
     if (typeof format === 'string') {
-      // Check for the specific defaultProps warning
-      if (format.includes('Support for defaultProps will be removed from function components')) {
-        // Check if this warning is about Recharts components
-        const componentName = args[0];
-        if (typeof componentName === 'string') {
-          const rechartsComponents = [
-            'XAxis', 'YAxis', 'XAxis2', 'YAxis2', 'CartesianGrid', 
-            'Tooltip', 'Legend', 'ResponsiveContainer', 'BarChart', 
-            'LineChart', 'PieChart', 'Area', 'Bar', 'Line', 'Pie', 
-            'Cell', 'Surface', 'ReferenceLine', 'ReferenceArea'
-          ];
-          
-          if (rechartsComponents.some(comp => componentName.includes(comp))) {
-            // Suppress this warning - it's a Recharts defaultProps warning
-            return;
-          }
+      // Check for the exact defaultProps warning pattern from React
+      if (format.includes('%s: Support for defaultProps will be removed from function components') ||
+          format.includes('Support for defaultProps will be removed from function components')) {
+
+        // Check if any of the arguments are Recharts components
+        const allArgs = [format, ...args].join(' ');
+        const rechartsComponents = [
+          'XAxis', 'YAxis', 'XAxis2', 'YAxis2', 'CartesianGrid',
+          'Tooltip', 'Legend', 'ResponsiveContainer', 'BarChart',
+          'LineChart', 'PieChart', 'Area', 'Bar', 'Line', 'Pie',
+          'Cell', 'Surface', 'ReferenceLine', 'ReferenceArea'
+        ];
+
+        if (rechartsComponents.some(comp => allArgs.includes(comp))) {
+          return true;
         }
       }
-      
-      // Also check if the full warning contains Recharts-related content
-      const fullWarning = format + ' ' + args.join(' ');
-      if (fullWarning.includes('defaultProps') && 
-          (fullWarning.includes('recharts') || 
-           fullWarning.includes('XAxis') || 
-           fullWarning.includes('YAxis'))) {
-        return;
+
+      // Also check for any warning that mentions defaultProps and Recharts
+      const allContent = [format, ...args].join(' ');
+      if (allContent.includes('defaultProps') &&
+          (allContent.includes('XAxis') || allContent.includes('YAxis') ||
+           allContent.includes('recharts') || allContent.includes('Recharts'))) {
+        return true;
       }
     }
-    
-    // If it's not a Recharts defaultProps warning, let it through
+
+    return false;
+  }
+
+  // Override console.warn
+  console.warn = function(format, ...args) {
+    if (shouldSuppressWarning(format, ...args)) {
+      return; // Suppress this warning
+    }
     return originalWarn.apply(console, [format, ...args]);
   };
-  
-  // Also try to intercept at the window level
+
+  // Override console.error as well (some warnings might be logged as errors)
+  console.error = function(format, ...args) {
+    if (shouldSuppressWarning(format, ...args)) {
+      return; // Suppress this error
+    }
+    return originalError.apply(console, [format, ...args]);
+  };
+
+  // Override console.log as a fallback
+  console.log = function(format, ...args) {
+    if (shouldSuppressWarning(format, ...args)) {
+      return; // Suppress this log
+    }
+    return originalLog.apply(console, [format, ...args]);
+  };
+
+  // Override at window level
   if (typeof window !== 'undefined') {
-    const originalWindowWarn = window.console.warn;
     window.console.warn = console.warn;
+    window.console.error = console.error;
+    window.console.log = console.log;
+  }
+
+  // Additional global error handler
+  if (typeof window !== 'undefined') {
+    const originalOnError = window.onerror;
+    window.onerror = function(message, source, lineno, colno, error) {
+      if (typeof message === 'string' && shouldSuppressWarning(message)) {
+        return true; // Suppress the error
+      }
+      if (originalOnError) {
+        return originalOnError.call(window, message, source, lineno, colno, error);
+      }
+      return false;
+    };
   }
 })();
