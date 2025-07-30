@@ -1150,6 +1150,52 @@ export default function CandidateDetail() {
     }
   };
 
+  const handleDownloadResume = () => {
+    // Create a mock download
+    const link = document.createElement('a');
+    link.href = `/files/resumes/${candidate.resume}`;
+    link.download = candidate.resume;
+    link.click();
+
+    toast({
+      title: "Download Started",
+      description: `Downloading ${candidate.resume}`,
+    });
+  };
+
+  const handleDownloadAttachment = (attachment: any) => {
+    // Create a mock download
+    const link = document.createElement('a');
+    link.href = attachment.url;
+    link.download = attachment.name;
+    link.click();
+
+    toast({
+      title: "Download Started",
+      description: `Downloading ${attachment.name}`,
+    });
+  };
+
+  const handleShareProfile = () => {
+    // Copy profile link to clipboard
+    const profileUrl = `${window.location.origin}/candidates/${candidate.id}`;
+    navigator.clipboard.writeText(profileUrl).then(() => {
+      toast({
+        title: "Profile Link Copied",
+        description: "Profile URL copied to clipboard",
+      });
+    });
+  };
+
+  const handleSaveProfile = () => {
+    // Mock save functionality
+    toast({
+      title: "Profile Updated",
+      description: "Candidate profile has been successfully updated",
+    });
+    setShowEditProfileDialog(false);
+  };
+
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
