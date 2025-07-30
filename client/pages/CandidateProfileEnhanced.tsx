@@ -199,18 +199,27 @@ export default function CandidateProfileEnhanced() {
             </div>
 
             {/* Status and Stage */}
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge variant={getStatusBadgeVariant(application.status)}>
-                <Activity className="w-3 h-3 mr-1" />
-                {application.status}
-              </Badge>
-              <Badge variant={getStageBadgeVariant(application.currentStage)}>
-                <Target className="w-3 h-3 mr-1" />
-                {application.currentStage}
-              </Badge>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge
+                  variant={getStatusBadgeVariant(application.status)}
+                  className={`sm:hidden ${getPriorityColor(application.priority)} border font-medium`}
+                >
+                  {application.priority}
+                </Badge>
+                <Badge variant={getStatusBadgeVariant(application.status)}>
+                  <Activity className="w-3 h-3 mr-1" />
+                  {application.status}
+                </Badge>
+                <Badge variant={getStageBadgeVariant(application.currentStage)}>
+                  <Target className="w-3 h-3 mr-1" />
+                  {application.currentStage}
+                </Badge>
+              </div>
               {application.salary && (
-                <Badge variant="outline">
+                <Badge variant="outline" className="w-fit">
                   <DollarSign className="w-3 h-3 mr-1" />
+                  <span className="hidden sm:inline">Salary: </span>
                   {application.salary}
                 </Badge>
               )}
