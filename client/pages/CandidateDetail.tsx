@@ -254,42 +254,8 @@ export default function CandidateDetail() {
     content: item.details,
   }));
 
-  // Enhanced demo email history
-  const emailHistory: EmailData[] = [
-    {
-      id: "email_1",
-      subject: "Interview Invitation - Senior Product Manager",
-      content:
-        "Hi Marissa, Thank you for your interest in the Senior Product Manager position. We would like to invite you for an interview on January 25th at 2:00 PM. Please find the calendar invitation attached. We'll be discussing your background, technical skills, and how you approach product challenges. Looking forward to meeting you!",
-      from: "alex.chen@company.com",
-      to: candidate.email,
-      timestamp: "2024-01-17 9:00 AM",
-      status: "sent",
-      template: "interview_invitation",
-    },
-    {
-      id: "email_2",
-      subject: "Application Received - Senior Product Manager",
-      content:
-        "Thank you for applying to our Senior Product Manager position. We have received your application and will review it shortly. You can expect to hear from us within 3-5 business days. In the meantime, feel free to explore our company culture and values on our website.",
-      from: "noreply@company.com",
-      to: candidate.email,
-      timestamp: "2024-01-15 2:30 PM",
-      status: "sent",
-      template: "application_received",
-    },
-    {
-      id: "email_3",
-      subject: "Technical Assessment Details",
-      content:
-        "Hi Marissa, Following our successful initial interview, we'd like to proceed with the technical assessment. This will include a coding challenge and system design discussion. Please find the assessment materials attached. You have 48 hours to complete this. Good luck!",
-      from: "sarah.kim@company.com",
-      to: candidate.email,
-      timestamp: "2024-01-20 3:15 PM",
-      status: "sent",
-      template: "technical_assessment",
-    },
-  ];
+  // Use candidate emails from centralized data
+  const emailHistory: EmailData[] = candidate.emails || [];
 
   const emailTemplates = EMAIL_TEMPLATES;
 
