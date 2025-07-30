@@ -101,9 +101,14 @@ export default function CandidateApplicationProgress() {
           <p className="text-slate-600 mt-2">
             The job application you're looking for doesn't exist.
           </p>
-          <Link to={`/candidates/${candidateId}`}>
-            <Button className="mt-4">Back to Candidate Profile</Button>
-          </Link>
+          <div className="flex gap-2 mt-4">
+            <Link to="/follow-up">
+              <Button>Back to Follow-up Dashboard</Button>
+            </Link>
+            <Link to={`/candidates/${candidateId}`}>
+              <Button variant="outline">View Candidate Profile</Button>
+            </Link>
+          </div>
         </div>
       </div>
     );
