@@ -727,7 +727,7 @@ export default function CandidateDetail() {
                     </p>
                   </div>
                 </div>
-                <Button variant="outline" size="sm" className="flex-shrink-0">
+                <Button variant="outline" size="sm" className="flex-shrink-0" onClick={() => setShowResumePreview(true)}>
                   <Eye className="w-4 h-4 mr-2" />
                   View
                 </Button>
