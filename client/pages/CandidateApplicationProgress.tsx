@@ -398,6 +398,11 @@ export default function CandidateApplicationProgress() {
               </Link>
             </div>
             <div>
+              <div className="flex items-center gap-2 text-sm text-slate-500 mb-1">
+                <span>Follow-up Dashboard</span>
+                <span>•</span>
+                <span>Applicant Progress</span>
+              </div>
               <h1 className="text-xl sm:text-2xl font-bold text-slate-900">
                 Application Progress
               </h1>
