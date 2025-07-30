@@ -3,17 +3,23 @@ import "./global.css";
 
 // Suppress Recharts defaultProps warnings
 const originalWarn = console.warn;
-console.warn = (...args: any[]) => {
-  const message = args.join(" ");
+console.warn = (format: any, ...args: any[]) => {
+  // Handle React's format string warnings
+  if (typeof format === 'string') {
+    const fullMessage = format + ' ' + args.join(' ');
 
-  // Only suppress specific Recharts defaultProps warnings
-  const isRechartsDefaultPropsWarning =
-    message.includes("Support for defaultProps will be removed") &&
-    (message.includes("XAxis") || message.includes("YAxis"));
+    // Check for Recharts defaultProps warnings
+    const isRechartsDefaultPropsWarning =
+      fullMessage.includes('Support for defaultProps will be removed') &&
+      (fullMessage.includes('XAxis') || fullMessage.includes('YAxis'));
 
-  if (!isRechartsDefaultPropsWarning) {
-    originalWarn.apply(console, args);
+    if (isRechartsDefaultPropsWarning) {
+      return; // Suppress this warning
+    }
   }
+
+  // Pass through all other warnings
+  originalWarn.call(console, format, ...args);
 };
 
 import { Toaster } from "@/components/ui/toaster";
