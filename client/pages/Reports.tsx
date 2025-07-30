@@ -62,7 +62,11 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
-import { HARDCODED_JOBS, HARDCODED_CANDIDATES, HARDCODED_INTERVIEWS } from "@/data/hardcoded-data";
+import {
+  HARDCODED_JOBS,
+  HARDCODED_CANDIDATES,
+  HARDCODED_INTERVIEWS,
+} from "@/data/hardcoded-data";
 import { useLanguage } from "@/hooks/use-language";
 import { useToast } from "@/hooks/use-toast";
 import { RechartsWarningSuppress } from "@/components/RechartsWarningSuppress";
@@ -98,23 +102,23 @@ export default function Reports() {
 
   // Calculate pipeline data from actual candidates
   const totalCandidates = HARDCODED_CANDIDATES.length;
-  const appliedCount = HARDCODED_CANDIDATES.filter(
-    (c) => c.jobApplications.some(app => app.currentStage === "Applied"),
+  const appliedCount = HARDCODED_CANDIDATES.filter((c) =>
+    c.jobApplications.some((app) => app.currentStage === "Applied"),
   ).length;
-  const screeningCount = HARDCODED_CANDIDATES.filter(
-    (c) => c.jobApplications.some(app => app.currentStage === "Screening"),
+  const screeningCount = HARDCODED_CANDIDATES.filter((c) =>
+    c.jobApplications.some((app) => app.currentStage === "Screening"),
   ).length;
-  const interviewCount = HARDCODED_CANDIDATES.filter(
-    (c) => c.jobApplications.some(app => app.currentStage === "Interview"),
+  const interviewCount = HARDCODED_CANDIDATES.filter((c) =>
+    c.jobApplications.some((app) => app.currentStage === "Interview"),
   ).length;
-  const technicalCount = HARDCODED_CANDIDATES.filter(
-    (c) => c.jobApplications.some(app => app.currentStage === "Technical"),
+  const technicalCount = HARDCODED_CANDIDATES.filter((c) =>
+    c.jobApplications.some((app) => app.currentStage === "Technical"),
   ).length;
-  const offerCount = HARDCODED_CANDIDATES.filter(
-    (c) => c.jobApplications.some(app => app.currentStage === "Offer"),
+  const offerCount = HARDCODED_CANDIDATES.filter((c) =>
+    c.jobApplications.some((app) => app.currentStage === "Offer"),
   ).length;
-  const hiredCount = HARDCODED_CANDIDATES.filter(
-    (c) => c.jobApplications.some(app => app.currentStage === "Hired"),
+  const hiredCount = HARDCODED_CANDIDATES.filter((c) =>
+    c.jobApplications.some((app) => app.currentStage === "Hired"),
   ).length;
 
   const pipeline = [
@@ -1022,14 +1026,10 @@ export default function Reports() {
                       ) /
                         Math.max(
                           HARDCODED_JOBS.reduce(
-                            (count, job) =>
-                              count +
-                              (job.hires
-                                ? job.hires
-                                : 0),
-                            0
+                            (count, job) => count + (job.hires ? job.hires : 0),
+                            0,
                           ),
-                          1
+                          1,
                         ),
                     ).toLocaleString()}
                   </span>
@@ -1040,12 +1040,15 @@ export default function Reports() {
                   </span>
                   <span className="font-semibold text-green-600 text-responsive-base text-wrap-safe">
                     {Math.round(
-                      (HARDCODED_CANDIDATES.filter(c =>
-                        c.jobApplications.some(app => app.currentStage === "Hired")
+                      (HARDCODED_CANDIDATES.filter((c) =>
+                        c.jobApplications.some(
+                          (app) => app.currentStage === "Hired",
+                        ),
                       ).length /
-                        Math.max(HARDCODED_CANDIDATES.length, 1)
-                      ) * 100
-                    )}%
+                        Math.max(HARDCODED_CANDIDATES.length, 1)) *
+                        100,
+                    )}
+                    %
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
