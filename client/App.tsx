@@ -98,6 +98,14 @@ const App = () => (
                 path="/candidates-enhanced/:id"
                 element={<CandidateDetailEnhanced />}
               />
+              <Route
+                path="/candidates-profile/:id"
+                element={<CandidateProfileEnhanced />}
+              />
+              <Route
+                path="/candidates/:candidateId/jobs/:jobId/progress"
+                element={<CandidateApplicationProgress />}
+              />
               <Route path="/cv-evaluation" element={<CVEvaluation />} />
               <Route path="/follow-up" element={<FollowUpDashboard />} />
               <Route path="/calendar" element={<Calendar />} />
