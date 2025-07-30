@@ -60,6 +60,12 @@ import {
 import { JobApplication } from "@/types/enhanced-candidate";
 import { CandidateData } from "@/data/hardcoded-data";
 import { EmailTrigger } from "@/components/EmailTrigger";
+import { EnhancedCandidateData } from "@/types/enhanced-candidate";
+
+interface CandidateApplicationProgressProps {
+  candidate?: EnhancedCandidateData;
+  jobId?: string;
+}
 
 type StageData = {
   name: string;
@@ -73,12 +79,12 @@ type StageData = {
   mailConfirmed?: boolean;
 };
 
-export default function CandidateApplicationProgress() {
-  const { candidateId, jobId } = useParams();
-  const [candidate] = useState(ENHANCED_CANDIDATE_SAMPLE);
-  const [jobApplication, setJobApplication] = useState<JobApplication | null>(
-    null,
-  );
+export default function CandidateApplicationProgress(props: CandidateApplicationProgressProps) {
+  const params = useParams();
+  const candidate = props.candidate ?? ENHANCED_CANDIDATE_SAMPLE;
+  const jobId = props.jobId ?? params.jobId;
+
+  const [jobApplication, setJobApplication] = useState<JobApplication | null>(null);
   const [selectedEmail, setSelectedEmail] = useState<any>(null);
   const [showEmailTrigger, setShowEmailTrigger] = useState(false);
   const [newNote, setNewNote] = useState("");
@@ -105,7 +111,7 @@ export default function CandidateApplicationProgress() {
             <Link to="/follow-up">
               <Button>Back to Follow-up Dashboard</Button>
             </Link>
-            <Link to={`/candidates/${candidateId}`}>
+            <Link to={`/candidates/${candidate.id}`}>
               <Button variant="outline">View Candidate Profile</Button>
             </Link>
           </div>
@@ -395,7 +401,7 @@ export default function CandidateApplicationProgress() {
                   Back to Follow-up Dashboard
                 </Button>
               </Link>
-              <Link to={`/candidates/${candidateId}`}>
+              <Link to={`/candidates/${candidate.id}`}>
                 <Button
                   variant="outline"
                   size="sm"

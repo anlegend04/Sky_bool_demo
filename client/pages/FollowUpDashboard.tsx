@@ -71,8 +71,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 import {
   HARDCODED_CANDIDATES,
-  type CandidateData,
 } from "@/data/hardcoded-data";
+import type { EnhancedCandidateData } from "@/types/enhanced-candidate";
 import {
   Table,
   TableBody,
@@ -81,9 +81,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import CandidateApplicationProgress from "./CandidateApplicationProgress";
 
 // Các type definitions giữ nguyên như trước
-interface FollowUpCandidate extends CandidateData {
+interface FollowUpCandidate extends EnhancedCandidateData {
   lastInteraction: string;
   nextFollowUp: string;
   daysInStage: number;
@@ -231,6 +232,8 @@ export default function FollowUpDashboard() {
               : undefined,
         },
       ],
+      jobApplications: (candidate as any).jobApplications ?? [],
+      globalNotes: (candidate as any).globalNotes ?? [],
     })),
   );
 
@@ -250,6 +253,7 @@ export default function FollowUpDashboard() {
   const [showNoteDialog, setShowNoteDialog] = useState(false);
   const [emailTemplate, setEmailTemplate] = useState("");
   const [bulkAction, setBulkAction] = useState("");
+  const [viewProcessCandidate, setViewProcessCandidate] = useState<FollowUpCandidate | null>(null);
 
   // Handle send email
   const handleSendEmail = (candidate: FollowUpCandidate) => {
@@ -851,6 +855,12 @@ export default function FollowUpDashboard() {
                             <Download className="w-4 h-4 mr-2" />
                             Download CV
                           </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => setViewProcessCandidate(candidate)}
+                          >
+                            <Eye className="w-4 h-4 mr-2" />
+                            View Process of Stage
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -1399,6 +1409,24 @@ export default function FollowUpDashboard() {
                 </TabsContent>
               </Tabs>
             </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* View Process of Stage Dialog */}
+      <Dialog open={!!viewProcessCandidate} onOpenChange={open => !open && setViewProcessCandidate(null)}>
+        <DialogContent className="max-w-4xl w-full">
+          <DialogHeader>
+            <DialogTitle>Applicant Progress</DialogTitle>
+            <DialogDescription>
+              Quá trình tuyển dụng của ứng viên <b>{viewProcessCandidate?.name}</b>
+            </DialogDescription>
+          </DialogHeader>
+          {viewProcessCandidate && (
+            <CandidateApplicationProgress
+              candidate={viewProcessCandidate}
+              jobId={viewProcessCandidate.jobId}
+            />
           )}
         </DialogContent>
       </Dialog>
