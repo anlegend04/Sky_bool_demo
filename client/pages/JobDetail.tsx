@@ -381,76 +381,133 @@ export default function JobDetail() {
     </div>
   );
 
-  const PipelineGridView = () => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 overflow-x-auto">
-      {stages.map((stage) => {
-        const stageCandidates = candidates.filter((c) => c.stage === stage);
-        const isDropTarget = dragOverStage === stage;
-        const maxVisible = 5;
-        const showingMore = showMoreCandidates[stage] || false;
-        const visibleCandidates = showingMore
-          ? stageCandidates
-          : stageCandidates.slice(0, maxVisible);
-        const hasMore = stageCandidates.length > maxVisible;
+  // const PipelineGridView = () => (
+  //   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 overflow-x-auto">
+  //     {stages.map((stage) => {
+  //       const stageCandidates = candidates.filter((c) => c.stage === stage);
+  //       const isDropTarget = dragOverStage === stage;
+  //       const maxVisible = 5;
+  //       const showingMore = showMoreCandidates[stage] || false;
+  //       const visibleCandidates = showingMore
+  //         ? stageCandidates
+  //         : stageCandidates.slice(0, maxVisible);
+  //       const hasMore = stageCandidates.length > maxVisible;
 
-        return (
-          <div
-            key={stage}
-            className={`rounded-lg border p-4 transition-all ${getStageColor(stage)} min-w-[200px] ${
-              isDropTarget
-                ? "ring-2 ring-blue-500 ring-opacity-50 bg-blue-50"
-                : ""
-            }`}
-            onDragOver={(e) => handleDragOver(e, stage)}
-            onDragLeave={handleDragLeave}
-            onDrop={(e) => handleDrop(e, stage)}
-          >
-            <div className="flex items-center justify-between mb-4 min-w-0">
-              <h3 className="font-semibold text-sm text-slate-900 truncate flex-1">
-                {stage}
-              </h3>
-              <Badge variant="outline" className="text-xs flex-shrink-0 ml-2">
-                {stageCandidates.length}
-              </Badge>
-            </div>
-            <div className="space-y-2 min-h-[200px] relative">
-              {visibleCandidates.map((candidate) => (
-                <CompactCandidateCard
-                  key={candidate.id}
-                  candidate={candidate}
-                />
-              ))}
-              {stageCandidates.length === 0 && (
-                <div className="text-center text-slate-400 text-xs py-8">
-                  {isDropTarget ? "Drop candidate here" : "No candidates"}
+  //       return (
+  //         <div
+  //           key={stage}
+  //           className={`rounded-lg border p-4 transition-all ${getStageColor(stage)} min-w-[200px] ${
+  //             isDropTarget
+  //               ? "ring-2 ring-blue-500 ring-opacity-50 bg-blue-50"
+  //               : ""
+  //           }`}
+  //           onDragOver={(e) => handleDragOver(e, stage)}
+  //           onDragLeave={handleDragLeave}
+  //           onDrop={(e) => handleDrop(e, stage)}
+  //         >
+  //           <div className="flex items-center justify-between mb-4 min-w-0">
+  //             <h3 className="font-semibold text-sm text-slate-900 truncate flex-1">
+  //               {stage}
+  //             </h3>
+  //             <Badge variant="outline" className="text-xs flex-shrink-0 ml-2">
+  //               {stageCandidates.length}
+  //             </Badge>
+  //           </div>
+  //           <div className="space-y-2 min-h-[200px] relative">
+  //             {visibleCandidates.map((candidate) => (
+  //               <CompactCandidateCard
+  //                 key={candidate.id}
+  //                 candidate={candidate}
+  //               />
+  //             ))}
+  //             {stageCandidates.length === 0 && (
+  //               <div className="text-center text-slate-400 text-xs py-8">
+  //                 {isDropTarget ? "Drop candidate here" : "No candidates"}
+  //               </div>
+  //             )}
+  //             {hasMore && (
+  //               <Button
+  //                 variant="ghost"
+  //                 size="sm"
+  //                 className="w-full text-xs"
+  //                 onClick={() =>
+  //                   setShowMoreCandidates((prev) => ({
+  //                     ...prev,
+  //                     [stage]: !showingMore,
+  //                   }))
+  //                 }
+  //               >
+  //                 {showingMore
+  //                   ? `Show Less`
+  //                   : `Show ${stageCandidates.length - maxVisible} More`}
+  //               </Button>
+  //             )}
+  //             {isDropTarget && (
+  //               <div className="absolute inset-0 border-2 border-dashed border-blue-400 rounded-lg pointer-events-none opacity-50" />
+  //             )}
+  //           </div>
+  //         </div>
+  //       );
+  //     })}
+  //   </div>
+  // );
+
+  const PipelineGridView = ({
+    stages,
+    candidates,
+    dragOverStage,
+    handleDragOver,
+    handleDragLeave,
+    handleDrop,
+  }) => {
+    const [expandedStage, setExpandedStage] = useState(null);
+
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2 overflow-x-auto p-2">
+        {stages.map((stage) => {
+          const stageCandidates = candidates.filter((c) => c.stage === stage);
+          const isDropTarget = dragOverStage === stage;
+          const isExpanded = expandedStage === stage;
+
+          return (
+            <div
+              key={stage}
+              className={`rounded border p-2 ${isDropTarget ? "ring-2 ring-blue-300 bg-blue-50" : "bg-white"} min-w-[150px]`}
+              onDragOver={(e) => handleDragOver(e, stage)}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, stage)}
+              onClick={() => setExpandedStage(isExpanded ? null : stage)}
+            >
+              <div className="flex items-center justify-between">
+                <h3 className="font-medium text-xs text-gray-800 truncate">
+                  {stage}
+                </h3>
+                <Badge variant="outline" className="text-xs">
+                  {stageCandidates.length}
+                </Badge>
+              </div>
+              {isExpanded && (
+                <div className="mt-2 space-y-1">
+                  {stageCandidates.length > 0 ? (
+                    stageCandidates.map((candidate) => (
+                      <CompactCandidateCard
+                        key={candidate.id}
+                        candidate={candidate}
+                      />
+                    ))
+                  ) : (
+                    <div className="text-xs text-gray-400 text-center py-2">
+                      No candidates
+                    </div>
+                  )}
                 </div>
               )}
-              {hasMore && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full text-xs"
-                  onClick={() =>
-                    setShowMoreCandidates((prev) => ({
-                      ...prev,
-                      [stage]: !showingMore,
-                    }))
-                  }
-                >
-                  {showingMore
-                    ? `Show Less`
-                    : `Show ${stageCandidates.length - maxVisible} More`}
-                </Button>
-              )}
-              {isDropTarget && (
-                <div className="absolute inset-0 border-2 border-dashed border-blue-400 rounded-lg pointer-events-none opacity-50" />
-              )}
             </div>
-          </div>
-        );
-      })}
-    </div>
-  );
+          );
+        })}
+      </div>
+    );
+  };
 
   const PipelineListView = () => (
     <Card>
@@ -948,7 +1005,18 @@ export default function JobDetail() {
             </div>
           </CardHeader>
           <CardContent>
-            {viewMode === "grid" ? <PipelineGridView /> : <PipelineListView />}
+            {viewMode === "grid" ? (
+              <PipelineGridView
+                stages={stages}
+                candidates={candidates}
+                dragOverStage={dragOverStage}
+                handleDragOver={handleDragOver}
+                handleDragLeave={handleDragLeave}
+                handleDrop={handleDrop}
+              />
+            ) : (
+              <PipelineListView />
+            )}
           </CardContent>
         </Card>
 
