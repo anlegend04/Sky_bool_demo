@@ -235,12 +235,10 @@ export default function FollowUpDashboard() {
   );
 
   const [selectedCandidates, setSelectedCandidates] = useState<string[]>([]);
-  const [viewMode, setViewMode] = useState<"pipeline" | "list" | "timeline">(
-    "pipeline",
-  );
+  const [viewMode, setViewMode] = useState<"pipeline" | "list">("list");
   const [filterStage, setFilterStage] = useState("all");
   const [filterJob, setFilterJob] = useState("all");
-  
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [candidatesPerPage] = useState(10);
@@ -333,7 +331,10 @@ export default function FollowUpDashboard() {
   const totalPages = Math.ceil(filteredCandidates.length / candidatesPerPage);
   const indexOfLastCandidate = currentPage * candidatesPerPage;
   const indexOfFirstCandidate = indexOfLastCandidate - candidatesPerPage;
-  const currentCandidates = filteredCandidates.slice(indexOfFirstCandidate, indexOfLastCandidate);
+  const currentCandidates = filteredCandidates.slice(
+    indexOfFirstCandidate,
+    indexOfLastCandidate,
+  );
 
   // Reset to first page when filters change
   useEffect(() => {
@@ -540,12 +541,14 @@ export default function FollowUpDashboard() {
       "Hired",
     ];
 
-    const [candidatesPerStage, setCandidatesPerStage] = useState<Record<string, number>>({});
+    const [candidatesPerStage, setCandidatesPerStage] = useState<
+      Record<string, number>
+    >({});
 
     const showMoreCandidates = (stage: string) => {
-      setCandidatesPerStage(prev => ({
+      setCandidatesPerStage((prev) => ({
         ...prev,
-        [stage]: (prev[stage] || 5) + 5
+        [stage]: (prev[stage] || 5) + 5,
       }));
     };
 
@@ -585,8 +588,12 @@ export default function FollowUpDashboard() {
               style={{ maxWidth: 340 }}
             >
               <div className="flex items-center justify-between mb-4 p-4 pb-2 border-b border-slate-100">
-                <h3 className="font-semibold text-base text-slate-900 break-words flex-1">{stage}</h3>
-                <Badge variant="outline" className="text-xs flex-shrink-0 ml-2">{stageCandidates.length}</Badge>
+                <h3 className="font-semibold text-base text-slate-900 break-words flex-1">
+                  {stage}
+                </h3>
+                <Badge variant="outline" className="text-xs flex-shrink-0 ml-2">
+                  {stageCandidates.length}
+                </Badge>
               </div>
               <div className="space-y-3 px-4 pb-4 pt-2 min-h-[180px] relative flex-1">
                 {stageCandidates.length === 0 ? (
@@ -1043,13 +1050,6 @@ export default function FollowUpDashboard() {
                 >
                   List
                 </Button>
-                <Button
-                  variant={viewMode === "timeline" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("timeline")}
-                >
-                  Timeline
-                </Button>
               </div>
               {viewMode === "list" && (
                 <DropdownMenu>
@@ -1127,63 +1127,20 @@ export default function FollowUpDashboard() {
       {/* Main Content */}
       {viewMode === "pipeline" && <PipelineView />}
       {viewMode === "list" && <PipelineListView />}
-      {viewMode === "timeline" && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Activity Timeline</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {currentCandidates.map((candidate) => (
-                <div
-                  key={candidate.id}
-                  className="flex items-center space-x-4 p-3 border rounded-lg"
-                >
-                  <Avatar className="w-8 h-8">
-                    <AvatarFallback>
-                      {candidate.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2">
-                      <span className="font-medium text-sm">
-                        {candidate.name}
-                      </span>
-                      <Badge variant="outline" className="text-xs">
-                        {candidate.stage}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-gray-600">
-                      Last contact {formatTimeAgo(candidate.lastInteraction)} •
-                      Next follow-up {formatTimeAgo(candidate.nextFollowUp)}
-                    </p>
-                  </div>
-                  <Button size="sm" variant="outline">
-                    <Mail className="w-4 h-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center">
           <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               disabled={currentPage === 1}
               onClick={() => setCurrentPage(currentPage - 1)}
             >
               Previous
             </Button>
-            
+
             {/* Page numbers */}
             {Array.from({ length: totalPages }, (_, index) => {
               const pageNumber = index + 1;
@@ -1207,14 +1164,18 @@ export default function FollowUpDashboard() {
                 pageNumber === currentPage - 2 ||
                 pageNumber === currentPage + 2
               ) {
-                return <span key={pageNumber} className="px-2 py-1">...</span>;
+                return (
+                  <span key={pageNumber} className="px-2 py-1">
+                    ...
+                  </span>
+                );
               }
               return null;
             })}
-            
-            <Button 
-              variant="outline" 
-              size="sm" 
+
+            <Button
+              variant="outline"
+              size="sm"
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage(currentPage + 1)}
             >
@@ -1312,9 +1273,8 @@ export default function FollowUpDashboard() {
                 </DialogTitle>
               </DialogHeader>
               <Tabs defaultValue="overview" className="w-full">
-                <TabsList className="grid w-full grid-cols-4">
+                <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="overview">Overview</TabsTrigger>
-                  <TabsTrigger value="timeline">Timeline</TabsTrigger>
                   <TabsTrigger value="emails">Emails</TabsTrigger>
                   <TabsTrigger value="actions">Actions</TabsTrigger>
                 </TabsList>
@@ -1382,49 +1342,7 @@ export default function FollowUpDashboard() {
                     </Card>
                   </div>
                 </TabsContent>
-                <TabsContent value="timeline" className="space-y-4">
-                  <div className="space-y-3">
-                    {selectedCandidate.interactions.map((interaction) => (
-                      <div
-                        key={interaction.id}
-                        className="flex space-x-3 p-3 border rounded-lg"
-                      >
-                        <div className="flex-shrink-0">
-                          {interaction.type === "call" && (
-                            <Phone className="w-5 h-5 text-green-500" />
-                          )}
-                          {interaction.type === "email" && (
-                            <Mail className="w-5 h-5 text-blue-500" />
-                          )}
-                          {interaction.type === "meeting" && (
-                            <Calendar className="w-5 h-5 text-purple-500" />
-                          )}
-                          {interaction.type === "note" && (
-                            <FileText className="w-5 h-5 text-gray-500" />
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium capitalize">
-                              {interaction.type}
-                            </span>
-                            <span className="text-sm text-gray-500">
-                              {formatTimeAgo(interaction.date)}
-                            </span>
-                          </div>
-                          <p className="text-sm text-gray-700 mt-1">
-                            {interaction.summary}
-                          </p>
-                          {interaction.nextAction && (
-                            <p className="text-sm text-blue-600 mt-1">
-                              Next: {interaction.nextAction}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </TabsContent>
+
                 <TabsContent value="emails" className="space-y-4">
                   <div className="space-y-3">
                     {selectedCandidate.emailHistory.map((email) => (
