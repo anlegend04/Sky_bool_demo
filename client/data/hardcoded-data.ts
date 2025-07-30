@@ -1350,12 +1350,13 @@ export const getUser = (id: string): UserData | undefined => {
 };
 
 export const getUnreadNotificationCount = (): number => {
-  return 5;
+  return HARDCODED_NOTIFICATIONS.filter((notification) => !notification.read).length;
 };
 
 export const getUserNotifications = (userId: string): NotificationData[] => {
-  // This would be implemented with actual notification data
-  return [];
+  return HARDCODED_NOTIFICATIONS.filter(
+    (notification) => notification.recipientId === userId,
+  );
 };
 
 export const getUpcomingSchedule = (days: number = 7): ScheduleData[] => {
