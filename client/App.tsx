@@ -63,6 +63,7 @@ import JobDetail from "./pages/JobDetail";
 import JobCreate from "./pages/JobCreate";
 import Candidates from "./pages/Candidates";
 import CandidateDetail from "./pages/CandidateDetail";
+import CandidateDetailEnhanced from "./pages/CandidateDetailEnhanced";
 import CVEvaluation from "./pages/CVEvaluation";
 import FollowUpDashboard from "./pages/FollowUpDashboard";
 import Calendar from "./pages/Calendar";
@@ -91,6 +92,10 @@ const App = () => (
               <Route path="/jobs/:id" element={<JobDetail />} />
               <Route path="/candidates" element={<Candidates />} />
               <Route path="/candidates/:id" element={<CandidateDetail />} />
+              <Route
+                path="/candidates-enhanced/:id"
+                element={<CandidateDetailEnhanced />}
+              />
               <Route path="/cv-evaluation" element={<CVEvaluation />} />
               <Route path="/follow-up" element={<FollowUpDashboard />} />
               <Route path="/calendar" element={<Calendar />} />
