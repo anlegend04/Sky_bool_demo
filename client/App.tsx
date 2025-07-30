@@ -64,6 +64,8 @@ import JobCreate from "./pages/JobCreate";
 import Candidates from "./pages/Candidates";
 import CandidateDetail from "./pages/CandidateDetail";
 import CandidateDetailEnhanced from "./pages/CandidateDetailEnhanced";
+import CandidateProfileEnhanced from "./pages/CandidateProfileEnhanced";
+import CandidateApplicationProgress from "./pages/CandidateApplicationProgress";
 import CVEvaluation from "./pages/CVEvaluation";
 import FollowUpDashboard from "./pages/FollowUpDashboard";
 import Calendar from "./pages/Calendar";
