@@ -305,9 +305,16 @@ export default function CandidateApplicationProgress(props: CandidateApplication
     const stageTemplates = getTemplatesForStage(currentStage);
     
     stageTemplates.forEach(template => {
-      const existingEmail = jobApplication.emails.find(email => 
-        email.template === template.name || email.subject.includes(template.name)
-      );
+      // Tìm email đã gửi cho template này - cải thiện logic matching
+      const existingEmail = jobApplication.emails.find(email => {
+        // So sánh theo template name hoặc subject chứa template name hoặc stage name
+        const templateNameMatch = email.template === template.name;
+        const subjectMatch = email.subject.toLowerCase().includes(template.name.toLowerCase());
+        const stageMatch = email.subject.toLowerCase().includes(template.stage?.toLowerCase() || '');
+        const genericStageMatch = email.subject.toLowerCase().includes(currentStage);
+        
+        return templateNameMatch || subjectMatch || stageMatch || genericStageMatch;
+      });
       
       const status: EmailStatusData = {
         template,
@@ -317,8 +324,8 @@ export default function CandidateApplicationProgress(props: CandidateApplication
         confirmedDate: existingEmail?.repliedAt,
         overdue: false,
         autoRejected: false,
-        deadline: template.confirmationDeadline 
-          ? new Date(Date.now() + template.confirmationDeadline * 24 * 60 * 60 * 1000).toISOString()
+        deadline: template.confirmationDeadline && existingEmail?.timestamp
+          ? new Date(new Date(existingEmail.timestamp).getTime() + template.confirmationDeadline * 24 * 60 * 60 * 1000).toISOString()
           : undefined
       };
       
@@ -336,10 +343,10 @@ export default function CandidateApplicationProgress(props: CandidateApplication
     return statuses;
   };
 
-  // Convert stage history to StageData format
+  // Convert stage history to StageData format with improved logic
   const stages: StageData[] = [
     "Applied",
-    "Screening",
+    "Screening", 
     "Interview",
     "Technical",
     "Offer",
@@ -348,9 +355,29 @@ export default function CandidateApplicationProgress(props: CandidateApplication
     const stageData = jobApplication.stageHistory.find(
       (s) => s.stage === stageName,
     );
+    
+    // Tính toán trạng thái completion dựa trên stage history và current stage
+    const currentStageIndex = stages.findIndex(s => s.name === jobApplication.currentStage);
+    const thisStageIndex = stages.findIndex(s => s.name === stageName);
+    const isCompleted = stageData && stageData.endDate;
+    const isCurrentStage = stageName === jobApplication.currentStage;
+    const isPastStage = thisStageIndex < currentStageIndex;
+    
+    // Xác định trạng thái completion
+    let completionStatus: 'completed' | 'current' | 'pending' | 'not_started';
+    if (isCompleted) {
+      completionStatus = 'completed';
+    } else if (isCurrentStage) {
+      completionStatus = 'current';
+    } else if (isPastStage) {
+      completionStatus = 'completed'; // Nếu đã qua stage này nhưng không có endDate, coi như completed
+    } else {
+      completionStatus = 'not_started';
+    }
+    
     return {
       name: stageName,
-      completed: !!stageData,
+      completed: completionStatus === 'completed',
       duration: stageData?.duration || 0,
       startDate: stageData?.startDate || "",
       endDate: stageData?.endDate,
@@ -454,7 +481,7 @@ export default function CandidateApplicationProgress(props: CandidateApplication
                 {jobApplication.priority} Priority
               </Badge>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 text-sm text-slate-600">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-2 sm:gap-3 text-sm text-slate-600">
               <div className="flex items-center gap-1 min-w-0">
                 <Calendar className="w-4 h-4 flex-shrink-0" />
                 <span className="break-words">
@@ -468,18 +495,18 @@ export default function CandidateApplicationProgress(props: CandidateApplication
                   Recruiter: {jobApplication.recruiter}
                 </span>
               </div>
-              {jobApplication.salary && (
+              {/* {jobApplication.salary && (
                 <div className="flex items-center gap-1 min-w-0">
                   <DollarSign className="w-4 h-4 flex-shrink-0" />
                   <span className="break-words">{jobApplication.salary}</span>
                 </div>
-              )}
-              {jobApplication.location && (
+              )} */}
+              {/* {jobApplication.location && (
                 <div className="flex items-center gap-1 min-w-0">
                   <MapPin className="w-4 h-4 flex-shrink-0" />
                   <span className="break-words">{jobApplication.location}</span>
                 </div>
-              )}
+              )} */}
             </div>
           </div>
         </div>
@@ -524,10 +551,16 @@ export default function CandidateApplicationProgress(props: CandidateApplication
           {stages.map((stage, index) => {
             // Lấy tất cả template cho stage này
             const stageTemplates = getTemplatesForStage(stage.name.toLowerCase());
-            // Lấy tất cả email đã gửi cho stage này
+            // Lấy tất cả email đã gửi cho stage này - cải thiện logic matching
             const emailsForStage = jobApplication.emails.filter(email => {
-              // So sánh theo template name hoặc subject chứa template name
-              return stageTemplates.some(tpl => email.template === tpl.name || email.subject.includes(tpl.name));
+              return stageTemplates.some(tpl => {
+                const templateNameMatch = email.template === tpl.name;
+                const subjectMatch = email.subject.toLowerCase().includes(tpl.name.toLowerCase());
+                const stageMatch = email.subject.toLowerCase().includes(tpl.stage?.toLowerCase() || '');
+                const genericStageMatch = email.subject.toLowerCase().includes(stage.name.toLowerCase());
+                
+                return templateNameMatch || subjectMatch || stageMatch || genericStageMatch;
+              });
             });
             return (
               <div key={stage.name} className="text-center relative group">
@@ -536,7 +569,14 @@ export default function CandidateApplicationProgress(props: CandidateApplication
                   {stageTemplates.length > 0 ? (
                     stageTemplates.map((template, templateIdx) => {
                       // Tìm email đã gửi gần nhất cho template này
-                      const sentEmails = emailsForStage.filter(email => email.template === template.name || email.subject.includes(template.name));
+                      const sentEmails = emailsForStage.filter(email => {
+                        const templateNameMatch = email.template === template.name;
+                        const subjectMatch = email.subject.toLowerCase().includes(template.name.toLowerCase());
+                        const stageMatch = email.subject.toLowerCase().includes(template.stage?.toLowerCase() || '');
+                        const genericStageMatch = email.subject.toLowerCase().includes(stage.name.toLowerCase());
+                        
+                        return templateNameMatch || subjectMatch || stageMatch || genericStageMatch;
+                      });
                       const latestEmail = sentEmails.length > 0 ? sentEmails.reduce((a, b) => new Date(a.timestamp) > new Date(b.timestamp) ? a : b) : undefined;
                       // Xác định trạng thái
                       const sent = !!latestEmail;
@@ -605,29 +645,46 @@ export default function CandidateApplicationProgress(props: CandidateApplication
                     let foundAutoRejected = false;
                     let foundOverdue = false;
                     let allConfirmed = true;
+                    let hasSentEmails = false;
+                    
                     stageTemplates.forEach((template) => {
-                      const sentEmails = emailsForStage.filter(email => email.template === template.name || email.subject.includes(template.name));
+                      const sentEmails = emailsForStage.filter(email => {
+                        const templateNameMatch = email.template === template.name;
+                        const subjectMatch = email.subject.toLowerCase().includes(template.name.toLowerCase());
+                        const stageMatch = email.subject.toLowerCase().includes(template.stage?.toLowerCase() || '');
+                        const genericStageMatch = email.subject.toLowerCase().includes(stage.name.toLowerCase());
+                        
+                        return templateNameMatch || subjectMatch || stageMatch || genericStageMatch;
+                      });
+                      
                       const latestEmail = sentEmails.length > 0 ? sentEmails.reduce((a, b) => new Date(a.timestamp) > new Date(b.timestamp) ? a : b) : undefined;
                       const sent = !!latestEmail;
                       const confirmed = latestEmail?.repliedAt ? true : false;
                       const sentDate = latestEmail?.timestamp;
+                      
+                      if (sent) hasSentEmails = true;
+                      
                       let deadline: string | undefined = undefined;
                       if (template.confirmationDeadline && sentDate) {
                         const sentTime = new Date(sentDate).getTime();
                         deadline = new Date(sentTime + template.confirmationDeadline * 24 * 60 * 60 * 1000).toISOString();
                       }
+                      
                       const overdue = template.requiresConfirmation && sent && !confirmed && deadline && (new Date() > new Date(deadline));
                       const autoRejected = template.autoRejectOnOverdue && overdue;
+                      
                       if (autoRejected) foundAutoRejected = true;
                       if (overdue) foundOverdue = true;
-                      if (!confirmed) allConfirmed = false;
+                      if (template.requiresConfirmation && sent && !confirmed) allConfirmed = false;
                     });
+                    
                     if (foundAutoRejected) circleStatus = 'autoRejected';
                     else if (foundOverdue) circleStatus = 'overdue';
-                    else if (allConfirmed && stage.completed) circleStatus = 'completed';
+                    else if (stage.completed) circleStatus = 'completed';
                     else if (index === currentStageIndex) circleStatus = 'current';
+                    else if (hasSentEmails) circleStatus = 'completed'; // Có email đã gửi nhưng chưa hoàn thành
                   } else {
-                    // Không có template, giữ logic cũ
+                    // Không có template, dựa vào stage completion
                     if (stage.completed) circleStatus = 'completed';
                     else if (index === currentStageIndex) circleStatus = 'current';
                   }
@@ -678,13 +735,20 @@ export default function CandidateApplicationProgress(props: CandidateApplication
                   {stageTemplates.length > 0 ? (
                     <div>
                       {stageTemplates.map((template) => {
-                        const sentEmails = emailsForStage.filter(email => email.template === template.name || email.subject.includes(template.name));
+                        const sentEmails = emailsForStage.filter(email => {
+                          const templateNameMatch = email.template === template.name;
+                          const subjectMatch = email.subject.toLowerCase().includes(template.name.toLowerCase());
+                          const stageMatch = email.subject.toLowerCase().includes(template.stage?.toLowerCase() || '');
+                          const genericStageMatch = email.subject.toLowerCase().includes(stage.name.toLowerCase());
+                          
+                          return templateNameMatch || subjectMatch || stageMatch || genericStageMatch;
+                        });
                         const latestEmail = sentEmails.length > 0 ? sentEmails.reduce((a, b) => new Date(a.timestamp) > new Date(b.timestamp) ? a : b) : undefined;
                         const sent = !!latestEmail;
                         const confirmed = latestEmail?.repliedAt ? true : false;
                         const sentDate = latestEmail?.timestamp;
                         const confirmedDate = latestEmail?.repliedAt;
-                        const deadline: string | undefined = template.confirmationDeadline && sentDate ? new Date(Date.now() + template.confirmationDeadline * 24 * 60 * 60 * 1000).toISOString() : undefined;
+                        const deadline: string | undefined = template.confirmationDeadline && sentDate ? new Date(new Date(sentDate).getTime() + template.confirmationDeadline * 24 * 60 * 60 * 1000).toISOString() : undefined;
                         const overdue = template.requiresConfirmation && sent && !confirmed && deadline && (new Date() > new Date(deadline));
                         const autoRejected = template.autoRejectOnOverdue && overdue;
                         return (
@@ -852,7 +916,7 @@ export default function CandidateApplicationProgress(props: CandidateApplication
             </div>
             <div>
               <div className="flex items-center gap-2 text-sm text-slate-500 mb-1">
-                <span>Follow-up Dashboard</span>
+                <span>Recuitment Process</span>
                 <span>•</span>
                 <span>Applicant Progress</span>
               </div>

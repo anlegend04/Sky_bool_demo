@@ -133,6 +133,19 @@ export function getAllEmailTemplates(): EmailTemplate[] {
       confirmationDeadline: 5,
       autoRejectOnOverdue: false,
     },
+    {
+      id: 7,
+      name: "application_received",
+      subject: "Application Received - {{job_title}}",
+      content:
+        "Dear {{candidate_name}},\n\nWe have received your application for the {{job_title}} position at {{company_name}}. Thank you for your interest in joining our team.\n\nOur team will review your application and get back to you within 3-5 business days.\n\nBest regards,\n{{company_name}} Team",
+      type: "auto-response",
+      stage: "applied",
+      variables: ["{{candidate_name}}", "{{job_title}}", "{{company_name}}"],
+      requiresConfirmation: false,
+      confirmationDeadline: 5,
+      autoRejectOnOverdue: false,
+    },
 
     // Interview Stage Templates - Interview invitation with confirmation required
     {
@@ -152,6 +165,32 @@ export function getAllEmailTemplates(): EmailTemplate[] {
         "{{interview_time}}",
         "{{confirmation_deadline}}",
       ],
+      requiresConfirmation: true,
+      confirmationDeadline: 3,
+      autoRejectOnOverdue: true,
+    },
+    {
+      id: 8,
+      name: "screening_invitation",
+      subject: "Screening Invitation - {{job_title}}",
+      content:
+        "Dear {{candidate_name}},\n\nCongratulations! Your application for the {{job_title}} position at {{company_name}} has been selected for the screening phase.\n\nWe would like to schedule a brief phone call to discuss your background and answer any questions you may have about the role.\n\nPlease reply to this email with your availability for the next week.\n\nBest regards,\n{{company_name}} Team",
+      type: "screening",
+      stage: "screening",
+      variables: ["{{candidate_name}}", "{{job_title}}", "{{company_name}}"],
+      requiresConfirmation: true,
+      confirmationDeadline: 3,
+      autoRejectOnOverdue: true,
+    },
+    {
+      id: 9,
+      name: "interview_scheduling",
+      subject: "Interview Scheduling - {{job_title}}",
+      content:
+        "Dear {{candidate_name}},\n\nWe are excited to invite you for an interview for the {{job_title}} position at {{company_name}}.\n\nPlease confirm your availability for the following time slots:\n- Option 1: {{interview_date}} at {{interview_time}}\n- Option 2: Alternative time (please specify)\n\nIMPORTANT: Please confirm your attendance by replying to this email within 3 days.\n\nBest regards,\n{{company_name}} Team",
+      type: "interview",
+      stage: "interview",
+      variables: ["{{candidate_name}}", "{{job_title}}", "{{company_name}}", "{{interview_date}}", "{{interview_time}}"],
       requiresConfirmation: true,
       confirmationDeadline: 3,
       autoRejectOnOverdue: true,
@@ -189,6 +228,19 @@ export function getAllEmailTemplates(): EmailTemplate[] {
       confirmationDeadline: 7,
       autoRejectOnOverdue: true,
     },
+    {
+      id: 10,
+      name: "technical_assessment",
+      subject: "Technical Assessment - {{job_title}}",
+      content:
+        "Dear {{candidate_name}},\n\nYou have been selected for the technical assessment phase for the {{job_title}} position at {{company_name}}.\n\nAssessment Details:\n- Type: Coding challenge\n- Duration: 2 hours\n- Deadline: {{test_deadline}}\n\nPlease complete the assessment by the deadline. You will receive login credentials shortly.\n\nBest regards,\n{{company_name}} Technical Team",
+      type: "technical",
+      stage: "technical",
+      variables: ["{{candidate_name}}", "{{job_title}}", "{{company_name}}", "{{test_deadline}}"],
+      requiresConfirmation: false,
+      confirmationDeadline: 7,
+      autoRejectOnOverdue: true,
+    },
 
     // Offer Stage Templates - Offer letter with acceptance confirmation
     {
@@ -207,6 +259,19 @@ export function getAllEmailTemplates(): EmailTemplate[] {
         "{{position_department}}",
         "{{offer_deadline}}",
       ],
+      requiresConfirmation: true,
+      confirmationDeadline: 5,
+      autoRejectOnOverdue: true,
+    },
+    {
+      id: 11,
+      name: "offer_letter",
+      subject: "Job Offer - {{job_title}}",
+      content:
+        "Dear {{candidate_name}},\n\nCongratulations! We are pleased to offer you the {{job_title}} position at {{company_name}}.\n\nOffer Details:\n- Salary: {{salary_range}}\n- Start Date: To be discussed\n\nPlease review the attached offer letter and confirm your acceptance by {{offer_deadline}}.\n\nBest regards,\n{{company_name}} HR Team",
+      type: "offer",
+      stage: "offer",
+      variables: ["{{candidate_name}}", "{{job_title}}", "{{company_name}}", "{{salary_range}}", "{{offer_deadline}}"],
       requiresConfirmation: true,
       confirmationDeadline: 5,
       autoRejectOnOverdue: true,
@@ -232,10 +297,23 @@ export function getAllEmailTemplates(): EmailTemplate[] {
       confirmationDeadline: 0,
       autoRejectOnOverdue: false,
     },
+    {
+      id: 12,
+      name: "welcome_onboard",
+      subject: "Welcome to {{company_name}} - Onboarding",
+      content:
+        "Dear {{candidate_name}},\n\nWelcome to {{company_name}}! We are excited to have you join our team as {{job_title}}.\n\nOnboarding Details:\n- First Day: To be confirmed\n- Location: {{company_name}} Headquarters\n- Dress Code: Business casual\n\nYou will receive additional onboarding materials shortly.\n\nBest regards,\n{{company_name}} HR Team",
+      type: "onboarding",
+      stage: "hired",
+      variables: ["{{candidate_name}}", "{{job_title}}", "{{company_name}}"],
+      requiresConfirmation: false,
+      confirmationDeadline: undefined,
+      autoRejectOnOverdue: false,
+    },
 
     // Legacy templates for backward compatibility
     {
-      id: 7,
+      id: 13,
       name: "Application Confirmation",
       subject: "Application Submitted Successfully - {{job_title}}",
       content:
@@ -254,7 +332,7 @@ export function getAllEmailTemplates(): EmailTemplate[] {
       autoRejectOnOverdue: false,
     },
     {
-      id: 8,
+      id: 14,
       name: "Screening Invitation",
       subject: "Next Steps - {{job_title}} at {{company_name}}",
       content:

@@ -137,6 +137,7 @@ export default function CVEvaluation() {
   const [showSavedEvaluations, setShowSavedEvaluations] = useState(false);
   const [selectedSavedEvaluation, setSelectedSavedEvaluation] =
     useState<CVEvaluationData | null>(null);
+  const [candidateNotes, setCandidateNotes] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load saved evaluations from candidates' cvEvaluations data
@@ -272,29 +273,14 @@ export default function CVEvaluation() {
       }
     }
 
-    // Generate mock evaluation
+    // Generate mock evaluation with candidate notes integration
     const mockEvaluation: CVEvaluation = {
-      summary:
-        "This candidate shows strong technical skills with relevant experience in software development. Their background aligns well with the job requirements, particularly in React and Node.js development.",
-      strengths: [
-        "5+ years of experience in software development",
-        "Strong proficiency in React and JavaScript/TypeScript",
-        "Experience with modern development tools and practices",
-        "Leadership and mentoring experience",
-        "Full-stack development capabilities",
-      ],
-      weaknesses: [
-        "Limited experience with Python (job requirement)",
-        "No specific AWS certification mentioned",
-        "Could benefit from more UI/UX design experience",
-      ],
-      jobFitScore: 85,
-      finalVerdict: "Good Fit",
-      suggestedImprovements: [
-        "Consider additional Python training for backend development",
-        "Pursue AWS certification to strengthen cloud skills",
-        "Gain more experience with design systems and UI/UX principles",
-      ],
+      summary: generateSummaryWithNotes(),
+      strengths: generateStrengthsWithNotes(),
+      weaknesses: generateWeaknessesWithNotes(),
+      jobFitScore: calculateJobFitScoreWithNotes(),
+      finalVerdict: determineFinalVerdictWithNotes(),
+      suggestedImprovements: generateImprovementsWithNotes(),
       skillsMatch: selectedJob.expectedSkills.map((skill) => ({
         skill,
         hasSkill: ["React", "JavaScript", "TypeScript", "Node.js"].includes(
@@ -306,13 +292,9 @@ export default function CVEvaluation() {
             ? "Intermediate"
             : "Beginner",
       })),
-      experienceMatch: 85,
+      experienceMatch: calculateExperienceMatchWithNotes(),
       educationMatch: 90,
-      recommendations: [
-        "Schedule technical interview to assess coding skills",
-        "Discuss Python learning plan during interview",
-        "Consider for senior-level position based on leadership experience",
-      ],
+      recommendations: generateRecommendationsWithNotes(),
       extractedData: {
         name: "John Doe",
         email: "john.doe@email.com",
@@ -344,6 +326,190 @@ export default function CVEvaluation() {
       title: "Analysis Complete!",
       description: "CV analysis has been completed successfully.",
     });
+  };
+
+  // Helper functions to integrate candidate notes into analysis
+  const generateSummaryWithNotes = (): string => {
+    let baseSummary = "This candidate shows strong technical skills with relevant experience in software development. Their background aligns well with the job requirements, particularly in React and Node.js development.";
+    
+    if (candidateNotes.trim()) {
+      baseSummary += ` Additional context from notes: ${candidateNotes}. This information has been considered in the overall evaluation.`;
+    }
+    
+    return baseSummary;
+  };
+
+  const generateStrengthsWithNotes = (): string[] => {
+    const baseStrengths = [
+      "5+ years of experience in software development",
+      "Strong proficiency in React and JavaScript/TypeScript",
+      "Experience with modern development tools and practices",
+      "Leadership and mentoring experience",
+      "Full-stack development capabilities",
+    ];
+
+    if (candidateNotes.trim()) {
+      // Extract potential strengths from notes
+      const notesLower = candidateNotes.toLowerCase();
+      if (notesLower.includes("leadership") || notesLower.includes("manage")) {
+        baseStrengths.push("Demonstrated leadership qualities mentioned in notes");
+      }
+      if (notesLower.includes("communication") || notesLower.includes("team")) {
+        baseStrengths.push("Strong communication and teamwork skills noted");
+      }
+      if (notesLower.includes("fast learner") || notesLower.includes("quick")) {
+        baseStrengths.push("Quick learning ability highlighted in notes");
+      }
+    }
+
+    return baseStrengths;
+  };
+
+  const generateWeaknessesWithNotes = (): string[] => {
+    const baseWeaknesses = [
+      "Limited experience with Python (job requirement)",
+      "No specific AWS certification mentioned",
+      "Could benefit from more UI/UX design experience",
+    ];
+
+    if (candidateNotes.trim()) {
+      // Extract potential concerns from notes
+      const notesLower = candidateNotes.toLowerCase();
+      if (notesLower.includes("gap") || notesLower.includes("unemployment")) {
+        baseWeaknesses.push("Employment gap mentioned in notes needs clarification");
+      }
+      if (notesLower.includes("communication") && notesLower.includes("weak")) {
+        baseWeaknesses.push("Communication concerns noted in candidate feedback");
+      }
+      if (notesLower.includes("culture") && notesLower.includes("fit")) {
+        baseWeaknesses.push("Cultural fit concerns raised in notes");
+      }
+    }
+
+    return baseWeaknesses;
+  };
+
+  const calculateJobFitScoreWithNotes = (): number => {
+    let baseScore = 85;
+
+    if (candidateNotes.trim()) {
+      const notesLower = candidateNotes.toLowerCase();
+      
+      // Positive factors that increase score
+      if (notesLower.includes("excellent") || notesLower.includes("outstanding")) {
+        baseScore += 5;
+      }
+      if (notesLower.includes("recommend") || notesLower.includes("referral")) {
+        baseScore += 3;
+      }
+      if (notesLower.includes("culture fit") && notesLower.includes("good")) {
+        baseScore += 2;
+      }
+
+      // Negative factors that decrease score
+      if (notesLower.includes("concern") || notesLower.includes("issue")) {
+        baseScore -= 5;
+      }
+      if (notesLower.includes("weak") || notesLower.includes("poor")) {
+        baseScore -= 3;
+      }
+      if (notesLower.includes("not suitable") || notesLower.includes("reject")) {
+        baseScore -= 10;
+      }
+    }
+
+    return Math.max(0, Math.min(100, baseScore));
+  };
+
+  const determineFinalVerdictWithNotes = (): "Good Fit" | "Needs Improvement" | "Not Suitable" => {
+    const score = calculateJobFitScoreWithNotes();
+    
+    if (candidateNotes.trim()) {
+      const notesLower = candidateNotes.toLowerCase();
+      
+      // Override based on explicit notes
+      if (notesLower.includes("not suitable") || notesLower.includes("reject")) {
+        return "Not Suitable";
+      }
+      if (notesLower.includes("excellent fit") || notesLower.includes("perfect")) {
+        return "Good Fit";
+      }
+    }
+
+    if (score >= 80) return "Good Fit";
+    if (score >= 60) return "Needs Improvement";
+    return "Not Suitable";
+  };
+
+  const generateImprovementsWithNotes = (): string[] => {
+    const baseImprovements = [
+      "Consider additional Python training for backend development",
+      "Pursue AWS certification to strengthen cloud skills",
+      "Gain more experience with design systems and UI/UX principles",
+    ];
+
+    if (candidateNotes.trim()) {
+      const notesLower = candidateNotes.toLowerCase();
+      
+      if (notesLower.includes("communication")) {
+        baseImprovements.push("Focus on improving communication skills during interview process");
+      }
+      if (notesLower.includes("culture")) {
+        baseImprovements.push("Address cultural fit concerns through team interaction opportunities");
+      }
+      if (notesLower.includes("experience") && notesLower.includes("lack")) {
+        baseImprovements.push("Consider additional training or mentorship programs");
+      }
+    }
+
+    return baseImprovements;
+  };
+
+  const calculateExperienceMatchWithNotes = (): number => {
+    let baseMatch = 85;
+
+    if (candidateNotes.trim()) {
+      const notesLower = candidateNotes.toLowerCase();
+      
+      if (notesLower.includes("senior") || notesLower.includes("lead")) {
+        baseMatch += 5;
+      }
+      if (notesLower.includes("junior") || notesLower.includes("entry")) {
+        baseMatch -= 10;
+      }
+      if (notesLower.includes("relevant") && notesLower.includes("experience")) {
+        baseMatch += 3;
+      }
+    }
+
+    return Math.max(0, Math.min(100, baseMatch));
+  };
+
+  const generateRecommendationsWithNotes = (): string[] => {
+    const baseRecommendations = [
+      "Schedule technical interview to assess coding skills",
+      "Discuss Python learning plan during interview",
+      "Consider for senior-level position based on leadership experience",
+    ];
+
+    if (candidateNotes.trim()) {
+      const notesLower = candidateNotes.toLowerCase();
+      
+      if (notesLower.includes("referral") || notesLower.includes("recommend")) {
+        baseRecommendations.push("Prioritize this candidate due to strong referral/recommendation");
+      }
+      if (notesLower.includes("culture") && notesLower.includes("concern")) {
+        baseRecommendations.push("Include team members in interview to assess cultural fit");
+      }
+      if (notesLower.includes("communication")) {
+        baseRecommendations.push("Include communication assessment in interview process");
+      }
+      if (notesLower.includes("technical") && notesLower.includes("strong")) {
+        baseRecommendations.push("Focus technical interview on advanced concepts");
+      }
+    }
+
+    return baseRecommendations;
   };
 
   // Quick analysis with pre-selected candidate and job
@@ -406,6 +572,7 @@ export default function CVEvaluation() {
     const analysisData = {
       ...evaluation,
       notes: analysisNotes,
+      candidateNotes: candidateNotes,
       savedAt: new Date().toISOString(),
       candidateName: selectedCandidate?.name,
       jobTitle: selectedJob?.position,
@@ -420,6 +587,7 @@ export default function CVEvaluation() {
       fileName: selectedFile?.name || "unknown",
       ...evaluation,
       notes: analysisNotes,
+      candidateNotes: candidateNotes,
       savedAt: new Date().toISOString(),
       createdBy: "Current User",
       isShared: false,
@@ -547,7 +715,10 @@ Analysis Date: ${new Date().toLocaleDateString()}
 OVERALL SCORE: ${evaluation.jobFitScore}%
 VERDICT: ${evaluation.finalVerdict}
 
-SUMMARY:
+${candidateNotes.trim() ? `CANDIDATE NOTES:
+${candidateNotes}
+
+` : ''}SUMMARY:
 ${evaluation.summary}
 
 STRENGTHS:
@@ -607,6 +778,7 @@ Generated by CV Evaluation System
 
       setEvaluation(loadedEvaluation);
       setAnalysisNotes(savedEval.notes || "");
+      setCandidateNotes(savedEval.candidateNotes || "");
       setSelectedSavedEvaluation(savedEval);
       setIsSaved(true);
 
@@ -844,6 +1016,54 @@ Generated by CV Evaluation System
             </CardContent>
           </Card>
 
+          {/* Candidate Notes */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <NotebookPen className="w-5 h-5" />
+                <span>Candidate Notes</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label className="text-sm font-medium">
+                  Additional Notes about Candidate/CV
+                </Label>
+                <p className="text-xs text-gray-500 mb-2">
+                  Add any additional context, observations, or feedback about the candidate or CV that should be considered in the analysis.
+                </p>
+                <Textarea
+                  placeholder="E.g., Strong referral from team lead, concerns about communication skills, excellent culture fit, previous interview feedback, employment gap explanation, etc."
+                  value={candidateNotes}
+                  onChange={(e) => setCandidateNotes(e.target.value)}
+                  className="min-h-[120px] resize-none"
+                  maxLength={1000}
+                />
+                <div className="flex justify-between items-center mt-2">
+                  <p className="text-xs text-gray-500">
+                    {candidateNotes.length}/1000 characters
+                  </p>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setCandidateNotes("")}
+                    disabled={!candidateNotes.trim()}
+                  >
+                    Clear
+                  </Button>
+                </div>
+              </div>
+              
+              {candidateNotes.trim() && (
+                <div className="bg-blue-50 p-3 rounded-lg">
+                  <p className="text-sm text-blue-800">
+                    <strong>Note:</strong> These notes will be integrated into the CV analysis to provide more context and improve the evaluation accuracy.
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           {/* Analysis Controls */}
           <Card>
             <CardHeader>
@@ -961,6 +1181,28 @@ Generated by CV Evaluation System
                     </div>
                   </CardContent>
                 </Card>
+
+                {/* Candidate Notes Display */}
+                {candidateNotes.trim() && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center space-x-2">
+                        <User className="w-5 h-5" />
+                        <span>Candidate Notes (Used in Analysis)</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="bg-blue-50 p-4 rounded-lg">
+                        <p className="text-sm text-blue-900 whitespace-pre-wrap">
+                          {candidateNotes}
+                        </p>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-2">
+                        These notes were integrated into the CV analysis to provide additional context and improve evaluation accuracy.
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
 
                 {/* Overview Summary */}
                 <Card>
@@ -1438,6 +1680,11 @@ Generated by CV Evaluation System
                         {savedEval.notes && (
                           <div className="mt-2 p-2 bg-slate-50 rounded text-xs text-slate-600">
                             <strong>Notes:</strong> {savedEval.notes}
+                          </div>
+                        )}
+                        {savedEval.candidateNotes && (
+                          <div className="mt-2 p-2 bg-blue-50 rounded text-xs text-blue-700">
+                            <strong>Candidate Notes:</strong> {savedEval.candidateNotes}
                           </div>
                         )}
                       </CardContent>

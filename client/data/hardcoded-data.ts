@@ -132,6 +132,7 @@ export interface CVEvaluationData {
     skills: string[];
   };
   notes?: string;
+  candidateNotes?: string;
   savedAt: string;
   createdBy: string;
   isShared: boolean;
@@ -431,31 +432,84 @@ const createJobApplication = (
       mailConfirmed: Math.random() > 0.3,
     });
 
-    // Add emails for each stage
+    // Add emails for each stage with more realistic template names
+    const emailTemplates = {
+      "Applied": "application_received",
+      "Screening": "screening_invitation", 
+      "Interview": "interview_scheduling",
+      "Technical": "technical_assessment",
+      "Offer": "offer_letter",
+      "Hired": "welcome_onboard"
+    };
+    
+    // Add email with different confirmation statuses for testing
+    const emailStatus = {
+      "Applied": { requiresConfirmation: false, confirmed: Math.random() > 0.3 },
+      "Screening": { requiresConfirmation: true, confirmed: Math.random() > 0.4 },
+      "Interview": { requiresConfirmation: true, confirmed: Math.random() > 0.3 },
+      "Technical": { requiresConfirmation: false, confirmed: Math.random() > 0.6 },
+      "Offer": { requiresConfirmation: true, confirmed: Math.random() > 0.2 },
+      "Hired": { requiresConfirmation: false, confirmed: Math.random() > 0.8 }
+    };
+    
+    const status = emailStatus[stage as keyof typeof emailStatus];
+    
     emails.push({
       id: `email_${id}_${i}`,
-      subject: `${stage} Stage Notification`,
-      content: `You have been moved to the ${stage} stage for ${jobTitle}`,
+      subject: `${stage} Stage Notification - ${jobTitle}`,
+      content: `You have been moved to the ${stage} stage for ${jobTitle}. Please review the details and respond accordingly.`,
       from: "hr@company.com",
       to: "candidate@email.com",
       timestamp: getRandomDateTime(20 - i * 3),
       status: "sent",
-      template: `${stage.toLowerCase()}_notification`,
+      template: emailTemplates[stage as keyof typeof emailTemplates] || `${stage.toLowerCase()}_notification`,
       openedAt: Math.random() > 0.2 ? getRandomDateTime(15 - i * 3) : undefined,
-      repliedAt:
-        Math.random() > 0.5 ? getRandomDateTime(10 - i * 3) : undefined,
+      repliedAt: status.requiresConfirmation && status.confirmed ? getRandomDateTime(10 - i * 3) : undefined,
     });
   }
 
-  // Add some notes
-  notes.push({
-    id: `note_${id}_1`,
-    content: `Strong candidate for ${jobTitle} position`,
-    userId: "user_1",
-    userName: recruiter,
-    timestamp: getRandomDateTime(25),
-    type: "note",
-  });
+      // Add some notes
+    notes.push({
+      id: `note_${id}_1`,
+      content: `Strong candidate for ${jobTitle} position`,
+      userId: "user_1",
+      userName: recruiter,
+      timestamp: getRandomDateTime(25),
+      type: "note",
+    });
+
+    // Add some overdue emails for testing (for specific applications)
+    if (id === "app_2" && currentStage === "Interview") {
+      // Add an overdue email for David Kim's interview
+      emails.push({
+        id: `email_${id}_overdue`,
+        subject: "Interview Confirmation Required - Backend Developer",
+        content: "Please confirm your interview attendance. This email was sent 5 days ago.",
+        from: "hr@company.com",
+        to: "candidate@email.com",
+        timestamp: getRandomDateTime(10), // Sent 10 days ago
+        status: "sent",
+        template: "interview_scheduling",
+        openedAt: getRandomDateTime(8),
+        repliedAt: undefined, // No reply - overdue
+      });
+    }
+
+    if (id === "app_4" && currentStage === "Technical") {
+      // Add an overdue technical assessment for Emily Chen
+      emails.push({
+        id: `email_${id}_overdue`,
+        subject: "Technical Assessment Deadline - Senior Software Engineer",
+        content: "Your technical assessment is overdue. Please complete it immediately.",
+        from: "hr@company.com",
+        to: "candidate@email.com",
+        timestamp: getRandomDateTime(10), // Sent 10 days ago
+        status: "sent",
+        template: "technical_assessment",
+        openedAt: getRandomDateTime(8),
+        repliedAt: undefined, // No reply - overdue
+      });
+    }
 
   return {
     id,
@@ -1350,9 +1404,9 @@ export const getUser = (id: string): UserData | undefined => {
 };
 
 export const getUnreadNotificationCount = (): number => {
-  return HARDCODED_NOTIFICATIONS.filter((notification) => !notification.read)
-    .length;
+  return HARDCODED_NOTIFICATIONS.filter(notification => !notification.read).length;
 };
+
 
 export const getUserNotifications = (userId: string): NotificationData[] => {
   return HARDCODED_NOTIFICATIONS.filter(
