@@ -386,7 +386,7 @@ export default function Reports() {
 
   return (
     <div className="p-6 space-y-6">
-      <RechartsWarningSuppress />
+      <RechartsWarningSuppress>{null}</RechartsWarningSuppress>
 
       {/* Header */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0">
