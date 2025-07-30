@@ -36,6 +36,7 @@ import {
   AlertTriangle,
   Bell,
   Calendar,
+  Check,
   ChevronRight,
   Clock,
   Eye,
@@ -52,6 +53,7 @@ import {
   TrendingUp,
   User,
   Users,
+  X,
   Zap,
   CheckCircle,
   XCircle,
@@ -67,6 +69,7 @@ import {
   Download,
   UserPlus,
   Activity,
+  Building,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
@@ -82,6 +85,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { EmailTrigger } from "@/components/EmailTrigger";
+import {
+  EmailTemplate,
+  ConfirmationStatus,
+  StageTracking,
+  createStageTracking,
+  createConfirmationStatus,
+  checkOverdueStatus
+} from "@/lib/email-utils";
 
 // Các type definitions giữ nguyên như trước
 interface FollowUpCandidate extends CandidateData {
@@ -102,6 +114,11 @@ interface FollowUpCandidate extends CandidateData {
   recruiter: string;
   salary: string;
   department: string;
+  // New fields for confirmation tracking
+  stageTracking?: StageTracking;
+  confirmationStatus?: ConfirmationStatus;
+  autoRejected?: boolean;
+  overdue?: boolean;
 }
 
 interface FollowUpAction {
@@ -134,14 +151,7 @@ interface EmailRecord {
   responseDate?: string;
 }
 
-interface EmailTemplate {
-  id: string;
-  name: string;
-  subject: string;
-  body: string;
-  stage: string;
-  variables: string[];
-}
+
 
 interface Job {
   id: string;
@@ -181,8 +191,15 @@ export default function FollowUpDashboard() {
   const [applyCandidateId, setApplyCandidateId] = useState<string | null>(null);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
 
+  // State cho EmailTrigger
+  const [showEmailTrigger, setShowEmailTrigger] = useState(false);
+  const [pendingStageChange, setPendingStageChange] = useState<{
+    candidate: FollowUpCandidate;
+    newStage: string;
+  } | null>(null);
+
   // Transform candidates to FollowUpCandidate format
-  const [candidates] = useState<FollowUpCandidate[]>(
+  const [candidates, setCandidates] = useState<FollowUpCandidate[]>(
     HARDCODED_CANDIDATES.map((candidate, index) => {
       // Get the primary job application for this candidate
       const primaryJob = candidate.jobApplications[0];
@@ -270,7 +287,7 @@ export default function FollowUpDashboard() {
     useState<FollowUpCandidate | null>(null);
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [showNoteDialog, setShowNoteDialog] = useState(false);
-  const [emailTemplate, setEmailTemplate] = useState("");
+  const [emailTemplate, setEmailTemplate] = useState<number | null>(null);
   const [bulkAction, setBulkAction] = useState("");
 
   // Handle send email
@@ -300,31 +317,167 @@ export default function FollowUpDashboard() {
     });
   };
 
+  // Handle stage change with email trigger
+  const handleStageChange = (candidate: FollowUpCandidate, newStage: string) => {
+    // Set pending stage change and show EmailTrigger
+    setPendingStageChange({ candidate, newStage });
+    setShowEmailTrigger(true);
+  };
+
+  // Handle email sent or skipped from EmailTrigger
+  const handleConfirmationResponse = (candidateId: string, confirmed: boolean) => {
+    setCandidates((prevCandidates) =>
+      prevCandidates.map((c) =>
+        c.id === candidateId && c.confirmationStatus ? {
+          ...c,
+          confirmationStatus: {
+            ...c.confirmationStatus,
+            confirmed,
+            confirmedDate: new Date().toISOString(),
+            overdue: false,
+            autoRejected: false,
+          },
+          overdue: false,
+          autoRejected: false,
+        } : c
+      )
+    );
+
+    const candidate = candidates.find(c => c.id === candidateId);
+    if (candidate) {
+      toast({
+        title: "Confirmation Updated",
+        description: `${candidate.name} ${confirmed ? 'confirmed' : 'rejected'} the ${candidate.confirmationStatus?.type || 'request'}.`,
+      });
+    }
+  };
+
+  const handleEmailSentOrSkipped = (emailData?: any) => {
+    if (pendingStageChange) {
+      const { candidate, newStage } = pendingStageChange;
+      
+      // Create stage tracking and confirmation status based on the new stage
+      let stageTracking: StageTracking | undefined;
+      let confirmationStatus: ConfirmationStatus | undefined;
+      
+      // Set up stage-specific tracking and confirmation requirements
+      switch (newStage.toLowerCase()) {
+        case "applied":
+          stageTracking = createStageTracking("applied", 5);
+          break;
+        case "interview":
+          stageTracking = createStageTracking("interview", 7);
+          stageTracking.confirmationRequired = true;
+          confirmationStatus = createConfirmationStatus("interview", 3);
+          break;
+        case "technical":
+          stageTracking = createStageTracking("technical", 7);
+          stageTracking.confirmationRequired = false;
+          // Technical stage doesn't require confirmation but has deadline
+          break;
+        case "offer":
+          stageTracking = createStageTracking("offer", 5);
+          stageTracking.confirmationRequired = true;
+          confirmationStatus = createConfirmationStatus("offer", 5);
+          break;
+        case "hired":
+          stageTracking = createStageTracking("hired", 0);
+          stageTracking.confirmationRequired = false;
+          break;
+        default:
+          stageTracking = createStageTracking(newStage.toLowerCase(), 5);
+      }
+      
+      // Update the candidate's stage in the main candidates list
+      setCandidates((prevCandidates) =>
+        prevCandidates.map((c) =>
+          c.id === candidate.id ? {
+            ...c,
+            stage: newStage,
+            stageTracking,
+            confirmationStatus,
+            autoRejected: false,
+            overdue: false,
+            // Update email history if email was sent
+            ...(emailData && {
+              emailsSent: c.emailsSent + 1,
+              lastEmailSent: new Date().toISOString(),
+              emailHistory: [
+                ...c.emailHistory,
+                {
+                  id: `email_${Date.now()}`,
+                  subject: emailData.subject || "Stage Update Email",
+                  template: emailData.template || "stage_update",
+                  sentDate: new Date().toISOString(),
+                  opened: false,
+                  responded: false,
+                }
+              ]
+            })
+          } : c
+        )
+      );
+      
+      // In a real app, this would be an API call
+      const currentStage = candidate.stage || "Unknown";
+      console.log(`Moving candidate ${candidate.name} from ${currentStage} to ${newStage}`);
+      
+      // Show success message
+      if (emailData) {
+        toast({
+          title: "Stage updated & Email sent",
+          description: `${candidate.name} moved to ${newStage} stage and email sent.`,
+        });
+      } else {
+        toast({
+          title: "Stage updated",
+          description: `${candidate.name} moved to ${newStage} stage.`,
+        });
+      }
+    }
+    
+    // Reset state
+    setPendingStageChange(null);
+    setShowEmailTrigger(false);
+  };
+
   // Email templates (giữ nguyên)
   const emailTemplates: EmailTemplate[] = [
     {
-      id: "interview_invitation",
+      id: 1,
       name: "Interview Invitation",
-      subject: "Interview Invitation - {{position}}",
-      body: "Dear {{name}},\n\nWe would like to invite you for an interview for the {{position}} position.\n\nBest regards,\n{{recruiter}}",
-      stage: "Interview",
-      variables: ["name", "position", "recruiter"],
+      subject: "Interview Invitation - {{job_title}}",
+      content: "Dear {{candidate_name}},\n\nWe would like to invite you for an interview for the {{job_title}} position.\n\nBest regards,\n{{recruiter_name}}",
+      type: "interview",
+      stage: "interview",
+      variables: ["{{candidate_name}}", "{{job_title}}", "{{recruiter_name}}"],
+      requiresConfirmation: true,
+      confirmationDeadline: 3,
+      autoRejectOnOverdue: true,
     },
     {
-      id: "follow_up",
+      id: 2,
       name: "General Follow-up",
-      subject: "Following up on your application - {{position}}",
-      body: "Hi {{name}},\n\nI wanted to follow up on your application for the {{position}} role.\n\nLet me know if you have any questions.\n\nBest,\n{{recruiter}}",
-      stage: "Any",
-      variables: ["name", "position", "recruiter"],
+      subject: "Following up on your application - {{job_title}}",
+      content: "Hi {{candidate_name}},\n\nI wanted to follow up on your application for the {{job_title}} role.\n\nLet me know if you have any questions.\n\nBest,\n{{recruiter_name}}",
+      type: "follow-up",
+      stage: "any",
+      variables: ["{{candidate_name}}", "{{job_title}}", "{{recruiter_name}}"],
+      requiresConfirmation: false,
+      confirmationDeadline: 5,
+      autoRejectOnOverdue: false,
     },
     {
-      id: "offer_letter",
+      id: 3,
       name: "Offer Letter",
-      subject: "Job Offer - {{position}}",
-      body: "Dear {{name}},\n\nWe are pleased to offer you the position of {{position}}.\n\nPlease review the attached offer details.\n\nBest regards,\n{{recruiter}}",
-      stage: "Offer",
-      variables: ["name", "position", "recruiter"],
+      subject: "Job Offer - {{job_title}}",
+      content: "Dear {{candidate_name}},\n\nWe are pleased to offer you the position of {{job_title}}.\n\nPlease review the attached offer details.\n\nBest regards,\n{{recruiter_name}}",
+      type: "offer",
+      stage: "offer",
+      variables: ["{{candidate_name}}", "{{job_title}}", "{{recruiter_name}}"],
+      requiresConfirmation: true,
+      confirmationDeadline: 5,
+      autoRejectOnOverdue: true,
     },
   ];
 
@@ -362,6 +515,44 @@ export default function FollowUpDashboard() {
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, filterStage, filterJob, filterUrgency]);
+
+  // Check for overdue confirmations and update candidates
+  useEffect(() => {
+    const checkOverdueConfirmations = () => {
+      setCandidates((prevCandidates) =>
+        prevCandidates.map((candidate) => {
+          if (!candidate.confirmationStatus) return candidate;
+          
+          const updatedConfirmationStatus = checkOverdueStatus(candidate.confirmationStatus);
+          
+          // If candidate is overdue and should be auto-rejected
+          if (updatedConfirmationStatus.autoRejected && !candidate.autoRejected) {
+            return {
+              ...candidate,
+              confirmationStatus: updatedConfirmationStatus,
+              autoRejected: true,
+              overdue: true,
+              stage: "Rejected", // Auto-reject by moving to rejected stage
+            };
+          }
+          
+          return {
+            ...candidate,
+            confirmationStatus: updatedConfirmationStatus,
+            overdue: updatedConfirmationStatus.overdue,
+          };
+        })
+      );
+    };
+
+    // Check every hour for overdue confirmations
+    const interval = setInterval(checkOverdueConfirmations, 60 * 60 * 1000);
+    
+    // Initial check
+    checkOverdueConfirmations();
+    
+    return () => clearInterval(interval);
+  }, []);
 
   // Statistics (giữ nguyên)
   const stats = useMemo(() => {
@@ -423,7 +614,7 @@ export default function FollowUpDashboard() {
   );
 
   const sendEmail = useCallback(
-    (templateId: string, candidateIds: string[]) => {
+    (templateId: number, candidateIds: string[]) => {
       const template = emailTemplates.find((t) => t.id === templateId);
       if (!template) return;
 
@@ -478,7 +669,17 @@ export default function FollowUpDashboard() {
   );
 
   // Candidate Card Component (giữ nguyên)
-  const CandidateCard = ({ candidate }: { candidate: FollowUpCandidate }) => (
+  const CandidateCard = ({ candidate }: { candidate: FollowUpCandidate }) => {
+    const stages = [
+      "Applied",
+      "Screening",
+      "Interview",
+      "Technical",
+      "Offer",
+      "Hired",
+    ];
+    
+    return (
     <Card
       className={`hover:shadow-lg transition-all border-l-4 cursor-pointer rounded-lg ${
         selectedCandidates.includes(candidate.id)
@@ -516,9 +717,29 @@ export default function FollowUpDashboard() {
                 <Badge variant="outline" className="text-xs">
                   {candidate.stage}
                 </Badge>
-                {/* <Badge variant="secondary" className="text-xs">
-                  {candidate.urgencyLevel}
-                </Badge> */}
+                {/* Show confirmation status badges */}
+                {candidate.confirmationStatus && (
+                  <Badge 
+                    variant={candidate.confirmationStatus.confirmed === true ? "default" : 
+                           candidate.confirmationStatus.confirmed === false ? "destructive" :
+                           candidate.confirmationStatus.overdue ? "destructive" : "secondary"}
+                    className="text-xs"
+                  >
+                    {candidate.confirmationStatus.confirmed === true ? "Confirmed" :
+                     candidate.confirmationStatus.confirmed === false ? "Rejected" :
+                     candidate.confirmationStatus.overdue ? "Overdue" : "Pending"}
+                  </Badge>
+                )}
+                {candidate.autoRejected && (
+                  <Badge variant="destructive" className="text-xs">
+                    Auto-Rejected
+                  </Badge>
+                )}
+                {candidate.overdue && !candidate.autoRejected && (
+                  <Badge variant="destructive" className="text-xs">
+                    Overdue
+                  </Badge>
+                )}
               </div>
             </div>
           </div>
@@ -551,12 +772,84 @@ export default function FollowUpDashboard() {
                 <Edit3 className="w-4 h-4 mr-2" />
                 Add Note
               </DropdownMenuItem>
+              {/* Confirmation actions */}
+              {candidate.confirmationStatus && candidate.confirmationStatus.confirmed === null && (
+                <>
+                  <DropdownMenuItem onClick={() => handleConfirmationResponse(candidate.id, true)}>
+                    <Check className="w-4 h-4 mr-2" />
+                    Mark as Confirmed
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleConfirmationResponse(candidate.id, false)}>
+                    <X className="w-4 h-4 mr-2" />
+                    Mark as Rejected
+                  </DropdownMenuItem>
+                </>
+              )}
+              <DropdownMenuItem
+                onClick={() => {
+                  const currentStage = candidate.stage || "Applied";
+                  const nextStageIndex =
+                    stages.findIndex((s) => s === currentStage) + 1;
+                  if (nextStageIndex < stages.length) {
+                    handleStageChange(candidate, stages[nextStageIndex]);
+                  }
+                }}
+                disabled={
+                  stages.findIndex((s) => s === (candidate.stage || "Applied")) ===
+                  stages.length - 1
+                }
+              >
+                <Mail className="w-4 h-4 mr-2" />
+                Move to Next Stage
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </CardHeader>
+      <CardContent className="space-y-2">
+        <div className="flex items-center text-xs text-slate-600 min-w-0">
+          <Building className="w-3 h-3 mr-1 flex-shrink-0" />
+          <span className="break-words">{candidate.department || "No Department"}</span>
+        </div>
+        <div className="flex items-center text-xs text-slate-600 min-w-0">
+          <Clock className="w-3 h-3 mr-1 flex-shrink-0" />
+          <span className="line-clamp-1">
+            {candidate.daysInStage} days in stage
+          </span>
+        </div>
+        <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+          <div className="flex items-center space-x-1">
+            {/* Rating removed */}
+          </div>
+          <Badge
+            variant="outline"
+            className="text-xs line-clamp-1 max-w-20"
+            title={candidate.recruiter || "No Recruiter"}
+          >
+            {candidate.recruiter || "No Recruiter"}
+          </Badge>
+        </div>
+        <div className="flex space-x-1 mt-2">
+          <Select
+            value={candidate.stage || "Applied"}
+            onValueChange={(value) => handleStageChange(candidate, value)}
+          >
+            <SelectTrigger className="h-7 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {stages.map((stage) => (
+                <SelectItem key={stage} value={stage} className="text-xs">
+                  {stage}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </CardContent>
     </Card>
-  );
+    );
+  };
 
   // Pipeline View Component (giữ nguyên)
   const PipelineView = () => {
@@ -1272,13 +1565,16 @@ export default function FollowUpDashboard() {
           <div className="space-y-4">
             <div>
               <Label>Email Template</Label>
-              <Select value={emailTemplate} onValueChange={setEmailTemplate}>
+              <Select 
+                value={emailTemplate?.toString() || ""} 
+                onValueChange={(value) => setEmailTemplate(value ? parseInt(value) : null)}
+              >
                 <SelectTrigger className="mt-1">
                   <SelectValue placeholder="Choose a template" />
                 </SelectTrigger>
                 <SelectContent>
                   {emailTemplates.map((template) => (
-                    <SelectItem key={template.id} value={template.id}>
+                    <SelectItem key={template.id} value={template.id.toString()}>
                       {template.name}
                     </SelectItem>
                   ))}
@@ -1300,7 +1596,7 @@ export default function FollowUpDashboard() {
                     <strong>Body:</strong>
                   </div>
                   <pre className="text-xs whitespace-pre-wrap">
-                    {emailTemplates.find((t) => t.id === emailTemplate)?.body}
+                    {emailTemplates.find((t) => t.id === emailTemplate)?.content}
                   </pre>
                 </div>
               </div>
@@ -1520,6 +1816,21 @@ export default function FollowUpDashboard() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Email Trigger Modal */}
+      {pendingStageChange && (
+        <EmailTrigger
+          isOpen={showEmailTrigger}
+          onClose={() => {
+            setShowEmailTrigger(false);
+            setPendingStageChange(null);
+          }}
+          candidate={pendingStageChange.candidate}
+          newStage={pendingStageChange.newStage}
+          jobTitle={pendingStageChange.candidate.position}
+          onEmailSent={handleEmailSentOrSkipped}
+        />
+      )}
     </div>
   );
 }

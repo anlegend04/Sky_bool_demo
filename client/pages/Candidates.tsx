@@ -40,7 +40,7 @@ import {
   DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
-import { EmailTrigger } from "@/components/EmailTrigger";
+
 import {
   Plus,
   Search,
@@ -153,10 +153,7 @@ export default function Candidates() {
     [],
   );
   const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
-  const [emailTriggerOpen, setEmailTriggerOpen] = useState(false);
-  const [selectedCandidateForEmail, setSelectedCandidateForEmail] =
-    useState<CandidateData | null>(null);
-  const [newStageForEmail, setNewStageForEmail] = useState<string>("");
+
   const [isDragOver, setIsDragOver] = useState(false);
   const [bulkJobPosition, setBulkJobPosition] = useState("");
   const [bulkSource, setBulkSource] = useState("");
@@ -1150,36 +1147,8 @@ export default function Candidates() {
     </Card>
   );
 
-  // Handle stage change with email trigger
-  const handleStageChange = (candidate: CandidateData, newStage: string) => {
-    // Update the candidate's stage in the main candidates list
-    setCandidates((prevCandidates) =>
-      prevCandidates.map((c) =>
-        c.id === candidate.id ? {
-          ...c,
-          jobApplications: c.jobApplications.map(app => ({
-            ...app,
-            currentStage: newStage as any
-          }))
-        } : c
-      )
-    );
-    
-    // In a real app, this would be an API call
-    const currentStage = candidate.jobApplications[0]?.currentStage || "Unknown";
-    console.log(`Moving candidate ${candidate.name} from ${currentStage} to ${newStage}`);
-    
-    // Show success message
-    toast({
-      title: "Stage updated",
-      description: `${candidate.name} moved to ${newStage} stage.`,
-    });
-    
-    // Trigger email dialog for notification
-    setSelectedCandidateForEmail(candidate);
-    setNewStageForEmail(newStage);
-    setEmailTriggerOpen(true);
-  };
+  // Note: Stage change functionality has been moved to FollowUpDashboard
+  // This page now focuses on candidate management without stage updates
 
   // Handle candidate editing
   const handleEditCandidate = (candidate: CandidateData) => {
@@ -1243,17 +1212,7 @@ export default function Candidates() {
     });
   };
 
-  // Handle email sent callback
-  const handleEmailSent = (emailData: any) => {
-    toast({
-      title: "Email sent successfully",
-      description: `Email sent to ${emailData.recipientName}`,
-    });
 
-    // Update candidate stage in the data
-    // In a real app, this would be an API call
-    console.log("Updating candidate stage and logging email:", emailData);
-  };
 
   // Existing candidate components (simplified for space)
   const CandidateCard = ({ candidate }: { candidate: CandidateData }) => {
@@ -1293,7 +1252,7 @@ export default function Candidates() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <Link to={`/candidates-profile/${candidate.id}`}>
+                <Link to={`/candidates/${candidate.id}`}>
                   <DropdownMenuItem>
                     <Eye className="w-4 h-4 mr-2" />
                     View Profile
@@ -1319,23 +1278,7 @@ export default function Candidates() {
                   <Edit3 className="w-4 h-4 mr-2" />
                   Add Note
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => {
-                    const currentStage = primaryJob?.currentStage || "Applied";
-                    const nextStageIndex =
-                      stages.findIndex((s) => s === currentStage) + 1;
-                    if (nextStageIndex < stages.length) {
-                      handleStageChange(candidate, stages[nextStageIndex]);
-                    }
-                  }}
-                  disabled={
-                    stages.findIndex((s) => s === (primaryJob?.currentStage || "Applied")) ===
-                    stages.length - 1
-                  }
-                >
-                  <Mail className="w-4 h-4 mr-2" />
-                  Move to Next Stage
-                </DropdownMenuItem>
+
                 <DropdownMenuItem 
                   onClick={() => handleDeleteCandidate(candidate)}
                   className="text-red-600 focus:text-red-600"
@@ -1370,23 +1313,7 @@ export default function Candidates() {
               {primaryJob?.recruiter || "No Recruiter"}
             </Badge>
           </div>
-          <div className="flex space-x-1 mt-2">
-            <Select
-              value={primaryJob?.currentStage || "Applied"}
-              onValueChange={(value) => handleStageChange(candidate, value)}
-            >
-              <SelectTrigger className="h-7 text-xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {stages.map((stage) => (
-                  <SelectItem key={stage} value={stage} className="text-xs">
-                    {stage}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+
         </CardContent>
       </Card>
     );
@@ -1537,7 +1464,7 @@ export default function Candidates() {
                           Apply to Job
                         </DropdownMenuItem>
 
-                        <Link to={`/candidates-profile/${candidate.id}`}>
+                        <Link to={`/candidates/${candidate.id}`}>
                           <DropdownMenuItem>
                             <Eye className="w-4 h-4 mr-2" />
                             View Profile
@@ -1654,6 +1581,17 @@ export default function Candidates() {
   );
 
   const GridView = () => {
+    const [candidatesPerStage, setCandidatesPerStage] = useState<
+      Record<string, number>
+    >({});
+
+    const showMoreCandidates = (stage: string) => {
+      setCandidatesPerStage((prev) => ({
+        ...prev,
+        [stage]: (prev[stage] || 5) + 5,
+      }));
+    };
+
     const getStageColor = (stage: string) => {
       switch (stage) {
         case "Applied":
@@ -1668,8 +1606,6 @@ export default function Candidates() {
           return "bg-green-50 border-green-200";
         case "Hired":
           return "bg-emerald-50 border-emerald-200";
-        case "Rejected":
-          return "bg-red-50 border-red-200";
         default:
           return "bg-slate-50 border-slate-200";
       }
@@ -1681,9 +1617,10 @@ export default function Candidates() {
           const stageCandidates = filteredCandidates.filter(
             (candidate) => candidate.jobApplications[0]?.currentStage === stage,
           );
-          const displayedCount = candidatesPerStage[stage] || 5;
-          const hasMoreCandidates = stageCandidates.length > displayedCount;
-          
+          const maxVisible = candidatesPerStage[stage] || 5;
+          const visibleCandidates = stageCandidates.slice(0, maxVisible);
+          const hasMore = stageCandidates.length > maxVisible;
+
           return (
             <div
               key={stage}
@@ -1691,8 +1628,12 @@ export default function Candidates() {
               style={{ maxWidth: 340 }}
             >
               <div className="flex items-center justify-between mb-4 p-4 pb-2 border-b border-slate-100">
-                <h3 className="font-semibold text-base text-slate-900 break-words flex-1">{stage}</h3>
-                <Badge variant="outline" className="text-xs flex-shrink-0 ml-2">{stageCandidates.length}</Badge>
+                <h3 className="font-semibold text-base text-slate-900 break-words flex-1">
+                  {stage}
+                </h3>
+                <Badge variant="outline" className="text-xs flex-shrink-0 ml-2">
+                  {stageCandidates.length}
+                </Badge>
               </div>
               <div className="space-y-3 px-4 pb-4 pt-2 min-h-[180px] relative flex-1">
                 {stageCandidates.length === 0 ? (
@@ -1714,17 +1655,17 @@ export default function Candidates() {
                   </div>
                 ) : (
                   <>
-                    {stageCandidates.slice(0, displayedCount).map((candidate) => (
+                    {visibleCandidates.map((candidate) => (
                       <CandidateCard key={candidate.id} candidate={candidate} />
                     ))}
-                    {hasMoreCandidates && (
+                    {hasMore && (
                       <Button
                         variant="ghost"
                         size="sm"
                         className="w-full text-xs h-8"
                         onClick={() => showMoreCandidates(stage)}
                       >
-                        Show {stageCandidates.length - displayedCount} More
+                        Show {stageCandidates.length - maxVisible} More
                       </Button>
                     )}
                   </>
@@ -2784,21 +2725,7 @@ export default function Candidates() {
       {/* Content based on view mode */}
       {viewMode === "list" ? <ListView /> : <GridView />}
 
-      {/* Email Trigger Modal */}
-      {selectedCandidateForEmail && (
-        <EmailTrigger
-          isOpen={emailTriggerOpen}
-          onClose={() => {
-            setEmailTriggerOpen(false);
-            setSelectedCandidateForEmail(null);
-            setNewStageForEmail("");
-          }}
-          candidate={selectedCandidateForEmail}
-          newStage={newStageForEmail}
-          jobTitle={selectedCandidateForEmail.jobApplications[0]?.jobTitle || "Unknown Position"}
-          onEmailSent={handleEmailSent}
-        />
-      )}
+
     </div>
   );
 }

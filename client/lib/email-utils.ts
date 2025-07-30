@@ -8,6 +8,9 @@ export interface EmailTemplate {
   type: string;
   stage?: string;
   variables: string[];
+  requiresConfirmation?: boolean;
+  confirmationDeadline?: number; // days
+  autoRejectOnOverdue?: boolean;
 }
 
 export interface EmailData {
@@ -20,7 +23,34 @@ export interface EmailData {
   interviewTime?: string;
   salaryRange?: string;
   applicationDate?: string;
+  confirmationDeadline?: string;
+  testDeadline?: string;
+  offerDeadline?: string;
   [key: string]: string | undefined;
+}
+
+// New interfaces for tracking confirmation status
+export interface ConfirmationStatus {
+  id: string;
+  type: "interview" | "test" | "offer";
+  requestedDate: string;
+  deadline: string;
+  confirmed: boolean | null; // null = pending, true = confirmed, false = rejected
+  confirmedDate?: string;
+  overdue: boolean;
+  autoRejected: boolean;
+}
+
+export interface StageTracking {
+  stage: string;
+  enteredDate: string;
+  duration: number; // days
+  emailSent: boolean;
+  emailSentDate?: string;
+  confirmationRequired: boolean;
+  confirmationStatus?: ConfirmationStatus;
+  completed: boolean;
+  completedDate?: string;
 }
 
 export function generateEmailContent(
@@ -30,6 +60,12 @@ export function generateEmailContent(
 ): { subject: string; content: string } {
   // Get the primary job application for email data
   const primaryJob = candidate.jobApplications[0];
+  
+  // Calculate deadlines based on template requirements
+  const now = new Date();
+  const confirmationDeadline = template.confirmationDeadline 
+    ? new Date(now.getTime() + template.confirmationDeadline * 24 * 60 * 60 * 1000).toLocaleDateString()
+    : undefined;
   
   const defaultData: EmailData = {
     candidateName: candidate.name,
@@ -41,6 +77,9 @@ export function generateEmailContent(
     interviewTime: "2:00 PM EST",
     salaryRange: primaryJob?.salary || "$80,000 - $120,000",
     applicationDate: primaryJob?.appliedDate || new Date().toLocaleDateString(),
+    confirmationDeadline,
+    testDeadline: template.stage === "technical" ? new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString() : undefined,
+    offerDeadline: template.stage === "offer" ? new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString() : undefined,
     ...additionalData,
   };
 
@@ -80,19 +119,123 @@ export function getTemplatesForStage(stage: string): EmailTemplate[] {
 
 export function getAllEmailTemplates(): EmailTemplate[] {
   return [
-    // Applied Stage Templates
+    // Applied Stage Templates - Thank you email with 3-5 days promise
     {
       id: 1,
-      name: "Application Received",
+      name: "Application Received - Thank You",
       subject: "Thank you for your application - {{job_title}}",
       content:
-        "Dear {{candidate_name}},\n\nThank you for applying to the {{job_title}} position at {{company_name}}. We have received your application and will review it shortly.\n\nWe will contact you within the next 5-7 business days to update you on the status of your application.\n\nIf you have any questions in the meantime, please don't hesitate to reach out.\n\nBest regards,\n{{company_name}} Recruitment Team",
+        "Dear {{candidate_name}},\n\nThank you for your interest in the {{job_title}} position at {{company_name}}. We have received your application and are excited to review your qualifications.\n\nOur recruitment team will carefully review your application and we will contact you within 3-5 business days to inform you about the next steps in our process.\n\nIf you have any questions in the meantime, please don't hesitate to reach out to our HR team.\n\nBest regards,\n{{company_name}} Recruitment Team",
       type: "auto-response",
       stage: "applied",
       variables: ["{{candidate_name}}", "{{job_title}}", "{{company_name}}"],
+      requiresConfirmation: false,
+      confirmationDeadline: 5,
+      autoRejectOnOverdue: false,
     },
+
+    // Interview Stage Templates - Interview invitation with confirmation required
     {
       id: 2,
+      name: "Interview Invitation",
+      subject: "Interview Invitation - {{job_title}} at {{company_name}}",
+      content:
+        "Dear {{candidate_name}},\n\nWe are pleased to invite you for an interview for the {{job_title}} position at {{company_name}}.\n\nInterview Details:\n- Date: {{interview_date}}\n- Time: {{interview_time}}\n- Interviewer: {{interviewer_name}}\n- Location: {{company_name}} Headquarters\n\nIMPORTANT: Please confirm your attendance by replying to this email by {{confirmation_deadline}}. If you do not confirm by this deadline, we will assume you are no longer interested in the position.\n\nIf you need to reschedule, please let us know as soon as possible.\n\nWe look forward to meeting you!\n\nBest regards,\n{{company_name}} Team",
+      type: "interview",
+      stage: "interview",
+      variables: [
+        "{{candidate_name}}",
+        "{{job_title}}",
+        "{{company_name}}",
+        "{{interviewer_name}}",
+        "{{interview_date}}",
+        "{{interview_time}}",
+        "{{confirmation_deadline}}",
+      ],
+      requiresConfirmation: true,
+      confirmationDeadline: 3,
+      autoRejectOnOverdue: true,
+    },
+    {
+      id: 3,
+      name: "Post-Interview Thank You",
+      subject: "Thank you for your interview - {{job_title}}",
+      content:
+        "Dear {{candidate_name}},\n\nThank you for taking the time to interview for the {{job_title}} position at {{company_name}}. We enjoyed learning more about your background and experience.\n\nWe were impressed by your knowledge and enthusiasm for the role. Our team will review your interview performance and we will contact you within 5-7 business days with an update on next steps.\n\nIf you have any additional questions, please feel free to reach out.\n\nBest regards,\n{{company_name}} Team",
+      type: "follow-up",
+      stage: "interview",
+      variables: ["{{candidate_name}}", "{{job_title}}", "{{company_name}}"],
+      requiresConfirmation: false,
+      confirmationDeadline: 7,
+      autoRejectOnOverdue: false,
+    },
+
+    // Technical Stage Templates - Test assignment with deadline
+    {
+      id: 4,
+      name: "Technical Test Assignment",
+      subject: "Technical Assessment - {{job_title}} at {{company_name}}",
+      content:
+        "Dear {{candidate_name}},\n\nCongratulations on progressing to the technical assessment stage for the {{job_title}} position at {{company_name}}!\n\nTechnical Assessment Details:\n- Test Type: Coding challenge and system design\n- Duration: 2 hours\n- Deadline: {{test_deadline}}\n- Format: Online coding platform\n\nIMPORTANT: Please complete the technical assessment by {{test_deadline}}. If we do not receive your submission by this deadline, we will consider you as no longer interested in the position.\n\nYou will receive an email with login credentials and test instructions shortly.\n\nGood luck!\n\nBest regards,\n{{company_name}} Technical Team",
+      type: "technical",
+      stage: "technical",
+      variables: [
+        "{{candidate_name}}",
+        "{{job_title}}",
+        "{{company_name}}",
+        "{{test_deadline}}",
+      ],
+      requiresConfirmation: false,
+      confirmationDeadline: 7,
+      autoRejectOnOverdue: true,
+    },
+
+    // Offer Stage Templates - Offer letter with acceptance confirmation
+    {
+      id: 5,
+      name: "Job Offer",
+      subject: "Job Offer - {{job_title}} at {{company_name}}",
+      content:
+        "Dear {{candidate_name}},\n\nWe are delighted to offer you the position of {{job_title}} at {{company_name}}!\n\nOffer Details:\n- Position: {{job_title}}\n- Department: {{position_department}}\n- Salary: {{salary_range}}\n- Start Date: Flexible, based on your availability\n\nPlease review the attached offer letter for complete details including benefits, vacation policy, and other terms.\n\nIMPORTANT: Please confirm your acceptance or rejection of this offer by {{offer_deadline}}. If we do not receive your confirmation by this deadline, we will assume you are declining the offer.\n\nWe would love to have you join our team and look forward to hearing from you!\n\nBest regards,\n{{company_name}} HR Team",
+      type: "offer",
+      stage: "offer",
+      variables: [
+        "{{candidate_name}}",
+        "{{job_title}}",
+        "{{company_name}}",
+        "{{salary_range}}",
+        "{{position_department}}",
+        "{{offer_deadline}}",
+      ],
+      requiresConfirmation: true,
+      confirmationDeadline: 5,
+      autoRejectOnOverdue: true,
+    },
+
+    // Onboard Stage Templates - First day instructions
+    {
+      id: 6,
+      name: "Onboarding Instructions",
+      subject: "Welcome to {{company_name}} - First Day Instructions",
+      content:
+        "Dear {{candidate_name}},\n\nWelcome to {{company_name}}! We are thrilled to have you join our team as {{job_title}}.\n\nYour first day is scheduled for {{interview_date}}. Here's what you need to do:\n\nFirst Day Schedule:\n- 9:00 AM: Arrival and welcome at reception\n- 9:30 AM: HR orientation and paperwork completion\n- 11:00 AM: IT setup and system access\n- 1:00 PM: Team lunch and introductions\n- 2:00 PM: Department overview and role expectations\n- 4:00 PM: First team meeting\n\nWhat to bring:\n- Valid ID for I-9 verification\n- Banking information for direct deposit\n- Emergency contact information\n- Any questions you have about the role\n\nYour manager {{interviewer_name}} will be your primary point of contact and will help you get settled in.\n\nWe're excited to see the great things you'll accomplish with us!\n\nBest regards,\n{{company_name}} HR Team",
+      type: "onboarding",
+      stage: "hired",
+      variables: [
+        "{{candidate_name}}",
+        "{{job_title}}",
+        "{{company_name}}",
+        "{{interviewer_name}}",
+        "{{interview_date}}",
+      ],
+      requiresConfirmation: false,
+      confirmationDeadline: 0,
+      autoRejectOnOverdue: false,
+    },
+
+    // Legacy templates for backward compatibility
+    {
+      id: 7,
       name: "Application Confirmation",
       subject: "Application Submitted Successfully - {{job_title}}",
       content:
@@ -106,11 +249,12 @@ export function getAllEmailTemplates(): EmailTemplate[] {
         "{{position_department}}",
         "{{application_date}}",
       ],
+      requiresConfirmation: false,
+      confirmationDeadline: 5,
+      autoRejectOnOverdue: false,
     },
-
-    // Screening Stage Templates
     {
-      id: 3,
+      id: 8,
       name: "Screening Invitation",
       subject: "Next Steps - {{job_title}} at {{company_name}}",
       content:
@@ -123,199 +267,9 @@ export function getAllEmailTemplates(): EmailTemplate[] {
         "{{company_name}}",
         "{{interviewer_name}}",
       ],
-    },
-    {
-      id: 4,
-      name: "Phone Screening Scheduled",
-      subject: "Phone Screening Confirmed - {{job_title}}",
-      content:
-        "Dear {{candidate_name}},\n\nYour phone screening for the {{job_title}} position has been scheduled.\n\nScreening Details:\n- Date: {{interview_date}}\n- Time: {{interview_time}}\n- Duration: 30 minutes\n- Interviewer: {{interviewer_name}}\n\nWe'll call you at the number you provided. Please ensure you're available and in a quiet environment.\n\nLooking forward to speaking with you!\n\nBest regards,\n{{company_name}} Recruitment Team",
-      type: "confirmation",
-      stage: "screening",
-      variables: [
-        "{{candidate_name}}",
-        "{{job_title}}",
-        "{{company_name}}",
-        "{{interviewer_name}}",
-        "{{interview_date}}",
-        "{{interview_time}}",
-      ],
-    },
-
-    // Interview Stage Templates
-    {
-      id: 5,
-      name: "Interview Invitation",
-      subject: "Interview Invitation - {{job_title}} at {{company_name}}",
-      content:
-        "Dear {{candidate_name}},\n\nWe are impressed with your qualifications and would like to invite you for an interview for the {{job_title}} position.\n\nInterview Details:\n- Date: {{interview_date}}\n- Time: {{interview_time}}\n- Interviewer: {{interviewer_name}}\n- Location: {{company_name}} Headquarters\n\nPlease confirm your attendance by replying to this email. If you need to reschedule, please let us know as soon as possible.\n\nWe look forward to meeting you!\n\nBest regards,\n{{company_name}} Team",
-      type: "interview",
-      stage: "interview",
-      variables: [
-        "{{candidate_name}}",
-        "{{job_title}}",
-        "{{company_name}}",
-        "{{interviewer_name}}",
-        "{{interview_date}}",
-        "{{interview_time}}",
-      ],
-    },
-    {
-      id: 6,
-      name: "Interview Reminder",
-      subject: "Reminder: Interview Tomorrow - {{job_title}}",
-      content:
-        "Dear {{candidate_name}},\n\nThis is a friendly reminder about your interview scheduled for tomorrow at {{interview_time}} for the {{job_title}} position.\n\nInterview Details:\n- Date: {{interview_date}}\n- Time: {{interview_time}}\n- Interviewer: {{interviewer_name}}\n- Location: {{company_name}} Headquarters\n\nPlease arrive 10 minutes early and bring a copy of your resume. If you have any questions or need directions, please don't hesitate to contact us.\n\nBest regards,\n{{company_name}} Team",
-      type: "reminder",
-      stage: "interview",
-      variables: [
-        "{{candidate_name}}",
-        "{{job_title}}",
-        "{{company_name}}",
-        "{{interviewer_name}}",
-        "{{interview_date}}",
-        "{{interview_time}}",
-      ],
-    },
-    {
-      id: 7,
-      name: "Follow-up after Interview",
-      subject: "Thank you for interviewing - {{job_title}}",
-      content:
-        "Dear {{candidate_name}},\n\nThank you for taking the time to interview for the {{job_title}} position at {{company_name}}. We enjoyed learning more about your background and experience.\n\nWe were impressed by your knowledge and enthusiasm for the role. We will be in touch within the next few days with an update on next steps.\n\nIf you have any additional questions, please feel free to reach out.\n\nBest regards,\n{{company_name}} Team",
-      type: "follow-up",
-      stage: "interview",
-      variables: ["{{candidate_name}}", "{{job_title}}", "{{company_name}}"],
-    },
-
-    // Technical Stage Templates
-    {
-      id: 8,
-      name: "Technical Assessment Invitation",
-      subject: "Technical Assessment - {{job_title}} at {{company_name}}",
-      content:
-        "Dear {{candidate_name}},\n\nCongratulations on progressing to the technical assessment stage for the {{job_title}} position at {{company_name}}!\n\nTechnical Assessment Details:\n- Date: {{interview_date}}\n- Time: {{interview_time}}\n- Duration: 2 hours\n- Format: Coding challenge and system design discussion\n- Interviewer: {{interviewer_name}}\n\nPlease bring your laptop and be prepared to code in your preferred programming language. We'll provide all necessary development tools.\n\nIf you have any questions about the assessment format, please let us know.\n\nBest regards,\n{{company_name}} Technical Team",
-      type: "technical",
-      stage: "technical",
-      variables: [
-        "{{candidate_name}}",
-        "{{job_title}}",
-        "{{company_name}}",
-        "{{interviewer_name}}",
-        "{{interview_date}}",
-        "{{interview_time}}",
-      ],
-    },
-    {
-      id: 9,
-      name: "Technical Round Scheduled",
-      subject: "Technical Interview Confirmed - {{job_title}}",
-      content:
-        "Dear {{candidate_name}},\n\nYour technical interview for the {{job_title}} position has been scheduled.\n\nTechnical Interview Details:\n- Date: {{interview_date}}\n- Time: {{interview_time}}\n- Duration: 90 minutes\n- Interviewer: {{interviewer_name}} (Senior Engineer)\n- Format: Live coding and technical discussion\n\nTopics covered will include:\n- Problem-solving and algorithms\n- System design concepts\n- Best practices and code quality\n- Technical questions related to {{job_title}}\n\nPlease confirm your attendance. Good luck!\n\nBest regards,\n{{company_name}} Engineering Team",
-      type: "confirmation",
-      stage: "technical",
-      variables: [
-        "{{candidate_name}}",
-        "{{job_title}}",
-        "{{company_name}}",
-        "{{interviewer_name}}",
-        "{{interview_date}}",
-        "{{interview_time}}",
-      ],
-    },
-    {
-      id: 10,
-      name: "Technical Assessment Results",
-      subject: "Technical Assessment Follow-up - {{job_title}}",
-      content:
-        "Dear {{candidate_name}},\n\nThank you for completing the technical assessment for the {{job_title}} position at {{company_name}}.\n\nWe were impressed with your technical skills and problem-solving approach during the assessment. Our technical team will review your performance and we'll get back to you within 2-3 business days with the next steps.\n\nIf you have any questions about the assessment or the role, please don't hesitate to reach out.\n\nBest regards,\n{{company_name}} Technical Team",
-      type: "follow-up",
-      stage: "technical",
-      variables: ["{{candidate_name}}", "{{job_title}}", "{{company_name}}"],
-    },
-
-    // Offer Stage Templates
-    {
-      id: 11,
-      name: "Job Offer",
-      subject: "Job Offer - {{job_title}} at {{company_name}}",
-      content:
-        "Dear {{candidate_name}},\n\nWe are delighted to offer you the position of {{job_title}} at {{company_name}}!\n\nOffer Details:\n- Position: {{job_title}}\n- Department: {{position_department}}\n- Salary: {{salary_range}}\n- Start Date: Flexible, based on your availability\n\nPlease review the attached offer letter for complete details including benefits, vacation policy, and other terms.\n\nWe would like to hear your decision within 5 business days. If you have any questions or would like to discuss the offer, please don't hesitate to contact us.\n\nWe look forward to welcoming you to our team!\n\nBest regards,\n{{company_name}} HR Team",
-      type: "offer",
-      stage: "offer",
-      variables: [
-        "{{candidate_name}}",
-        "{{job_title}}",
-        "{{company_name}}",
-        "{{salary_range}}",
-        "{{position_department}}",
-      ],
-    },
-    {
-      id: 12,
-      name: "Offer Letter Follow-up",
-      subject: "Following up on your job offer - {{job_title}}",
-      content:
-        "Dear {{candidate_name}},\n\nI hope this email finds you well. I wanted to follow up on the job offer we extended for the {{job_title}} position at {{company_name}}.\n\nWe're excited about the possibility of you joining our team and would love to answer any questions you might have about the role, the company, or the offer details.\n\nPlease let us know if you need any additional information to help with your decision. We're here to support you through this process.\n\nLooking forward to hearing from you soon!\n\nBest regards,\n{{company_name}} HR Team",
-      type: "follow-up",
-      stage: "offer",
-      variables: ["{{candidate_name}}", "{{job_title}}", "{{company_name}}"],
-    },
-
-    // Hired Stage Templates
-    {
-      id: 13,
-      name: "Welcome to the Team",
-      subject: "Welcome to {{company_name}} - {{job_title}}",
-      content:
-        "Dear {{candidate_name}},\n\nWelcome to {{company_name}}! We are thrilled to have you join our team as {{job_title}}.\n\nYour first day is scheduled for {{interview_date}}. Here's what you can expect:\n\n- 9:00 AM: Arrival and welcome\n- 9:30 AM: HR orientation and paperwork\n- 11:00 AM: IT setup and access\n- 1:00 PM: Team lunch\n- 2:00 PM: Department introduction\n- 4:00 PM: First team meeting\n\nPlease bring:\n- Valid ID for I-9 verification\n- Banking information for direct deposit\n- Emergency contact information\n\nYour manager {{interviewer_name}} will be your primary point of contact and will help you get settled in.\n\nWe're excited to see the great things you'll accomplish with us!\n\nBest regards,\n{{company_name}} HR Team",
-      type: "welcome",
-      stage: "hired",
-      variables: [
-        "{{candidate_name}}",
-        "{{job_title}}",
-        "{{company_name}}",
-        "{{interviewer_name}}",
-        "{{interview_date}}",
-      ],
-    },
-    {
-      id: 14,
-      name: "Onboarding Instructions",
-      subject: "Onboarding Instructions - First Day at {{company_name}}",
-      content:
-        "Dear {{candidate_name}},\n\nWe're just a few days away from your start date as {{job_title}} at {{company_name}}! Here are some important details for your first day:\n\nFirst Day Details:\n- Date: {{interview_date}}\n- Time: 9:00 AM\n- Location: {{company_name}} Main Office\n- Contact: {{interviewer_name}} (your manager)\n\nWhat to expect:\n- Welcome orientation session\n- IT equipment setup\n- Benefits enrollment\n- Team introductions\n- Initial training schedule\n\nDress code: Business casual\n\nIf you have any questions before your start date, please don't hesitate to reach out.\n\nSee you soon!\n\nBest regards,\n{{company_name}} HR Team",
-      type: "onboarding",
-      stage: "hired",
-      variables: [
-        "{{candidate_name}}",
-        "{{job_title}}",
-        "{{company_name}}",
-        "{{interviewer_name}}",
-        "{{interview_date}}",
-      ],
-    },
-
-    // Rejected Stage Templates
-    {
-      id: 15,
-      name: "Application Not Selected",
-      subject: "Update on your application - {{job_title}}",
-      content:
-        "Dear {{candidate_name}},\n\nThank you for your interest in the {{job_title}} position at {{company_name}} and for the time you invested in our interview process.\n\nAfter careful consideration, we have decided to move forward with other candidates whose qualifications more closely match our current needs for this specific role.\n\nThis decision was not easy, as we were impressed by your background and experience. We encourage you to apply for future opportunities that match your skills and experience.\n\nWe will keep your resume on file and will reach out if a suitable position becomes available.\n\nThank you again for your interest in {{company_name}}.\n\nBest regards,\n{{company_name}} Recruitment Team",
-      type: "rejection",
-      stage: "rejected",
-      variables: ["{{candidate_name}}", "{{job_title}}", "{{company_name}}"],
-    },
-    {
-      id: 16,
-      name: "Thank You and Future Opportunities",
-      subject: "Thank you for your application - {{job_title}}",
-      content:
-        "Dear {{candidate_name}},\n\nThank you for taking the time to apply for the {{job_title}} position at {{company_name}}. We appreciate your interest in our company and the effort you put into your application.\n\nWhile we've decided to pursue other candidates for this particular role, we were impressed by your qualifications and would like to keep in touch for future opportunities.\n\nWe have added your profile to our talent pool and will notify you of relevant openings that match your skills and experience.\n\nWe wish you the best in your career search and hope to have the opportunity to work together in the future.\n\nBest regards,\n{{company_name}} Talent Acquisition Team",
-      type: "future-opportunity",
-      stage: "rejected",
-      variables: ["{{candidate_name}}", "{{job_title}}", "{{company_name}}"],
+      requiresConfirmation: false,
+      confirmationDeadline: 5,
+      autoRejectOnOverdue: false,
     },
   ];
 }
@@ -333,4 +287,48 @@ export const commonEmailVariables = [
   "{{application_date}}",
   "{{recruiter_name}}",
   "{{duration}}",
+  "{{confirmation_deadline}}",
+  "{{test_deadline}}",
+  "{{offer_deadline}}",
 ];
+
+// Helper functions for stage tracking
+export function createStageTracking(stage: string, duration: number = 5): StageTracking {
+  return {
+    stage,
+    enteredDate: new Date().toISOString(),
+    duration,
+    emailSent: false,
+    confirmationRequired: false,
+    completed: false,
+  };
+}
+
+export function createConfirmationStatus(
+  type: "interview" | "test" | "offer",
+  deadlineDays: number
+): ConfirmationStatus {
+  const now = new Date();
+  const deadline = new Date(now.getTime() + deadlineDays * 24 * 60 * 60 * 1000);
+  
+  return {
+    id: `${type}_${Date.now()}`,
+    type,
+    requestedDate: now.toISOString(),
+    deadline: deadline.toISOString(),
+    confirmed: null,
+    overdue: false,
+    autoRejected: false,
+  };
+}
+
+export function checkOverdueStatus(confirmationStatus: ConfirmationStatus): ConfirmationStatus {
+  const now = new Date();
+  const deadline = new Date(confirmationStatus.deadline);
+  
+  return {
+    ...confirmationStatus,
+    overdue: now > deadline,
+    autoRejected: now > deadline && confirmationStatus.confirmed === null,
+  };
+}

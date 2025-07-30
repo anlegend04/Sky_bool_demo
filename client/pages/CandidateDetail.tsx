@@ -73,6 +73,7 @@ import {
   Save,
   Trash2,
   Copy,
+  Globe,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -1180,8 +1181,15 @@ export default function CandidateDetail() {
 
     return (
       <div className="lg:col-span-2 order-1 lg:order-2">
-        <Tabs defaultValue="applications" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 h-auto">
+        <Tabs defaultValue="sumary" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 h-auto">
+            <TabsTrigger
+              value="sumary"
+              className="text-xs sm:text-sm px-2 py-2"
+            >
+              <span className="hidden sm:inline">Sumary</span>
+              <span className="sm:hidden">Experience</span>
+            </TabsTrigger>
             <TabsTrigger
               value="applications"
               className="text-xs sm:text-sm px-2 py-2"
@@ -1189,49 +1197,48 @@ export default function CandidateDetail() {
               <span className="hidden sm:inline">Job Applications</span>
               <span className="sm:hidden">Jobs</span>
             </TabsTrigger>
-            <TabsTrigger
-              value="education"
-              className="text-xs sm:text-sm px-2 py-2"
-            >
-              <span className="hidden sm:inline">Education & Experience</span>
-              <span className="sm:hidden">Experience</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="evaluations"
-              className="text-xs sm:text-sm px-2 py-2"
-            >
-              <span className="hidden sm:inline">CV Evaluations</span>
-              <span className="sm:hidden">CV Eval</span>
-            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="applications" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>
-                    Active Applications ({candidate.jobApplications.length})
-                  </span>
-                  <Button size="sm">
-                    <Plus className="w-4 h-4 mr-2" />
-                    Apply to New Job
-                  </Button>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {candidate.jobApplications.map((application) => (
-                    <JobApplicationCard
-                      key={application.id}
-                      application={application}
-                    />
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            {candidateJobs.map((job) => (
+              <Card key={job.id} className="hover:shadow-md transition-shadow">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div className="flex-1">
+                    <CardTitle className="text-base font-medium">
+                      {job.jobTitle}
+                    </CardTitle>
+                    <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <Building2 className="w-3 h-3" />
+                        {job.department}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {new Date(job.appliedDate).toLocaleDateString()}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      variant={getStageBadgeVariant(job.currentStage)}
+                      className="text-xs"
+                    >
+                      {job.currentStage}
+                    </Badge>
+                    <Button size="sm" variant="outline" asChild>
+                      <Link
+                        to={`/candidates/${candidate?.id}/jobs/${job.id}/progress`}
+                      >
+                        View Stage Progress
+                      </Link>
+                    </Button>
+                  </div>
+                </CardHeader>
+              </Card>
+            ))}
           </TabsContent>
 
-          <TabsContent value="education" className="space-y-4">
+          <TabsContent value="sumary" className="space-y-4">
             {/* Education */}
             <Card>
               <CardHeader>
@@ -1294,9 +1301,7 @@ export default function CandidateDetail() {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
 
-          <TabsContent value="evaluations" className="space-y-4">
             <Card>
               <CardHeader>
                 <CardTitle>CV Evaluations</CardTitle>
@@ -1375,6 +1380,109 @@ export default function CandidateDetail() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Professional Links */}
+            {(candidate.linkedInProfile ||
+              candidate.githubProfile ||
+              candidate.portfolioUrl) && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Professional Links</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {candidate.linkedInProfile && (
+                      <div className="flex items-center gap-3">
+                        <div className="w-4 h-4 bg-blue-600 rounded flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">
+                            in
+                          </span>
+                        </div>
+                        <a
+                          href={candidate.linkedInProfile}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-blue-600 hover:underline"
+                        >
+                          LinkedIn Profile
+                        </a>
+                      </div>
+                    )}
+                    {candidate.githubProfile && (
+                      <div className="flex items-center gap-3">
+                        <div className="w-4 h-4 bg-gray-900 rounded flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">
+                            gh
+                          </span>
+                        </div>
+                        <a
+                          href={candidate.githubProfile}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-gray-600 hover:underline"
+                        >
+                          GitHub Profile
+                        </a>
+                      </div>
+                    )}
+                    {candidate.portfolioUrl && (
+                      <div className="flex items-center gap-3">
+                        <Globe className="w-4 h-4 text-slate-500" />
+                        <a
+                          href={candidate.portfolioUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-blue-600 hover:underline"
+                        >
+                          Portfolio
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Attachments & Documents */}
+            {candidate.attachments && candidate.attachments.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Attachments & Documents</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {candidate.attachments.map((attachment) => (
+                      <div
+                        key={attachment.id}
+                        className="flex items-center justify-between p-3 border rounded-lg hover:bg-slate-50"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Paperclip className="w-4 h-4 text-slate-500" />
+                          <div>
+                            <p className="text-sm font-medium">
+                              {attachment.name}
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              {(attachment.size / 1024 / 1024).toFixed(2)} MB •{" "}
+                              {new Date(
+                                attachment.uploadedAt,
+                              ).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDownloadAttachment(attachment)}
+                        >
+                          <Download className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
         </Tabs>
       </div>

@@ -62,6 +62,14 @@ import { getCandidate } from "@/data/hardcoded-data";
 import { EmailTrigger } from "@/components/EmailTrigger";
 import { EnhancedCandidateData } from "@/types/enhanced-candidate";
 import { convertCandidateToEnhanced } from "@/data/enhanced-mock-data";
+import {
+  EmailTemplate,
+  ConfirmationStatus,
+  StageTracking,
+  getAllEmailTemplates,
+  getTemplatesForStage,
+} from "@/lib/email-utils";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 
 interface CandidateApplicationProgressProps {
   candidate?: EnhancedCandidateData;
@@ -78,7 +86,24 @@ type StageData = {
   reason?: string;
   mailSent?: boolean;
   mailConfirmed?: boolean;
+  // Enhanced email tracking
+  stageTracking?: StageTracking;
+  confirmationStatus?: ConfirmationStatus;
+  requiredEmails?: EmailTemplate[];
+  overdue?: boolean;
+  autoRejected?: boolean;
 };
+
+interface EmailStatusData {
+  template: EmailTemplate;
+  sent: boolean;
+  sentDate?: string;
+  confirmed?: boolean;
+  confirmedDate?: string;
+  overdue: boolean;
+  autoRejected: boolean;
+  deadline?: string;
+}
 
 export default function CandidateApplicationProgress(props: CandidateApplicationProgressProps) {
   const params = useParams();
@@ -95,6 +120,8 @@ export default function CandidateApplicationProgress(props: CandidateApplication
   const [showEmailTrigger, setShowEmailTrigger] = useState(false);
   const [newNote, setNewNote] = useState("");
   const [selectedJobId, setSelectedJobId] = useState<string | null>(jobId);
+  const [emailTemplates] = useState<EmailTemplate[]>(getAllEmailTemplates());
+  const [emailStatuses, setEmailStatuses] = useState<EmailStatusData[]>([]);
   const { toast } = useToast();
 
   // Handle case when no candidate is found
@@ -127,6 +154,54 @@ export default function CandidateApplicationProgress(props: CandidateApplication
       setJobApplication(app || null);
     }
   }, [selectedJobId, candidate]);
+
+  // Update email statuses when job application changes
+  useEffect(() => {
+    if (jobApplication) {
+      const statuses = analyzeEmailStatuses();
+      setEmailStatuses(statuses);
+    }
+  }, [jobApplication]);
+
+  // Handle email actions
+  const handleEmailAction = (action: 'send' | 'confirm' | 'autoReject', templateId: number) => {
+    const status = emailStatuses.find(s => s.template.id === templateId);
+    if (!status) return;
+
+    switch (action) {
+      case 'send':
+        setShowEmailTrigger(true);
+        toast({
+          title: "Email Trigger",
+          description: `Preparing to send ${status.template.name} email.`,
+        });
+        break;
+      case 'confirm':
+        // Update the email status to confirmed
+        setEmailStatuses(prev => prev.map(s => 
+          s.template.id === templateId 
+            ? { ...s, confirmed: true, confirmedDate: new Date().toISOString(), overdue: false, autoRejected: false }
+            : s
+        ));
+        toast({
+          title: "Email Confirmed",
+          description: `${status.template.name} has been marked as confirmed.`,
+        });
+        break;
+      case 'autoReject':
+        // Update the email status to auto-rejected
+        setEmailStatuses(prev => prev.map(s => 
+          s.template.id === templateId 
+            ? { ...s, autoRejected: true, overdue: true }
+            : s
+        ));
+        toast({
+          title: "Candidate Auto-Rejected",
+          description: `Candidate has been auto-rejected due to overdue ${status.template.name}.`,
+        });
+        break;
+    }
+  };
 
   // Auto-select job if candidate has only one application
   useEffect(() => {
@@ -218,6 +293,48 @@ export default function CandidateApplicationProgress(props: CandidateApplication
       </div>
     );
   }
+
+  // Analyze email statuses for the current application
+  const analyzeEmailStatuses = (): EmailStatusData[] => {
+    if (!jobApplication) return [];
+    
+    const statuses: EmailStatusData[] = [];
+    const currentStage = jobApplication.currentStage.toLowerCase();
+    
+    // Get required emails for each stage
+    const stageTemplates = getTemplatesForStage(currentStage);
+    
+    stageTemplates.forEach(template => {
+      const existingEmail = jobApplication.emails.find(email => 
+        email.template === template.name || email.subject.includes(template.name)
+      );
+      
+      const status: EmailStatusData = {
+        template,
+        sent: !!existingEmail,
+        sentDate: existingEmail?.timestamp,
+        confirmed: existingEmail?.repliedAt ? true : false,
+        confirmedDate: existingEmail?.repliedAt,
+        overdue: false,
+        autoRejected: false,
+        deadline: template.confirmationDeadline 
+          ? new Date(Date.now() + template.confirmationDeadline * 24 * 60 * 60 * 1000).toISOString()
+          : undefined
+      };
+      
+      // Check if overdue
+      if (template.requiresConfirmation && status.sent && !status.confirmed && status.deadline) {
+        const deadline = new Date(status.deadline);
+        const now = new Date();
+        status.overdue = now > deadline;
+        status.autoRejected = template.autoRejectOnOverdue && status.overdue;
+      }
+      
+      statuses.push(status);
+    });
+    
+    return statuses;
+  };
 
   // Convert stage history to StageData format
   const stages: StageData[] = [
@@ -402,65 +519,203 @@ export default function CandidateApplicationProgress(props: CandidateApplication
         </div>
 
         {/* Stages Grid */}
+        <TooltipProvider>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          {stages.map((stage, index) => (
-            <div key={stage.name} className="text-center relative group">
-              <div className="flex justify-center mb-1">
-                {stage.mailSent ? (
-                  stage.mailConfirmed ? (
-                    <CheckCircle className="w-4 h-4 text-blue-500" />
+          {stages.map((stage, index) => {
+            // Get email status for this stage
+            const stageEmailStatuses = emailStatuses.filter(status => 
+              status.template.stage?.toLowerCase() === stage.name.toLowerCase()
+            );
+            const hasOverdue = stageEmailStatuses.some(s => s.overdue);
+            const hasAutoRejected = stageEmailStatuses.some(s => s.autoRejected);
+            const hasConfirmationRequired = stageEmailStatuses.some(s => s.template.requiresConfirmation);
+            
+            return (
+              <div key={stage.name} className="text-center relative group">
+                {/* Email status indicators */}
+                <div className="flex justify-center mb-1 gap-1">
+                  {stageEmailStatuses.length > 0 ? (
+                    stageEmailStatuses.map((emailStatus, emailIndex) => (
+                      <Tooltip key={emailIndex}>
+                        <TooltipTrigger asChild>
+                          <div className="relative">
+                            {emailStatus.autoRejected ? (
+                              <AlertCircle className="w-4 h-4 text-red-500" />
+                            ) : emailStatus.overdue ? (
+                              <Clock className="w-4 h-4 text-orange-500" />
+                            ) : emailStatus.confirmed ? (
+                              <CheckCircle className="w-4 h-4 text-green-500" />
+                            ) : emailStatus.sent ? (
+                              <MailCheck className="w-4 h-4 text-blue-500" />
+                            ) : (
+                              <Mail className="w-4 h-4 text-slate-300" />
+                            )}
+                            {/* Chấm vàng nếu cần xác nhận và chưa xác nhận */}
+                            {emailStatus.template.requiresConfirmation && emailStatus.sent && !emailStatus.confirmed && !emailStatus.autoRejected && !emailStatus.overdue && (
+                              <span className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full border border-white"></span>
+                            )}
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
+                          <div className="text-xs font-semibold mb-1">{emailStatus.template.name}</div>
+                          <div className="text-xs">
+                            Trạng thái: {emailStatus.autoRejected ? "Auto-Rejected" : emailStatus.overdue ? "Overdue" : emailStatus.confirmed ? "Đã xác nhận" : emailStatus.sent ? "Đã gửi" : "Chưa gửi"}
+                          </div>
+                          {emailStatus.sentDate && (
+                            <div className="text-xs">Gửi lúc: {new Date(emailStatus.sentDate).toLocaleString()}</div>
+                          )}
+                          {emailStatus.template.requiresConfirmation && emailStatus.deadline && (
+                            <div className="text-xs">Deadline xác nhận: {new Date(emailStatus.deadline).toLocaleDateString()}</div>
+                          )}
+                          {emailStatus.confirmedDate && (
+                            <div className="text-xs">Xác nhận: {new Date(emailStatus.confirmedDate).toLocaleString()}</div>
+                          )}
+                        </TooltipContent>
+                      </Tooltip>
+                    ))
                   ) : (
-                    <MailCheck className="w-4 h-4 text-green-500" />
-                  )
-                ) : (
-                  <Mail className="w-4 h-4 text-slate-300" />
-                )}
-              </div>
-
-              {/* Circle stage */}
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center border-2 mx-auto mb-2 ${
-                  stage.completed
-                    ? "bg-green-500 border-green-500 text-white"
-                    : index === currentStageIndex
-                      ? "bg-blue-500 border-blue-500 text-white"
-                      : "bg-white border-slate-300 text-slate-400"
-                }`}
-              >
-                {stage.completed ? (
-                  <CheckCircle className="w-4 h-4" />
-                ) : index === currentStageIndex ? (
-                  <Circle className="w-4 h-4 fill-current" />
-                ) : (
-                  <Circle className="w-4 h-4" />
-                )}
-              </div>
-
-              {/* Stage name */}
-              <div className="text-xs font-medium text-slate-700 break-words px-1">
-                {stage.name}
-              </div>
-
-              {/* Duration */}
-              {stage.duration > 0 && (
-                <div className="text-xs text-slate-500 flex items-center justify-center gap-1 mt-1">
-                  <Clock className="w-3 h-3" />
-                  <span className="break-words">{stage.duration}d</span>
+                    <Mail className="w-4 h-4 text-slate-300" />
+                  )}
                 </div>
-              )}
 
-              {/* Email status tooltip */}
-              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                {stage.mailSent 
-                  ? stage.mailConfirmed 
-                    ? "Email confirmed" 
-                    : "Email sent, pending confirmation"
-                  : "No email sent"
-                }
+                {/* Circle stage */}
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center border-2 mx-auto mb-2 ${
+                    hasAutoRejected
+                      ? "bg-red-500 border-red-500 text-white"
+                      : hasOverdue
+                        ? "bg-orange-500 border-orange-500 text-white"
+                        : stage.completed
+                          ? "bg-green-500 border-green-500 text-white"
+                          : index === currentStageIndex
+                            ? "bg-blue-500 border-blue-500 text-white"
+                            : "bg-white border-slate-300 text-slate-400"
+                  }`}
+                >
+                  {hasAutoRejected ? (
+                    <AlertCircle className="w-4 h-4" />
+                  ) : hasOverdue ? (
+                    <Clock className="w-4 h-4" />
+                  ) : stage.completed ? (
+                    <CheckCircle className="w-4 h-4" />
+                  ) : index === currentStageIndex ? (
+                    <Circle className="w-4 h-4 fill-current" />
+                  ) : (
+                    <Circle className="w-4 h-4" />
+                  )}
+                </div>
+
+                {/* Stage name */}
+                <div className="text-xs font-medium text-slate-700 break-words px-1">
+                  {stage.name}
+                </div>
+
+                {/* Duration */}
+                {stage.duration > 0 && (
+                  <div className="text-xs text-slate-500 flex items-center justify-center gap-1 mt-1">
+                    <Clock className="w-3 h-3" />
+                    <span className="break-words">{stage.duration}d</span>
+                  </div>
+                )}
+
+                {/* Email status tooltip */}
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                  {stageEmailStatuses.length > 0 ? (
+                    <div>
+                      {stageEmailStatuses.map((emailStatus, emailIndex) => (
+                        <div key={emailIndex}>
+                          {emailStatus.template.name}: {
+                            emailStatus.autoRejected ? "Auto-Rejected" :
+                            emailStatus.overdue ? "Overdue" :
+                            emailStatus.confirmed ? "Confirmed" :
+                            emailStatus.sent ? "Sent" : "Required"
+                          }
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    "No email requirements"
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
+        </TooltipProvider>
+
+        {/* Email Status Overview */}
+        {emailStatuses.length > 0 && (
+          <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
+            <h4 className="font-medium text-blue-900 mb-3 flex items-center gap-2">
+              <Mail className="w-4 h-4" />
+              Email Status & Required Actions
+            </h4>
+            <div className="space-y-3">
+              {emailStatuses.map((status, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg border border-blue-100">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-medium text-sm text-slate-900">
+                        {status.template.name}
+                      </span>
+                      <Badge 
+                        variant={
+                          status.autoRejected ? "destructive" :
+                          status.overdue ? "destructive" :
+                          status.confirmed ? "default" :
+                          status.sent ? "secondary" : "outline"
+                        }
+                        className="text-xs"
+                      >
+                        {status.autoRejected ? "Auto-Rejected" :
+                         status.overdue ? "Overdue" :
+                         status.confirmed ? "Confirmed" :
+                         status.sent ? "Sent" : "Required"}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-slate-600">
+                      {status.template.subject}
+                    </p>
+                    {status.sentDate && (
+                      <p className="text-xs text-slate-500 mt-1">
+                        Sent: {new Date(status.sentDate).toLocaleDateString()}
+                      </p>
+                    )}
+                    {status.deadline && status.template.requiresConfirmation && (
+                      <p className="text-xs text-slate-500">
+                        Deadline: {new Date(status.deadline).toLocaleDateString()}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {!status.sent && (
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="text-xs"
+                        onClick={() => handleEmailAction('send', status.template.id)}
+                      >
+                        <Send className="w-3 h-3 mr-1" />
+                        Send
+                      </Button>
+                    )}
+                    {status.sent && !status.confirmed && status.template.requiresConfirmation && (
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="text-xs"
+                        onClick={() => handleEmailAction('confirm', status.template.id)}
+                      >
+                        <CheckCircle className="w-3 h-3 mr-1" />
+                        Mark Confirmed
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Stage Details */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mt-6">
@@ -565,9 +820,86 @@ export default function CandidateApplicationProgress(props: CandidateApplication
 
       {/* Main Content */}
       <div className="p-3 sm:p-4 lg:p-6 space-y-6 lg:space-y-0 lg:grid lg:grid-cols-12 lg:gap-6">
+        {/* Email Status Alerts */}
+        {emailStatuses.some(s => s.overdue || s.autoRejected) && (
+          <div className="lg:col-span-12">
+            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertCircle className="w-5 h-5 text-red-600" />
+                <h3 className="font-medium text-red-900">Action Required</h3>
+              </div>
+              <div className="text-sm text-red-700">
+                <p className="mb-2">
+                  {emailStatuses.filter(s => s.autoRejected).length} email(s) auto-rejected, 
+                  {emailStatuses.filter(s => s.overdue && !s.autoRejected).length} email(s) overdue
+                </p>
+                <div className="flex gap-2">
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="text-red-700 border-red-300 hover:bg-red-100"
+                    onClick={() => {
+                      const trackingTab = document.querySelector('[data-value="tracking"]') as HTMLElement;
+                      if (trackingTab) trackingTab.click();
+                    }}
+                  >
+                    View Details
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         {/* Left Panel - Status & Quick Actions */}
         <div className="lg:col-span-4 space-y-6">
           <StatusTracker />
+
+          {/* Email Tracking Summary */}
+          {emailStatuses.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
+                  <Mail className="w-4 h-4" />
+                  Email Tracking
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div className="text-center p-2 bg-green-50 rounded-lg">
+                    <div className="font-semibold text-green-700">
+                      {emailStatuses.filter(s => s.sent).length}
+                    </div>
+                    <div className="text-xs text-green-600">Sent</div>
+                  </div>
+                  <div className="text-center p-2 bg-blue-50 rounded-lg">
+                    <div className="font-semibold text-blue-700">
+                      {emailStatuses.filter(s => s.confirmed).length}
+                    </div>
+                    <div className="text-xs text-blue-600">Confirmed</div>
+                  </div>
+                  <div className="text-center p-2 bg-yellow-50 rounded-lg">
+                    <div className="font-semibold text-yellow-700">
+                      {emailStatuses.filter(s => s.overdue && !s.autoRejected).length}
+                    </div>
+                    <div className="text-xs text-yellow-600">Overdue</div>
+                  </div>
+                  <div className="text-center p-2 bg-red-50 rounded-lg">
+                    <div className="font-semibold text-red-700">
+                      {emailStatuses.filter(s => s.autoRejected).length}
+                    </div>
+                    <div className="text-xs text-red-600">Auto-Rejected</div>
+                  </div>
+                </div>
+                {emailStatuses.some(s => s.overdue || s.autoRejected) && (
+                  <div className="p-2 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-xs text-red-700 font-medium">
+                      ⚠️ Action Required: {emailStatuses.filter(s => s.overdue || s.autoRejected).length} emails need attention
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
           {/* Quick Actions */}
           <Card>
@@ -612,7 +944,7 @@ export default function CandidateApplicationProgress(props: CandidateApplication
         {/* Right Panel - Timeline & Communications */}
         <div className="lg:col-span-8">
           <Tabs defaultValue="timeline" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 h-auto">
+            <TabsList className="grid w-full grid-cols-4 h-auto">
               <TabsTrigger
                 value="timeline"
                 className="text-xs sm:text-sm px-2 py-2"
@@ -626,6 +958,13 @@ export default function CandidateApplicationProgress(props: CandidateApplication
               >
                 <span className="hidden sm:inline">Email History</span>
                 <span className="sm:hidden">Emails</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="tracking"
+                className="text-xs sm:text-sm px-2 py-2"
+              >
+                <span className="hidden sm:inline">Email Tracking</span>
+                <span className="sm:hidden">Tracking</span>
               </TabsTrigger>
               <TabsTrigger
                 value="stages"
@@ -794,6 +1133,152 @@ export default function CandidateApplicationProgress(props: CandidateApplication
                         </div>
                       </div>
                     ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="tracking" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Mail className="w-4 h-4" />
+                    Email Tracking & Required Actions
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {/* Current Stage Email Requirements */}
+                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                      <h4 className="font-medium text-blue-900 mb-3">
+                        Current Stage: {jobApplication.currentStage}
+                      </h4>
+                      <div className="space-y-3">
+                        {emailStatuses.length > 0 ? (
+                          emailStatuses.map((status, index) => (
+                            <div key={index} className="bg-white p-3 rounded-lg border border-blue-100">
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <span className="font-medium text-sm">
+                                      {status.template.name}
+                                    </span>
+                                    <Badge 
+                                      variant={
+                                        status.autoRejected ? "destructive" :
+                                        status.overdue ? "destructive" :
+                                        status.confirmed ? "default" :
+                                        status.sent ? "secondary" : "outline"
+                                      }
+                                      className="text-xs"
+                                    >
+                                      {status.autoRejected ? "Auto-Rejected" :
+                                       status.overdue ? "Overdue" :
+                                       status.confirmed ? "Confirmed" :
+                                       status.sent ? "Sent" : "Required"}
+                                    </Badge>
+                                  </div>
+                                  <p className="text-xs text-slate-600 mb-2">
+                                    {status.template.subject}
+                                  </p>
+                                  {status.template.requiresConfirmation && (
+                                    <div className="text-xs text-slate-500">
+                                      <p>Requires confirmation: Yes</p>
+                                      {status.deadline && (
+                                        <p>Deadline: {new Date(status.deadline).toLocaleDateString()}</p>
+                                      )}
+                                    </div>
+                                  )}
+                                  {status.sentDate && (
+                                    <p className="text-xs text-slate-500 mt-1">
+                                      Sent: {new Date(status.sentDate).toLocaleDateString()}
+                                    </p>
+                                  )}
+                                  {status.confirmedDate && (
+                                    <p className="text-xs text-green-600 mt-1">
+                                      Confirmed: {new Date(status.confirmedDate).toLocaleDateString()}
+                                    </p>
+                                  )}
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                  {!status.sent && (
+                                    <Button 
+                                      size="sm" 
+                                      variant="default" 
+                                      className="text-xs"
+                                      onClick={() => handleEmailAction('send', status.template.id)}
+                                    >
+                                      <Send className="w-3 h-3 mr-1" />
+                                      Send Email
+                                    </Button>
+                                  )}
+                                  {status.sent && !status.confirmed && status.template.requiresConfirmation && (
+                                    <Button 
+                                      size="sm" 
+                                      variant="outline" 
+                                      className="text-xs"
+                                      onClick={() => handleEmailAction('confirm', status.template.id)}
+                                    >
+                                      <CheckCircle className="w-3 h-3 mr-1" />
+                                      Mark Confirmed
+                                    </Button>
+                                  )}
+                                  {status.overdue && !status.autoRejected && (
+                                    <Button 
+                                      size="sm" 
+                                      variant="destructive" 
+                                      className="text-xs"
+                                      onClick={() => handleEmailAction('autoReject', status.template.id)}
+                                    >
+                                      <AlertCircle className="w-3 h-3 mr-1" />
+                                      Auto-Reject
+                                    </Button>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-sm text-slate-600">
+                            No email requirements for current stage.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* All Stage Email Templates */}
+                    <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg">
+                      <h4 className="font-medium text-slate-900 mb-3">
+                        All Stage Email Templates
+                      </h4>
+                      <div className="space-y-2">
+                        {["applied", "interview", "technical", "offer", "hired"].map((stage) => {
+                          const templates = getTemplatesForStage(stage);
+                          return (
+                            <div key={stage} className="bg-white p-3 rounded-lg border border-slate-100">
+                              <h5 className="font-medium text-sm text-slate-900 mb-2 capitalize">
+                                {stage} Stage
+                              </h5>
+                              <div className="space-y-1">
+                                {templates.map((template) => (
+                                  <div key={template.id} className="flex items-center justify-between text-xs">
+                                    <span className="text-slate-600">{template.name}</span>
+                                    <div className="flex items-center gap-1">
+                                      {template.requiresConfirmation && (
+                                        <Badge variant="outline" className="text-xs">Confirmation Required</Badge>
+                                      )}
+                                      {template.autoRejectOnOverdue && (
+                                        <Badge variant="outline" className="text-xs">Auto-Reject</Badge>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
