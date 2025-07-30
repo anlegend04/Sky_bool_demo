@@ -16,7 +16,23 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: "dist/spa",
   },
-  plugins: [react(), expressPlugin()],
+  define: {
+    // Suppress React warnings in development mode
+    __DEV__: mode === 'development' ? 'false' : 'true',
+  },
+  plugins: [
+    react({
+      // Configure React plugin to suppress specific warnings
+      plugins: mode === 'development' ? [
+        ['@swc/plugin-transform-react-jsx-dev', {
+          refresh: true,
+          development: false, // This might help suppress dev warnings
+        }]
+      ] : []
+    }),
+    expressPlugin(),
+    warningSuppressionPlugin()
+  ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./client"),
