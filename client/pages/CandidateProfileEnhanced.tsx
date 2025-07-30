@@ -237,18 +237,19 @@ export default function CandidateProfileEnhanced() {
             {/* Recent Activity */}
             {application.stageHistory.length > 0 && (
               <div className="pt-2 border-t border-slate-100">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm text-slate-600">
-                    <Clock className="w-3 h-3" />
-                    <span>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                  <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-600">
+                    <Clock className="w-3 h-3 flex-shrink-0" />
+                    <span className="truncate">
                       Last updated: {new Date(application.stageHistory[application.stageHistory.length - 1]?.startDate || '').toLocaleDateString()}
                     </span>
                   </div>
-                  <Link 
+                  <Link
                     to={`/candidates/${candidate.id}/jobs/${application.id}/progress`}
-                    className="text-sm text-primary hover:text-primary/80 font-medium flex items-center gap-1 group"
+                    className="text-xs sm:text-sm text-primary hover:text-primary/80 font-medium flex items-center gap-1 group w-fit"
                   >
-                    View Details
+                    <span className="hidden sm:inline">View Details</span>
+                    <span className="sm:hidden">Details</span>
                     <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                   </Link>
                 </div>
