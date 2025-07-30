@@ -120,6 +120,9 @@ export default function CandidateDetail() {
   const [newStage, setNewStage] = useState("");
   const [selectedEmail, setSelectedEmail] = useState<EmailData | null>(null);
   const [emailSubject, setEmailSubject] = useState("");
+  const [selectedCVEvaluation, setSelectedCVEvaluation] = useState<CVEvaluationData | null>(null);
+  const [showEditProfileDialog, setShowEditProfileDialog] = useState(false);
+  const [showResumePreview, setShowResumePreview] = useState(false);
   const { toast } = useToast();
 
   // Load candidate from hardcoded data or localStorage
