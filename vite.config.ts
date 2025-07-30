@@ -48,8 +48,8 @@ function warningSuppressionPlugin(): Plugin {
     name: "warning-suppression",
     apply: "serve",
     transformIndexHtml: {
-      enforce: 'pre',
-      transform(html) {
+      order: 'pre',
+      handler(html) {
         // Inject our warning suppression script at the very beginning
         return html.replace(
           '<head>',
