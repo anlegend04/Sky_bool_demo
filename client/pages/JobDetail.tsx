@@ -159,10 +159,19 @@ export default function JobDetail() {
   const handleDrop = (e: React.DragEvent, newStage: string) => {
     e.preventDefault();
     if (draggedCandidate) {
-      // Update the candidate's stage
+      // Update the candidate's stage for the specific job
       setCandidates((prevCandidates) =>
         prevCandidates.map((c) =>
-          c.id === draggedCandidate.id ? { ...c, stage: newStage as CandidateData['stage'] } : c
+          c.id === draggedCandidate.id 
+            ? {
+                ...c,
+                jobApplications: c.jobApplications.map(app => 
+                  app.jobId === job?.id 
+                    ? { ...app, currentStage: newStage as "Applied" | "Screening" | "Interview" | "Technical" | "Offer" | "Hired" | "Rejected" }
+                    : app
+                )
+              }
+            : c
         )
       );
 
@@ -215,13 +224,31 @@ export default function JobDetail() {
     }
   };
 
+  // Helper functions to get candidate data for the specific job
+  const getCandidateStage = (candidate: CandidateData) => {
+    const jobApp = candidate.jobApplications.find(app => app.jobId === job?.id);
+    return jobApp?.currentStage || "Applied";
+  };
+
+  const getCandidateDuration = (candidate: CandidateData) => {
+    const jobApp = candidate.jobApplications.find(app => app.jobId === job?.id);
+    if (!jobApp) return 0;
+    
+    const appliedDate = new Date(jobApp.appliedDate);
+    const now = new Date();
+    return Math.floor((now.getTime() - appliedDate.getTime()) / (1000 * 60 * 60 * 24));
+  };
+
   const getCandidateStatusColor = (candidate: CandidateData) => {
+    const stage = getCandidateStage(candidate);
+    const duration = getCandidateDuration(candidate);
+    
     // Green = progressing, Red = blocked, Gray = in review
-    if (candidate.stage === "Hired") return "border-l-green-500";
-    if (candidate.stage === "Rejected") return "border-l-red-500";
-    if (["Interview", "Technical", "Offer"].includes(candidate.stage))
+    if (stage === "Hired") return "border-l-green-500";
+    if (stage === "Rejected") return "border-l-red-500";
+    if (["Interview", "Technical", "Offer"].includes(stage))
       return "border-l-green-500";
-    if (candidate.duration > 7) return "border-l-red-500"; // Blocked if more than 7 days
+    if (duration > 7) return "border-l-red-500"; // Blocked if more than 7 days
     return "border-l-gray-500"; // In review
   };
 
@@ -295,7 +322,7 @@ export default function JobDetail() {
           <div className="flex items-center gap-2 min-w-0">
             <Clock className="w-3 h-3 flex-shrink-0" />
             <span className="text-xs break-words">
-              {candidate.duration} days in stage
+              {getCandidateDuration(candidate)} days in stage
             </span>
           </div>
         </div>
@@ -341,7 +368,7 @@ export default function JobDetail() {
           {candidate.name}
         </p>
         <p className="text-xs text-slate-500 break-words">
-          {candidate.duration} days
+          {getCandidateDuration(candidate)} days
         </p>
       </div>
       {/* Rating removed */}
@@ -557,8 +584,8 @@ export default function JobDetail() {
                     </td>
                     <td className="px-4 py-2">{candidate.email}</td>
                     <td className="px-4 py-2">{candidate.location}</td>
-                    <td className="px-4 py-2">{candidate.stage}</td>
-                    <td className="px-4 py-2">{candidate.duration} days</td>
+                    <td className="px-4 py-2">{getCandidateStage(candidate)}</td>
+                    <td className="px-4 py-2">{getCandidateDuration(candidate)} days</td>
                     <td className="px-4 py-2">
                       {/* Rating removed */}
                     </td>
@@ -728,7 +755,7 @@ export default function JobDetail() {
                   <p className="text-xl sm:text-2xl font-bold text-slate-900">
                     {
                       candidates.filter((c) =>
-                        ["Interview", "Technical"].includes(c.stage),
+                        ["Interview", "Technical"].includes(getCandidateStage(c)),
                       ).length
                     }
                   </p>
@@ -1114,7 +1141,7 @@ export default function JobDetail() {
               {selectedCandidatePopup?.name}
             </DialogTitle>
             <DialogDescription>
-              {selectedCandidatePopup?.position}
+              {selectedCandidatePopup?.jobApplications.find(app => app.jobId === job?.id)?.jobTitle || "Unknown Position"}
             </DialogDescription>
           </DialogHeader>
           {selectedCandidatePopup && (
@@ -1157,7 +1184,7 @@ export default function JobDetail() {
                 <label className="text-sm font-medium text-slate-700">
                   Current Stage
                 </label>
-                <Badge className="mt-1">{selectedCandidatePopup.stage}</Badge>
+                <Badge className="mt-1">{getCandidateStage(selectedCandidatePopup)}</Badge>
               </div>
               <div>
                 <label className="text-sm font-medium text-slate-700">
