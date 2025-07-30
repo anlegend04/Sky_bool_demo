@@ -67,6 +67,11 @@ import {
   HARDCODED_CANDIDATES,
   HARDCODED_INTERVIEWS,
 } from "@/data/hardcoded-data";
+import {
+  ENHANCED_JOBS,
+  ENHANCED_CANDIDATES,
+  ENHANCED_INTERVIEWS,
+} from "@/data/enhanced-mock-data";
 import { useLanguage } from "@/hooks/use-language";
 import { useToast } from "@/hooks/use-toast";
 import { RechartsWarningSuppress } from "@/components/RechartsWarningSuppress";
@@ -90,9 +95,9 @@ export default function Reports() {
 
   // Create dashboard stats data inline
   const dashboardStats = {
-    activeJobs: HARDCODED_JOBS.filter((job) => job.status === "Open").length,
-    totalCandidates: HARDCODED_CANDIDATES.length,
-    interviewsThisWeek: HARDCODED_CANDIDATES.filter((c) =>
+    activeJobs: ENHANCED_JOBS.filter((job) => job.status === "Open").length,
+    totalCandidates: ENHANCED_CANDIDATES.length,
+    interviewsThisWeek: ENHANCED_CANDIDATES.filter((c) =>
       c.jobApplications.some((app) =>
         ["Interview", "Technical"].includes(app.currentStage),
       ),
@@ -101,23 +106,23 @@ export default function Reports() {
   };
 
   // Calculate pipeline data from actual candidates
-  const totalCandidates = HARDCODED_CANDIDATES.length;
-  const appliedCount = HARDCODED_CANDIDATES.filter((c) =>
+  const totalCandidates = ENHANCED_CANDIDATES.length;
+  const appliedCount = ENHANCED_CANDIDATES.filter((c) =>
     c.jobApplications.some((app) => app.currentStage === "Applied"),
   ).length;
-  const screeningCount = HARDCODED_CANDIDATES.filter((c) =>
+  const screeningCount = ENHANCED_CANDIDATES.filter((c) =>
     c.jobApplications.some((app) => app.currentStage === "Screening"),
   ).length;
-  const interviewCount = HARDCODED_CANDIDATES.filter((c) =>
+  const interviewCount = ENHANCED_CANDIDATES.filter((c) =>
     c.jobApplications.some((app) => app.currentStage === "Interview"),
   ).length;
-  const technicalCount = HARDCODED_CANDIDATES.filter((c) =>
+  const technicalCount = ENHANCED_CANDIDATES.filter((c) =>
     c.jobApplications.some((app) => app.currentStage === "Technical"),
   ).length;
-  const offerCount = HARDCODED_CANDIDATES.filter((c) =>
+  const offerCount = ENHANCED_CANDIDATES.filter((c) =>
     c.jobApplications.some((app) => app.currentStage === "Offer"),
   ).length;
-  const hiredCount = HARDCODED_CANDIDATES.filter((c) =>
+  const hiredCount = ENHANCED_CANDIDATES.filter((c) =>
     c.jobApplications.some((app) => app.currentStage === "Hired"),
   ).length;
 
@@ -167,17 +172,17 @@ export default function Reports() {
   // Get unique values for filters
   const recruiters = Array.from(
     new Set(
-      HARDCODED_CANDIDATES.flatMap((c) =>
+      ENHANCED_CANDIDATES.flatMap((c) =>
         c.jobApplications.map((app) => app.recruiter),
       ),
     ),
   );
   const sources = Array.from(
-    new Set([...HARDCODED_CANDIDATES.map((c) => c.source), ...customSources]),
+    new Set([...ENHANCED_CANDIDATES.map((c) => c.source), ...customSources]),
   );
   const stages = Array.from(
     new Set([
-      ...HARDCODED_CANDIDATES.flatMap((c) =>
+      ...ENHANCED_CANDIDATES.flatMap((c) =>
         c.jobApplications.map((app) => app.currentStage),
       ),
       ...customStages,
@@ -266,10 +271,10 @@ export default function Reports() {
 
   // Filtered data based on current filters
   const filteredData = useMemo(() => {
-    let filtered = HARDCODED_CANDIDATES;
+    let filtered = ENHANCED_CANDIDATES;
 
     if (selectedJob !== "all") {
-      const job = HARDCODED_JOBS.find((j) => j.id === selectedJob);
+      const job = ENHANCED_JOBS.find((j) => j.id === selectedJob);
       if (job) {
         filtered = filtered.filter((c) =>
           c.jobApplications.some((app) => app.jobTitle === job.position),
@@ -504,7 +509,7 @@ export default function Reports() {
     ];
 
     // Cost by position
-    const costByPosition = HARDCODED_JOBS.map((job) => {
+    const costByPosition = ENHANCED_JOBS.map((job) => {
       const positionHires = filteredData.filter((c) =>
         c.jobApplications.some(
           (app) =>
@@ -566,7 +571,7 @@ export default function Reports() {
     {
       title: "Total Candidates",
       value: filteredData.length.toString(),
-      change: `${filteredData.length > 50 ? "+" : ""}${Math.round((filteredData.length / HARDCODED_CANDIDATES.length - 1) * 100)}%`,
+      change: `${filteredData.length > 50 ? "+" : ""}${Math.round((filteredData.length / ENHANCED_CANDIDATES.length - 1) * 100)}%`,
       trend: filteredData.length > 50 ? "up" : "down",
       icon: Users,
       color: "blue",
@@ -704,7 +709,7 @@ export default function Reports() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Jobs</SelectItem>
-                  {HARDCODED_JOBS.map((job) => (
+                  {ENHANCED_JOBS.map((job) => (
                     <SelectItem key={job.id} value={job.id}>
                       {job.position}
                     </SelectItem>
@@ -1020,12 +1025,12 @@ export default function Reports() {
                   <span className="font-semibold text-responsive-base text-wrap-safe">
                     $
                     {Math.round(
-                      HARDCODED_JOBS.reduce(
+                      ENHANCED_JOBS.reduce(
                         (sum, job) => sum + (job.budget?.actual || 0),
                         0,
                       ) /
                         Math.max(
-                          HARDCODED_JOBS.reduce(
+                          ENHANCED_JOBS.reduce(
                             (count, job) => count + job.hired,
                             0,
                           ),
@@ -1040,12 +1045,12 @@ export default function Reports() {
                   </span>
                   <span className="font-semibold text-green-600 text-responsive-base text-wrap-safe">
                     {Math.round(
-                      (HARDCODED_CANDIDATES.filter((c) =>
+                      (ENHANCED_CANDIDATES.filter((c) =>
                         c.jobApplications.some(
                           (app) => app.currentStage === "Hired",
                         ),
                       ).length /
-                        Math.max(HARDCODED_CANDIDATES.length, 1)) *
+                        Math.max(ENHANCED_CANDIDATES.length, 1)) *
                         100,
                     )}
                     %

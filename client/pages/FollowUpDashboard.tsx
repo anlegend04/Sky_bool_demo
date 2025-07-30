@@ -319,9 +319,30 @@ export default function FollowUpDashboard() {
 
   // Handle stage change with email trigger
   const handleStageChange = (candidate: FollowUpCandidate, newStage: string) => {
-    // Set pending stage change and show EmailTrigger
-    setPendingStageChange({ candidate, newStage });
-    setShowEmailTrigger(true);
+    const currentStage = candidate.stage || "Applied";
+    
+    // Define the proper stage transitions and their corresponding email templates
+    const stageTransitions = {
+      "Applied": "Screening", // Applied → Screening: Send confirmation email
+      "Screening": "Interview", // Screening → Interview: Send interview invitation
+      "Interview": "Technical", // Interview → Technical: Send interview results + technical test
+      "Technical": "Offer", // Technical → Offer: Send offer letter
+      "Offer": "Hired", // Offer → Hired: Send onboarding instructions
+    };
+    
+    // Check if this is a valid stage transition
+    if (stageTransitions[currentStage] === newStage) {
+      // Set pending stage change and show EmailTrigger
+      setPendingStageChange({ candidate, newStage });
+      setShowEmailTrigger(true);
+    } else {
+      // Invalid transition - show warning
+      toast({
+        title: "Invalid Stage Transition",
+        description: `Cannot move from ${currentStage} to ${newStage}. Please follow the proper recruitment flow.`,
+        variant: "destructive",
+      });
+    }
   };
 
   // Handle email sent or skipped from EmailTrigger
@@ -672,7 +693,7 @@ export default function FollowUpDashboard() {
   const CandidateCard = ({ candidate }: { candidate: FollowUpCandidate }) => {
     const stages = [
       "Applied",
-      "Screening",
+      "Screening", 
       "Interview",
       "Technical",
       "Offer",
@@ -788,15 +809,20 @@ export default function FollowUpDashboard() {
               <DropdownMenuItem
                 onClick={() => {
                   const currentStage = candidate.stage || "Applied";
-                  const nextStageIndex =
-                    stages.findIndex((s) => s === currentStage) + 1;
-                  if (nextStageIndex < stages.length) {
-                    handleStageChange(candidate, stages[nextStageIndex]);
+                  const stageTransitions = {
+                    "Applied": "Screening",
+                    "Screening": "Interview", 
+                    "Interview": "Technical",
+                    "Technical": "Offer",
+                    "Offer": "Hired",
+                  };
+                  const nextStage = stageTransitions[currentStage];
+                  if (nextStage) {
+                    handleStageChange(candidate, nextStage);
                   }
                 }}
                 disabled={
-                  stages.findIndex((s) => s === (candidate.stage || "Applied")) ===
-                  stages.length - 1
+                  !["Applied", "Screening", "Interview", "Technical", "Offer"].includes(candidate.stage || "Applied")
                 }
               >
                 <Mail className="w-4 h-4 mr-2" />
@@ -838,11 +864,29 @@ export default function FollowUpDashboard() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {stages.map((stage) => (
-                <SelectItem key={stage} value={stage} className="text-xs">
-                  {stage}
-                </SelectItem>
-              ))}
+              {stages.map((stage) => {
+                const currentStage = candidate.stage || "Applied";
+                const stageTransitions = {
+                  "Applied": "Screening",
+                  "Screening": "Interview", 
+                  "Interview": "Technical",
+                  "Technical": "Offer",
+                  "Offer": "Hired",
+                };
+                const isNextStage = stageTransitions[currentStage] === stage;
+                const isCurrentStage = stage === currentStage;
+                
+                return (
+                  <SelectItem 
+                    key={stage} 
+                    value={stage} 
+                    className={`text-xs ${isNextStage ? 'font-semibold text-blue-600' : ''}`}
+                    disabled={!isCurrentStage && !isNextStage}
+                  >
+                    {stage} {isNextStage ? '(Next)' : ''}
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
         </div>
@@ -855,7 +899,7 @@ export default function FollowUpDashboard() {
   const PipelineView = () => {
     const stages = [
       "Applied",
-      "Screening",
+      "Screening", 
       "Interview",
       "Technical",
       "Offer",
@@ -894,7 +938,7 @@ export default function FollowUpDashboard() {
 
     return (
       <div className="flex gap-4 overflow-x-auto pb-2">
-        {stages.map((stage) => {
+        {stages.map((stage, index) => {
           const stageCandidates = filteredCandidates.filter(
             (c) => c.stage === stage,
           );
@@ -1178,6 +1222,28 @@ export default function FollowUpDashboard() {
                             <Download className="w-4 h-4 mr-2" />
                             Download CV
                           </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              const currentStage = candidate.stage || "Applied";
+                              const stageTransitions = {
+                                "Applied": "Screening",
+                                "Screening": "Interview", 
+                                "Interview": "Technical",
+                                "Technical": "Offer",
+                                "Offer": "Hired",
+                              };
+                              const nextStage = stageTransitions[currentStage];
+                              if (nextStage) {
+                                handleStageChange(candidate, nextStage);
+                              }
+                            }}
+                            disabled={
+                              !["Applied", "Screening", "Interview", "Technical", "Offer"].includes(candidate.stage || "Applied")
+                            }
+                          >
+                            <Mail className="w-4 h-4 mr-2" />
+                            Move to Next Stage
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -1244,11 +1310,21 @@ export default function FollowUpDashboard() {
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            Recuitment Process
+            Recruitment Process
           </h1>
           <p className="text-gray-600 mt-1">
             Track and manage candidate progress across the hiring pipeline
           </p>
+          {/* <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <h4 className="text-sm font-medium text-blue-900 mb-2">📋 Recruitment Flow Rules:</h4>
+            <div className="text-xs text-blue-700 space-y-1">
+              <div>• <strong>Applied → Screening:</strong> Send confirmation email</div>
+              <div>• <strong>Screening → Interview:</strong> Send interview invitation</div>
+              <div>• <strong>Interview → Technical:</strong> Send interview results + technical test (if needed)</div>
+              <div>• <strong>Technical → Offer:</strong> Send offer letter</div>
+              <div>• <strong>Offer → Hired:</strong> Send onboarding instructions</div>
+            </div>
+          </div> */}
         </div>
         <div className="flex flex-wrap gap-3">
           {/* <Button variant="outline" size="sm">

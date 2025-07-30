@@ -485,7 +485,7 @@ export default function CandidateApplicationProgress(
             <span className="text-lg sm:text-xl">Application Progress</span>
             <HelpTooltip content="Track the candidate's progress through different stages for this specific job application" />
           </div>
-          <div className="flex flex-col sm:flex-row gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">                                                                                                                                                 
             <Badge variant="outline" className="flex items-center gap-1">
               <Building2 className="w-3 h-3" />
               {jobApplication.department}

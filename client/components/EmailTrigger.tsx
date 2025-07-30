@@ -63,8 +63,32 @@ export function EmailTrigger({
   const [isPreviewMode, setIsPreviewMode] = useState(true);
   const [isEmailOptional, setIsEmailOptional] = useState(false);
 
-  // Get templates for the new stage
-  const stageTemplates = getTemplatesForStage(newStage);
+  // Get templates for the new stage based on the transition
+  const getTemplatesForTransition = (currentStage: string, newStage: string) => {
+    const stageTransitions = {
+      "Applied": "Screening", // Applied → Screening: Send confirmation email
+      "Screening": "Interview", // Screening → Interview: Send interview invitation
+      "Interview": "Technical", // Interview → Technical: Send interview results + technical test
+      "Technical": "Offer", // Technical → Offer: Send offer letter
+      "Offer": "Hired", // Offer → Hired: Send onboarding instructions
+    };
+    
+    // Get templates for the new stage
+    const stageTemplates = getTemplatesForStage(newStage);
+    
+    // For Interview → Technical transition, show both technical test and no-test options
+    if (currentStage === "Interview" && newStage === "Technical") {
+      return stageTemplates.filter(template => 
+        template.name.includes("Technical Test") || template.name.includes("No Technical Test")
+      );
+    }
+    
+    return stageTemplates;
+  };
+  
+  // Get the stage from the candidate's job application
+  const candidateStage = candidate.jobApplications?.[0]?.currentStage || "Applied";
+  const stageTemplates = getTemplatesForTransition(candidateStage, newStage);
   const selectedTemplate = stageTemplates.find(
     (t) => t.id === selectedTemplateId,
   );
@@ -75,8 +99,14 @@ export function EmailTrigger({
       setSelectedTemplateId(stageTemplates[0].id);
     } else if (stageTemplates.length === 0) {
       setIsEmailOptional(true);
+    } else if (stageTemplates.length > 1 && candidateStage === "Interview" && newStage === "Technical") {
+      // For Interview → Technical, default to technical test required
+      const technicalTestTemplate = stageTemplates.find(t => t.name.includes("Technical Test"));
+      if (technicalTestTemplate) {
+        setSelectedTemplateId(technicalTestTemplate.id);
+      }
     }
-  }, [newStage, stageTemplates.length]);
+  }, [newStage, stageTemplates.length, candidateStage]);
 
   // Generate email content when template is selected
   useEffect(() => {
@@ -129,7 +159,7 @@ export function EmailTrigger({
           </DialogTitle>
           <DialogDescription>
             {stageTemplates.length > 0
-              ? `A template is available for the ${stageName} stage. Review and send the email to ${candidate.name}.`
+              ? `Moving ${candidate.name} from ${candidateStage} to ${stageName}. Select the appropriate email template to send.`
               : `No template available for the ${stageName} stage. You can skip sending an email or manually compose one.`}
           </DialogDescription>
         </DialogHeader>
@@ -176,6 +206,11 @@ export function EmailTrigger({
                   <p className="text-sm text-blue-700 mt-1">
                     Template for {stageName} stage communications
                   </p>
+                  {candidateStage === "Interview" && newStage === "Technical" && (
+                    <p className="text-xs text-blue-600 mt-2">
+                      💡 <strong>Recruitment Rule:</strong> After interview, choose whether candidate needs technical test or can proceed directly to offer.
+                    </p>
+                  )}
                 </div>
                 <Badge variant="outline">{selectedTemplate.type}</Badge>
               </div>
