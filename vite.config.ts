@@ -16,10 +16,7 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: "dist/spa",
   },
-  define: {
-    // Suppress React warnings in development mode
-    __DEV__: mode === 'development' ? 'false' : 'true',
-  },
+
   plugins: [
     react(),
     expressPlugin(),
