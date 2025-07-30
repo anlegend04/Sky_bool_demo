@@ -334,7 +334,6 @@ export interface ActivityData {
   userName: string;
   timestamp: string;
   metadata?: any;
-
 }
 
 export interface DashboardStatsData {
@@ -1820,6 +1819,75 @@ const generateMoreCandidates = (): CandidateData[] => {
     "Data Scientist",
     "DevOps Engineer",
   ];
+
+  const skillSets = {
+    "Frontend Developer": [
+      "React",
+      "TypeScript",
+      "JavaScript",
+      "CSS3",
+      "HTML5",
+      "Redux",
+      "GraphQL",
+      "Vue.js",
+    ],
+    "Backend Engineer": [
+      "Python",
+      "Node.js",
+      "Java",
+      "Django",
+      "PostgreSQL",
+      "MongoDB",
+      "AWS",
+      "Docker",
+    ],
+    "Full Stack Developer": [
+      "React",
+      "Node.js",
+      "JavaScript",
+      "TypeScript",
+      "MongoDB",
+      "SQL",
+      "AWS",
+      "Express",
+    ],
+    "Product Manager": [
+      "Product Strategy",
+      "User Research",
+      "Data Analysis",
+      "Agile",
+      "Roadmapping",
+      "SQL",
+      "Figma",
+    ],
+    "UX Designer": [
+      "Figma",
+      "User Research",
+      "Prototyping",
+      "Design Systems",
+      "Usability Testing",
+      "Adobe Creative Suite",
+    ],
+    "Data Scientist": [
+      "Python",
+      "R",
+      "SQL",
+      "Machine Learning",
+      "Data Visualization",
+      "TensorFlow",
+      "Pandas",
+    ],
+    "DevOps Engineer": [
+      "AWS",
+      "Docker",
+      "Kubernetes",
+      "CI/CD",
+      "Terraform",
+      "Linux",
+      "Ansible",
+    ],
+  };
+
   const stages = [
     "Applied",
     "Screening",
@@ -1829,6 +1897,7 @@ const generateMoreCandidates = (): CandidateData[] => {
     "Hired",
     "Rejected",
   ];
+
   const sources = [
     "LinkedIn",
     "Indeed",
@@ -1837,6 +1906,7 @@ const generateMoreCandidates = (): CandidateData[] => {
     "Glassdoor",
     "AngelList",
   ];
+
   const recruiters = [
     "Alex Chen",
     "Sarah Kim",
@@ -1844,15 +1914,52 @@ const generateMoreCandidates = (): CandidateData[] => {
     "Emily Rodriguez",
   ];
 
+  const departments = ["Engineering", "Product", "Design", "Data"];
+
+  const educationInstitutions = [
+    "Stanford University",
+    "MIT",
+    "UC Berkeley",
+    "Carnegie Mellon",
+    "University of Washington",
+    "NYU",
+    "Art Center College of Design",
+    "Georgia Tech",
+  ];
+
+  const degrees = ["Bachelor's", "Master's", "MBA", "PhD"];
+
+  const fields = [
+    "Computer Science",
+    "Business Administration",
+    "Interaction Design",
+    "Data Science",
+    "Electrical Engineering",
+    "Economics",
+  ];
+
+  const timezones = ["PST", "CST", "EST", "MST"];
+
   const candidates: CandidateData[] = [];
 
   for (let i = 5; i <= 100; i++) {
     const name = names[Math.floor(Math.random() * names.length)];
     const position = positions[Math.floor(Math.random() * positions.length)];
-
-    // Realistic stage distribution: more candidates in early stages
-    let stage;
+    const email = `${name.toLowerCase().replace(" ", ".")}@email.com`;
+    const location = [
+      "San Francisco, CA",
+      "New York, NY",
+      "Austin, TX",
+      "Seattle, WA",
+      "Remote",
+    ][Math.floor(Math.random() * 5)];
+    const source = sources[Math.floor(Math.random() * sources.length)];
+    const recruiter = recruiters[Math.floor(Math.random() * recruiters.length)];
+    const department =
+      departments[Math.floor(Math.random() * departments.length)];
+    const experienceYears = Math.floor(Math.random() * 10) + 1;
     const stageRand = Math.random();
+    let stage;
     if (stageRand < 0.4)
       stage = "Applied"; // 40%
     else if (stageRand < 0.65)
@@ -1867,63 +1974,251 @@ const generateMoreCandidates = (): CandidateData[] => {
       stage = "Hired"; // 3%
     else stage = "Rejected"; // 2%
 
-    const source = sources[Math.floor(Math.random() * sources.length)];
-    const recruiter = recruiters[Math.floor(Math.random() * recruiters.length)];
+    const skills = skillSets[position].slice(
+      0,
+      Math.floor(Math.random() * 3) + skillSets[position].length - 2,
+    );
+
+    const salaryBase =
+      position.includes("Manager") || position.includes("Senior")
+        ? 120000
+        : 80000;
+    const salary = `$${salaryBase + Math.floor(Math.random() * 30000)} - $${salaryBase + Math.floor(Math.random() * 50000) + 20000}`;
+
+    const education = [
+      {
+        id: `edu_${i}`,
+        institution:
+          educationInstitutions[
+            Math.floor(Math.random() * educationInstitutions.length)
+          ],
+        degree: degrees[Math.floor(Math.random() * degrees.length)],
+        field: fields[Math.floor(Math.random() * fields.length)],
+        graduationYear: (
+          2025 -
+          experienceYears -
+          Math.floor(Math.random() * 3)
+        ).toString(),
+        gpa: (3.0 + Math.random() * 0.9).toFixed(1),
+      },
+    ];
+
+    const workExperience = [];
+    let currentYear = 2025;
+    const experienceCount = Math.min(
+      experienceYears,
+      Math.floor(Math.random() * 3) + 1,
+    );
+    for (let j = 1; j <= experienceCount; j++) {
+      const jobDuration = Math.floor(experienceYears / experienceCount);
+      const startYear = currentYear - jobDuration;
+      const endYear = j === 1 ? undefined : currentYear;
+      currentYear = startYear;
+      workExperience.push({
+        id: `work_${i}_${j}`,
+        company: `TechCorp${Math.floor(Math.random() * 100)}`,
+        position: position.includes("Senior") ? `Junior ${position}` : position,
+        startDate: `${startYear}-${Math.floor(Math.random() * 12 + 1)
+          .toString()
+          .padStart(2, "0")}`,
+        endDate: endYear
+          ? `${endYear}-${Math.floor(Math.random() * 12 + 1)
+              .toString()
+              .padStart(2, "0")}`
+          : undefined,
+        description: `Contributed to ${position.toLowerCase()} projects, focusing on core functionalities`,
+        achievements: [
+          `Improved ${position.includes("Developer") ? "performance" : "user engagement"} by ${Math.floor(Math.random() * 30 + 10)}%`,
+          `Led a team of ${Math.floor(Math.random() * 5 + 2)} members`,
+        ],
+      });
+    }
+
+    const appliedDate = getRandomDate(Math.floor(Math.random() * 60) + 1);
+    const stageHistory = [];
+    let currentStageDate = appliedDate;
+    const stageIndices = stages.indexOf(stage);
+    for (let s = 0; s <= stageIndices; s++) {
+      const stageDuration = Math.floor(Math.random() * 7) + 1;
+      const endDate =
+        s < stageIndices
+          ? getRandomDate(Math.floor(Math.random() * 10) + 1)
+          : undefined;
+      stageHistory.push({
+        id: `stage_${i}_${s}`,
+        stage: stages[s],
+        startDate: currentStageDate,
+        endDate: endDate,
+        duration: stageDuration,
+        reason: `${stages[s]} phase completed`,
+        notes: `Candidate performed well in ${stages[s].toLowerCase()} phase`,
+        userId: `user_${Math.floor(Math.random() * 5) + 1}`,
+        userName: recruiters[Math.floor(Math.random() * recruiters.length)],
+        mailSent: true,
+        mailConfirmed: Math.random() > 0.2,
+      });
+      currentStageDate =
+        endDate ||
+        getRandomDate(Math.floor(Math.random() * 5) + 1);
+    }
+
+    const notes = [
+      {
+        id: `note_${i}`,
+        content: `Candidate shows promise in ${position.toLowerCase()} with relevant skills`,
+        userId: `user_${Math.floor(Math.random() * 5) + 1}`,
+        userName: recruiters[Math.floor(Math.random() * recruiters.length)],
+        timestamp: getRandomDateTime(Math.floor(Math.random() * 10) + 1),
+        type: "note" as "note",
+        tags: ["skills", stage.toLowerCase()],
+      },
+    ];
+
+    const emails = stageHistory.map((stage, idx) => ({
+      id: `email_${i}_${idx}`,
+      subject: `${stage.stage} - ${position}`,
+      content: `Dear ${name}, Thank you for your progress in our ${stage.stage.toLowerCase()} process...`,
+      from: `${stage.userName.toLowerCase().replace(" ", ".")}@techcorp.com`,
+      to: email,
+      timestamp: stage.startDate,
+      status: "sent" as "sent",
+      template: `${stage.stage.toLowerCase()}_template`,
+        openedAt: getRandomDateTime(
+        Math.floor(Math.random() * 2) + 1
+      ),
+      repliedAt:
+        Math.random() > 0.5
+          ? getRandomDateTime(
+              Math.floor(Math.random() * 2) + 1
+            )
+          : undefined,
+    }));
+
+    const attachments = [
+      {
+        id: `att_${i}`,
+        name: `${name.toLowerCase().replace(" ", "_")}_resume.pdf`,
+        type: "application/pdf",
+        size: Math.floor(Math.random() * 100000 + 100000),
+        url: `/files/resumes/${name.toLowerCase().replace(" ", "_")}_resume.pdf`,
+        uploadedAt: appliedDate,
+        uploadedBy: email,
+      },
+    ];
+
+    const cvEvaluations = [
+      {
+        id: `eval_${i}`,
+        candidateId: `candidate_${i}`,
+        jobId: `job_${Math.floor(Math.random() * 5) + 1}`,
+        fileName: `${name.toLowerCase().replace(" ", "_")}_resume.pdf`,
+        summary: `Candidate has relevant experience for ${position} with strong skills in ${skills[0]}.`,
+        strengths: skills.map((skill) => `Proficient in ${skill}`),
+        weaknesses: [
+          `Could improve in ${skillSets[position][Math.floor(Math.random() * skillSets[position].length)]}`,
+        ],
+        jobFitScore: Math.floor(Math.random() * 30) + 70,
+        finalVerdict:
+          stage === "Hired"
+            ? "Good Fit"
+            : stage === "Rejected"
+              ? "Not Suitable"
+              : "Needs Improvement" as "Good Fit" | "Needs Improvement" | "Not Suitable",
+        suggestedImprovements: [
+          `Consider additional training in ${skillSets[position][Math.floor(Math.random() * skillSets[position].length)]}`,
+        ],
+        skillsMatch: skills.map((skill) => ({
+          skill,
+          hasSkill: true,
+          level: ["Beginner", "Intermediate", "Advanced", "Expert"][
+            Math.floor(Math.random() * 4)
+          ],
+        })),
+        experienceMatch: Math.floor(Math.random() * 20) + 80,
+        educationMatch: Math.floor(Math.random() * 20) + 80,
+        recommendations: [
+          `Proceed to ${stages[Math.min(stages.indexOf(stage) + 1, stages.length - 1)]}`,
+        ],
+        extractedData: {
+          name,
+          email,
+          phone: `+1 (555) ${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 9000 + 1000)}`,
+          location,
+          education: education.map(
+            (edu) =>
+              `${edu.degree} in ${edu.field} - ${edu.institution} (${edu.graduationYear})`,
+          ),
+          workExperience: workExperience.map(
+            (exp) =>
+              `${exp.position} at ${exp.company} (${exp.startDate}${exp.endDate ? ` - ${exp.endDate}` : ""})`,
+          ),
+          skills,
+        },
+        notes: `Evaluated resume shows strong alignment with ${position} requirements`,
+        savedAt: getRandomDateTime(Math.floor(Math.random() * 10) + 1),
+        createdBy: recruiter,
+        isShared: Math.random() > 0.5,
+      },
+    ];
 
     candidates.push({
       id: `candidate_${i}`,
-      name: name,
-      email: `${name.toLowerCase().replace(" ", ".")}@email.com`,
+      name,
+      email,
       phone: `+1 (555) ${Math.floor(Math.random() * 900 + 100)}-${Math.floor(Math.random() * 9000 + 1000)}`,
-      location: [
-        "San Francisco, CA",
-        "New York, NY",
-        "Austin, TX",
-        "Seattle, WA",
-        "Remote",
-      ][Math.floor(Math.random() * 5)],
-      position: position,
-      experience: `${Math.floor(Math.random() * 10 + 1)} years`,
-      skills: ["JavaScript", "Python", "React", "Node.js", "SQL"].slice(
-        0,
-        Math.floor(Math.random() * 5) + 3,
-      ),
-      status: ["Active", "Inactive"][Math.floor(Math.random() * 2)] as
-        | "Active"
-        | "Inactive",
+      location,
+      position,
+      experience: `${experienceYears} years`,
+      skills,
+      status:
+        stage === "Hired" || stage === "Offer"
+          ? "Active"
+          : (["Active", "Inactive"][Math.floor(Math.random() * 2)] as
+              | "Active"
+              | "Inactive"),
       stage: stage as any,
       rating: Math.floor(Math.random() * 5) + 1,
-      appliedDate: getRandomDate(Math.floor(Math.random() * 60) + 1),
+      appliedDate,
       resume: `${name.toLowerCase().replace(" ", "_")}_resume.pdf`,
       avatar: `https://images.unsplash.com/photo-${Math.floor(Math.random() * 1000000000000) + 1500000000000}?w=150&h=150&fit=crop&crop=face`,
-      salary: `$${Math.floor(Math.random() * 50000) + 80000}`,
-      source: source,
-      recruiter: recruiter,
-      department: ["Engineering", "Product", "Design", "Data"][
-        Math.floor(Math.random() * 4)
-      ],
+      salary,
+      source,
+      recruiter,
+      department,
       duration: Math.floor(Math.random() * 30) + 1,
       tags: [
         "Strong Technical Skills",
         "Cultural Fit",
         "Leadership Potential",
+        "Creative",
+        "Analytical",
       ].slice(0, Math.floor(Math.random() * 3) + 1),
-      education: [],
-      workExperience: [],
-      lastActivity: getRandomDateTime(Math.floor(Math.random() * 30) + 1),
+      linkedInProfile: `https://linkedin.com/in/${name.toLowerCase().replace(" ", "-")}`,
+      githubProfile:
+        position.includes("Developer") || position.includes("Engineer")
+          ? `https://github.com/${name.toLowerCase().replace(" ", "-")}`
+          : undefined,
+      portfolioUrl: position.includes("Designer")
+        ? `https://${name.toLowerCase().replace(" ", "")}.design`
+        : undefined,
+      education,
+      workExperience,
+      lastActivity: getRandomDateTime(Math.floor(Math.random() * 5) + 1),
       communicationPreference: ["email", "phone", "video"][
         Math.floor(Math.random() * 3)
       ] as any,
-      timezone: "PST",
-      availability: ["Immediate", "2 weeks", "1 month"][
-        Math.floor(Math.random() * 3)
-      ],
+      timezone: timezones[Math.floor(Math.random() * timezones.length)],
+      availability:
+        stage === "Hired"
+          ? "Hired"
+          : ["Immediate", "2 weeks", "1 month"][Math.floor(Math.random() * 3)],
       jobId: `job_${Math.floor(Math.random() * 5) + 1}`,
-      stageHistory: [],
-      notes: [],
-      emails: [],
-      attachments: [],
-      createdAt: getRandomDateTime(Math.floor(Math.random() * 60) + 1),
+      stageHistory,
+      notes,
+      emails,
+      attachments,
+      cvEvaluations,
+      createdAt: appliedDate,
       updatedAt: getRandomDateTime(Math.floor(Math.random() * 5) + 1),
     });
   }
