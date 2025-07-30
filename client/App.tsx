@@ -4,10 +4,12 @@ import "./global.css";
 // Enhanced React warning suppression
 (() => {
   const originalReactWarn = console.warn;
-  console.warn = function (format: any, ...args: any[]) {
+  console.warn = function (...allArgs: any[]) {
+    const [format, ...args] = allArgs;
+
     // Handle React's warning format with %s placeholders
     if (typeof format === "string") {
-      // Check for defaultProps warning pattern
+      // Check for defaultProps warning pattern in the format string
       if (format.includes("Support for defaultProps will be removed")) {
         // Check if any argument contains Recharts component names
         const hasRechartsComponent = args.some((arg: any) => {
@@ -23,7 +25,9 @@ import "./global.css";
             argStr.includes("ResponsiveContainer") ||
             argStr.includes("BarChart") ||
             argStr.includes("LineChart") ||
-            argStr.includes("PieChart")
+            argStr.includes("PieChart") ||
+            argStr.includes("FunnelChart") ||
+            argStr.includes("RadarChart")
           );
         });
 
@@ -32,21 +36,30 @@ import "./global.css";
         }
       }
 
-      // Also check the full formatted message
-      const fullMessage = format.replace(/%s/g, () =>
-        String(args.shift() || ""),
-      );
+      // Also check for any recharts-related warnings
+      const allArgsString = allArgs.join(' ');
       if (
-        fullMessage.includes("Support for defaultProps will be removed") &&
-        (fullMessage.includes("XAxis") ||
-          fullMessage.includes("YAxis") ||
-          fullMessage.includes("recharts"))
+        (format.includes("Support for defaultProps") ||
+         allArgsString.includes("Support for defaultProps")) &&
+        (allArgsString.includes("XAxis") ||
+         allArgsString.includes("YAxis") ||
+         allArgsString.includes("recharts") ||
+         allArgsString.includes("CartesianGrid") ||
+         allArgsString.includes("Tooltip") ||
+         allArgsString.includes("Legend"))
       ) {
         return; // Suppress this warning
       }
     }
 
-    return originalReactWarn.apply(console, [format, ...args]);
+    // Check the entire args array as a string
+    const fullArgsString = allArgs.join(' ');
+    if (fullArgsString.includes('Support for defaultProps will be removed') &&
+        (fullArgsString.includes('XAxis') || fullArgsString.includes('YAxis'))) {
+      return; // Suppress this warning
+    }
+
+    return originalReactWarn.apply(console, allArgs);
   };
 })();
 
