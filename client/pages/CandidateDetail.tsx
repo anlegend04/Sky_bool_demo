@@ -1301,6 +1301,168 @@ export default function CandidateDetail() {
         </DialogContent>
       </Dialog>
 
+      {/* CV Evaluation Dialog */}
+      <Dialog
+        open={!!selectedCVEvaluation}
+        onOpenChange={() => setSelectedCVEvaluation(null)}
+      >
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              CV Evaluation Details
+              <Badge variant={selectedCVEvaluation?.finalVerdict === "Good Fit" ? "default" :
+                             selectedCVEvaluation?.finalVerdict === "Needs Improvement" ? "secondary" : "destructive"}>
+                {selectedCVEvaluation?.finalVerdict}
+              </Badge>
+            </DialogTitle>
+            <DialogDescription>
+              Analysis for {selectedCVEvaluation?.fileName} • {selectedCVEvaluation?.jobFitScore}% job fit score
+            </DialogDescription>
+          </DialogHeader>
+          {selectedCVEvaluation && (
+            <div className="space-y-6">
+              <div>
+                <h4 className="font-semibold mb-2">Summary</h4>
+                <p className="text-sm text-slate-600">{selectedCVEvaluation.summary}</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="font-semibold mb-2 text-green-700">Strengths</h4>
+                  <ul className="space-y-1">
+                    {selectedCVEvaluation.strengths.map((strength, index) => (
+                      <li key={index} className="text-sm text-slate-600 flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        {strength}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold mb-2 text-orange-700">Areas for Improvement</h4>
+                  <ul className="space-y-1">
+                    {selectedCVEvaluation.weaknesses.map((weakness, index) => (
+                      <li key={index} className="text-sm text-slate-600 flex items-start gap-2">
+                        <AlertCircle className="w-4 h-4 text-orange-500 mt-0.5 flex-shrink-0" />
+                        {weakness}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-2">Skills Match</h4>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {selectedCVEvaluation.skillsMatch.map((skill, index) => (
+                    <div key={index} className="flex items-center gap-2 p-2 bg-slate-50 rounded">
+                      <div className={`w-2 h-2 rounded-full ${
+                        skill.hasSkill ? "bg-green-500" : "bg-red-500"
+                      }`} />
+                      <span className="text-sm truncate">{skill.skill}</span>
+                      {skill.hasSkill && skill.level && (
+                        <Badge variant="outline" className="text-xs">{skill.level}</Badge>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h4 className="font-semibold mb-2">Recommendations</h4>
+                <ul className="space-y-1">
+                  {selectedCVEvaluation.recommendations.map((rec, index) => (
+                    <li key={index} className="text-sm text-slate-600 flex items-start gap-2">
+                      <Target className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                      {rec}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {selectedCVEvaluation.notes && (
+                <div>
+                  <h4 className="font-semibold mb-2">Additional Notes</h4>
+                  <p className="text-sm text-slate-600 bg-slate-50 p-3 rounded">{selectedCVEvaluation.notes}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Resume Preview Dialog */}
+      <Dialog open={showResumePreview} onOpenChange={setShowResumePreview}>
+        <DialogContent className="sm:max-w-4xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle>Resume Preview</DialogTitle>
+            <DialogDescription>{candidate.resume}</DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 bg-slate-100 rounded-lg p-4 min-h-[60vh] flex items-center justify-center">
+            <div className="text-center text-slate-500">
+              <FileText className="w-16 h-16 mx-auto mb-4 text-slate-300" />
+              <p className="mb-2">Resume Preview</p>
+              <p className="text-sm">PDF viewer would be integrated here</p>
+              <Button className="mt-4" onClick={() => handleDownloadResume()}>
+                <Download className="w-4 h-4 mr-2" />
+                Download Resume
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Profile Dialog */}
+      <Dialog open={showEditProfileDialog} onOpenChange={setShowEditProfileDialog}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Candidate Profile</DialogTitle>
+            <DialogDescription>
+              Update candidate information and details
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium">Name</label>
+                <Input defaultValue={candidate.name} />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Email</label>
+                <Input defaultValue={candidate.email} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium">Phone</label>
+                <Input defaultValue={candidate.phone} />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Location</label>
+                <Input defaultValue={candidate.location} />
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium">Position</label>
+              <Input defaultValue={candidate.position} />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Experience</label>
+              <Input defaultValue={candidate.experience} />
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={() => setShowEditProfileDialog(false)}>
+                Cancel
+              </Button>
+              <Button onClick={() => handleSaveProfile()}>
+                Save Changes
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Email Trigger Modal */}
       {candidate && (
         <EmailTrigger
