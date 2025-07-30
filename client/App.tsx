@@ -4,17 +4,12 @@ import "./global.css";
 // Suppress Recharts defaultProps warnings
 const originalWarn = console.warn;
 console.warn = (format: any, ...args: any[]) => {
-  // Handle React's format string warnings
-  if (typeof format === 'string') {
-    const fullMessage = format + ' ' + args.join(' ');
-
-    // Check for Recharts defaultProps warnings
-    const isRechartsDefaultPropsWarning =
-      fullMessage.includes('Support for defaultProps will be removed') &&
-      (fullMessage.includes('XAxis') || fullMessage.includes('YAxis'));
-
-    if (isRechartsDefaultPropsWarning) {
-      return; // Suppress this warning
+  // Handle React's specific defaultProps warning format
+  if (typeof format === 'string' && format.includes('Support for defaultProps will be removed')) {
+    // Check if any of the arguments are Recharts components
+    const argsString = args.join(' ');
+    if (argsString.includes('XAxis') || argsString.includes('YAxis')) {
+      return; // Suppress Recharts defaultProps warnings
     }
   }
 
