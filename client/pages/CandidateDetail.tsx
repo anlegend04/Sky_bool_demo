@@ -136,11 +136,7 @@ const getPriorityColor = (priority: string) => {
 };
 
 // JobApplicationCard component
-const JobApplicationCard = ({
-  application,
-}: {
-  application: any;
-}) => {
+const JobApplicationCard = ({ application }: { application: any }) => {
   const completedStages = application.stageHistory?.length || 0;
   const totalStages = 6; // Applied, Screening, Interview, Technical, Offer, Hired
   const progressPercentage = (completedStages / totalStages) * 100;
@@ -159,11 +155,7 @@ const JobApplicationCard = ({
                 <div className="sm:hidden">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8 w-8 p-0"
-                      >
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                         <MoreHorizontal className="w-4 h-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -286,7 +278,11 @@ const JobApplicationCard = ({
                     ).toLocaleDateString()}
                   </span>
                 </div>
-                <Button variant="ghost" size="sm" className="text-xs sm:text-sm text-primary hover:text-primary/80 font-medium flex items-center gap-1 group w-fit">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-xs sm:text-sm text-primary hover:text-primary/80 font-medium flex items-center gap-1 group w-fit"
+                >
                   <span className="hidden sm:inline">View Details</span>
                   <span className="sm:hidden">Details</span>
                   <ArrowLeft className="w-3 h-3 group-hover:translate-x-0.5 transition-transform rotate-180" />
