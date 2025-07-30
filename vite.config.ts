@@ -38,34 +38,3 @@ function expressPlugin(): Plugin {
     },
   };
 }
-
-function warningSuppressionPlugin(): Plugin {
-  return {
-    name: "warning-suppression",
-    apply: "serve",
-    transformIndexHtml: {
-      order: "pre",
-      handler(html) {
-        // Inject our warning suppression script at the very beginning
-        return html.replace(
-          "<head>",
-          `<head>
-    <script>
-      // Immediate React warning suppression - runs before any other code
-      (function() {
-        const originalWarn = console.warn;
-        console.warn = function(format, ...args) {
-          if (typeof format === 'string' &&
-              format.includes('Support for defaultProps will be removed') &&
-              args.some(arg => typeof arg === 'string' && (arg.includes('XAxis') || arg.includes('YAxis')))) {
-            return; // Suppress Recharts defaultProps warnings
-          }
-          return originalWarn.apply(console, [format, ...args]);
-        };
-      })();
-    </script>`,
-        );
-      },
-    },
-  };
-}
