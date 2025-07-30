@@ -337,9 +337,9 @@ export default function CandidateApplicationProgress(
     const stageTemplates = getTemplatesForStage(currentStage);
 
     stageTemplates.forEach((template) => {
-      // Find emails sent for this template - improved matching logic
+              // Find emails sent for this template - improved matching logic
       const existingEmail = jobApplication.emails.find((email) => {
-        // Compare by template name or subject contains template name or stage name
+                  // Compare by template name or subject contains template name or stage name
         const templateNameMatch = email.template === template.name;
         const subjectMatch = email.subject
           .toLowerCase()
@@ -411,20 +411,20 @@ export default function CandidateApplicationProgress(
       (s) => s.stage === stageName,
     );
 
-    // Calculate completion status based on stage history and current stage
+            // Calculate completion status based on stage history and current stage
     const thisStageIndex = index;
     const isCompleted = stageData && stageData.endDate;
     const isCurrentStage = stageName === jobApplication.currentStage;
     const isPastStage = thisStageIndex < currentStageIndex;
 
-    // Determine completion status
+            // Determine completion status
     let completionStatus: "completed" | "current" | "pending" | "not_started";
     if (isCompleted) {
       completionStatus = "completed";
     } else if (isCurrentStage) {
       completionStatus = "current";
     } else if (isPastStage) {
-      completionStatus = "completed"; // If already passed this stage but no endDate, consider as completed
+              completionStatus = "completed"; // If already passed this stage but no endDate, consider as completed
     } else {
       completionStatus = "not_started";
     }
@@ -483,79 +483,7 @@ export default function CandidateApplicationProgress(
         <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
           <div className="flex items-center gap-2">
             <span className="text-lg sm:text-xl">Application Progress</span>
-            <HelpTooltip
-              content={
-                <div className="space-y-3 max-w-md">
-                  <div className="font-medium text-sm">
-                    How to read this interface:
-                  </div>
-                  <div className="space-y-2 text-xs">
-                    <div>
-                      <div className="font-medium mb-1">
-                        📧 Email Icons (above each stage):
-                      </div>
-                      <div className="space-y-1 ml-2">
-                        <div>
-                          • <span className="text-slate-300">Gray mail</span> =
-                          Email not sent yet
-                        </div>
-                        <div>
-                          • <span className="text-blue-500">Blue mail</span> =
-                          Email sent to candidate
-                        </div>
-                        <div>
-                          • <span className="text-green-500">Green check</span>{" "}
-                          = Candidate confirmed
-                        </div>
-                        <div>
-                          •{" "}
-                          <span className="text-orange-500">Orange clock</span>{" "}
-                          = Waiting for confirmation
-                        </div>
-                        <div>
-                          • <span className="text-red-500">Red alert</span> =
-                          Auto-rejected (missed deadline)
-                        </div>
-                        <div>
-                          • <span className="text-yellow-500">Yellow dot</span>{" "}
-                          = Needs candidate confirmation
-                        </div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="font-medium mb-1">⭕ Stage Circles:</div>
-                      <div className="space-y-1 ml-2">
-                        <div>
-                          • <span className="text-slate-400">Gray circle</span>{" "}
-                          = Stage not started
-                        </div>
-                        <div>
-                          • <span className="text-blue-500">Blue circle</span> =
-                          Current stage
-                        </div>
-                        <div>
-                          • <span className="text-green-500">Green check</span>{" "}
-                          = Stage completed
-                        </div>
-                        <div>
-                          •{" "}
-                          <span className="text-orange-500">Orange clock</span>{" "}
-                          = Stage overdue
-                        </div>
-                        <div>
-                          • <span className="text-red-500">Red alert</span> =
-                          Stage auto-rejected
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-slate-600 border-t pt-2">
-                      💡 <strong>Tip:</strong> Hover over any icon or stage
-                      circle for detailed information
-                    </div>
-                  </div>
-                </div>
-              }
-            />
+            <HelpTooltip content="Track the candidate's progress through different stages for this specific job application" />
           </div>
           <div className="flex flex-col sm:flex-row gap-2">
             <Badge variant="outline" className="flex items-center gap-1">
@@ -650,7 +578,39 @@ export default function CandidateApplicationProgress(
           />
         </div>
 
-        {/* Interface Legend - Now hidden by default, shown in tooltip */}
+        {/* Interface Legend */}
+        <div className="mb-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
+          <div className="flex items-center gap-2 mb-3">
+            <HelpCircle className="w-4 h-4 text-slate-600" />
+            <span className="font-medium text-sm text-slate-900">How to read this interface:</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-700">
+            <div className="space-y-2">
+              <div className="font-medium">📧 Email Icons (above each stage):</div>
+              <div className="space-y-1 ml-2">
+                <div>• <span className="text-slate-300">Gray mail</span> = Email not sent yet</div>
+                <div>• <span className="text-blue-500">Blue mail</span> = Email sent to candidate</div>
+                <div>• <span className="text-green-500">Green check</span> = Candidate confirmed</div>
+                <div>• <span className="text-orange-500">Orange clock</span> = Waiting for confirmation</div>
+                <div>• <span className="text-red-500">Red alert</span> = Auto-rejected (missed deadline)</div>
+                <div>• <span className="text-yellow-500">Yellow dot</span> = Needs candidate confirmation</div>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <div className="font-medium">⭕ Stage Circles:</div>
+              <div className="space-y-1 ml-2">
+                <div>• <span className="text-slate-400">Gray circle</span> = Stage not started</div>
+                <div>• <span className="text-blue-500">Blue circle</span> = Current stage</div>
+                <div>• <span className="text-green-500">Green check</span> = Stage completed</div>
+                <div>• <span className="text-orange-500">Orange clock</span> = Stage overdue</div>
+                <div>• <span className="text-red-500">Red alert</span> = Stage auto-rejected</div>
+              </div>
+            </div>
+          </div>
+          <div className="mt-3 text-xs text-slate-600">
+            💡 <strong>Tip:</strong> Hover over any icon or stage circle for detailed information
+          </div>
+        </div>
 
         {/* Current Stage Highlight */}
         <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
@@ -673,9 +633,7 @@ export default function CandidateApplicationProgress(
         {/* Stages Grid */}
         <div className="mb-4">
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-sm font-medium text-slate-700">
-              Recruitment Stages
-            </span>
+            <span className="text-sm font-medium text-slate-700">Recruitment Stages</span>
             <HelpTooltip content="Each circle represents a stage in the recruitment process. The color indicates the status: Gray (not started), Blue (current), Green (completed), Orange (overdue), Red (auto-rejected). Email icons above show communication status." />
           </div>
         </div>
@@ -795,10 +753,7 @@ export default function CandidateApplicationProgress(
                                   )}
                               </div>
                             </TooltipTrigger>
-                            <TooltipContent
-                              side="top"
-                              className="max-w-sm z-50 p-4"
-                            >
+                            <TooltipContent side="top" className="max-w-sm z-50 p-4">
                               <div className="space-y-3">
                                 {/* Icon Legend */}
                                 <div className="border-b border-slate-200 pb-2">
@@ -841,28 +796,16 @@ export default function CandidateApplicationProgress(
                                   <div className="text-xs text-slate-600">
                                     {(() => {
                                       // Stage descriptions based on stage name
-                                      const stageDescriptions: {
-                                        [key: string]: string;
-                                      } = {
-                                        Applied:
-                                          "Initial application received and under review",
-                                        Screening:
-                                          "Phone screening to assess basic qualifications",
-                                        Interview:
-                                          "In-depth interview with hiring team",
-                                        Technical:
-                                          "Technical assessment and skills evaluation",
-                                        Offer:
-                                          "Job offer extended and under negotiation",
-                                        Hired:
-                                          "Candidate successfully hired and onboarded",
-                                        Rejected:
-                                          "Application not selected for this position",
+                                      const stageDescriptions: { [key: string]: string } = {
+                                        "Applied": "Initial application received and under review",
+                                        "Screening": "Phone screening to assess basic qualifications",
+                                        "Interview": "In-depth interview with hiring team",
+                                        "Technical": "Technical assessment and skills evaluation",
+                                        "Offer": "Job offer extended and under negotiation",
+                                        "Hired": "Candidate successfully hired and onboarded",
+                                        "Rejected": "Application not selected for this position"
                                       };
-                                      return (
-                                        stageDescriptions[stage.name] ||
-                                        `${stage.name} stage in recruitment process`
-                                      );
+                                      return stageDescriptions[stage.name] || `${stage.name} stage in recruitment process`;
                                     })()}
                                   </div>
                                 </div>
@@ -870,18 +813,14 @@ export default function CandidateApplicationProgress(
                                 {/* Stage Status */}
                                 <div className="space-y-2">
                                   <div className="flex items-center justify-between text-xs">
-                                    <span className="text-slate-600">
-                                      Stage Status:
-                                    </span>
-                                    <span
-                                      className={`font-medium ${
-                                        stage.completed
-                                          ? "text-green-600"
-                                          : index === currentStageIndex
-                                            ? "text-blue-600"
-                                            : "text-slate-500"
-                                      }`}
-                                    >
+                                    <span className="text-slate-600">Stage Status:</span>
+                                    <span className={`font-medium ${
+                                      stage.completed
+                                        ? "text-green-600"
+                                        : index === currentStageIndex
+                                          ? "text-blue-600"
+                                          : "text-slate-500"
+                                    }`}>
                                       {stage.completed
                                         ? "Completed"
                                         : index === currentStageIndex
@@ -892,37 +831,25 @@ export default function CandidateApplicationProgress(
 
                                   {stage.duration > 0 && (
                                     <div className="flex items-center justify-between text-xs">
-                                      <span className="text-slate-600">
-                                        Duration:
-                                      </span>
-                                      <span className="text-slate-700">
-                                        {stage.duration} days
-                                      </span>
+                                      <span className="text-slate-600">Duration:</span>
+                                      <span className="text-slate-700">{stage.duration} days</span>
                                     </div>
                                   )}
 
                                   {stage.startDate && (
                                     <div className="flex items-center justify-between text-xs">
-                                      <span className="text-slate-600">
-                                        Started:
-                                      </span>
+                                      <span className="text-slate-600">Started:</span>
                                       <span className="text-slate-700">
-                                        {new Date(
-                                          stage.startDate,
-                                        ).toLocaleDateString()}
+                                        {new Date(stage.startDate).toLocaleDateString()}
                                       </span>
                                     </div>
                                   )}
 
                                   {stage.endDate && (
                                     <div className="flex items-center justify-between text-xs">
-                                      <span className="text-slate-600">
-                                        Completed:
-                                      </span>
+                                      <span className="text-slate-600">Completed:</span>
                                       <span className="text-slate-700">
-                                        {new Date(
-                                          stage.endDate,
-                                        ).toLocaleDateString()}
+                                        {new Date(stage.endDate).toLocaleDateString()}
                                       </span>
                                     </div>
                                   )}
@@ -939,54 +866,33 @@ export default function CandidateApplicationProgress(
                                         {(() => {
                                           try {
                                             // Provide specific descriptions for each email type
-                                            const emailDescriptions: {
-                                              [key: string]: string;
-                                            } = {
-                                              "Application Received - Thank You":
-                                                "Thank you email when application is received",
-                                              "Interview Invitation":
-                                                "Interview invitation with detailed information",
-                                              "Interview Reminder":
-                                                "Reminder email for interview confirmation",
-                                              "Post-Interview Thank You":
-                                                "Thank you email after interview and result announcement time",
-                                              "Technical Test Assignment":
-                                                "Technical test assignment email",
-                                              "Technical Results":
-                                                "Technical assessment results with confirmation required",
-                                              "Job Offer":
-                                                "Job offer email with acceptance confirmation required",
-                                              "Onboarding Instructions":
-                                                "Onboarding instructions with confirmation required",
+                                            const emailDescriptions: { [key: string]: string } = {
+                                              "Application Received - Thank You": "Thank you email when application is received",
+                                              "Interview Invitation": "Interview invitation with detailed information",
+                                              "Interview Reminder": "Reminder email for interview confirmation",
+                                              "Post-Interview Thank You": "Thank you email after interview and result announcement time",
+                                              "Technical Test Assignment": "Technical test assignment email",
+                                              "Technical Results": "Technical assessment results with confirmation required",
+                                              "Job Offer": "Job offer email with acceptance confirmation required",
+                                              "Onboarding Instructions": "Onboarding instructions with confirmation required"
                                             };
-                                            return (
-                                              emailDescriptions[
-                                                template.name
-                                              ] ||
-                                              template.subject ||
-                                              "Email template"
-                                            );
+                                            return emailDescriptions[template.name] || template.subject || "Email template";
                                           } catch (error) {
-                                            return (
-                                              template.subject ||
-                                              "Email template"
-                                            );
+                                            return template.subject || "Email template";
                                           }
                                         })()}
                                       </div>
-                                      <div
-                                        className={`text-xs px-2 py-1 rounded-full ${
-                                          autoRejected
-                                            ? "bg-red-100 text-red-700"
-                                            : overdue
-                                              ? "bg-orange-100 text-orange-700"
-                                              : confirmed
-                                                ? "bg-green-100 text-green-700"
-                                                : sent
-                                                  ? "bg-blue-100 text-blue-700"
-                                                  : "bg-slate-100 text-slate-700"
-                                        }`}
-                                      >
+                                      <div className={`text-xs px-2 py-1 rounded-full ${
+                                        autoRejected
+                                          ? "bg-red-100 text-red-700"
+                                          : overdue
+                                            ? "bg-orange-100 text-orange-700"
+                                            : confirmed
+                                              ? "bg-green-100 text-green-700"
+                                              : sent
+                                                ? "bg-blue-100 text-blue-700"
+                                                : "bg-slate-100 text-slate-700"
+                                      }`}>
                                         {autoRejected
                                           ? "Auto-Rejected"
                                           : overdue
@@ -1000,27 +906,17 @@ export default function CandidateApplicationProgress(
                                     </div>
                                     {sentDate && (
                                       <div className="text-xs text-slate-600">
-                                        Sent:{" "}
-                                        {new Date(
-                                          sentDate,
-                                        ).toLocaleDateString()}
+                                        Sent: {new Date(sentDate).toLocaleDateString()}
                                       </div>
                                     )}
-                                    {template.requiresConfirmation &&
-                                      deadline && (
-                                        <div className="text-xs text-slate-600">
-                                          Deadline:{" "}
-                                          {new Date(
-                                            deadline,
-                                          ).toLocaleDateString()}
-                                        </div>
-                                      )}
+                                    {template.requiresConfirmation && deadline && (
+                                      <div className="text-xs text-slate-600">
+                                        Deadline: {new Date(deadline).toLocaleDateString()}
+                                      </div>
+                                    )}
                                     {confirmedDate && (
                                       <div className="text-xs text-slate-600">
-                                        Confirmed:{" "}
-                                        {new Date(
-                                          confirmedDate,
-                                        ).toLocaleDateString()}
+                                        Confirmed: {new Date(confirmedDate).toLocaleDateString()}
                                       </div>
                                     )}
                                   </div>
@@ -1177,26 +1073,19 @@ export default function CandidateApplicationProgress(
                               {circleStatus === "autoRejected" && (
                                 <div className="flex items-center gap-2">
                                   <AlertCircle className="w-3 h-3 text-red-500" />
-                                  <span>
-                                    Auto-rejected: Candidate did not confirm
-                                    within deadline
-                                  </span>
+                                  <span>Auto-rejected: Candidate did not confirm within deadline</span>
                                 </div>
                               )}
                               {circleStatus === "overdue" && (
                                 <div className="flex items-center gap-2">
                                   <Clock className="w-3 h-3 text-orange-500" />
-                                  <span>
-                                    Overdue: Waiting for candidate confirmation
-                                  </span>
+                                  <span>Overdue: Waiting for candidate confirmation</span>
                                 </div>
                               )}
                               {circleStatus === "completed" && (
                                 <div className="flex items-center gap-2">
                                   <CheckCircle className="w-3 h-3 text-green-500" />
-                                  <span>
-                                    Completed: Stage finished successfully
-                                  </span>
+                                  <span>Completed: Stage finished successfully</span>
                                 </div>
                               )}
                               {circleStatus === "current" && (
@@ -1230,6 +1119,8 @@ export default function CandidateApplicationProgress(
                       <span className="break-words">{stage.duration}d</span>
                     </div>
                   )}
+
+                  
                 </div>
               );
             })}
@@ -1283,27 +1174,16 @@ export default function CandidateApplicationProgress(
                       {(() => {
                         // Provide specific descriptions for each email type
                         const emailDescriptions: { [key: string]: string } = {
-                          "Application Received - Thank You":
-                            "Thank you email when application is received",
-                          "Interview Invitation":
-                            "Interview invitation with detailed information",
-                          "Interview Reminder":
-                            "Reminder email for interview confirmation",
-                          "Post-Interview Thank You":
-                            "Thank you email after interview and result announcement time",
-                          "Technical Test Assignment":
-                            "Technical test assignment email",
-                          "Technical Results":
-                            "Technical assessment results with confirmation required",
-                          "Job Offer":
-                            "Job offer email with acceptance confirmation required",
-                          "Onboarding Instructions":
-                            "Onboarding instructions with confirmation required",
+                          "Application Received - Thank You": "Thank you email when application is received",
+                          "Interview Invitation": "Interview invitation with detailed information",
+                          "Interview Reminder": "Reminder email for interview confirmation",
+                          "Post-Interview Thank You": "Thank you email after interview and result announcement time",
+                          "Technical Test Assignment": "Technical test assignment email",
+                          "Technical Results": "Technical assessment results with confirmation required",
+                          "Job Offer": "Job offer email with acceptance confirmation required",
+                          "Onboarding Instructions": "Onboarding instructions with confirmation required"
                         };
-                        return (
-                          emailDescriptions[status.template.name] ||
-                          status.template.subject
-                        );
+                        return emailDescriptions[status.template.name] || status.template.subject;
                       })()}
                     </p>
                     <p className="text-xs text-slate-500">
@@ -1797,31 +1677,17 @@ export default function CandidateApplicationProgress(
                                   <p className="text-xs text-slate-600 mb-1">
                                     {(() => {
                                       // Provide specific descriptions for each email type
-                                      const emailDescriptions: {
-                                        [key: string]: string;
-                                      } = {
-                                        "Application Received - Thank You":
-                                          "Thank you email when application is received",
-                                        "Interview Invitation":
-                                          "Interview invitation with detailed information",
-                                        "Interview Reminder":
-                                          "Reminder email for interview confirmation",
-                                        "Post-Interview Thank You":
-                                          "Thank you email after interview and result announcement time",
-                                        "Technical Test Assignment":
-                                          "Technical test assignment email",
-                                        "Technical Results":
-                                          "Technical assessment results with confirmation required",
-                                        "Job Offer":
-                                          "Job offer email with acceptance confirmation required",
-                                        "Onboarding Instructions":
-                                          "Onboarding instructions with confirmation required",
+                                      const emailDescriptions: { [key: string]: string } = {
+                                        "Application Received - Thank You": "Thank you email when application is received",
+                                        "Interview Invitation": "Interview invitation with detailed information",
+                                        "Interview Reminder": "Reminder email for interview confirmation",
+                                        "Post-Interview Thank You": "Thank you email after interview and result announcement time",
+                                        "Technical Test Assignment": "Technical test assignment email",
+                                        "Technical Results": "Technical assessment results with confirmation required",
+                                        "Job Offer": "Job offer email with acceptance confirmation required",
+                                        "Onboarding Instructions": "Onboarding instructions with confirmation required"
                                       };
-                                      return (
-                                        emailDescriptions[
-                                          status.template.name
-                                        ] || status.template.subject
-                                      );
+                                      return emailDescriptions[status.template.name] || status.template.subject;
                                     })()}
                                   </p>
                                   <p className="text-xs text-slate-500 mb-2">
@@ -1945,27 +1811,17 @@ export default function CandidateApplicationProgress(
                               <div className="space-y-1">
                                 {templates.map((template) => {
                                   // Provide specific descriptions for each email type
-                                  const emailDescriptions: {
-                                    [key: string]: string;
-                                  } = {
-                                    "Application Received - Thank You":
-                                      "Thank you email when application is received",
-                                    "Interview Invitation":
-                                      "Interview invitation with detailed information",
-                                    "Interview Reminder":
-                                      "Reminder email for interview confirmation",
-                                    "Post-Interview Thank You":
-                                      "Thank you email after interview and result announcement time",
-                                    "Technical Test Assignment":
-                                      "Technical test assignment email",
-                                    "Technical Results":
-                                      "Technical assessment results with confirmation required",
-                                    "Job Offer":
-                                      "Job offer email with acceptance confirmation required",
-                                    "Onboarding Instructions":
-                                      "Onboarding instructions with confirmation required",
+                                  const emailDescriptions: { [key: string]: string } = {
+                                    "Application Received - Thank You": "Thank you email when application is received",
+                                    "Interview Invitation": "Interview invitation with detailed information",
+                                    "Interview Reminder": "Reminder email for interview confirmation",
+                                    "Post-Interview Thank You": "Thank you email after interview and result announcement time",
+                                    "Technical Test Assignment": "Technical test assignment email",
+                                    "Technical Results": "Technical assessment results with confirmation required",
+                                    "Job Offer": "Job offer email with acceptance confirmation required",
+                                    "Onboarding Instructions": "Onboarding instructions with confirmation required"
                                   };
-
+                                  
                                   return (
                                     <div
                                       key={template.id}
@@ -1995,8 +1851,7 @@ export default function CandidateApplicationProgress(
                                         </div>
                                       </div>
                                       <span className="text-slate-500 text-xs">
-                                        {emailDescriptions[template.name] ||
-                                          template.subject}
+                                        {emailDescriptions[template.name] || template.subject}
                                       </span>
                                     </div>
                                   );
