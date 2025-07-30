@@ -366,7 +366,7 @@ export default function JobDetail() {
           {candidate.duration} days
         </p>
       </div>
-      <div className="flex items-center space-x-1">
+      {/* <div className="flex items-center space-x-1">
         {[...Array(5)].map((_, i) => (
           <Star
             key={i}
@@ -377,7 +377,7 @@ export default function JobDetail() {
             }`}
           />
         ))}
-      </div>
+      </div> */}
     </div>
   );
 
@@ -997,10 +997,10 @@ export default function JobDetail() {
                     List
                   </Button>
                 </div>
-                <Button size="sm" onClick={() => setShowAddStageDialog(true)}>
+                {/* <Button size="sm" onClick={() => setShowAddStageDialog(true)}>
                   <Plus className="w-4 h-4 mr-2" />
                   Add Stage
-                </Button>
+                </Button> */}
               </div>
             </div>
           </CardHeader>

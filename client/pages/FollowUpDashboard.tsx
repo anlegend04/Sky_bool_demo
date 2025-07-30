@@ -451,9 +451,9 @@ export default function FollowUpDashboard() {
                 <Badge variant="outline" className="text-xs">
                   {candidate.stage}
                 </Badge>
-                <Badge variant="secondary" className="text-xs">
+                {/* <Badge variant="secondary" className="text-xs">
                   {candidate.urgencyLevel}
-                </Badge>
+                </Badge> */}
               </div>
             </div>
           </div>
