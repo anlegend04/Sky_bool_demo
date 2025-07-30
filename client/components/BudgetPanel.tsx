@@ -48,7 +48,7 @@ import {
   Edit,
   Trash2,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { JobData, ExpenseData } from "@/data/hardcoded-data";
 import { useToast } from "@/hooks/use-toast";
 import { RechartsWarningSuppress } from "./RechartsWarningSuppress";
