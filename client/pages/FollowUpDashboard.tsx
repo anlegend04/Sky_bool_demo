@@ -71,8 +71,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 import {
   HARDCODED_CANDIDATES,
+  type CandidateData,
 } from "@/data/hardcoded-data";
-import type { EnhancedCandidateData } from "@/types/enhanced-candidate";
 import {
   Table,
   TableBody,
@@ -81,10 +81,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import CandidateApplicationProgress from "./CandidateApplicationProgress";
 
 // Các type definitions giữ nguyên như trước
-interface FollowUpCandidate extends EnhancedCandidateData {
+interface FollowUpCandidate extends CandidateData {
   lastInteraction: string;
   nextFollowUp: string;
   daysInStage: number;
@@ -232,13 +231,13 @@ export default function FollowUpDashboard() {
               : undefined,
         },
       ],
-      jobApplications: (candidate as any).jobApplications ?? [],
-      globalNotes: (candidate as any).globalNotes ?? [],
     })),
   );
 
   const [selectedCandidates, setSelectedCandidates] = useState<string[]>([]);
-  const [viewMode, setViewMode] = useState<"pipeline" | "list">("list");
+  const [viewMode, setViewMode] = useState<"pipeline" | "list" | "timeline">(
+    "pipeline",
+  );
   const [filterStage, setFilterStage] = useState("all");
   const [filterJob, setFilterJob] = useState("all");
 
@@ -253,7 +252,6 @@ export default function FollowUpDashboard() {
   const [showNoteDialog, setShowNoteDialog] = useState(false);
   const [emailTemplate, setEmailTemplate] = useState("");
   const [bulkAction, setBulkAction] = useState("");
-  const [viewProcessCandidate, setViewProcessCandidate] = useState<FollowUpCandidate | null>(null);
 
   // Handle send email
   const handleSendEmail = (candidate: FollowUpCandidate) => {
@@ -855,12 +853,6 @@ export default function FollowUpDashboard() {
                             <Download className="w-4 h-4 mr-2" />
                             Download CV
                           </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => setViewProcessCandidate(candidate)}
-                          >
-                            <Eye className="w-4 h-4 mr-2" />
-                            View Process of Stage
-                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -1047,18 +1039,18 @@ export default function FollowUpDashboard() {
             <div className="flex items-center space-x-2">
               <div className="flex border rounded-lg p-1">
                 <Button
-                  variant={viewMode === "pipeline" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("pipeline")}
-                >
-                  Pipeline
-                </Button>
-                <Button
                   variant={viewMode === "list" ? "default" : "ghost"}
                   size="sm"
                   onClick={() => setViewMode("list")}
                 >
                   List
+                </Button>
+                <Button
+                  variant={viewMode === "pipeline" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("pipeline")}
+                >
+                  Pipeline
                 </Button>
               </div>
               {viewMode === "list" && (
@@ -1137,6 +1129,47 @@ export default function FollowUpDashboard() {
       {/* Main Content */}
       {viewMode === "pipeline" && <PipelineView />}
       {viewMode === "list" && <PipelineListView />}
+      {viewMode === "timeline" && (
+        <Card>
+
+          <CardContent>
+            <div className="space-y-4">
+              {currentCandidates.map((candidate) => (
+                <div
+                  key={candidate.id}
+                  className="flex items-center space-x-4 p-3 border rounded-lg"
+                >
+                  <Avatar className="w-8 h-8">
+                    <AvatarFallback>
+                      {candidate.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-2">
+                      <span className="font-medium text-sm">
+                        {candidate.name}
+                      </span>
+                      <Badge variant="outline" className="text-xs">
+                        {candidate.stage}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-gray-600">
+                      Last contact {formatTimeAgo(candidate.lastInteraction)} •
+                      Next follow-up {formatTimeAgo(candidate.nextFollowUp)}
+                    </p>
+                  </div>
+                  <Button size="sm" variant="outline">
+                    <Mail className="w-4 h-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Pagination */}
       {totalPages > 1 && (
@@ -1283,8 +1316,9 @@ export default function FollowUpDashboard() {
                 </DialogTitle>
               </DialogHeader>
               <Tabs defaultValue="overview" className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
+                <TabsList className="grid w-full grid-cols-4">
                   <TabsTrigger value="overview">Overview</TabsTrigger>
+                  <TabsTrigger value="timeline">Timeline</TabsTrigger>
                   <TabsTrigger value="emails">Emails</TabsTrigger>
                   <TabsTrigger value="actions">Actions</TabsTrigger>
                 </TabsList>
@@ -1352,7 +1386,49 @@ export default function FollowUpDashboard() {
                     </Card>
                   </div>
                 </TabsContent>
-
+                <TabsContent value="timeline" className="space-y-4">
+                  <div className="space-y-3">
+                    {selectedCandidate.interactions.map((interaction) => (
+                      <div
+                        key={interaction.id}
+                        className="flex space-x-3 p-3 border rounded-lg"
+                      >
+                        <div className="flex-shrink-0">
+                          {interaction.type === "call" && (
+                            <Phone className="w-5 h-5 text-green-500" />
+                          )}
+                          {interaction.type === "email" && (
+                            <Mail className="w-5 h-5 text-blue-500" />
+                          )}
+                          {interaction.type === "meeting" && (
+                            <Calendar className="w-5 h-5 text-purple-500" />
+                          )}
+                          {interaction.type === "note" && (
+                            <FileText className="w-5 h-5 text-gray-500" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium capitalize">
+                              {interaction.type}
+                            </span>
+                            <span className="text-sm text-gray-500">
+                              {formatTimeAgo(interaction.date)}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-700 mt-1">
+                            {interaction.summary}
+                          </p>
+                          {interaction.nextAction && (
+                            <p className="text-sm text-blue-600 mt-1">
+                              Next: {interaction.nextAction}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </TabsContent>
                 <TabsContent value="emails" className="space-y-4">
                   <div className="space-y-3">
                     {selectedCandidate.emailHistory.map((email) => (
@@ -1409,24 +1485,6 @@ export default function FollowUpDashboard() {
                 </TabsContent>
               </Tabs>
             </>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* View Process of Stage Dialog */}
-      <Dialog open={!!viewProcessCandidate} onOpenChange={open => !open && setViewProcessCandidate(null)}>
-        <DialogContent className="max-w-4xl w-full">
-          <DialogHeader>
-            <DialogTitle>Applicant Progress</DialogTitle>
-            <DialogDescription>
-              Quá trình tuyển dụng của ứng viên <b>{viewProcessCandidate?.name}</b>
-            </DialogDescription>
-          </DialogHeader>
-          {viewProcessCandidate && (
-            <CandidateApplicationProgress
-              candidate={viewProcessCandidate}
-              jobId={viewProcessCandidate.jobId}
-            />
           )}
         </DialogContent>
       </Dialog>
