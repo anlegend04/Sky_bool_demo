@@ -54,9 +54,7 @@ import {
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import {
-  getJobApplication,
-} from "@/data/enhanced-mock-data";
+import { getJobApplication } from "@/data/enhanced-mock-data";
 import { JobApplication } from "@/types/enhanced-candidate";
 import { getCandidate } from "@/data/hardcoded-data";
 import { EmailTrigger } from "@/components/EmailTrigger";
@@ -69,7 +67,12 @@ import {
   getAllEmailTemplates,
   getTemplatesForStage,
 } from "@/lib/email-utils";
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider,
+} from "@/components/ui/tooltip";
 
 interface CandidateApplicationProgressProps {
   candidate?: EnhancedCandidateData;
@@ -105,17 +108,25 @@ interface EmailStatusData {
   deadline?: string;
 }
 
-export default function CandidateApplicationProgress(props: CandidateApplicationProgressProps) {
+export default function CandidateApplicationProgress(
+  props: CandidateApplicationProgressProps,
+) {
   const params = useParams();
   const candidateId = params.candidateId || params.id;
-  
+
   // Get candidate from hardcoded data and convert to enhanced format
   const hardcodedCandidate = candidateId ? getCandidate(candidateId) : null;
-  const candidate = props.candidate ?? (hardcodedCandidate ? convertCandidateToEnhanced(hardcodedCandidate) : null);
-  
+  const candidate =
+    props.candidate ??
+    (hardcodedCandidate
+      ? convertCandidateToEnhanced(hardcodedCandidate)
+      : null);
+
   const jobId = props.jobId ?? params.jobId ?? params.candidateId;
 
-  const [jobApplication, setJobApplication] = useState<JobApplication | null>(null);
+  const [jobApplication, setJobApplication] = useState<JobApplication | null>(
+    null,
+  );
   const [selectedEmail, setSelectedEmail] = useState<any>(null);
   const [showEmailTrigger, setShowEmailTrigger] = useState(false);
   const [newNote, setNewNote] = useState("");
@@ -164,37 +175,50 @@ export default function CandidateApplicationProgress(props: CandidateApplication
   }, [jobApplication]);
 
   // Handle email actions
-  const handleEmailAction = (action: 'send' | 'confirm' | 'autoReject', templateId: number) => {
-    const status = emailStatuses.find(s => s.template.id === templateId);
+  const handleEmailAction = (
+    action: "send" | "confirm" | "autoReject",
+    templateId: number,
+  ) => {
+    const status = emailStatuses.find((s) => s.template.id === templateId);
     if (!status) return;
 
     switch (action) {
-      case 'send':
+      case "send":
         setShowEmailTrigger(true);
         toast({
           title: "Email Trigger",
           description: `Preparing to send ${status.template.name} email.`,
         });
         break;
-      case 'confirm':
+      case "confirm":
         // Update the email status to confirmed
-        setEmailStatuses(prev => prev.map(s => 
-          s.template.id === templateId 
-            ? { ...s, confirmed: true, confirmedDate: new Date().toISOString(), overdue: false, autoRejected: false }
-            : s
-        ));
+        setEmailStatuses((prev) =>
+          prev.map((s) =>
+            s.template.id === templateId
+              ? {
+                  ...s,
+                  confirmed: true,
+                  confirmedDate: new Date().toISOString(),
+                  overdue: false,
+                  autoRejected: false,
+                }
+              : s,
+          ),
+        );
         toast({
           title: "Email Confirmed",
           description: `${status.template.name} has been marked as confirmed.`,
         });
         break;
-      case 'autoReject':
+      case "autoReject":
         // Update the email status to auto-rejected
-        setEmailStatuses(prev => prev.map(s => 
-          s.template.id === templateId 
-            ? { ...s, autoRejected: true, overdue: true }
-            : s
-        ));
+        setEmailStatuses((prev) =>
+          prev.map((s) =>
+            s.template.id === templateId
+              ? { ...s, autoRejected: true, overdue: true }
+              : s,
+          ),
+        );
         toast({
           title: "Candidate Auto-Rejected",
           description: `Candidate has been auto-rejected due to overdue ${status.template.name}.`,
@@ -206,7 +230,7 @@ export default function CandidateApplicationProgress(props: CandidateApplication
   // Auto-select job if candidate has only one application
   useEffect(() => {
     const availableJobs = candidate.jobApplications || [];
-    
+
     // If no job is selected and candidate has exactly one job application, auto-select it
     if (!selectedJobId && availableJobs.length === 1) {
       setSelectedJobId(availableJobs[0].id);
@@ -216,7 +240,7 @@ export default function CandidateApplicationProgress(props: CandidateApplication
   if (!jobApplication) {
     // Get available job applications for this candidate
     const availableJobs = candidate.jobApplications || [];
-    
+
     // If candidate has only one job application, show loading while auto-selecting
     if (availableJobs.length === 1) {
       return (
@@ -234,7 +258,7 @@ export default function CandidateApplicationProgress(props: CandidateApplication
         </div>
       );
     }
-    
+
     return (
       <div className="p-6">
         <div className="max-w-2xl mx-auto">
@@ -243,26 +267,33 @@ export default function CandidateApplicationProgress(props: CandidateApplication
               Select Job Application
             </h2>
             <p className="text-slate-600 mt-2">
-              Choose a job application to view the recruitment process for {candidate.name}
+              Choose a job application to view the recruitment process for{" "}
+              {candidate.name}
             </p>
           </div>
-          
+
           {availableJobs.length > 0 ? (
             <div className="space-y-4">
               {availableJobs.map((job) => (
-                <Card key={job.id} className="cursor-pointer hover:shadow-md transition-shadow">
+                <Card
+                  key={job.id}
+                  className="cursor-pointer hover:shadow-md transition-shadow"
+                >
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
-                        <h3 className="font-semibold text-slate-900">{job.jobTitle}</h3>
+                        <h3 className="font-semibold text-slate-900">
+                          {job.jobTitle}
+                        </h3>
                         <p className="text-sm text-slate-600">
                           Current Stage: {job.currentStage}
                         </p>
                         <p className="text-sm text-slate-600">
-                          Applied: {new Date(job.appliedDate).toLocaleDateString()}
+                          Applied:{" "}
+                          {new Date(job.appliedDate).toLocaleDateString()}
                         </p>
                       </div>
-                      <Button 
+                      <Button
                         onClick={() => setSelectedJobId(job.id)}
                         className="ml-4"
                       >
@@ -280,7 +311,7 @@ export default function CandidateApplicationProgress(props: CandidateApplication
               </p>
             </div>
           )}
-          
+
           <div className="flex gap-2 mt-6 justify-center">
             <Link to="/follow-up">
               <Button variant="outline">Back to Recuitment Process</Button>
@@ -297,25 +328,33 @@ export default function CandidateApplicationProgress(props: CandidateApplication
   // Analyze email statuses for the current application
   const analyzeEmailStatuses = (): EmailStatusData[] => {
     if (!jobApplication) return [];
-    
+
     const statuses: EmailStatusData[] = [];
     const currentStage = jobApplication.currentStage.toLowerCase();
-    
+
     // Get required emails for each stage
     const stageTemplates = getTemplatesForStage(currentStage);
-    
-    stageTemplates.forEach(template => {
+
+    stageTemplates.forEach((template) => {
       // Tìm email đã gửi cho template này - cải thiện logic matching
-      const existingEmail = jobApplication.emails.find(email => {
+      const existingEmail = jobApplication.emails.find((email) => {
         // So sánh theo template name hoặc subject chứa template name hoặc stage name
         const templateNameMatch = email.template === template.name;
-        const subjectMatch = email.subject.toLowerCase().includes(template.name.toLowerCase());
-        const stageMatch = email.subject.toLowerCase().includes(template.stage?.toLowerCase() || '');
-        const genericStageMatch = email.subject.toLowerCase().includes(currentStage);
-        
-        return templateNameMatch || subjectMatch || stageMatch || genericStageMatch;
+        const subjectMatch = email.subject
+          .toLowerCase()
+          .includes(template.name.toLowerCase());
+        const stageMatch = email.subject
+          .toLowerCase()
+          .includes(template.stage?.toLowerCase() || "");
+        const genericStageMatch = email.subject
+          .toLowerCase()
+          .includes(currentStage);
+
+        return (
+          templateNameMatch || subjectMatch || stageMatch || genericStageMatch
+        );
       });
-      
+
       const status: EmailStatusData = {
         template,
         sent: !!existingEmail,
@@ -324,22 +363,31 @@ export default function CandidateApplicationProgress(props: CandidateApplication
         confirmedDate: existingEmail?.repliedAt,
         overdue: false,
         autoRejected: false,
-        deadline: template.confirmationDeadline && existingEmail?.timestamp
-          ? new Date(new Date(existingEmail.timestamp).getTime() + template.confirmationDeadline * 24 * 60 * 60 * 1000).toISOString()
-          : undefined
+        deadline:
+          template.confirmationDeadline && existingEmail?.timestamp
+            ? new Date(
+                new Date(existingEmail.timestamp).getTime() +
+                  template.confirmationDeadline * 24 * 60 * 60 * 1000,
+              ).toISOString()
+            : undefined,
       };
-      
+
       // Check if overdue
-      if (template.requiresConfirmation && status.sent && !status.confirmed && status.deadline) {
+      if (
+        template.requiresConfirmation &&
+        status.sent &&
+        !status.confirmed &&
+        status.deadline
+      ) {
         const deadline = new Date(status.deadline);
         const now = new Date();
         status.overdue = now > deadline;
         status.autoRejected = template.autoRejectOnOverdue && status.overdue;
       }
-      
+
       statuses.push(status);
     });
-    
+
     return statuses;
   };
 
@@ -353,7 +401,9 @@ export default function CandidateApplicationProgress(props: CandidateApplication
     "Hired",
   ];
 
-  const currentStageIndex = stageNames.findIndex(s => s === jobApplication.currentStage);
+  const currentStageIndex = stageNames.findIndex(
+    (s) => s === jobApplication.currentStage,
+  );
 
   const stages: StageData[] = stageNames.map((stageName, index) => {
     const stageData = jobApplication.stageHistory.find(
@@ -367,20 +417,20 @@ export default function CandidateApplicationProgress(props: CandidateApplication
     const isPastStage = thisStageIndex < currentStageIndex;
 
     // Xác định trạng thái completion
-    let completionStatus: 'completed' | 'current' | 'pending' | 'not_started';
+    let completionStatus: "completed" | "current" | "pending" | "not_started";
     if (isCompleted) {
-      completionStatus = 'completed';
+      completionStatus = "completed";
     } else if (isCurrentStage) {
-      completionStatus = 'current';
+      completionStatus = "current";
     } else if (isPastStage) {
-      completionStatus = 'completed'; // Nếu đã qua stage này nhưng không có endDate, coi như completed
+      completionStatus = "completed"; // Nếu đã qua stage này nhưng không có endDate, coi như completed
     } else {
-      completionStatus = 'not_started';
+      completionStatus = "not_started";
     }
 
     return {
       name: stageName,
-      completed: completionStatus === 'completed',
+      completed: completionStatus === "completed",
       duration: stageData?.duration || 0,
       startDate: stageData?.startDate || "",
       endDate: stageData?.endDate,
@@ -390,7 +440,6 @@ export default function CandidateApplicationProgress(props: CandidateApplication
       mailConfirmed: stageData?.mailConfirmed || false,
     };
   });
-
 
   const completedStages = stages.filter((s) => s.completed).length;
   const totalStages = stages.length;
@@ -548,230 +597,379 @@ export default function CandidateApplicationProgress(props: CandidateApplication
 
         {/* Stages Grid */}
         <TooltipProvider>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          {stages.map((stage, index) => {
-            // Lấy tất cả template cho stage này
-            const stageTemplates = getTemplatesForStage(stage.name.toLowerCase());
-            // Lấy tất cả email đã gửi cho stage này - cải thiện logic matching
-            const emailsForStage = jobApplication.emails.filter(email => {
-              return stageTemplates.some(tpl => {
-                const templateNameMatch = email.template === tpl.name;
-                const subjectMatch = email.subject.toLowerCase().includes(tpl.name.toLowerCase());
-                const stageMatch = email.subject.toLowerCase().includes(tpl.stage?.toLowerCase() || '');
-                const genericStageMatch = email.subject.toLowerCase().includes(stage.name.toLowerCase());
-                
-                return templateNameMatch || subjectMatch || stageMatch || genericStageMatch;
-              });
-            });
-            return (
-              <div key={stage.name} className="text-center relative group">
-                {/* Email status indicators */}
-                <div className="flex justify-center mb-1 gap-1">
-                  {stageTemplates.length > 0 ? (
-                    stageTemplates.map((template, templateIdx) => {
-                      // Tìm email đã gửi gần nhất cho template này
-                      const sentEmails = emailsForStage.filter(email => {
-                        const templateNameMatch = email.template === template.name;
-                        const subjectMatch = email.subject.toLowerCase().includes(template.name.toLowerCase());
-                        const stageMatch = email.subject.toLowerCase().includes(template.stage?.toLowerCase() || '');
-                        const genericStageMatch = email.subject.toLowerCase().includes(stage.name.toLowerCase());
-                        
-                        return templateNameMatch || subjectMatch || stageMatch || genericStageMatch;
-                      });
-                      const latestEmail = sentEmails.length > 0 ? sentEmails.reduce((a, b) => new Date(a.timestamp) > new Date(b.timestamp) ? a : b) : undefined;
-                      // Xác định trạng thái
-                      const sent = !!latestEmail;
-                      const confirmed = latestEmail?.repliedAt ? true : false;
-                      const sentDate = latestEmail?.timestamp;
-                      const confirmedDate = latestEmail?.repliedAt;
-                      // Deadline xác nhận
-                      let deadline: string | undefined = undefined;
-                      if (template.confirmationDeadline && sentDate) {
-                        const sentTime = new Date(sentDate).getTime();
-                        deadline = new Date(sentTime + template.confirmationDeadline * 24 * 60 * 60 * 1000).toISOString();
-                      }
-                      // Overdue
-                      const overdue = template.requiresConfirmation && sent && !confirmed && deadline && (new Date() > new Date(deadline));
-                      const autoRejected = template.autoRejectOnOverdue && overdue;
-                      return (
-                        <Tooltip key={templateIdx}>
-                          <TooltipTrigger asChild>
-                            <div className="relative">
-                              {autoRejected ? (
-                                <AlertCircle className="w-4 h-4 text-red-500" />
-                              ) : overdue ? (
-                                <Clock className="w-4 h-4 text-orange-500" />
-                              ) : confirmed ? (
-                                <CheckCircle className="w-4 h-4 text-green-500" />
-                              ) : sent ? (
-                                <MailCheck className="w-4 h-4 text-blue-500" />
-                              ) : (
-                                <Mail className="w-4 h-4 text-slate-300" />
-                              )}
-                              {/* Chấm vàng nếu cần xác nhận và chưa xác nhận */}
-                              {template.requiresConfirmation && sent && !confirmed && !autoRejected && !overdue && (
-                                <span className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full border border-white"></span>
-                              )}
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent side="top">
-                            <div className="text-xs font-semibold mb-1">{template.name}</div>
-                            <div className="text-xs">
-                              Trạng thái: {autoRejected ? "Auto-Rejected" : overdue ? "Overdue" : confirmed ? "Đã xác nhận" : sent ? "Đã gửi" : "Chưa gửi"}
-                            </div>
-                            {sentDate && (
-                              <div className="text-xs">Gửi lúc: {new Date(sentDate).toLocaleString()}</div>
-                            )}
-                            {template.requiresConfirmation && deadline && (
-                              <div className="text-xs">Deadline xác nhận: {new Date(deadline).toLocaleDateString()}</div>
-                            )}
-                            {confirmedDate && (
-                              <div className="text-xs">Xác nhận: {new Date(confirmedDate).toLocaleString()}</div>
-                            )}
-                          </TooltipContent>
-                        </Tooltip>
-                      );
-                    })
-                  ) : (
-                    <Mail className="w-4 h-4 text-slate-300" />
-                  )}
-                </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            {stages.map((stage, index) => {
+              // Lấy tất cả template cho stage này
+              const stageTemplates = getTemplatesForStage(
+                stage.name.toLowerCase(),
+              );
+              // Lấy tất cả email đã gửi cho stage này - cải thiện logic matching
+              const emailsForStage = jobApplication.emails.filter((email) => {
+                return stageTemplates.some((tpl) => {
+                  const templateNameMatch = email.template === tpl.name;
+                  const subjectMatch = email.subject
+                    .toLowerCase()
+                    .includes(tpl.name.toLowerCase());
+                  const stageMatch = email.subject
+                    .toLowerCase()
+                    .includes(tpl.stage?.toLowerCase() || "");
+                  const genericStageMatch = email.subject
+                    .toLowerCase()
+                    .includes(stage.name.toLowerCase());
 
-                {/* Circle stage */}
-                {(() => {
-                  // Tính trạng thái tổng hợp cho stage
-                  let circleStatus: 'autoRejected' | 'overdue' | 'completed' | 'current' | 'default' = 'default';
-                  if (stageTemplates.length > 0) {
-                    // Lặp qua từng template để xác định trạng thái
-                    let foundAutoRejected = false;
-                    let foundOverdue = false;
-                    let allConfirmed = true;
-                    let hasSentEmails = false;
-                    
-                    stageTemplates.forEach((template) => {
-                      const sentEmails = emailsForStage.filter(email => {
-                        const templateNameMatch = email.template === template.name;
-                        const subjectMatch = email.subject.toLowerCase().includes(template.name.toLowerCase());
-                        const stageMatch = email.subject.toLowerCase().includes(template.stage?.toLowerCase() || '');
-                        const genericStageMatch = email.subject.toLowerCase().includes(stage.name.toLowerCase());
-                        
-                        return templateNameMatch || subjectMatch || stageMatch || genericStageMatch;
-                      });
-                      
-                      const latestEmail = sentEmails.length > 0 ? sentEmails.reduce((a, b) => new Date(a.timestamp) > new Date(b.timestamp) ? a : b) : undefined;
-                      const sent = !!latestEmail;
-                      const confirmed = latestEmail?.repliedAt ? true : false;
-                      const sentDate = latestEmail?.timestamp;
-                      
-                      if (sent) hasSentEmails = true;
-                      
-                      let deadline: string | undefined = undefined;
-                      if (template.confirmationDeadline && sentDate) {
-                        const sentTime = new Date(sentDate).getTime();
-                        deadline = new Date(sentTime + template.confirmationDeadline * 24 * 60 * 60 * 1000).toISOString();
-                      }
-                      
-                      const overdue = template.requiresConfirmation && sent && !confirmed && deadline && (new Date() > new Date(deadline));
-                      const autoRejected = template.autoRejectOnOverdue && overdue;
-                      
-                      if (autoRejected) foundAutoRejected = true;
-                      if (overdue) foundOverdue = true;
-                      if (template.requiresConfirmation && sent && !confirmed) allConfirmed = false;
-                    });
-                    
-                    if (foundAutoRejected) circleStatus = 'autoRejected';
-                    else if (foundOverdue) circleStatus = 'overdue';
-                    else if (stage.completed) circleStatus = 'completed';
-                    else if (index === currentStageIndex) circleStatus = 'current';
-                    else if (hasSentEmails) circleStatus = 'completed'; // Có email đã gửi nhưng chưa hoàn thành
-                  } else {
-                    // Không có template, dựa vào stage completion
-                    if (stage.completed) circleStatus = 'completed';
-                    else if (index === currentStageIndex) circleStatus = 'current';
-                  }
                   return (
-                    <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center border-2 mx-auto mb-2 ${
-                        circleStatus === 'autoRejected'
-                          ? 'bg-red-500 border-red-500 text-white'
-                          : circleStatus === 'overdue'
-                            ? 'bg-orange-500 border-orange-500 text-white'
-                            : circleStatus === 'completed'
-                              ? 'bg-green-500 border-green-500 text-white'
-                              : circleStatus === 'current'
-                                ? 'bg-blue-500 border-blue-500 text-white'
-                                : 'bg-white border-slate-300 text-slate-400'
-                      }`}
-                    >
-                      {circleStatus === 'autoRejected' ? (
-                        <AlertCircle className="w-4 h-4" />
-                      ) : circleStatus === 'overdue' ? (
-                        <Clock className="w-4 h-4" />
-                      ) : circleStatus === 'completed' ? (
-                        <CheckCircle className="w-4 h-4" />
-                      ) : circleStatus === 'current' ? (
-                        <Circle className="w-4 h-4 fill-current" />
-                      ) : (
-                        <Circle className="w-4 h-4" />
-                      )}
-                    </div>
+                    templateNameMatch ||
+                    subjectMatch ||
+                    stageMatch ||
+                    genericStageMatch
                   );
-                })()}
+                });
+              });
+              return (
+                <div key={stage.name} className="text-center relative group">
+                  {/* Email status indicators */}
+                  <div className="flex justify-center mb-1 gap-1">
+                    {stageTemplates.length > 0 ? (
+                      stageTemplates.map((template, templateIdx) => {
+                        // Tìm email đã gửi gần nhất cho template này
+                        const sentEmails = emailsForStage.filter((email) => {
+                          const templateNameMatch =
+                            email.template === template.name;
+                          const subjectMatch = email.subject
+                            .toLowerCase()
+                            .includes(template.name.toLowerCase());
+                          const stageMatch = email.subject
+                            .toLowerCase()
+                            .includes(template.stage?.toLowerCase() || "");
+                          const genericStageMatch = email.subject
+                            .toLowerCase()
+                            .includes(stage.name.toLowerCase());
 
-                {/* Stage name */}
-                <div className="text-xs font-medium text-slate-700 break-words px-1">
-                  {stage.name}
-                </div>
-
-                {/* Duration */}
-                {stage.duration > 0 && (
-                  <div className="text-xs text-slate-500 flex items-center justify-center gap-1 mt-1">
-                    <Clock className="w-3 h-3" />
-                    <span className="break-words">{stage.duration}d</span>
-                  </div>
-                )}
-
-                {/* Email status tooltip */}
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                  {stageTemplates.length > 0 ? (
-                    <div>
-                      {stageTemplates.map((template) => {
-                        const sentEmails = emailsForStage.filter(email => {
-                          const templateNameMatch = email.template === template.name;
-                          const subjectMatch = email.subject.toLowerCase().includes(template.name.toLowerCase());
-                          const stageMatch = email.subject.toLowerCase().includes(template.stage?.toLowerCase() || '');
-                          const genericStageMatch = email.subject.toLowerCase().includes(stage.name.toLowerCase());
-                          
-                          return templateNameMatch || subjectMatch || stageMatch || genericStageMatch;
+                          return (
+                            templateNameMatch ||
+                            subjectMatch ||
+                            stageMatch ||
+                            genericStageMatch
+                          );
                         });
-                        const latestEmail = sentEmails.length > 0 ? sentEmails.reduce((a, b) => new Date(a.timestamp) > new Date(b.timestamp) ? a : b) : undefined;
+                        const latestEmail =
+                          sentEmails.length > 0
+                            ? sentEmails.reduce((a, b) =>
+                                new Date(a.timestamp) > new Date(b.timestamp)
+                                  ? a
+                                  : b,
+                              )
+                            : undefined;
+                        // Xác định trạng thái
                         const sent = !!latestEmail;
                         const confirmed = latestEmail?.repliedAt ? true : false;
                         const sentDate = latestEmail?.timestamp;
                         const confirmedDate = latestEmail?.repliedAt;
-                        const deadline: string | undefined = template.confirmationDeadline && sentDate ? new Date(new Date(sentDate).getTime() + template.confirmationDeadline * 24 * 60 * 60 * 1000).toISOString() : undefined;
-                        const overdue = template.requiresConfirmation && sent && !confirmed && deadline && (new Date() > new Date(deadline));
-                        const autoRejected = template.autoRejectOnOverdue && overdue;
+                        // Deadline xác nhận
+                        let deadline: string | undefined = undefined;
+                        if (template.confirmationDeadline && sentDate) {
+                          const sentTime = new Date(sentDate).getTime();
+                          deadline = new Date(
+                            sentTime +
+                              template.confirmationDeadline *
+                                24 *
+                                60 *
+                                60 *
+                                1000,
+                          ).toISOString();
+                        }
+                        // Overdue
+                        const overdue =
+                          template.requiresConfirmation &&
+                          sent &&
+                          !confirmed &&
+                          deadline &&
+                          new Date() > new Date(deadline);
+                        const autoRejected =
+                          template.autoRejectOnOverdue && overdue;
                         return (
-                          <div key={template.id}>
-                            {template.name}: {
-                              autoRejected ? "Auto-Rejected" :
-                              overdue ? "Overdue" :
-                              confirmed ? "Confirmed" :
-                              sent ? "Sent" : "Required"
-                            }
-                          </div>
+                          <Tooltip key={templateIdx}>
+                            <TooltipTrigger asChild>
+                              <div className="relative">
+                                {autoRejected ? (
+                                  <AlertCircle className="w-4 h-4 text-red-500" />
+                                ) : overdue ? (
+                                  <Clock className="w-4 h-4 text-orange-500" />
+                                ) : confirmed ? (
+                                  <CheckCircle className="w-4 h-4 text-green-500" />
+                                ) : sent ? (
+                                  <MailCheck className="w-4 h-4 text-blue-500" />
+                                ) : (
+                                  <Mail className="w-4 h-4 text-slate-300" />
+                                )}
+                                {/* Chấm vàng nếu cần xác nhận và chưa xác nhận */}
+                                {template.requiresConfirmation &&
+                                  sent &&
+                                  !confirmed &&
+                                  !autoRejected &&
+                                  !overdue && (
+                                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full border border-white"></span>
+                                  )}
+                              </div>
+                            </TooltipTrigger>
+                            <TooltipContent side="top">
+                              <div className="text-xs font-semibold mb-1">
+                                {template.name}
+                              </div>
+                              <div className="text-xs">
+                                Trạng thái:{" "}
+                                {autoRejected
+                                  ? "Auto-Rejected"
+                                  : overdue
+                                    ? "Overdue"
+                                    : confirmed
+                                      ? "Đã xác nhận"
+                                      : sent
+                                        ? "Đã gửi"
+                                        : "Chưa gửi"}
+                              </div>
+                              {sentDate && (
+                                <div className="text-xs">
+                                  Gửi lúc: {new Date(sentDate).toLocaleString()}
+                                </div>
+                              )}
+                              {template.requiresConfirmation && deadline && (
+                                <div className="text-xs">
+                                  Deadline xác nhận:{" "}
+                                  {new Date(deadline).toLocaleDateString()}
+                                </div>
+                              )}
+                              {confirmedDate && (
+                                <div className="text-xs">
+                                  Xác nhận:{" "}
+                                  {new Date(confirmedDate).toLocaleString()}
+                                </div>
+                              )}
+                            </TooltipContent>
+                          </Tooltip>
                         );
-                      })}
+                      })
+                    ) : (
+                      <Mail className="w-4 h-4 text-slate-300" />
+                    )}
+                  </div>
+
+                  {/* Circle stage */}
+                  {(() => {
+                    // Tính trạng thái tổng hợp cho stage
+                    let circleStatus:
+                      | "autoRejected"
+                      | "overdue"
+                      | "completed"
+                      | "current"
+                      | "default" = "default";
+                    if (stageTemplates.length > 0) {
+                      // Lặp qua từng template để xác định trạng thái
+                      let foundAutoRejected = false;
+                      let foundOverdue = false;
+                      let allConfirmed = true;
+                      let hasSentEmails = false;
+
+                      stageTemplates.forEach((template) => {
+                        const sentEmails = emailsForStage.filter((email) => {
+                          const templateNameMatch =
+                            email.template === template.name;
+                          const subjectMatch = email.subject
+                            .toLowerCase()
+                            .includes(template.name.toLowerCase());
+                          const stageMatch = email.subject
+                            .toLowerCase()
+                            .includes(template.stage?.toLowerCase() || "");
+                          const genericStageMatch = email.subject
+                            .toLowerCase()
+                            .includes(stage.name.toLowerCase());
+
+                          return (
+                            templateNameMatch ||
+                            subjectMatch ||
+                            stageMatch ||
+                            genericStageMatch
+                          );
+                        });
+
+                        const latestEmail =
+                          sentEmails.length > 0
+                            ? sentEmails.reduce((a, b) =>
+                                new Date(a.timestamp) > new Date(b.timestamp)
+                                  ? a
+                                  : b,
+                              )
+                            : undefined;
+                        const sent = !!latestEmail;
+                        const confirmed = latestEmail?.repliedAt ? true : false;
+                        const sentDate = latestEmail?.timestamp;
+
+                        if (sent) hasSentEmails = true;
+
+                        let deadline: string | undefined = undefined;
+                        if (template.confirmationDeadline && sentDate) {
+                          const sentTime = new Date(sentDate).getTime();
+                          deadline = new Date(
+                            sentTime +
+                              template.confirmationDeadline *
+                                24 *
+                                60 *
+                                60 *
+                                1000,
+                          ).toISOString();
+                        }
+
+                        const overdue =
+                          template.requiresConfirmation &&
+                          sent &&
+                          !confirmed &&
+                          deadline &&
+                          new Date() > new Date(deadline);
+                        const autoRejected =
+                          template.autoRejectOnOverdue && overdue;
+
+                        if (autoRejected) foundAutoRejected = true;
+                        if (overdue) foundOverdue = true;
+                        if (template.requiresConfirmation && sent && !confirmed)
+                          allConfirmed = false;
+                      });
+
+                      if (foundAutoRejected) circleStatus = "autoRejected";
+                      else if (foundOverdue) circleStatus = "overdue";
+                      else if (stage.completed) circleStatus = "completed";
+                      else if (index === currentStageIndex)
+                        circleStatus = "current";
+                      else if (hasSentEmails) circleStatus = "completed"; // Có email đã gửi nhưng chưa hoàn thành
+                    } else {
+                      // Không có template, dựa vào stage completion
+                      if (stage.completed) circleStatus = "completed";
+                      else if (index === currentStageIndex)
+                        circleStatus = "current";
+                    }
+                    return (
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center border-2 mx-auto mb-2 ${
+                          circleStatus === "autoRejected"
+                            ? "bg-red-500 border-red-500 text-white"
+                            : circleStatus === "overdue"
+                              ? "bg-orange-500 border-orange-500 text-white"
+                              : circleStatus === "completed"
+                                ? "bg-green-500 border-green-500 text-white"
+                                : circleStatus === "current"
+                                  ? "bg-blue-500 border-blue-500 text-white"
+                                  : "bg-white border-slate-300 text-slate-400"
+                        }`}
+                      >
+                        {circleStatus === "autoRejected" ? (
+                          <AlertCircle className="w-4 h-4" />
+                        ) : circleStatus === "overdue" ? (
+                          <Clock className="w-4 h-4" />
+                        ) : circleStatus === "completed" ? (
+                          <CheckCircle className="w-4 h-4" />
+                        ) : circleStatus === "current" ? (
+                          <Circle className="w-4 h-4 fill-current" />
+                        ) : (
+                          <Circle className="w-4 h-4" />
+                        )}
+                      </div>
+                    );
+                  })()}
+
+                  {/* Stage name */}
+                  <div className="text-xs font-medium text-slate-700 break-words px-1">
+                    {stage.name}
+                  </div>
+
+                  {/* Duration */}
+                  {stage.duration > 0 && (
+                    <div className="text-xs text-slate-500 flex items-center justify-center gap-1 mt-1">
+                      <Clock className="w-3 h-3" />
+                      <span className="break-words">{stage.duration}d</span>
                     </div>
-                  ) : (
-                    "No email requirements"
                   )}
+
+                  {/* Email status tooltip */}
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                    {stageTemplates.length > 0 ? (
+                      <div>
+                        {stageTemplates.map((template) => {
+                          const sentEmails = emailsForStage.filter((email) => {
+                            const templateNameMatch =
+                              email.template === template.name;
+                            const subjectMatch = email.subject
+                              .toLowerCase()
+                              .includes(template.name.toLowerCase());
+                            const stageMatch = email.subject
+                              .toLowerCase()
+                              .includes(template.stage?.toLowerCase() || "");
+                            const genericStageMatch = email.subject
+                              .toLowerCase()
+                              .includes(stage.name.toLowerCase());
+
+                            return (
+                              templateNameMatch ||
+                              subjectMatch ||
+                              stageMatch ||
+                              genericStageMatch
+                            );
+                          });
+                          const latestEmail =
+                            sentEmails.length > 0
+                              ? sentEmails.reduce((a, b) =>
+                                  new Date(a.timestamp) > new Date(b.timestamp)
+                                    ? a
+                                    : b,
+                                )
+                              : undefined;
+                          const sent = !!latestEmail;
+                          const confirmed = latestEmail?.repliedAt
+                            ? true
+                            : false;
+                          const sentDate = latestEmail?.timestamp;
+                          const confirmedDate = latestEmail?.repliedAt;
+                          const deadline: string | undefined =
+                            template.confirmationDeadline && sentDate
+                              ? new Date(
+                                  new Date(sentDate).getTime() +
+                                    template.confirmationDeadline *
+                                      24 *
+                                      60 *
+                                      60 *
+                                      1000,
+                                ).toISOString()
+                              : undefined;
+                          const overdue =
+                            template.requiresConfirmation &&
+                            sent &&
+                            !confirmed &&
+                            deadline &&
+                            new Date() > new Date(deadline);
+                          const autoRejected =
+                            template.autoRejectOnOverdue && overdue;
+                          return (
+                            <div key={template.id}>
+                              {template.name}:{" "}
+                              {autoRejected
+                                ? "Auto-Rejected"
+                                : overdue
+                                  ? "Overdue"
+                                  : confirmed
+                                    ? "Confirmed"
+                                    : sent
+                                      ? "Sent"
+                                      : "Required"}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      "No email requirements"
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
         </TooltipProvider>
 
         {/* Email Status Overview */}
@@ -783,25 +981,38 @@ export default function CandidateApplicationProgress(props: CandidateApplication
             </h4>
             <div className="space-y-3">
               {emailStatuses.map((status, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg border border-blue-100">
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-3 bg-white rounded-lg border border-blue-100"
+                >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-medium text-sm text-slate-900">
                         {status.template.name}
                       </span>
-                      <Badge 
+                      <Badge
                         variant={
-                          status.autoRejected ? "destructive" :
-                          status.overdue ? "destructive" :
-                          status.confirmed ? "default" :
-                          status.sent ? "secondary" : "outline"
+                          status.autoRejected
+                            ? "destructive"
+                            : status.overdue
+                              ? "destructive"
+                              : status.confirmed
+                                ? "default"
+                                : status.sent
+                                  ? "secondary"
+                                  : "outline"
                         }
                         className="text-xs"
                       >
-                        {status.autoRejected ? "Auto-Rejected" :
-                         status.overdue ? "Overdue" :
-                         status.confirmed ? "Confirmed" :
-                         status.sent ? "Sent" : "Required"}
+                        {status.autoRejected
+                          ? "Auto-Rejected"
+                          : status.overdue
+                            ? "Overdue"
+                            : status.confirmed
+                              ? "Confirmed"
+                              : status.sent
+                                ? "Sent"
+                                : "Required"}
                       </Badge>
                     </div>
                     <p className="text-xs text-slate-600">
@@ -812,35 +1023,43 @@ export default function CandidateApplicationProgress(props: CandidateApplication
                         Sent: {new Date(status.sentDate).toLocaleDateString()}
                       </p>
                     )}
-                    {status.deadline && status.template.requiresConfirmation && (
-                      <p className="text-xs text-slate-500">
-                        Deadline: {new Date(status.deadline).toLocaleDateString()}
-                      </p>
-                    )}
+                    {status.deadline &&
+                      status.template.requiresConfirmation && (
+                        <p className="text-xs text-slate-500">
+                          Deadline:{" "}
+                          {new Date(status.deadline).toLocaleDateString()}
+                        </p>
+                      )}
                   </div>
                   <div className="flex items-center gap-2">
                     {!status.sent && (
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
+                      <Button
+                        size="sm"
+                        variant="outline"
                         className="text-xs"
-                        onClick={() => handleEmailAction('send', status.template.id)}
+                        onClick={() =>
+                          handleEmailAction("send", status.template.id)
+                        }
                       >
                         <Send className="w-3 h-3 mr-1" />
                         Send
                       </Button>
                     )}
-                    {status.sent && !status.confirmed && status.template.requiresConfirmation && (
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
-                        className="text-xs"
-                        onClick={() => handleEmailAction('confirm', status.template.id)}
-                      >
-                        <CheckCircle className="w-3 h-3 mr-1" />
-                        Mark Confirmed
-                      </Button>
-                    )}
+                    {status.sent &&
+                      !status.confirmed &&
+                      status.template.requiresConfirmation && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-xs"
+                          onClick={() =>
+                            handleEmailAction("confirm", status.template.id)
+                          }
+                        >
+                          <CheckCircle className="w-3 h-3 mr-1" />
+                          Mark Confirmed
+                        </Button>
+                      )}
                   </div>
                 </div>
               ))}
@@ -952,7 +1171,7 @@ export default function CandidateApplicationProgress(props: CandidateApplication
       {/* Main Content */}
       <div className="p-3 sm:p-4 lg:p-6 space-y-6 lg:space-y-0 lg:grid lg:grid-cols-12 lg:gap-6">
         {/* Email Status Alerts */}
-        {emailStatuses.some(s => s.overdue || s.autoRejected) && (
+        {emailStatuses.some((s) => s.overdue || s.autoRejected) && (
           <div className="lg:col-span-12">
             <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
@@ -961,16 +1180,23 @@ export default function CandidateApplicationProgress(props: CandidateApplication
               </div>
               <div className="text-sm text-red-700">
                 <p className="mb-2">
-                  {emailStatuses.filter(s => s.autoRejected).length} email(s) auto-rejected, 
-                  {emailStatuses.filter(s => s.overdue && !s.autoRejected).length} email(s) overdue
+                  {emailStatuses.filter((s) => s.autoRejected).length} email(s)
+                  auto-rejected,
+                  {
+                    emailStatuses.filter((s) => s.overdue && !s.autoRejected)
+                      .length
+                  }{" "}
+                  email(s) overdue
                 </p>
                 <div className="flex gap-2">
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
+                  <Button
+                    size="sm"
+                    variant="outline"
                     className="text-red-700 border-red-300 hover:bg-red-100"
                     onClick={() => {
-                      const trackingTab = document.querySelector('[data-value="tracking"]') as HTMLElement;
+                      const trackingTab = document.querySelector(
+                        '[data-value="tracking"]',
+                      ) as HTMLElement;
                       if (trackingTab) trackingTab.click();
                     }}
                   >
@@ -998,33 +1224,42 @@ export default function CandidateApplicationProgress(props: CandidateApplication
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div className="text-center p-2 bg-green-50 rounded-lg">
                     <div className="font-semibold text-green-700">
-                      {emailStatuses.filter(s => s.sent).length}
+                      {emailStatuses.filter((s) => s.sent).length}
                     </div>
                     <div className="text-xs text-green-600">Sent</div>
                   </div>
                   <div className="text-center p-2 bg-blue-50 rounded-lg">
                     <div className="font-semibold text-blue-700">
-                      {emailStatuses.filter(s => s.confirmed).length}
+                      {emailStatuses.filter((s) => s.confirmed).length}
                     </div>
                     <div className="text-xs text-blue-600">Confirmed</div>
                   </div>
                   <div className="text-center p-2 bg-yellow-50 rounded-lg">
                     <div className="font-semibold text-yellow-700">
-                      {emailStatuses.filter(s => s.overdue && !s.autoRejected).length}
+                      {
+                        emailStatuses.filter(
+                          (s) => s.overdue && !s.autoRejected,
+                        ).length
+                      }
                     </div>
                     <div className="text-xs text-yellow-600">Overdue</div>
                   </div>
                   <div className="text-center p-2 bg-red-50 rounded-lg">
                     <div className="font-semibold text-red-700">
-                      {emailStatuses.filter(s => s.autoRejected).length}
+                      {emailStatuses.filter((s) => s.autoRejected).length}
                     </div>
                     <div className="text-xs text-red-600">Auto-Rejected</div>
                   </div>
                 </div>
-                {emailStatuses.some(s => s.overdue || s.autoRejected) && (
+                {emailStatuses.some((s) => s.overdue || s.autoRejected) && (
                   <div className="p-2 bg-red-50 border border-red-200 rounded-lg">
                     <p className="text-xs text-red-700 font-medium">
-                      ⚠️ Action Required: {emailStatuses.filter(s => s.overdue || s.autoRejected).length} emails need attention
+                      ⚠️ Action Required:{" "}
+                      {
+                        emailStatuses.filter((s) => s.overdue || s.autoRejected)
+                          .length
+                      }{" "}
+                      emails need attention
                     </p>
                   </div>
                 )}
@@ -1245,8 +1480,8 @@ export default function CandidateApplicationProgress(props: CandidateApplication
                         <div className="flex items-center space-x-2 mt-2">
                           <span
                             className={`px-2 py-1 rounded text-xs ${
-                              email.openedAt 
-                                ? "bg-green-100 text-green-800" 
+                              email.openedAt
+                                ? "bg-green-100 text-green-800"
                                 : "bg-gray-100 text-gray-800"
                             }`}
                           >
@@ -1254,8 +1489,8 @@ export default function CandidateApplicationProgress(props: CandidateApplication
                           </span>
                           <span
                             className={`px-2 py-1 rounded text-xs ${
-                              email.repliedAt 
-                                ? "bg-blue-100 text-blue-800" 
+                              email.repliedAt
+                                ? "bg-blue-100 text-blue-800"
                                 : "bg-gray-100 text-gray-800"
                             }`}
                           >
@@ -1287,26 +1522,39 @@ export default function CandidateApplicationProgress(props: CandidateApplication
                       <div className="space-y-3">
                         {emailStatuses.length > 0 ? (
                           emailStatuses.map((status, index) => (
-                            <div key={index} className="bg-white p-3 rounded-lg border border-blue-100">
+                            <div
+                              key={index}
+                              className="bg-white p-3 rounded-lg border border-blue-100"
+                            >
                               <div className="flex items-start justify-between">
                                 <div className="flex-1">
                                   <div className="flex items-center gap-2 mb-2">
                                     <span className="font-medium text-sm">
                                       {status.template.name}
                                     </span>
-                                    <Badge 
+                                    <Badge
                                       variant={
-                                        status.autoRejected ? "destructive" :
-                                        status.overdue ? "destructive" :
-                                        status.confirmed ? "default" :
-                                        status.sent ? "secondary" : "outline"
+                                        status.autoRejected
+                                          ? "destructive"
+                                          : status.overdue
+                                            ? "destructive"
+                                            : status.confirmed
+                                              ? "default"
+                                              : status.sent
+                                                ? "secondary"
+                                                : "outline"
                                       }
                                       className="text-xs"
                                     >
-                                      {status.autoRejected ? "Auto-Rejected" :
-                                       status.overdue ? "Overdue" :
-                                       status.confirmed ? "Confirmed" :
-                                       status.sent ? "Sent" : "Required"}
+                                      {status.autoRejected
+                                        ? "Auto-Rejected"
+                                        : status.overdue
+                                          ? "Overdue"
+                                          : status.confirmed
+                                            ? "Confirmed"
+                                            : status.sent
+                                              ? "Sent"
+                                              : "Required"}
                                     </Badge>
                                   </div>
                                   <p className="text-xs text-slate-600 mb-2">
@@ -1316,50 +1564,78 @@ export default function CandidateApplicationProgress(props: CandidateApplication
                                     <div className="text-xs text-slate-500">
                                       <p>Requires confirmation: Yes</p>
                                       {status.deadline && (
-                                        <p>Deadline: {new Date(status.deadline).toLocaleDateString()}</p>
+                                        <p>
+                                          Deadline:{" "}
+                                          {new Date(
+                                            status.deadline,
+                                          ).toLocaleDateString()}
+                                        </p>
                                       )}
                                     </div>
                                   )}
                                   {status.sentDate && (
                                     <p className="text-xs text-slate-500 mt-1">
-                                      Sent: {new Date(status.sentDate).toLocaleDateString()}
+                                      Sent:{" "}
+                                      {new Date(
+                                        status.sentDate,
+                                      ).toLocaleDateString()}
                                     </p>
                                   )}
                                   {status.confirmedDate && (
                                     <p className="text-xs text-green-600 mt-1">
-                                      Confirmed: {new Date(status.confirmedDate).toLocaleDateString()}
+                                      Confirmed:{" "}
+                                      {new Date(
+                                        status.confirmedDate,
+                                      ).toLocaleDateString()}
                                     </p>
                                   )}
                                 </div>
                                 <div className="flex flex-col gap-2">
                                   {!status.sent && (
-                                    <Button 
-                                      size="sm" 
-                                      variant="default" 
+                                    <Button
+                                      size="sm"
+                                      variant="default"
                                       className="text-xs"
-                                      onClick={() => handleEmailAction('send', status.template.id)}
+                                      onClick={() =>
+                                        handleEmailAction(
+                                          "send",
+                                          status.template.id,
+                                        )
+                                      }
                                     >
                                       <Send className="w-3 h-3 mr-1" />
                                       Send Email
                                     </Button>
                                   )}
-                                  {status.sent && !status.confirmed && status.template.requiresConfirmation && (
-                                    <Button 
-                                      size="sm" 
-                                      variant="outline" 
-                                      className="text-xs"
-                                      onClick={() => handleEmailAction('confirm', status.template.id)}
-                                    >
-                                      <CheckCircle className="w-3 h-3 mr-1" />
-                                      Mark Confirmed
-                                    </Button>
-                                  )}
+                                  {status.sent &&
+                                    !status.confirmed &&
+                                    status.template.requiresConfirmation && (
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="text-xs"
+                                        onClick={() =>
+                                          handleEmailAction(
+                                            "confirm",
+                                            status.template.id,
+                                          )
+                                        }
+                                      >
+                                        <CheckCircle className="w-3 h-3 mr-1" />
+                                        Mark Confirmed
+                                      </Button>
+                                    )}
                                   {status.overdue && !status.autoRejected && (
-                                    <Button 
-                                      size="sm" 
-                                      variant="destructive" 
+                                    <Button
+                                      size="sm"
+                                      variant="destructive"
                                       className="text-xs"
-                                      onClick={() => handleEmailAction('autoReject', status.template.id)}
+                                      onClick={() =>
+                                        handleEmailAction(
+                                          "autoReject",
+                                          status.template.id,
+                                        )
+                                      }
                                     >
                                       <AlertCircle className="w-3 h-3 mr-1" />
                                       Auto-Reject
@@ -1383,23 +1659,47 @@ export default function CandidateApplicationProgress(props: CandidateApplication
                         All Stage Email Templates
                       </h4>
                       <div className="space-y-2">
-                        {["applied", "interview", "technical", "offer", "hired"].map((stage) => {
+                        {[
+                          "applied",
+                          "interview",
+                          "technical",
+                          "offer",
+                          "hired",
+                        ].map((stage) => {
                           const templates = getTemplatesForStage(stage);
                           return (
-                            <div key={stage} className="bg-white p-3 rounded-lg border border-slate-100">
+                            <div
+                              key={stage}
+                              className="bg-white p-3 rounded-lg border border-slate-100"
+                            >
                               <h5 className="font-medium text-sm text-slate-900 mb-2 capitalize">
                                 {stage} Stage
                               </h5>
                               <div className="space-y-1">
                                 {templates.map((template) => (
-                                  <div key={template.id} className="flex items-center justify-between text-xs">
-                                    <span className="text-slate-600">{template.name}</span>
+                                  <div
+                                    key={template.id}
+                                    className="flex items-center justify-between text-xs"
+                                  >
+                                    <span className="text-slate-600">
+                                      {template.name}
+                                    </span>
                                     <div className="flex items-center gap-1">
                                       {template.requiresConfirmation && (
-                                        <Badge variant="outline" className="text-xs">Confirmation Required</Badge>
+                                        <Badge
+                                          variant="outline"
+                                          className="text-xs"
+                                        >
+                                          Confirmation Required
+                                        </Badge>
                                       )}
                                       {template.autoRejectOnOverdue && (
-                                        <Badge variant="outline" className="text-xs">Auto-Reject</Badge>
+                                        <Badge
+                                          variant="outline"
+                                          className="text-xs"
+                                        >
+                                          Auto-Reject
+                                        </Badge>
                                       )}
                                     </div>
                                   </div>
