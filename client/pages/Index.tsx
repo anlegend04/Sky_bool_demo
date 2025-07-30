@@ -58,7 +58,7 @@ export default function Index() {
           to finish generating
         </p>
         <div className="mt-6 space-y-3">
-          <Link to="/candidates-enhanced/cand-001">
+          <Link to="/candidates-profile/cand-001">
             <Button className="w-full max-w-sm">
               🚀 Demo: Enhanced Candidate Profile with Multiple Jobs
             </Button>
