@@ -78,7 +78,13 @@ export class RechartsWarningSuppress extends Component<Props, State> {
     // Suppress console warnings
     console.warn = (...args: any[]) => {
       const message = args.join(" ");
-      if (!isRechartsDefaultPropsWarning(message)) {
+      // Handle both regular strings and React's template format
+      const isRechartsWarning = isRechartsDefaultPropsWarning(message) ||
+        (args[0] && typeof args[0] === 'string' &&
+         args[0].includes('Support for defaultProps will be removed') &&
+         args.some(arg => typeof arg === 'string' && (arg.includes('XAxis') || arg.includes('YAxis'))));
+
+      if (!isRechartsWarning) {
         this.originalConsoleWarn(...args);
       }
     };
