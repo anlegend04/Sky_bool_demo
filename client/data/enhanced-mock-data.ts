@@ -1,5 +1,5 @@
 // Enhanced mock data utilities for multiple job applications
-import { CandidateData, JobApplicationData } from "@/data/hardcoded-data";
+import { CandidateData, JobApplicationData, getCandidate, HARDCODED_CANDIDATES } from "@/data/hardcoded-data";
 import { JobApplication, EnhancedCandidateData } from "@/types/enhanced-candidate";
 
 // Helper function to get a specific job application from enhanced candidate data
