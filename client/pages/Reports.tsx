@@ -155,6 +155,14 @@ export default function Reports() {
     });
   };
 
+  // Suppress Recharts warnings on mount
+  useEffect(() => {
+    suppressRechartsWarnings();
+    return () => {
+      restoreWarnings();
+    };
+  }, []);
+
   // Auto-apply filters when filter values change
   useEffect(() => {
     applyFilters();
@@ -1213,7 +1221,7 @@ export default function Reports() {
                   {(costData.avgCostPerHire / 1000).toFixed(0)}K VND
                 </div>
                 <p className="text-sm text-slate-600 mt-2">
-                  Giảm 5% so với tháng tr��ớc
+                  Giảm 5% so với tháng trước
                 </p>
               </CardContent>
             </Card>
