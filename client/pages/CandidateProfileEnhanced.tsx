@@ -195,9 +195,7 @@ export default function CandidateProfileEnhanced() {
                   </div>
                   <div className="flex items-center gap-1 min-w-0">
                     <User className="w-3 h-3 flex-shrink-0" />
-                    <span className="break-words">
-                      {application.recruiter}
-                    </span>
+                    <span className="break-words">{application.recruiter}</span>
                   </div>
                 </div>
               </div>
@@ -848,7 +846,9 @@ export default function CandidateProfileEnhanced() {
                             skill.hasSkill ? "bg-green-500" : "bg-red-500"
                           }`}
                         />
-                        <span className="text-sm break-words">{skill.skill}</span>
+                        <span className="text-sm break-words">
+                          {skill.skill}
+                        </span>
                         {skill.hasSkill && skill.level && (
                           <Badge variant="outline" className="text-xs">
                             {skill.level}

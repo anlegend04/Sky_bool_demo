@@ -235,12 +235,10 @@ export default function FollowUpDashboard() {
   );
 
   const [selectedCandidates, setSelectedCandidates] = useState<string[]>([]);
-  const [viewMode, setViewMode] = useState<"pipeline" | "list">(
-    "list",
-  );
+  const [viewMode, setViewMode] = useState<"pipeline" | "list">("list");
   const [filterStage, setFilterStage] = useState("all");
   const [filterJob, setFilterJob] = useState("all");
-  
+
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [candidatesPerPage] = useState(10);
@@ -333,7 +331,10 @@ export default function FollowUpDashboard() {
   const totalPages = Math.ceil(filteredCandidates.length / candidatesPerPage);
   const indexOfLastCandidate = currentPage * candidatesPerPage;
   const indexOfFirstCandidate = indexOfLastCandidate - candidatesPerPage;
-  const currentCandidates = filteredCandidates.slice(indexOfFirstCandidate, indexOfLastCandidate);
+  const currentCandidates = filteredCandidates.slice(
+    indexOfFirstCandidate,
+    indexOfLastCandidate,
+  );
 
   // Reset to first page when filters change
   useEffect(() => {
@@ -540,12 +541,14 @@ export default function FollowUpDashboard() {
       "Hired",
     ];
 
-    const [candidatesPerStage, setCandidatesPerStage] = useState<Record<string, number>>({});
+    const [candidatesPerStage, setCandidatesPerStage] = useState<
+      Record<string, number>
+    >({});
 
     const showMoreCandidates = (stage: string) => {
-      setCandidatesPerStage(prev => ({
+      setCandidatesPerStage((prev) => ({
         ...prev,
-        [stage]: (prev[stage] || 5) + 5
+        [stage]: (prev[stage] || 5) + 5,
       }));
     };
 
@@ -585,8 +588,12 @@ export default function FollowUpDashboard() {
               style={{ maxWidth: 340 }}
             >
               <div className="flex items-center justify-between mb-4 p-4 pb-2 border-b border-slate-100">
-                <h3 className="font-semibold text-base text-slate-900 break-words flex-1">{stage}</h3>
-                <Badge variant="outline" className="text-xs flex-shrink-0 ml-2">{stageCandidates.length}</Badge>
+                <h3 className="font-semibold text-base text-slate-900 break-words flex-1">
+                  {stage}
+                </h3>
+                <Badge variant="outline" className="text-xs flex-shrink-0 ml-2">
+                  {stageCandidates.length}
+                </Badge>
               </div>
               <div className="space-y-3 px-4 pb-4 pt-2 min-h-[180px] relative flex-1">
                 {stageCandidates.length === 0 ? (
@@ -1121,20 +1128,19 @@ export default function FollowUpDashboard() {
       {viewMode === "pipeline" && <PipelineView />}
       {viewMode === "list" && <PipelineListView />}
 
-
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center">
           <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               disabled={currentPage === 1}
               onClick={() => setCurrentPage(currentPage - 1)}
             >
               Previous
             </Button>
-            
+
             {/* Page numbers */}
             {Array.from({ length: totalPages }, (_, index) => {
               const pageNumber = index + 1;
@@ -1158,14 +1164,18 @@ export default function FollowUpDashboard() {
                 pageNumber === currentPage - 2 ||
                 pageNumber === currentPage + 2
               ) {
-                return <span key={pageNumber} className="px-2 py-1">...</span>;
+                return (
+                  <span key={pageNumber} className="px-2 py-1">
+                    ...
+                  </span>
+                );
               }
               return null;
             })}
-            
-            <Button 
-              variant="outline" 
-              size="sm" 
+
+            <Button
+              variant="outline"
+              size="sm"
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage(currentPage + 1)}
             >
@@ -1332,7 +1342,7 @@ export default function FollowUpDashboard() {
                     </Card>
                   </div>
                 </TabsContent>
-                
+
                 <TabsContent value="emails" className="space-y-4">
                   <div className="space-y-3">
                     {selectedCandidate.emailHistory.map((email) => (

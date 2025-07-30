@@ -396,7 +396,11 @@ export default function CandidateApplicationProgress() {
                 </Button>
               </Link>
               <Link to={`/candidates/${candidateId}`}>
-                <Button variant="outline" size="sm" className="w-full sm:w-auto">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full sm:w-auto"
+                >
                   <User className="w-4 h-4 mr-2" />
                   View Full Profile
                 </Button>
