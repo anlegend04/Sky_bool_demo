@@ -1350,7 +1350,8 @@ export const getUser = (id: string): UserData | undefined => {
 };
 
 export const getUnreadNotificationCount = (): number => {
-  return HARDCODED_NOTIFICATIONS.filter((notification) => !notification.read).length;
+  return HARDCODED_NOTIFICATIONS.filter((notification) => !notification.read)
+    .length;
 };
 
 export const getUserNotifications = (userId: string): NotificationData[] => {
@@ -1400,7 +1401,6 @@ export const getJobStats = (jobId: string) => {
     avgTimeToHire: 25, // Mock average
   };
 };
-
 
 export const getCandidateTimeline = (candidateId: string) => {
   const candidate = getCandidate(candidateId);
