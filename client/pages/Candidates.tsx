@@ -69,8 +69,6 @@ import {
   Upload,
   CheckCircle,
   AlertCircle,
-  Edit3,
-  Save,
   X,
   FileCheck,
   Users,
@@ -111,7 +109,6 @@ interface ParsedCandidate {
     degree: string;
     year: string;
   }[];
-  isEditing: boolean;
   isConfirmed: boolean;
   hasMissingInfo: boolean;
   isPotentialDuplicate: boolean;
@@ -351,7 +348,6 @@ export default function Candidates() {
             year: "2019",
           },
         ],
-        isEditing: false,
         isConfirmed: false,
         hasMissingInfo,
         isPotentialDuplicate,
@@ -719,15 +715,6 @@ export default function Candidates() {
     }
   };
 
-  // Edit candidate inline
-  const toggleEdit = (candidateId: string) => {
-    setParsedCandidates((prev) =>
-      prev.map((c) =>
-        c.id === candidateId ? { ...c, isEditing: !c.isEditing } : c,
-      ),
-    );
-  };
-
   // Update candidate field
   const updateCandidateField = (
     candidateId: string,
@@ -735,29 +722,19 @@ export default function Candidates() {
     value: string,
   ) => {
     setParsedCandidates((prev) =>
-      prev.map((c) => (c.id === candidateId ? { ...c, [field]: value } : c)),
-    );
-  };
-
-  // Save candidate
-  const saveCandidate = (candidateId: string) => {
-    setParsedCandidates((prev) =>
-      prev.map((c) =>
-        c.id === candidateId
-          ? {
-              ...c,
-              isEditing: false,
+      prev.map((c) => 
+        c.id === candidateId 
+          ? { 
+              ...c, 
+              [field]: value,
               isConfirmed: true,
-              hasMissingInfo: !c.name || !c.email || !c.phone,
-            }
-          : c,
+              hasMissingInfo: !(field === 'name' ? value : c.name) || 
+                              !(field === 'email' ? value : c.email) || 
+                              !(field === 'phone' ? value : c.phone)
+            } 
+          : c
       ),
     );
-
-    toast({
-      title: "Candidate saved",
-      description: "Candidate information has been updated.",
-    });
   };
 
   // Remove candidate from parsed list
@@ -917,6 +894,7 @@ export default function Candidates() {
             <Checkbox
               checked={selectedCandidates.includes(candidate.id)}
               onCheckedChange={() => toggleCandidateSelection(candidate.id)}
+              className="w-3 h-3"
             />
             <div className="flex items-center space-x-2">
               {candidate.isConfirmed && (
@@ -934,13 +912,6 @@ export default function Candidates() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => toggleEdit(candidate.id)}
-            >
-              <Edit3 className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
               onClick={() => removeCandidate(candidate.id)}
             >
               <X className="w-4 h-4" />
@@ -954,114 +925,68 @@ export default function Candidates() {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label className="text-xs text-gray-500">Name</Label>
-            {candidate.isEditing ? (
-              <Input
-                value={candidate.name}
-                onChange={(e) =>
-                  updateCandidateField(candidate.id, "name", e.target.value)
-                }
-                placeholder="Full name"
-                className="mt-1"
-              />
-            ) : (
-              <div className="flex items-center mt-1">
-                <User className="w-4 h-4 text-gray-400 mr-2" />
-                <span
-                  className={`${!candidate.name ? "text-red-500 italic" : ""}`}
-                >
-                  {candidate.name || "Missing name"}
-                </span>
-              </div>
-            )}
+            <Input
+              value={candidate.name}
+              onChange={(e) =>
+                updateCandidateField(candidate.id, "name", e.target.value)
+              }
+              placeholder="Full name"
+              className="mt-1"
+            />
           </div>
 
           <div>
             <Label className="text-xs text-gray-500">Email</Label>
-            {candidate.isEditing ? (
-              <Input
-                type="email"
-                value={candidate.email}
-                onChange={(e) =>
-                  updateCandidateField(candidate.id, "email", e.target.value)
-                }
-                placeholder="Email address"
-                className="mt-1"
-              />
-            ) : (
-              <div className="flex items-center mt-1">
-                <Mail className="w-4 h-4 text-gray-400 mr-2" />
-                <span
-                  className={`${!candidate.email ? "text-red-500 italic" : ""}`}
-                >
-                  {candidate.email || "Missing email"}
-                </span>
-              </div>
-            )}
+            <Input
+              type="email"
+              value={candidate.email}
+              onChange={(e) =>
+                updateCandidateField(candidate.id, "email", e.target.value)
+              }
+              placeholder="Email address"
+              className="mt-1"
+            />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label className="text-xs text-gray-500">Phone</Label>
-            {candidate.isEditing ? (
-              <Input
-                value={candidate.phone}
-                onChange={(e) =>
-                  updateCandidateField(candidate.id, "phone", e.target.value)
-                }
-                placeholder="Phone number"
-                className="mt-1"
-              />
-            ) : (
-              <div className="flex items-center mt-1">
-                <Phone className="w-4 h-4 text-gray-400 mr-2" />
-                <span
-                  className={`${!candidate.phone ? "text-red-500 italic" : ""}`}
-                >
-                  {candidate.phone || "Missing phone"}
-                </span>
-              </div>
-            )}
+            <Input
+              value={candidate.phone}
+              onChange={(e) =>
+                updateCandidateField(candidate.id, "phone", e.target.value)
+              }
+              placeholder="Phone number"
+              className="mt-1"
+            />
           </div>
 
           <div>
             <Label className="text-xs text-gray-500">Location</Label>
-            {candidate.isEditing ? (
-              <Input
-                value={candidate.location}
-                onChange={(e) =>
-                  updateCandidateField(candidate.id, "location", e.target.value)
-                }
-                placeholder="Location"
-                className="mt-1"
-              />
-            ) : (
-              <div className="flex items-center mt-1">
-                <MapPin className="w-4 h-4 text-gray-400 mr-2" />
-                <span>{candidate.location}</span>
-              </div>
-            )}
+            <Input
+              value={candidate.location}
+              onChange={(e) =>
+                updateCandidateField(candidate.id, "location", e.target.value)
+              }
+              placeholder="Location"
+              className="mt-1"
+            />
           </div>
         </div>
 
         {/* Summary */}
         <div>
           <Label className="text-xs text-gray-500">Summary</Label>
-          {candidate.isEditing ? (
-            <Textarea
-              value={candidate.summary}
-              onChange={(e) =>
-                updateCandidateField(candidate.id, "summary", e.target.value)
-              }
-              placeholder="Professional summary"
-              className="mt-1"
-              rows={3}
-            />
-          ) : (
-            <p className="text-sm mt-1 text-gray-700 line-clamp-3">
-              {candidate.summary}
-            </p>
-          )}
+          <Textarea
+            value={candidate.summary}
+            onChange={(e) =>
+              updateCandidateField(candidate.id, "summary", e.target.value)
+            }
+            placeholder="Professional summary"
+            className="mt-1"
+            rows={3}
+          />
         </div>
 
         {/* Skills */}
@@ -1127,22 +1052,6 @@ export default function Candidates() {
           </div>
         </div>
 
-        {/* Action Buttons */}
-        {candidate.isEditing && (
-          <div className="flex justify-end space-x-2 pt-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => toggleEdit(candidate.id)}
-            >
-              Cancel
-            </Button>
-            <Button size="sm" onClick={() => saveCandidate(candidate.id)}>
-              <Save className="w-4 h-4 mr-2" />
-              Save
-            </Button>
-          </div>
-        )}
       </CardContent>
     </Card>
   );
@@ -1275,7 +1184,7 @@ export default function Candidates() {
                   Schedule Call
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleAddNote(candidate)}>
-                  <Edit3 className="w-4 h-4 mr-2" />
+                  <Edit className="w-4 h-4 mr-2" />
                   Add Note
                 </DropdownMenuItem>
 
@@ -2099,7 +2008,7 @@ export default function Candidates() {
                         Clear
                       </Button>
                       <Button onClick={createAllCandidates}>
-                        <Save className="w-4 h-4 mr-2" />
+                        <UserPlus className="w-4 h-4 mr-2" />
                         Create Candidate
                       </Button>
                     </div>
@@ -2424,7 +2333,7 @@ export default function Candidates() {
                           Clear All
                         </Button>
                         <Button onClick={createAllCandidates}>
-                          <Save className="w-4 h-4 mr-2" />
+                          <UserPlus className="w-4 h-4 mr-2" />
                           Create{" "}
                           {selectedCandidates.length > 0
                             ? selectedCandidates.length

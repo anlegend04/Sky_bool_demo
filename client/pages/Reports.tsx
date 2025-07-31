@@ -79,6 +79,7 @@ import {
   suppressRechartsWarnings,
   restoreWarnings,
 } from "@/lib/suppress-recharts-warnings";
+import { formatCurrency, formatCurrencyForTooltip } from "@/lib/utils";
 
 export default function Reports() {
   const { t } = useLanguage();
@@ -468,7 +469,7 @@ export default function Reports() {
 
   // Cost data - Mock data for cost per hire analysis
   const costData = useMemo(() => {
-    const baseCostPerHire = 15000; // Base cost in VND (thousands)
+    const baseCostPerHire = 24000000; // Base cost in VND (24M VND = ~$1000 USD)
     const totalHires =
       filteredData.filter((c) =>
         c.jobApplications.some((app) => app.currentStage === "Hired"),
@@ -516,7 +517,7 @@ export default function Reports() {
             app.jobTitle === job.position && app.currentStage === "Hired",
         ),
       ).length;
-      const avgCost = baseCostPerHire + (Math.random() * 5000 - 2500); // Add variation
+      const avgCost = baseCostPerHire + (Math.random() * 120000000 - 60000000); // Add variation (±60M VND = ±$2500 USD)
       return {
         position: job.position,
         hires: positionHires,
@@ -611,7 +612,7 @@ export default function Reports() {
     },
     {
       title: "Avg Cost per Hire",
-      value: `${(costData.avgCostPerHire / 1000).toFixed(0)}K VND`,
+      value: formatCurrency(costData.avgCostPerHire, 'USD'),
       change: "-5%",
       trend: "up",
       icon: DollarSign,
@@ -619,7 +620,7 @@ export default function Reports() {
     },
     {
       title: "Total cost",
-      value: `${(costData.totalCost / 1000000).toFixed(1)}M VND`,
+      value: formatCurrency(costData.totalCost, 'USD'),
       change: "+12%",
       trend: "up",
       icon: Briefcase,
@@ -1490,7 +1491,7 @@ export default function Reports() {
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-green-600">
-                  {(costData.avgCostPerHire / 1000).toFixed(0)}K VND
+                  {formatCurrency(costData.avgCostPerHire, 'USD')}
                 </div>
                 <p className="text-sm text-slate-600 mt-2">
                   Decrease of 5% compared to last month
@@ -1506,7 +1507,7 @@ export default function Reports() {
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-blue-600">
-                  {(costData.totalCost / 1000000).toFixed(1)}M VND
+                  {formatCurrency(costData.totalCost, 'USD')}
                 </div>
                 <p className="text-sm text-slate-600 mt-2">
                   Cho {costData.totalHires} successful hires
@@ -1557,7 +1558,7 @@ export default function Reports() {
                       </Pie>
                       <Tooltip
                         formatter={(value) => [
-                          `${(Number(value) / 1000).toFixed(0)}K VND`,
+                          formatCurrencyForTooltip(Number(value), 'USD'),
                           "Cost",
                         ]}
                         labelFormatter={(label) => `Loại: ${label}`}
@@ -1576,7 +1577,7 @@ export default function Reports() {
                             typeof (entry.payload as { amount?: number })
                               .amount === "number"
                           ) {
-                            return `${value} (${((entry.payload as unknown as { amount: number }).amount / 1000).toFixed(0)}K)`;
+                            return `${value} (${formatCurrencyForTooltip((entry.payload as unknown as { amount: number }).amount, 'USD')})`;
                           }
                           return value;
                         }}
@@ -1616,20 +1617,18 @@ export default function Reports() {
                       />
                       <YAxis
                         fontSize={12}
-                        tickFormatter={(value) =>
-                          `${(value / 1000).toFixed(0)}K`
-                        }
+                        tickFormatter={(value) => formatCurrencyForTooltip(value, 'USD')}
                       />
                       <Tooltip
                         formatter={(value, name) => {
                           if (name === "avgCostPerHire") {
                             return [
-                              `${(Number(value) / 1000).toFixed(0)}K VND`,
+                              formatCurrencyForTooltip(Number(value), 'USD'),
                               "avgCostPerHire",
                             ];
                           }
                           return [
-                            `${(Number(value) / 1000).toFixed(0)}K VND`,
+                            formatCurrencyForTooltip(Number(value), 'USD'),
                             "Total Cost",
                           ];
                         }}
@@ -1682,7 +1681,7 @@ export default function Reports() {
                     <XAxis dataKey="month" fontSize={12} />
                     <YAxis
                       fontSize={12}
-                      tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
+                      tickFormatter={(value) => formatCurrencyForTooltip(value, 'USD')}
                     />
                     <Tooltip
                       formatter={(value, name) => {
@@ -1695,7 +1694,7 @@ export default function Reports() {
                           return [value, labels[name]];
                         }
                         return [
-                          `${(Number(value) / 1000).toFixed(0)}K VND`,
+                          formatCurrencyForTooltip(Number(value), 'USD'),
                           labels[name],
                         ];
                       }}
@@ -1767,11 +1766,10 @@ export default function Reports() {
                     </div>
                     <div className="text-right">
                       <div className="text-lg font-semibold text-gray-900">
-                        {(item.amount / 1000).toFixed(0)}K VND
+                        {formatCurrency(item.amount, 'USD')}
                       </div>
                       <div className="text-sm text-gray-600">
-                        ~{(item.amount / costData.totalHires / 1000).toFixed(0)}
-                        K/hire
+                        ~{formatCurrency(item.amount / costData.totalHires, 'USD')}/hire
                       </div>
                     </div>
                   </div>

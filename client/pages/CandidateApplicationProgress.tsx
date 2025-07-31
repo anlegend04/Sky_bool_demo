@@ -123,7 +123,7 @@ export default function CandidateApplicationProgress(
       ? convertCandidateToEnhanced(hardcodedCandidate)
       : null);
 
-  const jobId = props.jobId ?? params.jobId ?? params.candidateId;
+  const jobId = props.jobId ?? params.jobId;
 
   const [jobApplication, setJobApplication] = useState<JobApplication | null>(
     null,
@@ -132,6 +132,7 @@ export default function CandidateApplicationProgress(
   const [showEmailTrigger, setShowEmailTrigger] = useState(false);
   const [newNote, setNewNote] = useState("");
   const [selectedJobId, setSelectedJobId] = useState<string | null>(jobId);
+  const [isAutoSelecting, setIsAutoSelecting] = useState<boolean>(false);
   const [emailTemplates] = useState<EmailTemplate[]>(getAllEmailTemplates());
   const [emailStatuses, setEmailStatuses] = useState<EmailStatusData[]>([]);
   const { toast } = useToast();
@@ -228,22 +229,74 @@ export default function CandidateApplicationProgress(
     }
   };
 
-  // Auto-select job if candidate has only one application
+  // Auto-select job based on candidate name and position
   useEffect(() => {
     const availableJobs = candidate.jobApplications || [];
 
-    // If no job is selected and candidate has exactly one job application, auto-select it
-    if (!selectedJobId && availableJobs.length === 1) {
-      setSelectedJobId(availableJobs[0].id);
+    // If a specific jobId is provided in the URL, validate it exists for this candidate
+    if (jobId && availableJobs.length > 0) {
+      const jobExists = availableJobs.some(job => job.id === jobId);
+      if (jobExists) {
+        setSelectedJobId(jobId);
+        setIsAutoSelecting(false);
+      } else {
+        // Job doesn't exist for this candidate, show error
+        toast({
+          title: "Job Not Found",
+          description: "The specified job application was not found for this candidate.",
+          variant: "destructive",
+        });
+      }
     }
-  }, [candidate, selectedJobId]);
+    // If no specific jobId, automatically select the most relevant job
+    else if (!selectedJobId && availableJobs.length > 0) {
+      setIsAutoSelecting(true);
+      // Priority: 1. Most recent application, 2. First application
+      const sortedJobs = availableJobs.sort((a, b) => 
+        new Date(b.appliedDate).getTime() - new Date(a.appliedDate).getTime()
+      );
+      
+      // Add a small delay to show the loading state
+      const timeoutId = setTimeout(() => {
+        setSelectedJobId(sortedJobs[0].id);
+        setIsAutoSelecting(false);
+      }, 1000);
+
+      // Cleanup timeout on unmount
+      return () => clearTimeout(timeoutId);
+    }
+  }, [candidate, selectedJobId, jobId, toast]);
 
   if (!jobApplication) {
     // Get available job applications for this candidate
     const availableJobs = candidate.jobApplications || [];
 
-    // If candidate has only one job application, show loading while auto-selecting
-    if (availableJobs.length === 1) {
+    // If a specific jobId is provided in the URL but the job application is not found
+    if (jobId && !availableJobs.some(job => job.id === jobId)) {
+      return (
+        <div className="p-6">
+          <div className="max-w-2xl mx-auto text-center">
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">
+              Job Application Not Found
+            </h2>
+            <p className="text-slate-600 mb-6">
+              The specified job application was not found for this candidate.
+            </p>
+            <div className="flex gap-2 justify-center">
+              <Link to={`/candidates/${candidate.id}`}>
+                <Button variant="outline">Back to Candidate Profile</Button>
+              </Link>
+              <Link to="/follow-up">
+                <Button variant="outline">Back to Recruitment Process</Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Show loading while auto-selecting job application
+    if (isAutoSelecting || (!jobId && availableJobs.length > 0 && !selectedJobId)) {
       return (
         <div className="p-6">
           <div className="max-w-2xl mx-auto text-center">
@@ -252,7 +305,7 @@ export default function CandidateApplicationProgress(
                 Loading Application Progress...
               </h2>
               <p className="text-slate-600">
-                Redirecting to {availableJobs[0].jobTitle} application
+                Automatically selecting the most recent job application for {candidate.name}
               </p>
             </div>
           </div>
@@ -260,66 +313,41 @@ export default function CandidateApplicationProgress(
       );
     }
 
+    // If no job applications found
+    if (availableJobs.length === 0) {
+      return (
+        <div className="p-6">
+          <div className="max-w-2xl mx-auto text-center">
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">
+              No Job Applications Found
+            </h2>
+            <p className="text-slate-600 mb-6">
+              No job applications were found for {candidate.name}.
+            </p>
+            <div className="flex gap-2 justify-center">
+              <Link to="/follow-up">
+                <Button variant="outline">Back to Recruitment Process</Button>
+              </Link>
+              <Link to={`/candidates/${candidate.id}`}>
+                <Button variant="outline">View Candidate Profile</Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // If we have a jobId but jobApplication is still null, show loading
     return (
       <div className="p-6">
-        <div className="max-w-2xl mx-auto">
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-slate-900">
-              Select Job Application
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="animate-pulse">
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">
+              Loading Application Progress...
             </h2>
-            <p className="text-slate-600 mt-2">
-              Choose a job application to view the recruitment process for{" "}
-              {candidate.name}
+            <p className="text-slate-600">
+              Loading job application details...
             </p>
-          </div>
-
-          {availableJobs.length > 0 ? (
-            <div className="space-y-4">
-              {availableJobs.map((job) => (
-                <Card
-                  key={job.id}
-                  className="cursor-pointer hover:shadow-md transition-shadow"
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-slate-900">
-                          {job.jobTitle}
-                        </h3>
-                        <p className="text-sm text-slate-600">
-                          Current Stage: {job.currentStage}
-                        </p>
-                        <p className="text-sm text-slate-600">
-                          Applied:{" "}
-                          {new Date(job.appliedDate).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <Button
-                        onClick={() => setSelectedJobId(job.id)}
-                        className="ml-4"
-                      >
-                        View Process
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center">
-              <p className="text-slate-600 mb-4">
-                No job applications found for this candidate.
-              </p>
-            </div>
-          )}
-
-          <div className="flex gap-2 mt-6 justify-center">
-            <Link to="/follow-up">
-              <Button variant="outline">Back to Recuitment Process</Button>
-            </Link>
-            <Link to={`/candidates/${candidate.id}`}>
-              <Button variant="outline">View Candidate Profile</Button>
-            </Link>
           </div>
         </div>
       </div>
@@ -579,7 +607,7 @@ export default function CandidateApplicationProgress(
         </div>
 
         {/* Interface Legend */}
-        <div className="mb-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
+        <div className="hidden mb-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
           <div className="flex items-center gap-2 mb-3">
             <HelpCircle className="w-4 h-4 text-slate-600" />
             <span className="font-medium text-sm text-slate-900">How to read this interface:</span>
