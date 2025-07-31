@@ -579,7 +579,7 @@ export default function CandidateApplicationProgress(
         </div>
 
         {/* Interface Legend */}
-        <div className="hidden mb-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
+        <div className="mb-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
           <div className="flex items-center gap-2 mb-3">
             <HelpCircle className="w-4 h-4 text-slate-600" />
             <span className="font-medium text-sm text-slate-900">How to read this interface:</span>
@@ -634,7 +634,8 @@ export default function CandidateApplicationProgress(
         <div className="mb-4">
           <div className="flex items-center gap-2 mb-3">
             <span className="text-sm font-medium text-slate-700">Recruitment Stages</span>
-            <HelpTooltip content="Each circle represents a stage in the recruitment process. The color indicates the status: Gray (not started), Blue (current), Green (completed), Orange (overdue), Red (auto-rejected). Email icons above show communication status." />
+            <HelpTooltip content="Each circle represents a stage in the recruitment process. The color indicates the status: Gray (not started),
+             Blue (current), Green (completed), Orange (overdue), Red (auto-rejected). Email icons above show communication status." />
           </div>
         </div>
         <TooltipProvider>
