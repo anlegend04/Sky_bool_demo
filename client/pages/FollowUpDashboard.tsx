@@ -1,5 +1,6 @@
 import React, {
   useState,
+  useRef,
   useCallback,
   useMemo,
   useEffect,
@@ -890,6 +891,8 @@ const RecruitmentStagesDropdown = ({
   );
 };
 
+
+
 export default function FollowUpDashboard() {
   const { toast } = useToast();
 
@@ -1205,21 +1208,21 @@ export default function FollowUpDashboard() {
       );
 
       // In a real app, this would be an API call
-      const currentStage = candidate.currentStage || "Unknown";
+      const currentStage = candidate.stage || "Unknown";
       console.log(
-        `Moving progress entry ${candidate.candidateName} from ${currentStage} to ${newStage}`,
+        `Moving progress entry ${candidate.name} from ${currentStage} to ${newStage}`,
       );
 
       // Show success message
       if (emailData) {
         toast({
           title: "Stage updated & Email sent",
-          description: `${candidate.candidateName} moved to ${newStage} stage and email sent.`,
+          description: `${candidate.name} moved to ${newStage} stage and email sent.`,
         });
       } else {
         toast({
           title: "Stage updated",
-          description: `${candidate.candidateName} moved to ${newStage} stage.`,
+          description: `${candidate.name} moved to ${newStage} stage.`,
         });
       }
     }
@@ -2648,29 +2651,29 @@ export default function FollowUpDashboard() {
                         <div className="flex justify-between">
                           <span>Days in stage:</span>
                           <span className="font-medium">
-                            {selectedCandidate.daysInStage}
+                            {selectedProgressEntry.daysInStage}
                           </span>
                         </div>
                         <div className="flex justify-between">
                           <span>Emails sent:</span>
                           <span className="font-medium">
-                            {selectedCandidate.emailsSent}
+                            {selectedProgressEntry.emailsSent}
                           </span>
                         </div>
                         <div className="flex justify-between">
                           <span>Response rate:</span>
                           <span className="font-medium">
-                            {selectedCandidate.responseRate}%
+                            {selectedProgressEntry.responseRate}%
                           </span>
                         </div>
                         <div className="flex justify-between">
                           <span>Urgency level:</span>
                           <Badge
                             className={getUrgencyColor(
-                              selectedCandidate.urgencyLevel,
+                              selectedProgressEntry.urgencyLevel,
                             )}
                           >
-                            {selectedCandidate.urgencyLevel}
+                            {selectedProgressEntry.urgencyLevel}
                           </Badge>
                         </div>
                       </CardContent>
@@ -2683,19 +2686,19 @@ export default function FollowUpDashboard() {
                         <div className="flex items-center space-x-2">
                           <Mail className="w-4 h-4 text-gray-500" />
                           <span className="text-sm">
-                            {selectedCandidate.email}
+                            {selectedProgressEntry.candidateEmail}
                           </span>
                         </div>
                         <div className="flex items-center space-x-2">
                           <Phone className="w-4 h-4 text-gray-500" />
                           <span className="text-sm">
-                            {selectedCandidate.phone}
+                            {selectedProgressEntry.candidatePhone}
                           </span>
                         </div>
                         <div className="flex items-center space-x-2">
                           <User className="w-4 h-4 text-gray-500" />
                           <span className="text-sm">
-                            {selectedCandidate.location}
+                            {selectedProgressEntry.location}
                           </span>
                         </div>
                       </CardContent>
@@ -2704,7 +2707,7 @@ export default function FollowUpDashboard() {
                 </TabsContent>
                 <TabsContent value="timeline" className="space-y-4">
                   <div className="space-y-3">
-                    {selectedCandidate.interactions.map((interaction) => (
+                    {selectedProgressEntry.interactions.map((interaction) => (
                       <div
                         key={interaction.id}
                         className="flex space-x-3 p-3 border rounded-lg"
@@ -2747,7 +2750,7 @@ export default function FollowUpDashboard() {
                 </TabsContent>
                 <TabsContent value="emails" className="space-y-4">
                   <div className="space-y-3">
-                    {selectedCandidate.emailHistory.map((email) => (
+                    {selectedProgressEntry.emailHistory.map((email) => (
                       <div key={email.id} className="p-3 border rounded-lg">
                         <div className="flex items-center justify-between mb-2">
                           <span className="font-medium">{email.subject}</span>
