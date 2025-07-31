@@ -260,12 +260,12 @@ const RecruitmentStagesDropdown = ({
   ];
 
   const currentStageIndex = stageNames.findIndex(
-    (s) => s === mockJobApplication.currentStage
+    (s) => s === mockJobApplication.currentStage,
   );
 
   const stages = stageNames.map((stageName, index) => {
     const stageData = mockJobApplication.stageHistory.find(
-      (s) => s.stage === stageName
+      (s) => s.stage === stageName,
     );
 
     // Calculate completion status based on stage history and current stage
@@ -320,7 +320,7 @@ const RecruitmentStagesDropdown = ({
               {stages.map((stage, index) => {
                 // Get all templates for this stage
                 const stageTemplates = getTemplatesForStage(
-                  stage.name.toLowerCase()
+                  stage.name.toLowerCase(),
                 );
                 // Get all emails sent for this stage - improved matching logic
                 const emailsForStage = mockJobApplication.emails.filter(
@@ -344,7 +344,7 @@ const RecruitmentStagesDropdown = ({
                         genericStageMatch
                       );
                     });
-                  }
+                  },
                 );
                 return (
                   <div key={stage.name} className="text-center relative group">
@@ -378,7 +378,7 @@ const RecruitmentStagesDropdown = ({
                               ? sentEmails.reduce((a, b) =>
                                   new Date(a.timestamp) > new Date(b.timestamp)
                                     ? a
-                                    : b
+                                    : b,
                                 )
                               : undefined;
                           // Determine status
@@ -398,7 +398,7 @@ const RecruitmentStagesDropdown = ({
                                   24 *
                                   60 *
                                   60 *
-                                  1000
+                                  1000,
                             ).toISOString();
                           }
                           // Overdue
@@ -518,15 +518,15 @@ const RecruitmentStagesDropdown = ({
                                           stage.completed
                                             ? "text-green-600"
                                             : index === currentStageIndex
-                                            ? "text-blue-600"
-                                            : "text-slate-500"
+                                              ? "text-blue-600"
+                                              : "text-slate-500"
                                         }`}
                                       >
                                         {stage.completed
                                           ? "Completed"
                                           : index === currentStageIndex
-                                          ? "Current"
-                                          : "Pending"}
+                                            ? "Current"
+                                            : "Pending"}
                                       </span>
                                     </div>
 
@@ -548,7 +548,7 @@ const RecruitmentStagesDropdown = ({
                                         </span>
                                         <span className="text-slate-700">
                                           {new Date(
-                                            stage.startDate
+                                            stage.startDate,
                                           ).toLocaleDateString()}
                                         </span>
                                       </div>
@@ -561,7 +561,7 @@ const RecruitmentStagesDropdown = ({
                                         </span>
                                         <span className="text-slate-700">
                                           {new Date(
-                                            stage.endDate
+                                            stage.endDate,
                                           ).toLocaleDateString()}
                                         </span>
                                       </div>
@@ -619,30 +619,30 @@ const RecruitmentStagesDropdown = ({
                                             autoRejected
                                               ? "bg-red-100 text-red-700"
                                               : overdue
-                                              ? "bg-orange-100 text-orange-700"
-                                              : confirmed
-                                              ? "bg-green-100 text-green-700"
-                                              : sent
-                                              ? "bg-blue-100 text-blue-700"
-                                              : "bg-slate-100 text-slate-700"
+                                                ? "bg-orange-100 text-orange-700"
+                                                : confirmed
+                                                  ? "bg-green-100 text-green-700"
+                                                  : sent
+                                                    ? "bg-blue-100 text-blue-700"
+                                                    : "bg-slate-100 text-slate-700"
                                           }`}
                                         >
                                           {autoRejected
                                             ? "Auto-Rejected"
                                             : overdue
-                                            ? "Overdue"
-                                            : confirmed
-                                            ? "Confirmed"
-                                            : sent
-                                            ? "Sent"
-                                            : "Required"}
+                                              ? "Overdue"
+                                              : confirmed
+                                                ? "Confirmed"
+                                                : sent
+                                                  ? "Sent"
+                                                  : "Required"}
                                         </div>
                                       </div>
                                       {sentDate && (
                                         <div className="text-xs text-slate-600">
                                           Sent:{" "}
                                           {new Date(
-                                            sentDate
+                                            sentDate,
                                           ).toLocaleDateString()}
                                         </div>
                                       )}
@@ -651,7 +651,7 @@ const RecruitmentStagesDropdown = ({
                                           <div className="text-xs text-slate-600">
                                             Deadline:{" "}
                                             {new Date(
-                                              deadline
+                                              deadline,
                                             ).toLocaleDateString()}
                                           </div>
                                         )}
@@ -659,7 +659,7 @@ const RecruitmentStagesDropdown = ({
                                         <div className="text-xs text-slate-600">
                                           Confirmed:{" "}
                                           {new Date(
-                                            confirmedDate
+                                            confirmedDate,
                                           ).toLocaleDateString()}
                                         </div>
                                       )}
@@ -730,7 +730,7 @@ const RecruitmentStagesDropdown = ({
                               ? sentEmails.reduce((a, b) =>
                                   new Date(a.timestamp) > new Date(b.timestamp)
                                     ? a
-                                    : b
+                                    : b,
                                 )
                               : undefined;
                           const sent = !!latestEmail;
@@ -750,7 +750,7 @@ const RecruitmentStagesDropdown = ({
                                   24 *
                                   60 *
                                   60 *
-                                  1000
+                                  1000,
                             ).toISOString();
                           }
 
@@ -793,12 +793,12 @@ const RecruitmentStagesDropdown = ({
                                 circleStatus === "autoRejected"
                                   ? "bg-red-500 border-red-500 text-white"
                                   : circleStatus === "overdue"
-                                  ? "bg-orange-500 border-orange-500 text-white"
-                                  : circleStatus === "completed"
-                                  ? "bg-green-500 border-green-500 text-white"
-                                  : circleStatus === "current"
-                                  ? "bg-blue-500 border-blue-500 text-white"
-                                  : "bg-white border-slate-300 text-slate-400"
+                                    ? "bg-orange-500 border-orange-500 text-white"
+                                    : circleStatus === "completed"
+                                      ? "bg-green-500 border-green-500 text-white"
+                                      : circleStatus === "current"
+                                        ? "bg-blue-500 border-blue-500 text-white"
+                                        : "bg-white border-slate-300 text-slate-400"
                               }`}
                             >
                               {circleStatus === "autoRejected" ? (
@@ -932,7 +932,7 @@ export default function FollowUpDashboard() {
 
   // State cho Recruitment Stages dropdown
   const [expandedCandidateId, setExpandedCandidateId] = useState<string | null>(
-    null
+    null,
   );
 
   // Transform candidates to JobApplicationProgress format - one entry per job application
@@ -960,17 +960,17 @@ export default function FollowUpDashboard() {
           location: jobApp.location || "Unknown",
           // Follow-up specific data
           lastInteraction: new Date(
-            Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000
+            Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000,
           ).toISOString(),
           nextFollowUp: new Date(
-            Date.now() + Math.random() * 3 * 24 * 60 * 60 * 1000
+            Date.now() + Math.random() * 3 * 24 * 60 * 60 * 1000,
           ).toISOString(),
           daysInStage: Math.floor(Math.random() * 14) + 1,
           emailsSent: Math.floor(Math.random() * 5) + 1,
           lastEmailSent:
             Math.random() > 0.3
               ? new Date(
-                  Date.now() - Math.random() * 3 * 24 * 60 * 60 * 1000
+                  Date.now() - Math.random() * 3 * 24 * 60 * 60 * 1000,
                 ).toISOString()
               : undefined,
           responseRate: Math.floor(Math.random() * 100),
@@ -993,7 +993,7 @@ export default function FollowUpDashboard() {
               id: `int-${uniqueId}-1`,
               type: "call",
               date: new Date(
-                Date.now() - 2 * 24 * 60 * 60 * 1000
+                Date.now() - 2 * 24 * 60 * 60 * 1000,
               ).toISOString(),
               duration: 15,
               summary: "Discussed role requirements and candidate expectations",
@@ -1007,7 +1007,7 @@ export default function FollowUpDashboard() {
               subject: "Interview Invitation - " + jobApp.jobTitle,
               template: "interview_invitation",
               sentDate: new Date(
-                Date.now() - 24 * 60 * 60 * 1000
+                Date.now() - 24 * 60 * 60 * 1000,
               ).toISOString(),
               opened: Math.random() > 0.3,
               responded: Math.random() > 0.5,
@@ -1019,14 +1019,14 @@ export default function FollowUpDashboard() {
           ],
         };
       });
-    })
+    }),
   );
 
   const [selectedProgressEntries, setSelectedProgressEntries] = useState<
     string[]
   >([]);
   const [viewMode, setViewMode] = useState<"pipeline" | "list" | "timeline">(
-    "list"
+    "list",
   );
   const [filterStage, setFilterStage] = useState("all");
   const [filterJob, setFilterJob] = useState("all");
@@ -1073,7 +1073,7 @@ export default function FollowUpDashboard() {
   // Handle stage change with email trigger
   const handleStageChange = (
     progressEntry: JobApplicationProgress,
-    newStage: string
+    newStage: string,
   ) => {
     const currentStage = progressEntry.currentStage || "Applied";
 
@@ -1104,7 +1104,7 @@ export default function FollowUpDashboard() {
   // Handle email sent or skipped from EmailTrigger
   const handleConfirmationResponse = (
     progressEntryId: string,
-    confirmed: boolean
+    confirmed: boolean,
   ) => {
     setProgressEntries((prevProgressEntries) =>
       prevProgressEntries.map((p) =>
@@ -1121,8 +1121,8 @@ export default function FollowUpDashboard() {
               overdue: false,
               autoRejected: false,
             }
-          : p
-      )
+          : p,
+      ),
     );
 
     const progressEntry = progressEntries.find((p) => p.id === progressEntryId);
@@ -1200,14 +1200,14 @@ export default function FollowUpDashboard() {
                   ],
                 }),
               }
-            : p
-        )
+            : p,
+        ),
       );
 
       // In a real app, this would be an API call
       const currentStage = candidate.currentStage || "Unknown";
       console.log(
-        `Moving progress entry ${candidate.candidateName} from ${currentStage} to ${newStage}`
+        `Moving progress entry ${candidate.candidateName} from ${currentStage} to ${newStage}`,
       );
 
       // Show success message
@@ -1301,14 +1301,14 @@ export default function FollowUpDashboard() {
 
   // Pagination logic
   const totalPages = Math.ceil(
-    filteredProgressEntries.length / progressEntriesPerPage
+    filteredProgressEntries.length / progressEntriesPerPage,
   );
   const indexOfLastProgressEntry = currentPage * progressEntriesPerPage;
   const indexOfFirstProgressEntry =
     indexOfLastProgressEntry - progressEntriesPerPage;
   const currentProgressEntries = filteredProgressEntries.slice(
     indexOfFirstProgressEntry,
-    indexOfLastProgressEntry
+    indexOfLastProgressEntry,
   );
 
   // Reset to first page when filters change
@@ -1324,7 +1324,7 @@ export default function FollowUpDashboard() {
           if (!progressEntry.confirmationStatus) return progressEntry;
 
           const updatedConfirmationStatus = checkOverdueStatus(
-            progressEntry.confirmationStatus
+            progressEntry.confirmationStatus,
           );
 
           // If progress entry is overdue and should be auto-rejected
@@ -1346,7 +1346,7 @@ export default function FollowUpDashboard() {
             confirmationStatus: updatedConfirmationStatus,
             overdue: updatedConfirmationStatus.overdue,
           };
-        })
+        }),
       );
     };
 
@@ -1364,11 +1364,11 @@ export default function FollowUpDashboard() {
     const total = progressEntries.length;
     const needingFollowUp = progressEntries.filter(
       (p) =>
-        new Date(p.nextFollowUp) <= new Date(Date.now() + 24 * 60 * 60 * 1000)
+        new Date(p.nextFollowUp) <= new Date(Date.now() + 24 * 60 * 60 * 1000),
     ).length;
     const overdue = progressEntries.filter((p) => p.daysInStage > 7).length;
     const activeToday = progressEntries.filter((p) =>
-      p.upcomingActions.some((a) => !a.completed)
+      p.upcomingActions.some((a) => !a.completed),
     ).length;
 
     return { total, needingFollowUp, overdue, activeToday };
@@ -1379,7 +1379,7 @@ export default function FollowUpDashboard() {
     setSelectedProgressEntries((prev) =>
       prev.includes(progressEntryId)
         ? prev.filter((id) => id !== progressEntryId)
-        : [...prev, progressEntryId]
+        : [...prev, progressEntryId],
     );
   }, []);
 
@@ -1416,7 +1416,7 @@ export default function FollowUpDashboard() {
           break;
       }
     },
-    [selectedProgressEntries, toast]
+    [selectedProgressEntries, toast],
   );
 
   const sendEmail = useCallback(
@@ -1432,7 +1432,7 @@ export default function FollowUpDashboard() {
       setShowEmailDialog(false);
       setSelectedProgressEntries([]);
     },
-    [emailTemplates, toast]
+    [emailTemplates, toast],
   );
 
   const getUrgencyColor = (urgency: string) => {
@@ -1452,7 +1452,7 @@ export default function FollowUpDashboard() {
     const now = new Date();
     const then = new Date(date);
     const diffInHours = Math.floor(
-      (now.getTime() - then.getTime()) / (1000 * 60 * 60)
+      (now.getTime() - then.getTime()) / (1000 * 60 * 60),
     );
 
     if (diffInHours < 24) return `${diffInHours}h ago`;
@@ -1463,7 +1463,7 @@ export default function FollowUpDashboard() {
   const applyCandidateToJob = useCallback(
     (candidateId: string, jobId: string) => {
       const progressEntry = progressEntries.find(
-        (p) => p.candidateId === candidateId && p.jobId === jobId
+        (p) => p.candidateId === candidateId && p.jobId === jobId,
       );
       const job = jobs.find((j) => j.id === jobId);
       if (progressEntry && job) {
@@ -1473,7 +1473,7 @@ export default function FollowUpDashboard() {
         });
       }
     },
-    [progressEntries, jobs, toast]
+    [progressEntries, jobs, toast],
   );
 
   // Progress Entry Card Component (giữ nguyên)
@@ -1538,20 +1538,20 @@ export default function FollowUpDashboard() {
                         progressEntry.confirmationStatus.confirmed === true
                           ? "default"
                           : progressEntry.confirmationStatus.confirmed === false
-                          ? "destructive"
-                          : progressEntry.confirmationStatus.overdue
-                          ? "destructive"
-                          : "secondary"
+                            ? "destructive"
+                            : progressEntry.confirmationStatus.overdue
+                              ? "destructive"
+                              : "secondary"
                       }
                       className="text-xs"
                     >
                       {progressEntry.confirmationStatus.confirmed === true
                         ? "Confirmed"
                         : progressEntry.confirmationStatus.confirmed === false
-                        ? "Rejected"
-                        : progressEntry.confirmationStatus.overdue
-                        ? "Overdue"
-                        : "Pending"}
+                          ? "Rejected"
+                          : progressEntry.confirmationStatus.overdue
+                            ? "Overdue"
+                            : "Pending"}
                     </Badge>
                   )}
                   {progressEntry.autoRejected && (
@@ -1780,12 +1780,12 @@ export default function FollowUpDashboard() {
       <div className="flex gap-4 overflow-x-auto pb-2">
         {stages.map((stage, index) => {
           const stageProgressEntries = filteredProgressEntries.filter(
-            (p) => p.currentStage === stage
+            (p) => p.currentStage === stage,
           );
           const maxVisible = candidatesPerStage[stage] || 5;
           const visibleProgressEntries = stageProgressEntries.slice(
             0,
-            maxVisible
+            maxVisible,
           );
           const hasMore = stageProgressEntries.length > maxVisible;
 
@@ -1793,7 +1793,7 @@ export default function FollowUpDashboard() {
             <div
               key={stage}
               className={`rounded-xl border shadow-sm min-w-[260px] flex-1 flex flex-col transition-all ${getStageColor(
-                stage
+                stage,
               )}`}
               style={{ maxWidth: 340 }}
             >
@@ -1854,7 +1854,7 @@ export default function FollowUpDashboard() {
   // Cập nhật Pipeline List View Component
   const PipelineListView = () => {
     const applyProgressEntry = progressEntries.find(
-      (p) => p.id === applyCandidateId
+      (p) => p.id === applyCandidateId,
     );
 
     return (
@@ -1906,7 +1906,7 @@ export default function FollowUpDashboard() {
                         className="hover:bg-slate-50 cursor-pointer"
                         onClick={() =>
                           setExpandedCandidateId(
-                            isExpanded ? null : progressEntry.id
+                            isExpanded ? null : progressEntry.id,
                           )
                         }
                       >
@@ -1945,16 +1945,19 @@ export default function FollowUpDashboard() {
                                 progressEntry.currentStage === "Offer"
                                   ? "default"
                                   : progressEntry.currentStage === "Hired"
-                                  ? "default"
-                                  : progressEntry.currentStage === "Technical"
-                                  ? "secondary"
-                                  : progressEntry.currentStage === "Interview"
-                                  ? "outline"
-                                  : progressEntry.currentStage === "Screening"
-                                  ? "secondary"
-                                  : progressEntry.currentStage === "Applied"
-                                  ? "outline"
-                                  : "destructive"
+                                    ? "default"
+                                    : progressEntry.currentStage === "Technical"
+                                      ? "secondary"
+                                      : progressEntry.currentStage ===
+                                          "Interview"
+                                        ? "outline"
+                                        : progressEntry.currentStage ===
+                                            "Screening"
+                                          ? "secondary"
+                                          : progressEntry.currentStage ===
+                                              "Applied"
+                                            ? "outline"
+                                            : "destructive"
                               }
                               className="break-words max-w-24"
                             >
@@ -1970,7 +1973,7 @@ export default function FollowUpDashboard() {
                         {visibleFields.appliedDate && (
                           <TableCell className="break-words max-w-32">
                             {new Date(
-                              progressEntry.appliedDate
+                              progressEntry.appliedDate,
                             ).toLocaleDateString()}
                           </TableCell>
                         )}
@@ -1993,7 +1996,7 @@ export default function FollowUpDashboard() {
                           <TableCell>
                             <Badge
                               className={`break-words max-w-24 ${getUrgencyColor(
-                                progressEntry.urgencyLevel
+                                progressEntry.urgencyLevel,
                               )}`}
                             >
                               {progressEntry.urgencyLevel}
@@ -2117,7 +2120,7 @@ export default function FollowUpDashboard() {
                                     "Technical",
                                     "Offer",
                                   ].includes(
-                                    progressEntry.currentStage || "Applied"
+                                    progressEntry.currentStage || "Applied",
                                   )
                                 }
                               >
@@ -2664,7 +2667,7 @@ export default function FollowUpDashboard() {
                           <span>Urgency level:</span>
                           <Badge
                             className={getUrgencyColor(
-                              selectedCandidate.urgencyLevel
+                              selectedCandidate.urgencyLevel,
                             )}
                           >
                             {selectedCandidate.urgencyLevel}

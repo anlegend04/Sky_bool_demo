@@ -60,13 +60,15 @@ export function generateEmailContent(
 ): { subject: string; content: string } {
   // Get the primary job application for email data
   const primaryJob = candidate.jobApplications?.[0];
-  
+
   // Calculate deadlines based on template requirements
   const now = new Date();
-  const confirmationDeadline = template.confirmationDeadline 
-    ? new Date(now.getTime() + template.confirmationDeadline * 24 * 60 * 60 * 1000).toLocaleDateString()
+  const confirmationDeadline = template.confirmationDeadline
+    ? new Date(
+        now.getTime() + template.confirmationDeadline * 24 * 60 * 60 * 1000,
+      ).toLocaleDateString()
     : undefined;
-  
+
   const defaultData: EmailData = {
     candidateName: candidate.name,
     jobTitle: primaryJob?.jobTitle || "the position",
@@ -78,8 +80,14 @@ export function generateEmailContent(
     salaryRange: primaryJob?.salary || "$80,000 - $120,000",
     applicationDate: primaryJob?.appliedDate || new Date().toLocaleDateString(),
     confirmationDeadline,
-    testDeadline: template.stage === "technical" ? new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString() : undefined,
-    offerDeadline: template.stage === "offer" ? new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString() : undefined,
+    testDeadline:
+      template.stage === "technical"
+        ? new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString()
+        : undefined,
+    offerDeadline:
+      template.stage === "offer"
+        ? new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString()
+        : undefined,
     ...additionalData,
   };
 
@@ -98,7 +106,10 @@ export function generateEmailContent(
   // Handle additional common variables
   const commonReplacements = {
     "{{position_department}}": primaryJob?.department || "Engineering",
-    "{{duration}}": primaryJob?.stageHistory?.[primaryJob.stageHistory.length - 1]?.duration?.toString() || "5",
+    "{{duration}}":
+      primaryJob?.stageHistory?.[
+        primaryJob.stageHistory.length - 1
+      ]?.duration?.toString() || "5",
     "{{recruiter_name}}": primaryJob?.recruiter || "HR Team",
   };
 
@@ -123,7 +134,8 @@ export function getAllEmailTemplates(): EmailTemplate[] {
     {
       id: 1,
       name: "Application Received - Confirmation",
-      subject: "We received your application - {{job_title}} at {{company_name}}",
+      subject:
+        "We received your application - {{job_title}} at {{company_name}}",
       content:
         "Dear {{candidate_name}},\n\nThank you for your interest in the {{job_title}} position at {{company_name}}. We have successfully received your application and our recruitment team is currently reviewing your qualifications.\n\nWhat happens next:\n- Our team will review your application within 3-5 business days\n- If your profile matches our requirements, we will contact you to schedule a screening call\n- We will keep you updated throughout the process\n\nIf you have any questions about your application, please don't hesitate to reach out to our HR team.\n\nWe appreciate your interest in joining our team!\n\nBest regards,\n{{company_name}} Recruitment Team",
       type: "confirmation",
@@ -161,7 +173,8 @@ export function getAllEmailTemplates(): EmailTemplate[] {
     {
       id: 3,
       name: "Interview Reminder",
-      subject: "Reminder: Interview Tomorrow - {{job_title}} at {{company_name}}",
+      subject:
+        "Reminder: Interview Tomorrow - {{job_title}} at {{company_name}}",
       content:
         "Dear {{candidate_name}},\n\nThis is a friendly reminder that you have an interview scheduled for tomorrow.\n\nInterview Details:\n- Date: {{interview_date}}\n- Time: {{interview_time}}\n- Interviewer: {{interviewer_name}}\n- Location: {{company_name}} Headquarters\n\nPlease arrive 10 minutes early and bring a copy of your resume.\n\nIf you need to reschedule or have any questions, please contact us immediately.\n\nWe look forward to meeting you!\n\nBest regards,\n{{company_name}} Team",
       type: "reminder",
@@ -183,7 +196,8 @@ export function getAllEmailTemplates(): EmailTemplate[] {
     {
       id: 4,
       name: "Interview Results - Technical Test Required",
-      subject: "Interview Results & Technical Assessment - {{job_title}} at {{company_name}}",
+      subject:
+        "Interview Results & Technical Assessment - {{job_title}} at {{company_name}}",
       content:
         "Dear {{candidate_name}},\n\nThank you for taking the time to interview with us for the {{job_title}} position at {{company_name}}. We enjoyed learning more about your background and experience.\n\nInterview Results:\n- Overall Assessment: Positive\n- Technical Skills: Good foundation\n- Communication: Excellent\n- Cultural Fit: Strong match\n\nNext Steps:\nWe would like to proceed to the technical assessment phase. This will help us better understand your technical capabilities.\n\nTechnical Assessment Details:\n- Test Type: Coding challenge and system design\n- Duration: 2 hours\n- Deadline: {{test_deadline}}\n- Format: Online coding platform\n\nYou will receive a separate email with login credentials and detailed instructions for the technical test.\n\nIMPORTANT: Please complete the technical assessment by {{test_deadline}}. If we do not receive your submission by this deadline, we will consider you as no longer interested in the position.\n\nGood luck with the assessment!\n\nBest regards,\n{{company_name}} Technical Team",
       type: "results",
@@ -208,11 +222,7 @@ export function getAllEmailTemplates(): EmailTemplate[] {
         "Dear {{candidate_name}},\n\nThank you for taking the time to interview with us for the {{job_title}} position at {{company_name}}. We enjoyed learning more about your background and experience.\n\nInterview Results:\n- Overall Assessment: Excellent\n- Technical Skills: Strong\n- Communication: Outstanding\n- Cultural Fit: Perfect match\n\nGreat news! Based on your interview performance, we would like to proceed directly to the offer stage. You have demonstrated all the skills and qualities we are looking for.\n\nNext Steps:\nOur HR team will prepare your offer package and will contact you within 2-3 business days with the details.\n\nWe are excited about the possibility of having you join our team!\n\nBest regards,\n{{company_name}} Team",
       type: "results",
       stage: "offer",
-      variables: [
-        "{{candidate_name}}",
-        "{{job_title}}",
-        "{{company_name}}",
-      ],
+      variables: ["{{candidate_name}}", "{{job_title}}", "{{company_name}}"],
       requiresConfirmation: false,
       confirmationDeadline: 5,
       autoRejectOnOverdue: false,
@@ -283,7 +293,10 @@ export const commonEmailVariables = [
 ];
 
 // Helper functions for stage tracking
-export function createStageTracking(stage: string, duration: number = 5): StageTracking {
+export function createStageTracking(
+  stage: string,
+  duration: number = 5,
+): StageTracking {
   return {
     stage,
     enteredDate: new Date().toISOString(),
@@ -296,11 +309,11 @@ export function createStageTracking(stage: string, duration: number = 5): StageT
 
 export function createConfirmationStatus(
   type: "interview" | "test" | "offer",
-  deadlineDays: number
+  deadlineDays: number,
 ): ConfirmationStatus {
   const now = new Date();
   const deadline = new Date(now.getTime() + deadlineDays * 24 * 60 * 60 * 1000);
-  
+
   return {
     id: `${type}_${Date.now()}`,
     type,
@@ -312,10 +325,12 @@ export function createConfirmationStatus(
   };
 }
 
-export function checkOverdueStatus(confirmationStatus: ConfirmationStatus): ConfirmationStatus {
+export function checkOverdueStatus(
+  confirmationStatus: ConfirmationStatus,
+): ConfirmationStatus {
   const now = new Date();
   const deadline = new Date(confirmationStatus.deadline);
-  
+
   return {
     ...confirmationStatus,
     overdue: now > deadline,
