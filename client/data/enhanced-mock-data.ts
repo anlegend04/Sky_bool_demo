@@ -1058,3 +1058,52 @@ export const getEnhancedInterview = (id: string): InterviewData | undefined => {
 export const getEnhancedCandidateInterviews = (candidateId: string): InterviewData[] => {
   return ENHANCED_INTERVIEWS.filter(interview => interview.candidateId === candidateId);
 };
+
+// Get the current/primary job application for a candidate
+export const getCurrentJobApplication = (candidate: CandidateData | undefined) => {
+  if (!candidate || !candidate.jobApplications || candidate.jobApplications.length === 0) {
+    return null;
+  }
+
+  // Find the highest priority active application, or fallback to the first one
+  const activeApplications = candidate.jobApplications.filter(app => app.status === 'Active');
+  if (activeApplications.length > 0) {
+    // Sort by priority: High > Medium > Low
+    const priorityOrder = { 'High': 3, 'Medium': 2, 'Low': 1 };
+    activeApplications.sort((a, b) =>
+      (priorityOrder[b.priority as keyof typeof priorityOrder] || 0) -
+      (priorityOrder[a.priority as keyof typeof priorityOrder] || 0)
+    );
+    return activeApplications[0];
+  }
+
+  // If no active applications, return the first one
+  return candidate.jobApplications[0];
+};
+
+// Convert a regular candidate to enhanced candidate format
+export const convertCandidateToEnhanced = (candidate: CandidateData): CandidateData => {
+  // If it's already enhanced or has the required fields, return as is
+  if (candidate.globalNotes !== undefined && candidate.createdAt !== undefined) {
+    return candidate;
+  }
+
+  // Convert to enhanced format
+  return {
+    ...candidate,
+    globalNotes: candidate.globalNotes || [],
+    createdAt: candidate.createdAt || new Date().toISOString(),
+    updatedAt: candidate.updatedAt || new Date().toISOString(),
+    // Ensure other required enhanced fields exist
+    linkedInProfile: candidate.linkedInProfile || '',
+    githubProfile: candidate.githubProfile || '',
+    portfolioUrl: candidate.portfolioUrl || '',
+    education: candidate.education || [],
+    workExperience: candidate.workExperience || [],
+    lastActivity: candidate.lastActivity || new Date().toISOString(),
+    communicationPreference: candidate.communicationPreference || 'email',
+    timezone: candidate.timezone || 'UTC',
+    availability: candidate.availability || 'Unknown',
+    attachments: candidate.attachments || [],
+  };
+};
