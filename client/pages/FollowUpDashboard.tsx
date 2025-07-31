@@ -897,7 +897,11 @@ const RecruitmentStagesDropdown = ({
 };
 
 // Custom hook for handling click outside
-const useClickOutside = (ref: React.RefObject<HTMLElement>, callback: () => void, isActive: boolean) => {
+const useClickOutside = (
+  ref: React.RefObject<HTMLElement>,
+  callback: () => void,
+  isActive: boolean,
+) => {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (ref.current && !ref.current.contains(event.target as Node)) {
@@ -906,11 +910,11 @@ const useClickOutside = (ref: React.RefObject<HTMLElement>, callback: () => void
     };
 
     if (isActive) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [ref, callback, isActive]);
 };
@@ -1882,7 +1886,11 @@ export default function FollowUpDashboard() {
   };
 
   // Table Row Component with click outside functionality
-  const ProgressEntryTableRow = ({ progressEntry }: { progressEntry: JobApplicationProgress }) => {
+  const ProgressEntryTableRow = ({
+    progressEntry,
+  }: {
+    progressEntry: JobApplicationProgress;
+  }) => {
     const isExpanded = expandedCandidateId === progressEntry.id;
     const rowRef = useRef<HTMLTableRowElement>(null);
 
@@ -1895,9 +1903,7 @@ export default function FollowUpDashboard() {
           ref={rowRef}
           className="hover:bg-slate-50 cursor-pointer"
           onClick={() =>
-            setExpandedCandidateId(
-              isExpanded ? null : progressEntry.id,
-            )
+            setExpandedCandidateId(isExpanded ? null : progressEntry.id)
           }
         >
           {visibleFields.name && (
@@ -1907,9 +1913,7 @@ export default function FollowUpDashboard() {
                 className="flex items-center space-x-3 hover:text-blue-600 min-w-0"
               >
                 <Avatar className="w-8 h-8 flex-shrink-0">
-                  <AvatarImage
-                    src={progressEntry.candidateAvatar}
-                  />
+                  <AvatarImage src={progressEntry.candidateAvatar} />
                   <AvatarFallback className="text-xs">
                     {progressEntry.candidateName
                       .split(" ")
@@ -1938,14 +1942,11 @@ export default function FollowUpDashboard() {
                       ? "default"
                       : progressEntry.currentStage === "Technical"
                         ? "secondary"
-                        : progressEntry.currentStage ===
-                            "Interview"
+                        : progressEntry.currentStage === "Interview"
                           ? "outline"
-                          : progressEntry.currentStage ===
-                              "Screening"
+                          : progressEntry.currentStage === "Screening"
                             ? "secondary"
-                            : progressEntry.currentStage ===
-                                "Applied"
+                            : progressEntry.currentStage === "Applied"
                               ? "outline"
                               : "destructive"
                 }
@@ -1962,9 +1963,7 @@ export default function FollowUpDashboard() {
           )}
           {visibleFields.appliedDate && (
             <TableCell className="break-words max-w-32">
-              {new Date(
-                progressEntry.appliedDate,
-              ).toLocaleDateString()}
+              {new Date(progressEntry.appliedDate).toLocaleDateString()}
             </TableCell>
           )}
           {visibleFields.daysInStage && (
@@ -2032,11 +2031,7 @@ export default function FollowUpDashboard() {
           <TableCell>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="flex-shrink-0"
-                >
+                <Button variant="ghost" size="sm" className="flex-shrink-0">
                   <MoreHorizontal className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -2047,9 +2042,7 @@ export default function FollowUpDashboard() {
               <UserPlus className="w-4 h-4 mr-2" />
               Apply to Job
             </DropdownMenuItem> */}
-                <Link
-                  to={`/candidates/${progressEntry.candidateId}`}
-                >
+                <Link to={`/candidates/${progressEntry.candidateId}`}>
                   <DropdownMenuItem>
                     <Eye className="w-4 h-4 mr-2" />
                     View Details
@@ -2096,8 +2089,7 @@ export default function FollowUpDashboard() {
                       Technical: "Offer",
                       Offer: "Hired",
                     };
-                    const nextStage =
-                      stageTransitions[currentStage];
+                    const nextStage = stageTransitions[currentStage];
                     if (nextStage) {
                       handleStageChange(progressEntry, nextStage);
                     }
@@ -2109,9 +2101,7 @@ export default function FollowUpDashboard() {
                       "Interview",
                       "Technical",
                       "Offer",
-                    ].includes(
-                      progressEntry.currentStage || "Applied",
-                    )
+                    ].includes(progressEntry.currentStage || "Applied")
                   }
                 >
                   <Mail className="w-4 h-4 mr-2" />
@@ -2125,10 +2115,7 @@ export default function FollowUpDashboard() {
         {isExpanded && (
           <TableRow>
             <TableCell
-              colSpan={
-                Object.values(visibleFields).filter(Boolean)
-                  .length + 1
-              }
+              colSpan={Object.values(visibleFields).filter(Boolean).length + 1}
               className="p-0"
             >
               <RecruitmentStagesDropdown
@@ -2191,7 +2178,10 @@ export default function FollowUpDashboard() {
               </TableHeader>
               <TableBody>
                 {currentProgressEntries.map((progressEntry) => (
-                  <ProgressEntryTableRow key={progressEntry.id} progressEntry={progressEntry} />
+                  <ProgressEntryTableRow
+                    key={progressEntry.id}
+                    progressEntry={progressEntry}
+                  />
                 ))}
               </TableBody>
             </Table>
