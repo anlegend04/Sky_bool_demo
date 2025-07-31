@@ -59,7 +59,7 @@ export function generateEmailContent(
   additionalData?: Partial<EmailData>,
 ): { subject: string; content: string } {
   // Get the primary job application for email data
-  const primaryJob = candidate.jobApplications[0];
+  const primaryJob = candidate.jobApplications?.[0];
   
   // Calculate deadlines based on template requirements
   const now = new Date();
