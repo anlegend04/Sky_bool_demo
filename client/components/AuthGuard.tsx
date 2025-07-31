@@ -37,12 +37,15 @@ export function AuthGuard({ children }: AuthGuardProps) {
 
 // Hook to get current user info
 export function useAuth() {
-  const [user, setUser] = useState<{ email: string; isAuthenticated: boolean } | null>(null);
+  const [user, setUser] = useState<{
+    email: string;
+    isAuthenticated: boolean;
+  } | null>(null);
 
   useEffect(() => {
     const isAuthenticated = localStorage.getItem("isAuthenticated") === "true";
     const userEmail = localStorage.getItem("userEmail") || "";
-    
+
     if (isAuthenticated && userEmail) {
       setUser({ email: userEmail, isAuthenticated: true });
     } else {
