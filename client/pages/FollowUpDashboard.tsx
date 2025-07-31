@@ -306,12 +306,12 @@ const RecruitmentStagesDropdown = ({
   });
 
   return (
-    <div ref={dropdownRef} className="border-t border-slate-100 pt-4">
+    <div ref={dropdownRef} className="group border-t border-slate-100 pt-4">
       <button
         onClick={onToggle}
-        className="flex items-center justify-between w-full p-3 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors"
+        className="hidden flex items-center justify-between w-full p-3 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors"
       >
-        <div className="flex items-center gap-2"></div>
+        <div className=" hidden flex items-center gap-2"></div>
         {isExpanded ? (
           <ChevronUp className="w-4 h-4 text-slate-600" />
         ) : (
@@ -320,7 +320,7 @@ const RecruitmentStagesDropdown = ({
       </button>
 
       {isExpanded && (
-        <div className="mt-3 p-4 bg-white border border-slate-200 rounded-lg">
+        <div className="mt-3 p-4 bg-slate-50 border border-slate-200 rounded-lg">
           <TooltipProvider>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
               {stages.map((stage, index) => {
