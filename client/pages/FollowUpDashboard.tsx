@@ -1941,9 +1941,17 @@ export default function FollowUpDashboard() {
                           </TableCell>
                         )}
 
-                                                {visibleFields.position && (
+                        {visibleFields.position && (
                           <TableCell className="break-words max-w-40">
                             {progressEntry.jobTitle}
+                          </TableCell>
+                        )}
+
+                        {visibleFields.appliedDate && (
+                          <TableCell className="break-words max-w-32">
+                            {new Date(
+                              progressEntry.appliedDate
+                            ).toLocaleDateString()}
                           </TableCell>
                         )}
                         {visibleFields.stage && (
@@ -1996,13 +2004,7 @@ export default function FollowUpDashboard() {
                             </Badge>
                           </TableCell>
                         )}
-                        {visibleFields.appliedDate && (
-                          <TableCell className="break-words max-w-32">
-                            {new Date(
-                              progressEntry.appliedDate
-                            ).toLocaleDateString()}
-                          </TableCell>
-                        )}
+
                         {visibleFields.email && (
                           <TableCell className="break-words max-w-48">
                             {progressEntry.candidateEmail}
