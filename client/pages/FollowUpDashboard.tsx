@@ -2128,7 +2128,6 @@ export default function FollowUpDashboard() {
                           </DropdownMenu>
                         </TableCell>
                       </TableRow>
-
                       {/* Recruitment Stages Dropdown Row */}
                       {isExpanded && (
                         <TableRow>
