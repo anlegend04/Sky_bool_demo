@@ -1802,11 +1802,11 @@ export default function FollowUpDashboard() {
                   {stage}
                 </h3>
                 <Badge variant="outline" className="text-xs flex-shrink-0 ml-2">
-                  {stageCandidates.length}
+                  {stageProgressEntries.length}
                 </Badge>
               </div>
               <div className="space-y-3 px-4 pb-4 pt-2 min-h-[180px] relative flex-1">
-                {stageCandidates.length === 0 ? (
+                {stageProgressEntries.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-slate-400 text-xs py-8">
                     <svg
                       className="w-8 h-8 mb-2 opacity-30"
