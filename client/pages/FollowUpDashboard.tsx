@@ -1884,9 +1884,7 @@ export default function FollowUpDashboard() {
                   {visibleFields.urgencyLevel && (
                     <TableHead>Urgency Level</TableHead>
                   )}
-                  {visibleFields.appliedDate && (
-                    <TableHead>Applied On</TableHead>
-                  )}
+
                   {visibleFields.email && <TableHead>Email</TableHead>}
                   {visibleFields.phone && <TableHead>Phone</TableHead>}
                   {visibleFields.recruiter && <TableHead>Recruiter</TableHead>}
@@ -1940,8 +1938,6 @@ export default function FollowUpDashboard() {
                             </Link>
                           </TableCell>
                         )}
-
-
                         {visibleFields.stage && (
                           <TableCell>
                             <Badge
@@ -1965,12 +1961,12 @@ export default function FollowUpDashboard() {
                               {progressEntry.currentStage}
                             </Badge>
                           </TableCell>
-                        )}                        {visibleFields.position && (
+                        )}{" "}
+                        {visibleFields.position && (
                           <TableCell className="break-words max-w-40">
                             {progressEntry.jobTitle}
                           </TableCell>
                         )}
-
                         {visibleFields.appliedDate && (
                           <TableCell className="break-words max-w-32">
                             {new Date(
@@ -2004,7 +2000,6 @@ export default function FollowUpDashboard() {
                             </Badge>
                           </TableCell>
                         )}
-
                         {visibleFields.email && (
                           <TableCell className="break-words max-w-48">
                             {progressEntry.candidateEmail}
@@ -2015,7 +2010,6 @@ export default function FollowUpDashboard() {
                             {progressEntry.candidatePhone}
                           </TableCell>
                         )}
-
                         {visibleFields.recruiter && (
                           <TableCell className="break-words max-w-32">
                             {progressEntry.recruiter}
