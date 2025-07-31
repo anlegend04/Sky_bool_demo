@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useEffect } from "react";
+import React, { useState, useCallback, useMemo, useEffect, Fragment } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -70,6 +70,10 @@ import {
   UserPlus,
   Activity,
   Building,
+  MailCheck,
+  Circle,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
@@ -92,8 +96,18 @@ import {
   StageTracking,
   createStageTracking,
   createConfirmationStatus,
-  checkOverdueStatus
+  checkOverdueStatus,
+  getTemplatesForStage,
 } from "@/lib/email-utils";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider,
+} from "@/components/ui/tooltip";
+import { HelpTooltip } from "@/components/ui/help-tooltip";
+import { getJobApplication, convertCandidateToEnhanced } from "@/data/enhanced-mock-data";
+import { EnhancedCandidateData, JobApplication } from "@/types/enhanced-candidate";
 
 // Các type definitions giữ nguyên như trước
 interface FollowUpCandidate extends CandidateData {
@@ -158,6 +172,633 @@ interface Job {
   position: string;
 }
 
+// New interface for job application progress entries
+interface JobApplicationProgress {
+  id: string; // Unique ID for this progress entry (candidateId + jobId)
+  candidateId: string;
+  candidateName: string;
+  candidateEmail: string;
+  candidatePhone: string;
+  candidateAvatar: string;
+  jobId: string;
+  jobTitle: string;
+  department: string;
+  appliedDate: string;
+  currentStage: string;
+  recruiter: string;
+  salary: string;
+  location: string;
+  // Follow-up specific data
+  lastInteraction: string;
+  nextFollowUp: string;
+  daysInStage: number;
+  emailsSent: number;
+  lastEmailSent?: string;
+  responseRate: number;
+  urgencyLevel: "low" | "medium" | "high" | "critical";
+  upcomingActions: FollowUpAction[];
+  interactions: Interaction[];
+  emailHistory: EmailRecord[];
+  // Confirmation tracking
+  stageTracking?: StageTracking;
+  confirmationStatus?: ConfirmationStatus;
+  autoRejected?: boolean;
+  overdue?: boolean;
+}
+
+// Recruitment Stages Component
+const RecruitmentStagesDropdown = ({ 
+  progressEntry, 
+  isExpanded, 
+  onToggle 
+}: { 
+  progressEntry: JobApplicationProgress; 
+  isExpanded: boolean; 
+  onToggle: () => void; 
+}) => {
+  // Create a mock job application object for compatibility
+  const mockJobApplication = {
+    id: progressEntry.jobId,
+    jobId: progressEntry.jobId,
+    jobTitle: progressEntry.jobTitle,
+    department: progressEntry.department,
+    appliedDate: progressEntry.appliedDate,
+    currentStage: progressEntry.currentStage as any,
+    stageHistory: [], // We'll need to get this from the actual data
+    notes: [],
+    emails: progressEntry.emailHistory.map(email => ({
+      id: email.id,
+      template: email.template,
+      subject: email.subject,
+      timestamp: email.sentDate,
+      repliedAt: email.responseDate,
+    })),
+    priority: "Medium" as any,
+    recruiter: progressEntry.recruiter,
+    status: "Active" as any,
+    salary: progressEntry.salary,
+    location: progressEntry.location,
+  };
+
+  const stageNames = [
+    "Applied",
+    "Screening",
+    "Interview",
+    "Technical",
+    "Offer",
+    "Hired",
+  ];
+
+  const currentStageIndex = stageNames.findIndex(
+    (s) => s === mockJobApplication.currentStage,
+  );
+
+  const stages = stageNames.map((stageName, index) => {
+    const stageData = mockJobApplication.stageHistory.find(
+      (s) => s.stage === stageName,
+    );
+
+    // Calculate completion status based on stage history and current stage
+    const thisStageIndex = index;
+    const isCompleted = stageData && stageData.endDate;
+    const isCurrentStage = stageName === mockJobApplication.currentStage;
+    const isPastStage = thisStageIndex < currentStageIndex;
+
+    // Determine completion status
+    let completionStatus: "completed" | "current" | "pending" | "not_started";
+    if (isCompleted) {
+      completionStatus = "completed";
+    } else if (isCurrentStage) {
+      completionStatus = "current";
+    } else if (isPastStage) {
+      completionStatus = "completed"; // If already passed this stage but no endDate, consider as completed
+    } else {
+      completionStatus = "not_started";
+    }
+
+    return {
+      name: stageName,
+      completed: completionStatus === "completed",
+      duration: stageData?.duration || 0,
+      startDate: stageData?.startDate || "",
+      endDate: stageData?.endDate,
+      notes: stageData?.notes || `${stageName} stage`,
+      reason: stageData?.reason,
+      mailSent: stageData?.mailSent || false,
+      mailConfirmed: stageData?.mailConfirmed || false,
+    };
+  });
+
+  return (
+    <div className="border-t border-slate-100 pt-4">
+      <button
+        onClick={onToggle}
+        className="flex items-center justify-between w-full p-3 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors"
+      >
+        <div className="flex items-center gap-2">
+        </div>
+        {isExpanded ? (
+          <ChevronUp className="w-4 h-4 text-slate-600" />
+        ) : (
+          <ChevronDown className="w-4 h-4 text-slate-600" />
+        )}
+      </button>
+      
+      {isExpanded && (
+        <div className="mt-3 p-4 bg-white border border-slate-200 rounded-lg">
+          <TooltipProvider>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+              {stages.map((stage, index) => {
+                // Get all templates for this stage
+                const stageTemplates = getTemplatesForStage(
+                  stage.name.toLowerCase(),
+                );
+                // Get all emails sent for this stage - improved matching logic
+                const emailsForStage = mockJobApplication.emails.filter((email) => {
+                  return stageTemplates.some((tpl) => {
+                    const templateNameMatch = email.template === tpl.name;
+                    const subjectMatch = email.subject
+                      .toLowerCase()
+                      .includes(tpl.name.toLowerCase());
+                    const stageMatch = email.subject
+                      .toLowerCase()
+                      .includes(tpl.stage?.toLowerCase() || "");
+                    const genericStageMatch = email.subject
+                      .toLowerCase()
+                      .includes(stage.name.toLowerCase());
+
+                    return (
+                      templateNameMatch ||
+                      subjectMatch ||
+                      stageMatch ||
+                      genericStageMatch
+                    );
+                  });
+                });
+                return (
+                  <div key={stage.name} className="text-center relative group">
+                    {/* Email status indicators */}
+                    <div className="flex justify-center mb-1 gap-1">
+                      {stageTemplates.length > 0 ? (
+                        stageTemplates.map((template, templateIdx) => {
+                          // Find the most recent email sent for this template
+                          const sentEmails = emailsForStage.filter((email) => {
+                            const templateNameMatch =
+                              email.template === template.name;
+                            const subjectMatch = email.subject
+                              .toLowerCase()
+                              .includes(template.name.toLowerCase());
+                            const stageMatch = email.subject
+                              .toLowerCase()
+                              .includes(template.stage?.toLowerCase() || "");
+                            const genericStageMatch = email.subject
+                              .toLowerCase()
+                              .includes(stage.name.toLowerCase());
+
+                            return (
+                              templateNameMatch ||
+                              subjectMatch ||
+                              stageMatch ||
+                              genericStageMatch
+                            );
+                          });
+                          const latestEmail =
+                            sentEmails.length > 0
+                              ? sentEmails.reduce((a, b) =>
+                                  new Date(a.timestamp) > new Date(b.timestamp)
+                                    ? a
+                                    : b,
+                                )
+                              : undefined;
+                          // Determine status
+                          const sent = !!latestEmail;
+                          const confirmed = latestEmail?.repliedAt ? true : false;
+                          const sentDate = latestEmail?.timestamp;
+                          const confirmedDate = latestEmail?.repliedAt;
+                          // Confirmation deadline
+                          let deadline: string | undefined = undefined;
+                          if (template.confirmationDeadline && sentDate) {
+                            const sentTime = new Date(sentDate).getTime();
+                            deadline = new Date(
+                              sentTime +
+                                template.confirmationDeadline *
+                                  24 *
+                                  60 *
+                                  60 *
+                                  1000,
+                            ).toISOString();
+                          }
+                          // Overdue
+                          const overdue =
+                            template.requiresConfirmation &&
+                            sent &&
+                            !confirmed &&
+                            deadline &&
+                            new Date() > new Date(deadline);
+                          const autoRejected =
+                            template.autoRejectOnOverdue && overdue;
+                          return (
+                            <Tooltip key={templateIdx}>
+                              <TooltipTrigger asChild>
+                                <div className="relative">
+                                  {autoRejected ? (
+                                    <AlertCircle className="w-4 h-4 text-red-500" />
+                                  ) : overdue ? (
+                                    <Clock className="w-4 h-4 text-orange-500" />
+                                  ) : confirmed ? (
+                                    <CheckCircle className="w-4 h-4 text-green-500" />
+                                  ) : sent ? (
+                                    <MailCheck className="w-4 h-4 text-blue-500" />
+                                  ) : (
+                                    <Mail className="w-4 h-4 text-slate-300" />
+                                  )}
+                                  {/* Chấm vàng nếu cần xác nhận và chưa xác nhận */}
+                                  {template.requiresConfirmation &&
+                                    sent &&
+                                    !confirmed &&
+                                    !autoRejected &&
+                                    !overdue && (
+                                      <span className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full border border-white"></span>
+                                    )}
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent side="top" className="max-w-sm z-50 p-4">
+                                <div className="space-y-3">
+                                  {/* Icon Legend */}
+                                  <div className="border-b border-slate-200 pb-2">
+                                    <div className="font-semibold text-slate-900 text-sm mb-2">
+                                      Email Status Icons:
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-2 text-xs">
+                                      <div className="flex items-center gap-2">
+                                        <Mail className="w-3 h-3 text-slate-300" />
+                                        <span>Not sent</span>
+                                      </div>
+                                      <div className="flex items-center gap-2">
+                                        <MailCheck className="w-3 h-3 text-blue-500" />
+                                        <span>Sent</span>
+                                      </div>
+                                      <div className="flex items-center gap-2">
+                                        <CheckCircle className="w-3 h-3 text-green-500" />
+                                        <span>Confirmed</span>
+                                      </div>
+                                      <div className="flex items-center gap-2">
+                                        <Clock className="w-3 h-3 text-orange-500" />
+                                        <span>Overdue</span>
+                                      </div>
+                                      <div className="flex items-center gap-2">
+                                        <AlertCircle className="w-3 h-3 text-red-500" />
+                                        <span>Auto-rejected</span>
+                                      </div>
+                                      <div className="flex items-center gap-2">
+                                        <span className="w-3 h-3 bg-yellow-400 rounded-full border border-white"></span>
+                                        <span>Needs confirmation</span>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  {/* Stage Header */}
+                                  <div className="border-b border-slate-200 pb-2">
+                                    <div className="font-semibold text-slate-900 text-sm mb-1">
+                                      {stage.name} Stage
+                                    </div>
+                                    <div className="text-xs text-slate-600">
+                                      {(() => {
+                                        // Stage descriptions based on stage name
+                                        const stageDescriptions: { [key: string]: string } = {
+                                          "Applied": "Initial application received and under review",
+                                          "Screening": "Phone screening to assess basic qualifications",
+                                          "Interview": "In-depth interview with hiring team",
+                                          "Technical": "Technical assessment and skills evaluation",
+                                          "Offer": "Job offer extended and under negotiation",
+                                          "Hired": "Candidate successfully hired and onboarded",
+                                          "Rejected": "Application not selected for this position"
+                                        };
+                                        return stageDescriptions[stage.name] || `${stage.name} stage in recruitment process`;
+                                      })()}
+                                    </div>
+                                  </div>
+
+                                  {/* Stage Status */}
+                                  <div className="space-y-2">
+                                    <div className="flex items-center justify-between text-xs">
+                                      <span className="text-slate-600">Stage Status:</span>
+                                      <span className={`font-medium ${
+                                        stage.completed
+                                          ? "text-green-600"
+                                          : index === currentStageIndex
+                                            ? "text-blue-600"
+                                            : "text-slate-500"
+                                      }`}>
+                                        {stage.completed
+                                          ? "Completed"
+                                          : index === currentStageIndex
+                                            ? "Current"
+                                            : "Pending"}
+                                      </span>
+                                    </div>
+
+                                    {stage.duration > 0 && (
+                                      <div className="flex items-center justify-between text-xs">
+                                        <span className="text-slate-600">Duration:</span>
+                                        <span className="text-slate-700">{stage.duration} days</span>
+                                      </div>
+                                    )}
+
+                                    {stage.startDate && (
+                                      <div className="flex items-center justify-between text-xs">
+                                        <span className="text-slate-600">Started:</span>
+                                        <span className="text-slate-700">
+                                          {new Date(stage.startDate).toLocaleDateString()}
+                                        </span>
+                                      </div>
+                                    )}
+
+                                    {stage.endDate && (
+                                      <div className="flex items-center justify-between text-xs">
+                                        <span className="text-slate-600">Completed:</span>
+                                        <span className="text-slate-700">
+                                          {new Date(stage.endDate).toLocaleDateString()}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {/* Email Template Details */}
+                                  <div className="border-t border-slate-200 pt-2">
+                                    <div className="text-xs font-medium text-slate-700 mb-2">
+                                      Email: {template.name}
+                                    </div>
+                                    <div className="bg-slate-50 rounded p-2">
+                                      <div className="flex items-center justify-between mb-1">
+                                        <div className="text-xs font-medium text-slate-800">
+                                          {(() => {
+                                            try {
+                                              // Provide specific descriptions for each email type
+                                              const emailDescriptions: { [key: string]: string } = {
+                                                "Application Received - Thank You": "Thank you email when application is received",
+                                                "Interview Invitation": "Interview invitation with detailed information",
+                                                "Interview Reminder": "Reminder email for interview confirmation",
+                                                "Post-Interview Thank You": "Thank you email after interview and result announcement time",
+                                                "Technical Test Assignment": "Technical test assignment email",
+                                                "Technical Results": "Technical assessment results with confirmation required",
+                                                "Job Offer": "Job offer email with acceptance confirmation required",
+                                                "Onboarding Instructions": "Onboarding instructions with confirmation required"
+                                              };
+                                              return emailDescriptions[template.name] || template.subject || "Email template";
+                                            } catch (error) {
+                                              return template.subject || "Email template";
+                                            }
+                                          })()}
+                                        </div>
+                                        <div className={`text-xs px-2 py-1 rounded-full ${
+                                          autoRejected
+                                            ? "bg-red-100 text-red-700"
+                                            : overdue
+                                              ? "bg-orange-100 text-orange-700"
+                                              : confirmed
+                                                ? "bg-green-100 text-green-700"
+                                                : sent
+                                                  ? "bg-blue-100 text-blue-700"
+                                                  : "bg-slate-100 text-slate-700"
+                                        }`}>
+                                          {autoRejected
+                                            ? "Auto-Rejected"
+                                            : overdue
+                                              ? "Overdue"
+                                              : confirmed
+                                                ? "Confirmed"
+                                                : sent
+                                                  ? "Sent"
+                                                  : "Required"}
+                                        </div>
+                                      </div>
+                                      {sentDate && (
+                                        <div className="text-xs text-slate-600">
+                                          Sent: {new Date(sentDate).toLocaleDateString()}
+                                        </div>
+                                      )}
+                                      {template.requiresConfirmation && deadline && (
+                                        <div className="text-xs text-slate-600">
+                                          Deadline: {new Date(deadline).toLocaleDateString()}
+                                        </div>
+                                      )}
+                                      {confirmedDate && (
+                                        <div className="text-xs text-slate-600">
+                                          Confirmed: {new Date(confirmedDate).toLocaleDateString()}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  {/* Stage Notes */}
+                                  {stage.notes && (
+                                    <div className="border-t border-slate-200 pt-2">
+                                      <div className="text-xs font-medium text-slate-700 mb-1">
+                                        Notes:
+                                      </div>
+                                      <div className="text-xs text-slate-600 bg-slate-50 p-2 rounded">
+                                        {stage.notes}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </TooltipContent>
+                            </Tooltip>
+                          );
+                        })
+                      ) : (
+                        <Mail className="w-4 h-4 text-slate-300" />
+                      )}
+                    </div>
+
+                    {/* Circle stage */}
+                    {(() => {
+                      // Calculate overall status for stage
+                      let circleStatus:
+                        | "autoRejected"
+                        | "overdue"
+                        | "completed"
+                        | "current"
+                        | "default" = "default";
+                      if (stageTemplates.length > 0) {
+                        // Loop through each template to determine status
+                        let foundAutoRejected = false;
+                        let foundOverdue = false;
+                        let allConfirmed = true;
+                        let hasSentEmails = false;
+
+                        stageTemplates.forEach((template) => {
+                          const sentEmails = emailsForStage.filter((email) => {
+                            const templateNameMatch =
+                              email.template === template.name;
+                            const subjectMatch = email.subject
+                              .toLowerCase()
+                              .includes(template.name.toLowerCase());
+                            const stageMatch = email.subject
+                              .toLowerCase()
+                              .includes(template.stage?.toLowerCase() || "");
+                            const genericStageMatch = email.subject
+                              .toLowerCase()
+                              .includes(stage.name.toLowerCase());
+
+                            return (
+                              templateNameMatch ||
+                              subjectMatch ||
+                              stageMatch ||
+                              genericStageMatch
+                            );
+                          });
+
+                          const latestEmail =
+                            sentEmails.length > 0
+                              ? sentEmails.reduce((a, b) =>
+                                  new Date(a.timestamp) > new Date(b.timestamp)
+                                    ? a
+                                    : b,
+                                )
+                              : undefined;
+                          const sent = !!latestEmail;
+                          const confirmed = latestEmail?.repliedAt ? true : false;
+                          const sentDate = latestEmail?.timestamp;
+
+                          if (sent) hasSentEmails = true;
+
+                          let deadline: string | undefined = undefined;
+                          if (template.confirmationDeadline && sentDate) {
+                            const sentTime = new Date(sentDate).getTime();
+                            deadline = new Date(
+                              sentTime +
+                                template.confirmationDeadline *
+                                  24 *
+                                  60 *
+                                  60 *
+                                  1000,
+                            ).toISOString();
+                          }
+
+                          const overdue =
+                            template.requiresConfirmation &&
+                            sent &&
+                            !confirmed &&
+                            deadline &&
+                            new Date() > new Date(deadline);
+                          const autoRejected =
+                            template.autoRejectOnOverdue && overdue;
+
+                          if (autoRejected) foundAutoRejected = true;
+                          if (overdue) foundOverdue = true;
+                          if (template.requiresConfirmation && sent && !confirmed)
+                            allConfirmed = false;
+                        });
+
+                        if (foundAutoRejected) circleStatus = "autoRejected";
+                        else if (foundOverdue) circleStatus = "overdue";
+                        else if (stage.completed) circleStatus = "completed";
+                        else if (index === currentStageIndex)
+                          circleStatus = "current";
+                        else if (hasSentEmails) circleStatus = "completed"; // Has sent emails but not completed
+                      } else {
+                        // No templates, rely on stage completion
+                        if (stage.completed) circleStatus = "completed";
+                        else if (index === currentStageIndex)
+                          circleStatus = "current";
+                      }
+                      return (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div
+                              className={`w-8 h-8 rounded-full flex items-center justify-center border-2 mx-auto mb-2 cursor-help ${
+                                circleStatus === "autoRejected"
+                                  ? "bg-red-500 border-red-500 text-white"
+                                  : circleStatus === "overdue"
+                                    ? "bg-orange-500 border-orange-500 text-white"
+                                    : circleStatus === "completed"
+                                      ? "bg-green-500 border-green-500 text-white"
+                                      : circleStatus === "current"
+                                        ? "bg-blue-500 border-blue-500 text-white"
+                                        : "bg-white border-slate-300 text-slate-400"
+                              }`}
+                            >
+                              {circleStatus === "autoRejected" ? (
+                                <AlertCircle className="w-4 h-4" />
+                              ) : circleStatus === "overdue" ? (
+                                <Clock className="w-4 h-4" />
+                              ) : circleStatus === "completed" ? (
+                                <CheckCircle className="w-4 h-4" />
+                              ) : circleStatus === "current" ? (
+                                <Circle className="w-4 h-4 fill-current" />
+                              ) : (
+                                <Circle className="w-4 h-4" />
+                              )}
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="max-w-xs">
+                            <div className="space-y-2">
+                              <div className="font-semibold text-sm">
+                                Stage Status: {stage.name}
+                              </div>
+                              <div className="text-xs space-y-1">
+                                {circleStatus === "autoRejected" && (
+                                  <div className="flex items-center gap-2">
+                                    <AlertCircle className="w-3 h-3 text-red-500" />
+                                    <span>Auto-rejected: Candidate did not confirm within deadline</span>
+                                  </div>
+                                )}
+                                {circleStatus === "overdue" && (
+                                  <div className="flex items-center gap-2">
+                                    <Clock className="w-3 h-3 text-orange-500" />
+                                    <span>Overdue: Waiting for candidate confirmation</span>
+                                  </div>
+                                )}
+                                {circleStatus === "completed" && (
+                                  <div className="flex items-center gap-2">
+                                    <CheckCircle className="w-3 h-3 text-green-500" />
+                                    <span>Completed: Stage finished successfully</span>
+                                  </div>
+                                )}
+                                {circleStatus === "current" && (
+                                  <div className="flex items-center gap-2">
+                                    <Circle className="w-3 h-3 text-blue-500 fill-current" />
+                                    <span>Current: Currently in this stage</span>
+                                  </div>
+                                )}
+                                {circleStatus === "default" && (
+                                  <div className="flex items-center gap-2">
+                                    <Circle className="w-3 h-3 text-slate-400" />
+                                    <span>Pending: Stage not started yet</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      );
+                    })()}
+
+                    {/* Stage name */}
+                    <div className="text-xs font-medium text-slate-700 break-words px-1">
+                      {stage.name}
+                    </div>
+
+                    {/* Duration */}
+                    {stage.duration > 0 && (
+                      <div className="text-xs text-slate-500 flex items-center justify-center gap-1 mt-1">
+                        <Clock className="w-3 h-3" />
+                        <span className="break-words">{stage.duration}d</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </TooltipProvider>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function FollowUpDashboard() {
   const { toast } = useToast();
 
@@ -198,80 +839,91 @@ export default function FollowUpDashboard() {
     newStage: string;
   } | null>(null);
 
-  // Transform candidates to FollowUpCandidate format
-  const [candidates, setCandidates] = useState<FollowUpCandidate[]>(
-    HARDCODED_CANDIDATES.map((candidate, index) => {
-      // Get the primary job application for this candidate
-      const primaryJob = candidate.jobApplications[0];
-      
-      return {
-        ...candidate,
-        // Add computed properties for backward compatibility
-        position: primaryJob?.jobTitle || "Unknown Position",
-        stage: primaryJob?.currentStage || "Applied",
-        appliedDate: primaryJob?.appliedDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        recruiter: primaryJob?.recruiter || "Unknown Recruiter",
-        salary: primaryJob?.salary || "$0 - $0",
-        department: primaryJob?.department || "Unknown Department",
-        lastInteraction: new Date(
-          Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000,
-        ).toISOString(),
-        nextFollowUp: new Date(
-          Date.now() + Math.random() * 3 * 24 * 60 * 60 * 1000,
-        ).toISOString(),
-        daysInStage: Math.floor(Math.random() * 14) + 1,
-        emailsSent: Math.floor(Math.random() * 5) + 1,
-        lastEmailSent:
-          Math.random() > 0.3
-            ? new Date(
-                Date.now() - Math.random() * 3 * 24 * 60 * 60 * 1000,
-              ).toISOString()
-            : undefined,
-        responseRate: Math.floor(Math.random() * 100),
-        urgencyLevel: ["low", "medium", "high", "critical"][
-          Math.floor(Math.random() * 4)
-        ] as any,
-        upcomingActions: [
-          {
-            id: `action-${index}-1`,
-            type: "email",
-            title: "Send interview confirmation",
-            dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-            priority: "high",
-            template: "interview_confirmation",
-            completed: false,
-          },
-        ],
-        interactions: [
-          {
-            id: `int-${index}-1`,
-            type: "call",
-            date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-            duration: 15,
-            summary: "Discussed role requirements and candidate expectations",
-            outcome: "positive",
-            nextAction: "Send technical assessment",
-          },
-        ],
-        emailHistory: [
-          {
-            id: `email-${index}-1`,
-            subject: "Interview Invitation - " + (primaryJob?.jobTitle || "Position"),
-            template: "interview_invitation",
-            sentDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-            opened: Math.random() > 0.3,
-            responded: Math.random() > 0.5,
-            responseDate:
-              Math.random() > 0.5
-                ? new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString()
-                : undefined,
-          },
-        ],
-      };
+  // State cho Recruitment Stages dropdown
+  const [expandedCandidateId, setExpandedCandidateId] = useState<string | null>(null);
+
+  // Transform candidates to JobApplicationProgress format - one entry per job application
+  const [progressEntries, setProgressEntries] = useState<JobApplicationProgress[]>(
+    HARDCODED_CANDIDATES.flatMap((candidate, candidateIndex) => {
+      return candidate.jobApplications.map((jobApp, jobIndex) => {
+        const uniqueId = `${candidate.id}-${jobApp.jobId}`;
+        
+        return {
+          id: uniqueId,
+          candidateId: candidate.id,
+          candidateName: candidate.name,
+          candidateEmail: candidate.email,
+          candidatePhone: candidate.phone,
+          candidateAvatar: candidate.avatar,
+          jobId: jobApp.jobId,
+          jobTitle: jobApp.jobTitle,
+          department: jobApp.department,
+          appliedDate: jobApp.appliedDate,
+          currentStage: jobApp.currentStage,
+          recruiter: jobApp.recruiter,
+          salary: jobApp.salary || "$0 - $0",
+          location: jobApp.location || "Unknown",
+          // Follow-up specific data
+          lastInteraction: new Date(
+            Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000,
+          ).toISOString(),
+          nextFollowUp: new Date(
+            Date.now() + Math.random() * 3 * 24 * 60 * 60 * 1000,
+          ).toISOString(),
+          daysInStage: Math.floor(Math.random() * 14) + 1,
+          emailsSent: Math.floor(Math.random() * 5) + 1,
+          lastEmailSent:
+            Math.random() > 0.3
+              ? new Date(
+                  Date.now() - Math.random() * 3 * 24 * 60 * 60 * 1000,
+                ).toISOString()
+              : undefined,
+          responseRate: Math.floor(Math.random() * 100),
+          urgencyLevel: ["low", "medium", "high", "critical"][
+            Math.floor(Math.random() * 4)
+          ] as any,
+          upcomingActions: [
+            {
+              id: `action-${uniqueId}-1`,
+              type: "email",
+              title: "Send interview confirmation",
+              dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+              priority: "high",
+              template: "interview_confirmation",
+              completed: false,
+            },
+          ],
+          interactions: [
+            {
+              id: `int-${uniqueId}-1`,
+              type: "call",
+              date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+              duration: 15,
+              summary: "Discussed role requirements and candidate expectations",
+              outcome: "positive",
+              nextAction: "Send technical assessment",
+            },
+          ],
+          emailHistory: [
+            {
+              id: `email-${uniqueId}-1`,
+              subject: "Interview Invitation - " + jobApp.jobTitle,
+              template: "interview_invitation",
+              sentDate: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+              opened: Math.random() > 0.3,
+              responded: Math.random() > 0.5,
+              responseDate:
+                Math.random() > 0.5
+                  ? new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString()
+                  : undefined,
+            },
+          ],
+        };
+      });
     }),
   );
 
-  const [selectedCandidates, setSelectedCandidates] = useState<string[]>([]);
+  const [selectedProgressEntries, setSelectedProgressEntries] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<"pipeline" | "list" | "timeline">(
     "list",
   );
@@ -280,46 +932,46 @@ export default function FollowUpDashboard() {
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const [candidatesPerPage] = useState(10);
+  const [progressEntriesPerPage] = useState(10);
   const [filterUrgency, setFilterUrgency] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCandidate, setSelectedCandidate] =
-    useState<FollowUpCandidate | null>(null);
+  const [selectedProgressEntry, setSelectedProgressEntry] =
+    useState<JobApplicationProgress | null>(null);
   const [showEmailDialog, setShowEmailDialog] = useState(false);
   const [showNoteDialog, setShowNoteDialog] = useState(false);
   const [emailTemplate, setEmailTemplate] = useState<number | null>(null);
   const [bulkAction, setBulkAction] = useState("");
 
   // Handle send email
-  const handleSendEmail = (candidate: FollowUpCandidate) => {
-    console.log("Sending email to:", candidate.name);
+  const handleSendEmail = (progressEntry: JobApplicationProgress) => {
+    console.log("Sending email to:", progressEntry.candidateName);
     toast({
       title: "Email sent",
-      description: `Email sent to ${candidate.name}.`,
+      description: `Email sent to ${progressEntry.candidateName}.`,
     });
   };
 
   // Handle schedule call
-  const handleScheduleCall = (candidate: FollowUpCandidate) => {
-    console.log("Scheduling call with:", candidate.name);
+  const handleScheduleCall = (progressEntry: JobApplicationProgress) => {
+    console.log("Scheduling call with:", progressEntry.candidateName);
     toast({
       title: "Call scheduled",
-      description: `Call scheduled with ${candidate.name}.`,
+      description: `Call scheduled with ${progressEntry.candidateName}.`,
     });
   };
 
   // Handle add note
-  const handleAddNote = (candidate: FollowUpCandidate) => {
-    console.log("Adding note for:", candidate.name);
+  const handleAddNote = (progressEntry: JobApplicationProgress) => {
+    console.log("Adding note for:", progressEntry.candidateName);
     toast({
       title: "Note added",
-      description: `Note added for ${candidate.name}.`,
+      description: `Note added for ${progressEntry.candidateName}.`,
     });
   };
 
   // Handle stage change with email trigger
-  const handleStageChange = (candidate: FollowUpCandidate, newStage: string) => {
-    const currentStage = candidate.stage || "Applied";
+  const handleStageChange = (progressEntry: JobApplicationProgress, newStage: string) => {
+    const currentStage = progressEntry.currentStage || "Applied";
     
     // Define the proper stage transitions and their corresponding email templates
     const stageTransitions = {
@@ -333,7 +985,7 @@ export default function FollowUpDashboard() {
     // Check if this is a valid stage transition
     if (stageTransitions[currentStage] === newStage) {
       // Set pending stage change and show EmailTrigger
-      setPendingStageChange({ candidate, newStage });
+      setPendingStageChange({ candidate: progressEntry as any, newStage });
       setShowEmailTrigger(true);
     } else {
       // Invalid transition - show warning
@@ -346,13 +998,13 @@ export default function FollowUpDashboard() {
   };
 
   // Handle email sent or skipped from EmailTrigger
-  const handleConfirmationResponse = (candidateId: string, confirmed: boolean) => {
-    setCandidates((prevCandidates) =>
-      prevCandidates.map((c) =>
-        c.id === candidateId && c.confirmationStatus ? {
-          ...c,
+  const handleConfirmationResponse = (progressEntryId: string, confirmed: boolean) => {
+    setProgressEntries((prevProgressEntries) =>
+      prevProgressEntries.map((p) =>
+        p.id === progressEntryId && p.confirmationStatus ? {
+          ...p,
           confirmationStatus: {
-            ...c.confirmationStatus,
+            ...p.confirmationStatus,
             confirmed,
             confirmedDate: new Date().toISOString(),
             overdue: false,
@@ -360,15 +1012,15 @@ export default function FollowUpDashboard() {
           },
           overdue: false,
           autoRejected: false,
-        } : c
+        } : p
       )
     );
 
-    const candidate = candidates.find(c => c.id === candidateId);
-    if (candidate) {
+    const progressEntry = progressEntries.find(p => p.id === progressEntryId);
+    if (progressEntry) {
       toast({
         title: "Confirmation Updated",
-        description: `${candidate.name} ${confirmed ? 'confirmed' : 'rejected'} the ${candidate.confirmationStatus?.type || 'request'}.`,
+        description: `${progressEntry.candidateName} ${confirmed ? 'confirmed' : 'rejected'} the ${progressEntry.confirmationStatus?.type || 'request'}.`,
       });
     }
   };
@@ -409,22 +1061,22 @@ export default function FollowUpDashboard() {
           stageTracking = createStageTracking(newStage.toLowerCase(), 5);
       }
       
-      // Update the candidate's stage in the main candidates list
-      setCandidates((prevCandidates) =>
-        prevCandidates.map((c) =>
-          c.id === candidate.id ? {
-            ...c,
-            stage: newStage,
+      // Update the progress entry's stage in the main progress entries list
+      setProgressEntries((prevProgressEntries) =>
+        prevProgressEntries.map((p) =>
+          p.id === candidate.id ? {
+            ...p,
+            currentStage: newStage,
             stageTracking,
             confirmationStatus,
             autoRejected: false,
             overdue: false,
             // Update email history if email was sent
             ...(emailData && {
-              emailsSent: c.emailsSent + 1,
+              emailsSent: p.emailsSent + 1,
               lastEmailSent: new Date().toISOString(),
               emailHistory: [
-                ...c.emailHistory,
+                ...p.emailHistory,
                 {
                   id: `email_${Date.now()}`,
                   subject: emailData.subject || "Stage Update Email",
@@ -435,24 +1087,24 @@ export default function FollowUpDashboard() {
                 }
               ]
             })
-          } : c
+          } : p
         )
       );
       
       // In a real app, this would be an API call
-      const currentStage = candidate.stage || "Unknown";
-      console.log(`Moving candidate ${candidate.name} from ${currentStage} to ${newStage}`);
+      const currentStage = candidate.currentStage || "Unknown";
+      console.log(`Moving progress entry ${candidate.candidateName} from ${currentStage} to ${newStage}`);
       
       // Show success message
       if (emailData) {
         toast({
           title: "Stage updated & Email sent",
-          description: `${candidate.name} moved to ${newStage} stage and email sent.`,
+          description: `${candidate.candidateName} moved to ${newStage} stage and email sent.`,
         });
       } else {
         toast({
           title: "Stage updated",
-          description: `${candidate.name} moved to ${newStage} stage.`,
+          description: `${candidate.candidateName} moved to ${newStage} stage.`,
         });
       }
     }
@@ -503,33 +1155,33 @@ export default function FollowUpDashboard() {
   ];
 
   // Filter and search logic (giữ nguyên)
-  const filteredCandidates = useMemo(() => {
-    return candidates.filter((candidate) => {
+  const filteredProgressEntries = useMemo(() => {
+    return progressEntries.filter((progressEntry) => {
       const matchesSearch =
-        candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        candidate.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        candidate.email.toLowerCase().includes(searchTerm.toLowerCase());
+        progressEntry.candidateName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        progressEntry.jobTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        progressEntry.candidateEmail.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesStage =
         filterStage === "all" ||
-        candidate.stage.toLowerCase() === filterStage.toLowerCase();
+        progressEntry.currentStage.toLowerCase() === filterStage.toLowerCase();
       const matchesJob =
         filterJob === "all" ||
-        candidate.position.toLowerCase().includes(filterJob.toLowerCase());
+        progressEntry.jobTitle.toLowerCase().includes(filterJob.toLowerCase());
       const matchesUrgency =
-        filterUrgency === "all" || candidate.urgencyLevel === filterUrgency;
+        filterUrgency === "all" || progressEntry.urgencyLevel === filterUrgency;
 
       return matchesSearch && matchesStage && matchesJob && matchesUrgency;
     });
-  }, [candidates, searchTerm, filterStage, filterJob, filterUrgency]);
+  }, [progressEntries, searchTerm, filterStage, filterJob, filterUrgency]);
 
   // Pagination logic
-  const totalPages = Math.ceil(filteredCandidates.length / candidatesPerPage);
-  const indexOfLastCandidate = currentPage * candidatesPerPage;
-  const indexOfFirstCandidate = indexOfLastCandidate - candidatesPerPage;
-  const currentCandidates = filteredCandidates.slice(
-    indexOfFirstCandidate,
-    indexOfLastCandidate,
+  const totalPages = Math.ceil(filteredProgressEntries.length / progressEntriesPerPage);
+  const indexOfLastProgressEntry = currentPage * progressEntriesPerPage;
+  const indexOfFirstProgressEntry = indexOfLastProgressEntry - progressEntriesPerPage;
+  const currentProgressEntries = filteredProgressEntries.slice(
+    indexOfFirstProgressEntry,
+    indexOfLastProgressEntry,
   );
 
   // Reset to first page when filters change
@@ -540,25 +1192,25 @@ export default function FollowUpDashboard() {
   // Check for overdue confirmations and update candidates
   useEffect(() => {
     const checkOverdueConfirmations = () => {
-      setCandidates((prevCandidates) =>
-        prevCandidates.map((candidate) => {
-          if (!candidate.confirmationStatus) return candidate;
+      setProgressEntries((prevProgressEntries) =>
+        prevProgressEntries.map((progressEntry) => {
+          if (!progressEntry.confirmationStatus) return progressEntry;
           
-          const updatedConfirmationStatus = checkOverdueStatus(candidate.confirmationStatus);
+          const updatedConfirmationStatus = checkOverdueStatus(progressEntry.confirmationStatus);
           
-          // If candidate is overdue and should be auto-rejected
-          if (updatedConfirmationStatus.autoRejected && !candidate.autoRejected) {
+          // If progress entry is overdue and should be auto-rejected
+          if (updatedConfirmationStatus.autoRejected && !progressEntry.autoRejected) {
             return {
-              ...candidate,
+              ...progressEntry,
               confirmationStatus: updatedConfirmationStatus,
               autoRejected: true,
               overdue: true,
-              stage: "Rejected", // Auto-reject by moving to rejected stage
+              currentStage: "Rejected", // Auto-reject by moving to rejected stage
             };
           }
           
           return {
-            ...candidate,
+            ...progressEntry,
             confirmationStatus: updatedConfirmationStatus,
             overdue: updatedConfirmationStatus.overdue,
           };
@@ -577,38 +1229,38 @@ export default function FollowUpDashboard() {
 
   // Statistics (giữ nguyên)
   const stats = useMemo(() => {
-    const total = candidates.length;
-    const needingFollowUp = candidates.filter(
-      (c) =>
-        new Date(c.nextFollowUp) <= new Date(Date.now() + 24 * 60 * 60 * 1000),
+    const total = progressEntries.length;
+    const needingFollowUp = progressEntries.filter(
+      (p) =>
+        new Date(p.nextFollowUp) <= new Date(Date.now() + 24 * 60 * 60 * 1000),
     ).length;
-    const overdue = candidates.filter((c) => c.daysInStage > 7).length;
-    const activeToday = candidates.filter((c) =>
-      c.upcomingActions.some((a) => !a.completed),
+    const overdue = progressEntries.filter((p) => p.daysInStage > 7).length;
+    const activeToday = progressEntries.filter((p) =>
+      p.upcomingActions.some((a) => !a.completed),
     ).length;
 
     return { total, needingFollowUp, overdue, activeToday };
-  }, [candidates]);
+  }, [progressEntries]);
 
   // Handlers (giữ nguyên)
-  const handleCandidateSelect = useCallback((candidateId: string) => {
-    setSelectedCandidates((prev) =>
-      prev.includes(candidateId)
-        ? prev.filter((id) => id !== candidateId)
-        : [...prev, candidateId],
+  const handleProgressEntrySelect = useCallback((progressEntryId: string) => {
+    setSelectedProgressEntries((prev) =>
+      prev.includes(progressEntryId)
+        ? prev.filter((id) => id !== progressEntryId)
+        : [...prev, progressEntryId],
     );
   }, []);
 
   const handleSelectAll = useCallback(() => {
-    setSelectedCandidates(filteredCandidates.map((c) => c.id));
-  }, [filteredCandidates]);
+    setSelectedProgressEntries(filteredProgressEntries.map((p) => p.id));
+  }, [filteredProgressEntries]);
 
   const handleBulkAction = useCallback(
     (action: string) => {
-      if (selectedCandidates.length === 0) {
+      if (selectedProgressEntries.length === 0) {
         toast({
-          title: "No candidates selected",
-          description: "Please select candidates to perform bulk actions.",
+          title: "No progress entries selected",
+          description: "Please select progress entries to perform bulk actions.",
           variant: "destructive",
         });
         return;
@@ -620,8 +1272,8 @@ export default function FollowUpDashboard() {
           break;
         case "move_stage":
           toast({
-            title: "Moving candidates",
-            description: `Moving ${selectedCandidates.length} candidates to next stage.`,
+            title: "Moving progress entries",
+            description: `Moving ${selectedProgressEntries.length} progress entries to next stage.`,
           });
           break;
         case "add_note":
@@ -631,21 +1283,21 @@ export default function FollowUpDashboard() {
           break;
       }
     },
-    [selectedCandidates, toast],
+    [selectedProgressEntries, toast],
   );
 
   const sendEmail = useCallback(
-    (templateId: number, candidateIds: string[]) => {
+    (templateId: number, progressEntryIds: string[]) => {
       const template = emailTemplates.find((t) => t.id === templateId);
       if (!template) return;
 
       toast({
         title: "Emails sent",
-        description: `Sent "${template.name}" to ${candidateIds.length} candidate(s).`,
+        description: `Sent "${template.name}" to ${progressEntryIds.length} progress entry(s).`,
       });
 
       setShowEmailDialog(false);
-      setSelectedCandidates([]);
+      setSelectedProgressEntries([]);
     },
     [emailTemplates, toast],
   );
@@ -677,20 +1329,20 @@ export default function FollowUpDashboard() {
 
   const applyCandidateToJob = useCallback(
     (candidateId: string, jobId: string) => {
-      const candidate = candidates.find((c) => c.id === candidateId);
+      const progressEntry = progressEntries.find((p) => p.candidateId === candidateId && p.jobId === jobId);
       const job = jobs.find((j) => j.id === jobId);
-      if (candidate && job) {
+      if (progressEntry && job) {
         toast({
           title: "Application Submitted",
-          description: `${candidate.name} applied to ${job.position}`,
+          description: `${progressEntry.candidateName} applied to ${job.position}`,
         });
       }
     },
     [candidates, jobs, toast],
   );
 
-  // Candidate Card Component (giữ nguyên)
-  const CandidateCard = ({ candidate }: { candidate: FollowUpCandidate }) => {
+  // Progress Entry Card Component (giữ nguyên)
+  const ProgressEntryCard = ({ progressEntry }: { progressEntry: JobApplicationProgress }) => {
     const stages = [
       "Applied",
       "Screening", 
@@ -700,10 +1352,12 @@ export default function FollowUpDashboard() {
       "Hired",
     ];
     
+    const isExpanded = expandedCandidateId === progressEntry.id;
+    
     return (
     <Card
       className={`hover:shadow-lg transition-all border-l-4 cursor-pointer rounded-lg ${
-        selectedCandidates.includes(candidate.id)
+        selectedProgressEntries.includes(progressEntry.id)
           ? "ring-2 ring-blue-500 bg-blue-50"
           : ""
       } border-slate-200 hover:border-blue-300 group`}
@@ -713,9 +1367,9 @@ export default function FollowUpDashboard() {
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-3 flex-1 min-w-0">
             <Avatar className="w-10 h-10">
-              <AvatarImage src={candidate.avatar} />
+              <AvatarImage src={progressEntry.candidateAvatar} />
               <AvatarFallback>
-                {candidate.name
+                {progressEntry.candidateName
                   .split(" ")
                   .map((n) => n[0])
                   .join("")}
@@ -724,39 +1378,36 @@ export default function FollowUpDashboard() {
             <div className="flex-1 min-w-0">
               <h3
                 className="font-semibold text-sm group-hover:text-blue-700 transition-colors "
-                title={candidate.name}
+                title={progressEntry.candidateName}
               >
-                {candidate.name}
+                {progressEntry.candidateName}
               </h3>
-              {/* <p
-                className="text-xs text-gray-600 line-clamp-1"
-                title={candidate.email}
-              >
-                {candidate.email}
-              </p> */}
+              <p className="text-xs text-gray-600 line-clamp-1" title={progressEntry.jobTitle}>
+                {progressEntry.jobTitle}
+              </p>
               <div className="flex items-center space-x-2 mt-1">
                 <Badge variant="outline" className="text-xs">
-                  {candidate.stage}
+                  {progressEntry.currentStage}
                 </Badge>
                 {/* Show confirmation status badges */}
-                {candidate.confirmationStatus && (
+                {progressEntry.confirmationStatus && (
                   <Badge 
-                    variant={candidate.confirmationStatus.confirmed === true ? "default" : 
-                           candidate.confirmationStatus.confirmed === false ? "destructive" :
-                           candidate.confirmationStatus.overdue ? "destructive" : "secondary"}
+                    variant={progressEntry.confirmationStatus.confirmed === true ? "default" : 
+                           progressEntry.confirmationStatus.confirmed === false ? "destructive" :
+                           progressEntry.confirmationStatus.overdue ? "destructive" : "secondary"}
                     className="text-xs"
                   >
-                    {candidate.confirmationStatus.confirmed === true ? "Confirmed" :
-                     candidate.confirmationStatus.confirmed === false ? "Rejected" :
-                     candidate.confirmationStatus.overdue ? "Overdue" : "Pending"}
+                    {progressEntry.confirmationStatus.confirmed === true ? "Confirmed" :
+                     progressEntry.confirmationStatus.confirmed === false ? "Rejected" :
+                     progressEntry.confirmationStatus.overdue ? "Overdue" : "Pending"}
                   </Badge>
                 )}
-                {candidate.autoRejected && (
+                {progressEntry.autoRejected && (
                   <Badge variant="destructive" className="text-xs">
                     Auto-Rejected
                   </Badge>
                 )}
-                {candidate.overdue && !candidate.autoRejected && (
+                {progressEntry.overdue && !progressEntry.autoRejected && (
                   <Badge variant="destructive" className="text-xs">
                     Overdue
                   </Badge>
@@ -771,36 +1422,36 @@ export default function FollowUpDashboard() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setSelectedCandidate(candidate)}>
+              <DropdownMenuItem onClick={() => setSelectedProgressEntry(progressEntry)}>
                 <Eye className="w-4 h-4 mr-2" />
                 View Profile
               </DropdownMenuItem>
-              <Link to={`/candidates/${candidate.id}/progress`}>
+              <Link to={`/candidates/${progressEntry.candidateId}/progress?jobId=${progressEntry.jobId}`}>
                 <DropdownMenuItem>
                   <Activity className="w-4 h-4 mr-2" />
                   View Process of Stage
                 </DropdownMenuItem>
               </Link>
-              <DropdownMenuItem onClick={() => handleSendEmail(candidate)}>
+              <DropdownMenuItem onClick={() => handleSendEmail(progressEntry)}>
                 <Mail className="w-4 h-4 mr-2" />
                 Send Email
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleScheduleCall(candidate)}>
+              <DropdownMenuItem onClick={() => handleScheduleCall(progressEntry)}>
                 <Phone className="w-4 h-4 mr-2" />
                 Schedule Call
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleAddNote(candidate)}>
+              <DropdownMenuItem onClick={() => handleAddNote(progressEntry)}>
                 <Edit3 className="w-4 h-4 mr-2" />
                 Add Note
               </DropdownMenuItem>
               {/* Confirmation actions */}
-              {candidate.confirmationStatus && candidate.confirmationStatus.confirmed === null && (
+              {progressEntry.confirmationStatus && progressEntry.confirmationStatus.confirmed === null && (
                 <>
-                  <DropdownMenuItem onClick={() => handleConfirmationResponse(candidate.id, true)}>
+                  <DropdownMenuItem onClick={() => handleConfirmationResponse(progressEntry.id, true)}>
                     <Check className="w-4 h-4 mr-2" />
                     Mark as Confirmed
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleConfirmationResponse(candidate.id, false)}>
+                  <DropdownMenuItem onClick={() => handleConfirmationResponse(progressEntry.id, false)}>
                     <X className="w-4 h-4 mr-2" />
                     Mark as Rejected
                   </DropdownMenuItem>
@@ -808,7 +1459,7 @@ export default function FollowUpDashboard() {
               )}
               <DropdownMenuItem
                 onClick={() => {
-                  const currentStage = candidate.stage || "Applied";
+                  const currentStage = progressEntry.currentStage || "Applied";
                   const stageTransitions = {
                     "Applied": "Screening",
                     "Screening": "Interview", 
@@ -818,11 +1469,11 @@ export default function FollowUpDashboard() {
                   };
                   const nextStage = stageTransitions[currentStage];
                   if (nextStage) {
-                    handleStageChange(candidate, nextStage);
+                    handleStageChange(progressEntry, nextStage);
                   }
                 }}
                 disabled={
-                  !["Applied", "Screening", "Interview", "Technical", "Offer"].includes(candidate.stage || "Applied")
+                  !["Applied", "Screening", "Interview", "Technical", "Offer"].includes(progressEntry.currentStage || "Applied")
                 }
               >
                 <Mail className="w-4 h-4 mr-2" />
@@ -835,12 +1486,12 @@ export default function FollowUpDashboard() {
       <CardContent className="space-y-2">
         <div className="flex items-center text-xs text-slate-600 min-w-0">
           <Building className="w-3 h-3 mr-1 flex-shrink-0" />
-          <span className="break-words">{candidate.department || "No Department"}</span>
+          <span className="break-words">{progressEntry.department || "No Department"}</span>
         </div>
         <div className="flex items-center text-xs text-slate-600 min-w-0">
           <Clock className="w-3 h-3 mr-1 flex-shrink-0" />
           <span className="line-clamp-1">
-            {candidate.daysInStage} days in stage
+            {progressEntry.daysInStage} days in stage
           </span>
         </div>
         <div className="flex items-center justify-between pt-2 border-t border-slate-100">
@@ -850,22 +1501,22 @@ export default function FollowUpDashboard() {
           <Badge
             variant="outline"
             className="text-xs line-clamp-1 max-w-20"
-            title={candidate.recruiter || "No Recruiter"}
+            title={progressEntry.recruiter || "No Recruiter"}
           >
-            {candidate.recruiter || "No Recruiter"}
+            {progressEntry.recruiter || "No Recruiter"}
           </Badge>
         </div>
         <div className="flex space-x-1 mt-2">
           <Select
-            value={candidate.stage || "Applied"}
-            onValueChange={(value) => handleStageChange(candidate, value)}
+            value={progressEntry.currentStage || "Applied"}
+            onValueChange={(value) => handleStageChange(progressEntry, value)}
           >
             <SelectTrigger className="h-7 text-xs">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               {stages.map((stage) => {
-                const currentStage = candidate.stage || "Applied";
+                const currentStage = progressEntry.currentStage || "Applied";
                 const stageTransitions = {
                   "Applied": "Screening",
                   "Screening": "Interview", 
@@ -891,6 +1542,13 @@ export default function FollowUpDashboard() {
           </Select>
         </div>
       </CardContent>
+      
+                            {/* Recruitment Stages Dropdown */}
+                      <RecruitmentStagesDropdown
+                        progressEntry={progressEntry}
+                        isExpanded={isExpanded}
+                        onToggle={() => setExpandedCandidateId(isExpanded ? null : progressEntry.id)}
+                      />
     </Card>
     );
   };
@@ -939,12 +1597,12 @@ export default function FollowUpDashboard() {
     return (
       <div className="flex gap-4 overflow-x-auto pb-2">
         {stages.map((stage, index) => {
-          const stageCandidates = filteredCandidates.filter(
-            (c) => c.stage === stage,
-          );
-          const maxVisible = candidatesPerStage[stage] || 5;
-          const visibleCandidates = stageCandidates.slice(0, maxVisible);
-          const hasMore = stageCandidates.length > maxVisible;
+                  const stageProgressEntries = filteredProgressEntries.filter(
+          (p) => p.currentStage === stage,
+        );
+        const maxVisible = candidatesPerStage[stage] || 5;
+        const visibleProgressEntries = stageProgressEntries.slice(0, maxVisible);
+        const hasMore = stageProgressEntries.length > maxVisible;
 
           return (
             <div
@@ -980,8 +1638,8 @@ export default function FollowUpDashboard() {
                   </div>
                 ) : (
                   <>
-                    {visibleCandidates.map((candidate) => (
-                      <CandidateCard key={candidate.id} candidate={candidate} />
+                    {visibleProgressEntries.map((progressEntry) => (
+                      <ProgressEntryCard key={progressEntry.id} progressEntry={progressEntry} />
                     ))}
                     {hasMore && (
                       <Button
@@ -990,7 +1648,7 @@ export default function FollowUpDashboard() {
                         className="w-full text-xs h-8"
                         onClick={() => showMoreCandidates(stage)}
                       >
-                        Show {stageCandidates.length - maxVisible} More
+                        Show {stageProgressEntries.length - maxVisible} More
                       </Button>
                     )}
                   </>
@@ -1005,7 +1663,7 @@ export default function FollowUpDashboard() {
 
   // Cập nhật Pipeline List View Component
   const PipelineListView = () => {
-    const applyCandidate = candidates.find((c) => c.id === applyCandidateId);
+    const applyProgressEntry = progressEntries.find((p) => p.id === applyCandidateId);
 
     return (
       <Card>
@@ -1047,18 +1705,24 @@ export default function FollowUpDashboard() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {currentCandidates.map((candidate) => (
-                  <TableRow key={candidate.id} className="hover:bg-slate-50">
+                {currentProgressEntries.map((progressEntry) => {
+                  const isExpanded = expandedCandidateId === progressEntry.id;
+                                      return (
+                      <React.Fragment key={progressEntry.id}>
+                        <TableRow 
+                          className="hover:bg-slate-50 cursor-pointer"
+                          onClick={() => setExpandedCandidateId(isExpanded ? null : progressEntry.id)}
+                        >
                     {visibleFields.name && (
                       <TableCell>
                         <Link
-                          to={`/candidates/${candidate.id}`}
+                          to={`/candidates/${progressEntry.candidateId}`}
                           className="flex items-center space-x-3 hover:text-blue-600 min-w-0"
                         >
                           <Avatar className="w-8 h-8 flex-shrink-0">
-                            <AvatarImage src={candidate.avatar} />
+                            <AvatarImage src={progressEntry.candidateAvatar} />
                             <AvatarFallback className="text-xs">
-                              {candidate.name
+                              {progressEntry.candidateName
                                 .split(" ")
                                 .map((n) => n[0])
                                 .join("")}
@@ -1066,10 +1730,10 @@ export default function FollowUpDashboard() {
                           </Avatar>
                           <div className="min-w-0 flex-1">
                             <div className="font-medium break-words">
-                              {candidate.name}
+                              {progressEntry.candidateName}
                             </div>
-                            <div className="flex items-center space-x-1 mt-1">
-                              {/* Rating removed */}
+                            <div className="text-xs text-gray-500">
+                              {progressEntry.jobTitle}
                             </div>
                           </div>
                         </Link>
@@ -1079,95 +1743,96 @@ export default function FollowUpDashboard() {
                       <TableCell>
                         <Badge
                           variant={
-                            candidate.stage === "Offer"
+                            progressEntry.currentStage === "Offer"
                               ? "default"
-                              : candidate.stage === "Hired"
+                              : progressEntry.currentStage === "Hired"
                                 ? "default"
-                                : candidate.stage === "Technical"
+                                : progressEntry.currentStage === "Technical"
                                   ? "secondary"
-                                  : candidate.stage === "Interview"
+                                  : progressEntry.currentStage === "Interview"
                                     ? "outline"
-                                    : candidate.stage === "Screening"
+                                    : progressEntry.currentStage === "Screening"
                                       ? "secondary"
-                                      : candidate.stage === "Applied"
+                                      : progressEntry.currentStage === "Applied"
                                         ? "outline"
                                         : "destructive"
                           }
                           className="break-words max-w-24"
                         >
-                          {candidate.stage}
+                          {progressEntry.currentStage}
                         </Badge>
                       </TableCell>
                     )}
                     {visibleFields.daysInStage && (
                       <TableCell className="break-words max-w-32">
-                        {candidate.daysInStage} days
+                        {progressEntry.daysInStage} days
                       </TableCell>
                     )}
                     {visibleFields.lastInteraction && (
                       <TableCell className="break-words max-w-32">
-                        {formatTimeAgo(candidate.lastInteraction)}
+                        {formatTimeAgo(progressEntry.lastInteraction)}
                       </TableCell>
                     )}
                     {visibleFields.nextFollowUp && (
                       <TableCell className="break-words max-w-32">
-                        {formatTimeAgo(candidate.nextFollowUp)}
+                        {formatTimeAgo(progressEntry.nextFollowUp)}
                       </TableCell>
                     )}
                     {visibleFields.urgencyLevel && (
                       <TableCell>
                         <Badge
                           className={`break-words max-w-24 ${getUrgencyColor(
-                            candidate.urgencyLevel,
+                            progressEntry.urgencyLevel,
                           )}`}
                         >
-                          {candidate.urgencyLevel}
+                          {progressEntry.urgencyLevel}
                         </Badge>
                       </TableCell>
                     )}
                     {visibleFields.appliedDate && (
                       <TableCell className="break-words max-w-32">
-                        {new Date(candidate.appliedDate).toLocaleDateString()}
+                        {new Date(progressEntry.appliedDate).toLocaleDateString()}
                       </TableCell>
                     )}
                     {visibleFields.email && (
                       <TableCell className="break-words max-w-48">
-                        {candidate.email}
+                        {progressEntry.candidateEmail}
                       </TableCell>
                     )}
                     {visibleFields.phone && (
                       <TableCell className="break-words max-w-32">
-                        {candidate.phone}
+                        {progressEntry.candidatePhone}
                       </TableCell>
                     )}
                     {visibleFields.position && (
                       <TableCell className="break-words max-w-40">
-                        {candidate.position}
+                        {progressEntry.jobTitle}
                       </TableCell>
                     )}
                     {visibleFields.recruiter && (
                       <TableCell className="break-words max-w-32">
-                        {candidate.recruiter}
+                        {progressEntry.recruiter}
                       </TableCell>
                     )}
                     {visibleFields.source && (
                       <TableCell className="break-words max-w-32">
-                        {candidate.source}
+                        {/* Source not available in progress entry */}
+                        N/A
                       </TableCell>
                     )}
                     {visibleFields.salary && (
                       <TableCell className="break-words max-w-32">
-                        {candidate.salary}
+                        {progressEntry.salary}
                       </TableCell>
                     )}
                     {visibleFields.location && (
                       <TableCell className="break-words max-w-40">
-                        {candidate.location}
+                        {progressEntry.location}
                       </TableCell>
                     )}
                     {visibleFields.department && (
                       <TableCell className="break-words max-w-40">
-                        {candidate.department}
+                        {progressEntry.department}
                       </TableCell>
                     )}
                     <TableCell>
@@ -1188,13 +1853,13 @@ export default function FollowUpDashboard() {
                             <UserPlus className="w-4 h-4 mr-2" />
                             Apply to Job
                           </DropdownMenuItem> */}
-                          <Link to={`/candidates/${candidate.id}`}>
+                          <Link to={`/candidates/${progressEntry.candidateId}`}>
                             <DropdownMenuItem>
                               <Eye className="w-4 h-4 mr-2" />
                               View Details
                             </DropdownMenuItem>
                           </Link>
-                          <Link to={`/candidates/${candidate.id}/progress`}>
+                          <Link to={`/candidates/${progressEntry.candidateId}/progress?jobId=${progressEntry.jobId}`}>
                             <DropdownMenuItem>
                               <Activity className="w-4 h-4 mr-2" />
                               View Process of Stage
@@ -1204,7 +1869,7 @@ export default function FollowUpDashboard() {
                             onClick={() => {
                               toast({
                                 title: "Edit Candidate",
-                                description: `Editing ${candidate.name}`,
+                                description: `Editing ${progressEntry.candidateName}`,
                               });
                             }}
                           >
@@ -1215,7 +1880,7 @@ export default function FollowUpDashboard() {
                             onClick={() => {
                               toast({
                                 title: "Downloading CV",
-                                description: `Downloading CV for ${candidate.name}`,
+                                description: `Downloading CV for ${progressEntry.candidateName}`,
                               });
                             }}
                           >
@@ -1224,7 +1889,7 @@ export default function FollowUpDashboard() {
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => {
-                              const currentStage = candidate.stage || "Applied";
+                              const currentStage = progressEntry.currentStage || "Applied";
                               const stageTransitions = {
                                 "Applied": "Screening",
                                 "Screening": "Interview", 
@@ -1234,11 +1899,11 @@ export default function FollowUpDashboard() {
                               };
                               const nextStage = stageTransitions[currentStage];
                               if (nextStage) {
-                                handleStageChange(candidate, nextStage);
+                                handleStageChange(progressEntry, nextStage);
                               }
                             }}
                             disabled={
-                              !["Applied", "Screening", "Interview", "Technical", "Offer"].includes(candidate.stage || "Applied")
+                              !["Applied", "Screening", "Interview", "Technical", "Offer"].includes(progressEntry.currentStage || "Applied")
                             }
                           >
                             <Mail className="w-4 h-4 mr-2" />
@@ -1247,8 +1912,23 @@ export default function FollowUpDashboard() {
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
-                  </TableRow>
-                ))}
+                      </TableRow>
+                      
+                                                          {/* Recruitment Stages Dropdown Row */}
+                                    {isExpanded && (
+                                      <TableRow>
+                                        <TableCell colSpan={Object.values(visibleFields).filter(Boolean).length + 1} className="p-0">
+                                          <RecruitmentStagesDropdown
+                                            progressEntry={progressEntry}
+                                            isExpanded={isExpanded}
+                                            onToggle={() => setExpandedCandidateId(null)}
+                                          />
+                                        </TableCell>
+                                      </TableRow>
+                                    )}
+                    </React.Fragment>
+                  );
+                })}
               </TableBody>
             </Table>
             <Dialog
@@ -1258,10 +1938,10 @@ export default function FollowUpDashboard() {
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Apply to Job</DialogTitle>
-                  <DialogDescription>
-                    Select a job to apply candidate:{" "}
-                    <strong>{applyCandidate?.name}</strong>
-                  </DialogDescription>
+                                  <DialogDescription>
+                  Select a job to apply candidate:{" "}
+                  <strong>{applyProgressEntry?.candidateName}</strong>
+                </DialogDescription>
                 </DialogHeader>
                 <Select onValueChange={(value) => setSelectedJobId(value)}>
                   <SelectTrigger>
@@ -1483,11 +2163,11 @@ export default function FollowUpDashboard() {
               )}
             </div>
           </div>
-          {selectedCandidates.length > 0 && (
+          {selectedProgressEntries.length > 0 && (
             <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-blue-900">
-                  {selectedCandidates.length} candidate(s) selected
+                  {selectedProgressEntries.length} progress entry(s) selected
                 </span>
                 <div className="flex space-x-2">
                   <Button size="sm" onClick={() => handleBulkAction("email")}>
@@ -1516,7 +2196,7 @@ export default function FollowUpDashboard() {
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => setSelectedCandidates([])}
+                    onClick={() => setSelectedProgressEntries([])}
                   >
                     Clear
                   </Button>
@@ -1535,14 +2215,14 @@ export default function FollowUpDashboard() {
 
           <CardContent>
             <div className="space-y-4">
-              {currentCandidates.map((candidate) => (
+              {currentProgressEntries.map((progressEntry) => (
                 <div
-                  key={candidate.id}
+                  key={progressEntry.id}
                   className="flex items-center space-x-4 p-3 border rounded-lg"
                 >
                   <Avatar className="w-8 h-8">
                     <AvatarFallback>
-                      {candidate.name
+                      {progressEntry.candidateName
                         .split(" ")
                         .map((n) => n[0])
                         .join("")}
@@ -1551,15 +2231,15 @@ export default function FollowUpDashboard() {
                   <div className="flex-1">
                     <div className="flex items-center space-x-2">
                       <span className="font-medium text-sm">
-                        {candidate.name}
+                        {progressEntry.candidateName}
                       </span>
                       <Badge variant="outline" className="text-xs">
-                        {candidate.stage}
+                        {progressEntry.currentStage}
                       </Badge>
                     </div>
                     <p className="text-xs text-gray-600">
-                      Last contact {formatTimeAgo(candidate.lastInteraction)} •
-                      Next follow-up {formatTimeAgo(candidate.nextFollowUp)}
+                      {progressEntry.jobTitle} • Last contact {formatTimeAgo(progressEntry.lastInteraction)} •
+                      Next follow-up {formatTimeAgo(progressEntry.nextFollowUp)}
                     </p>
                   </div>
                   <Button size="sm" variant="outline">
@@ -1635,7 +2315,7 @@ export default function FollowUpDashboard() {
           <DialogHeader>
             <DialogTitle>Send Bulk Email</DialogTitle>
             <DialogDescription>
-              Send email to {selectedCandidates.length} selected candidate(s)
+              Send email to {selectedProgressEntries.length} selected progress entry(s)
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -1683,7 +2363,7 @@ export default function FollowUpDashboard() {
               Cancel
             </Button>
             <Button
-              onClick={() => sendEmail(emailTemplate, selectedCandidates)}
+              onClick={() => sendEmail(emailTemplate, selectedProgressEntries)}
               disabled={!emailTemplate}
             >
               <Send className="w-4 h-4 mr-2" />
@@ -1693,28 +2373,28 @@ export default function FollowUpDashboard() {
         </DialogContent>
       </Dialog>
 
-      {/* Candidate Profile Dialog */}
+      {/* Progress Entry Profile Dialog */}
       <Dialog
-        open={!!selectedCandidate}
-        onOpenChange={() => setSelectedCandidate(null)}
+        open={!!selectedProgressEntry}
+        onOpenChange={() => setSelectedProgressEntry(null)}
       >
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          {selectedCandidate && (
+          {selectedProgressEntry && (
             <>
               <DialogHeader>
                 <DialogTitle className="flex items-center space-x-3">
                   <Avatar>
                     <AvatarFallback>
-                      {selectedCandidate.name
+                      {selectedProgressEntry.candidateName
                         .split(" ")
                         .map((n) => n[0])
                         .join("")}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <div>{selectedCandidate.name}</div>
+                    <div>{selectedProgressEntry.candidateName}</div>
                     <div className="text-sm text-gray-600">
-                      {selectedCandidate.position}
+                      {selectedProgressEntry.jobTitle}
                     </div>
                   </div>
                 </DialogTitle>

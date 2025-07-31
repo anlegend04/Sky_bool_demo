@@ -579,7 +579,7 @@ export default function CandidateApplicationProgress(
         </div>
 
         {/* Interface Legend */}
-        <div className="mb-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
+        <div className="hidden mb-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
           <div className="flex items-center gap-2 mb-3">
             <HelpCircle className="w-4 h-4 text-slate-600" />
             <span className="font-medium text-sm text-slate-900">How to read this interface:</span>
