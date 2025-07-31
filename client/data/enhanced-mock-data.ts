@@ -1059,6 +1059,15 @@ export const getEnhancedCandidateInterviews = (candidateId: string): InterviewDa
   return ENHANCED_INTERVIEWS.filter(interview => interview.candidateId === candidateId);
 };
 
+// Get a specific job application from a candidate by job ID
+export const getJobApplication = (candidate: CandidateData | undefined, jobId: string) => {
+  if (!candidate || !candidate.jobApplications || candidate.jobApplications.length === 0) {
+    return null;
+  }
+
+  return candidate.jobApplications.find(app => app.jobId === jobId || app.id === jobId) || null;
+};
+
 // Get the current/primary job application for a candidate
 export const getCurrentJobApplication = (candidate: CandidateData | undefined) => {
   if (!candidate || !candidate.jobApplications || candidate.jobApplications.length === 0) {
