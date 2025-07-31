@@ -1940,6 +1940,12 @@ export default function FollowUpDashboard() {
                             </Link>
                           </TableCell>
                         )}
+
+                                                {visibleFields.position && (
+                          <TableCell className="break-words max-w-40">
+                            {progressEntry.jobTitle}
+                          </TableCell>
+                        )}
                         {visibleFields.stage && (
                           <TableCell>
                             <Badge
@@ -2007,11 +2013,7 @@ export default function FollowUpDashboard() {
                             {progressEntry.candidatePhone}
                           </TableCell>
                         )}
-                        {visibleFields.position && (
-                          <TableCell className="break-words max-w-40">
-                            {progressEntry.jobTitle}
-                          </TableCell>
-                        )}
+
                         {visibleFields.recruiter && (
                           <TableCell className="break-words max-w-32">
                             {progressEntry.recruiter}
