@@ -227,6 +227,11 @@ const RecruitmentStagesDropdown = ({
   isExpanded: boolean;
   onToggle: () => void;
 }) => {
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Use custom hook for click outside
+  useClickOutside(dropdownRef, onToggle, isExpanded);
+
   // Create a mock job application object for compatibility
   const mockJobApplication = {
     id: progressEntry.jobId,
@@ -301,7 +306,7 @@ const RecruitmentStagesDropdown = ({
   });
 
   return (
-    <div className="border-t border-slate-100 pt-4">
+    <div ref={dropdownRef} className="border-t border-slate-100 pt-4">
       <button
         onClick={onToggle}
         className="flex items-center justify-between w-full p-3 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors"
@@ -891,7 +896,24 @@ const RecruitmentStagesDropdown = ({
   );
 };
 
+// Custom hook for handling click outside
+const useClickOutside = (ref: React.RefObject<HTMLElement>, callback: () => void, isActive: boolean) => {
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        callback();
+      }
+    };
 
+    if (isActive) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [ref, callback, isActive]);
+};
 
 export default function FollowUpDashboard() {
   const { toast } = useToast();
@@ -1485,6 +1507,7 @@ export default function FollowUpDashboard() {
   }: {
     progressEntry: JobApplicationProgress;
   }) => {
+    const cardRef = useRef<HTMLDivElement>(null);
     const stages = [
       "Applied",
       "Screening",
@@ -1496,8 +1519,12 @@ export default function FollowUpDashboard() {
 
     const isExpanded = expandedCandidateId === progressEntry.id;
 
+    // Use custom hook for click outside
+    useClickOutside(cardRef, () => setExpandedCandidateId(null), isExpanded);
+
     return (
       <Card
+        ref={cardRef}
         className={`hover:shadow-lg transition-all border-l-4 cursor-pointer rounded-lg ${
           selectedProgressEntries.includes(progressEntry.id)
             ? "ring-2 ring-blue-500 bg-blue-50"
@@ -1854,6 +1881,268 @@ export default function FollowUpDashboard() {
     );
   };
 
+  // Table Row Component with click outside functionality
+  const ProgressEntryTableRow = ({ progressEntry }: { progressEntry: JobApplicationProgress }) => {
+    const isExpanded = expandedCandidateId === progressEntry.id;
+    const rowRef = useRef<HTMLTableRowElement>(null);
+
+    // Use custom hook for click outside
+    useClickOutside(rowRef, () => setExpandedCandidateId(null), isExpanded);
+
+    return (
+      <React.Fragment>
+        <TableRow
+          ref={rowRef}
+          className="hover:bg-slate-50 cursor-pointer"
+          onClick={() =>
+            setExpandedCandidateId(
+              isExpanded ? null : progressEntry.id,
+            )
+          }
+        >
+          {visibleFields.name && (
+            <TableCell>
+              <Link
+                to={`/candidates/${progressEntry.candidateId}`}
+                className="flex items-center space-x-3 hover:text-blue-600 min-w-0"
+              >
+                <Avatar className="w-8 h-8 flex-shrink-0">
+                  <AvatarImage
+                    src={progressEntry.candidateAvatar}
+                  />
+                  <AvatarFallback className="text-xs">
+                    {progressEntry.candidateName
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="min-w-0 flex-1">
+                  <div className="font-medium break-words">
+                    {progressEntry.candidateName}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {progressEntry.jobTitle}
+                  </div>
+                </div>
+              </Link>
+            </TableCell>
+          )}
+          {visibleFields.stage && (
+            <TableCell>
+              <Badge
+                variant={
+                  progressEntry.currentStage === "Offer"
+                    ? "default"
+                    : progressEntry.currentStage === "Hired"
+                      ? "default"
+                      : progressEntry.currentStage === "Technical"
+                        ? "secondary"
+                        : progressEntry.currentStage ===
+                            "Interview"
+                          ? "outline"
+                          : progressEntry.currentStage ===
+                              "Screening"
+                            ? "secondary"
+                            : progressEntry.currentStage ===
+                                "Applied"
+                              ? "outline"
+                              : "destructive"
+                }
+                className="break-words max-w-24"
+              >
+                {progressEntry.currentStage}
+              </Badge>
+            </TableCell>
+          )}{" "}
+          {visibleFields.position && (
+            <TableCell className="break-words max-w-40">
+              {progressEntry.jobTitle}
+            </TableCell>
+          )}
+          {visibleFields.appliedDate && (
+            <TableCell className="break-words max-w-32">
+              {new Date(
+                progressEntry.appliedDate,
+              ).toLocaleDateString()}
+            </TableCell>
+          )}
+          {visibleFields.daysInStage && (
+            <TableCell className="break-words max-w-32">
+              {progressEntry.daysInStage} days
+            </TableCell>
+          )}
+          {visibleFields.lastInteraction && (
+            <TableCell className="break-words max-w-32">
+              {formatTimeAgo(progressEntry.lastInteraction)}
+            </TableCell>
+          )}
+          {visibleFields.nextFollowUp && (
+            <TableCell className="break-words max-w-32">
+              {formatTimeAgo(progressEntry.nextFollowUp)}
+            </TableCell>
+          )}
+          {visibleFields.urgencyLevel && (
+            <TableCell>
+              <Badge
+                className={`break-words max-w-24 ${getUrgencyColor(
+                  progressEntry.urgencyLevel,
+                )}`}
+              >
+                {progressEntry.urgencyLevel}
+              </Badge>
+            </TableCell>
+          )}
+          {visibleFields.email && (
+            <TableCell className="break-words max-w-48">
+              {progressEntry.candidateEmail}
+            </TableCell>
+          )}
+          {visibleFields.phone && (
+            <TableCell className="break-words max-w-32">
+              {progressEntry.candidatePhone}
+            </TableCell>
+          )}
+          {visibleFields.recruiter && (
+            <TableCell className="break-words max-w-32">
+              {progressEntry.recruiter}
+            </TableCell>
+          )}
+          {visibleFields.source && (
+            <TableCell className="break-words max-w-32">
+              {/* Source not available in progress entry */}
+              N/A
+            </TableCell>
+          )}
+          {visibleFields.salary && (
+            <TableCell className="break-words max-w-32">
+              {progressEntry.salary}
+            </TableCell>
+          )}
+          {visibleFields.location && (
+            <TableCell className="break-words max-w-40">
+              {progressEntry.location}
+            </TableCell>
+          )}
+          {visibleFields.department && (
+            <TableCell className="break-words max-w-40">
+              {progressEntry.department}
+            </TableCell>
+          )}
+          <TableCell>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="flex-shrink-0"
+                >
+                  <MoreHorizontal className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {/* <DropdownMenuItem
+              onClick={() => setApplyCandidateId(candidate.id)}
+            >
+              <UserPlus className="w-4 h-4 mr-2" />
+              Apply to Job
+            </DropdownMenuItem> */}
+                <Link
+                  to={`/candidates/${progressEntry.candidateId}`}
+                >
+                  <DropdownMenuItem>
+                    <Eye className="w-4 h-4 mr-2" />
+                    View Details
+                  </DropdownMenuItem>
+                </Link>
+                <Link
+                  to={`/candidates/${progressEntry.candidateId}/progress?jobId=${progressEntry.jobId}`}
+                >
+                  <DropdownMenuItem>
+                    <Activity className="w-4 h-4 mr-2" />
+                    View Process of Stage
+                  </DropdownMenuItem>
+                </Link>
+                <DropdownMenuItem
+                  onClick={() => {
+                    toast({
+                      title: "Edit Candidate",
+                      description: `Editing ${progressEntry.candidateName}`,
+                    });
+                  }}
+                >
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit Candidate
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    toast({
+                      title: "Downloading CV",
+                      description: `Downloading CV for ${progressEntry.candidateName}`,
+                    });
+                  }}
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Download CV
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    const currentStage =
+                      progressEntry.currentStage || "Applied";
+                    const stageTransitions = {
+                      Applied: "Screening",
+                      Screening: "Interview",
+                      Interview: "Technical",
+                      Technical: "Offer",
+                      Offer: "Hired",
+                    };
+                    const nextStage =
+                      stageTransitions[currentStage];
+                    if (nextStage) {
+                      handleStageChange(progressEntry, nextStage);
+                    }
+                  }}
+                  disabled={
+                    ![
+                      "Applied",
+                      "Screening",
+                      "Interview",
+                      "Technical",
+                      "Offer",
+                    ].includes(
+                      progressEntry.currentStage || "Applied",
+                    )
+                  }
+                >
+                  <Mail className="w-4 h-4 mr-2" />
+                  Move to Next Stage
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </TableCell>
+        </TableRow>
+        {/* Recruitment Stages Dropdown Row */}
+        {isExpanded && (
+          <TableRow>
+            <TableCell
+              colSpan={
+                Object.values(visibleFields).filter(Boolean)
+                  .length + 1
+              }
+              className="p-0"
+            >
+              <RecruitmentStagesDropdown
+                progressEntry={progressEntry}
+                isExpanded={isExpanded}
+                onToggle={() => setExpandedCandidateId(null)}
+              />
+            </TableCell>
+          </TableRow>
+        )}
+      </React.Fragment>
+    );
+  };
+
   // Cập nhật Pipeline List View Component
   const PipelineListView = () => {
     const applyProgressEntry = progressEntries.find(
@@ -1901,11 +2190,14 @@ export default function FollowUpDashboard() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {currentProgressEntries.map((progressEntry) => {
-                  const isExpanded = expandedCandidateId === progressEntry.id;
+                {currentProgressEntries.map((progressEntry) => (
+                  <ProgressEntryTableRow key={progressEntry.id} progressEntry={progressEntry} />
+                ))}
+
                   return (
                     <React.Fragment key={progressEntry.id}>
                       <TableRow
+                        ref={rowRef}
                         className="hover:bg-slate-50 cursor-pointer"
                         onClick={() =>
                           setExpandedCandidateId(
