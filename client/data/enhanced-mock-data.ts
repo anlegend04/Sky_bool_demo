@@ -1,14 +1,14 @@
 // Enhanced Mock Data for Reports - Better Bar Chart Visualization
 // This file contains realistic, interconnected data optimized for report visualization
 
-import { CandidateData, JobData, InterviewData } from './hardcoded-data';
+import { CandidateData, JobData, InterviewData } from "./hardcoded-data";
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
 const getRandomDate = (daysBack: number) => {
   const date = new Date();
   date.setDate(date.getDate() - daysBack);
-  return date.toISOString().split('T')[0];
+  return date.toISOString().split("T")[0];
 };
 
 const getRandomDateTime = (daysBack: number) => {
@@ -30,7 +30,8 @@ export const ENHANCED_CANDIDATES: CandidateData[] = [
     skills: ["React", "TypeScript", "Node.js", "GraphQL", "Redux"],
     status: "Active",
     resume: "marissa_torres_resume.pdf",
-    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b077?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1494790108755-2616b612b077?w=150&h=150&fit=crop&crop=face",
     source: "LinkedIn",
     tags: ["Strong Technical Skills", "Cultural Fit"],
     attachments: [],
@@ -74,7 +75,8 @@ export const ENHANCED_CANDIDATES: CandidateData[] = [
     skills: ["React", "Vue.js", "JavaScript", "CSS3", "HTML5"],
     status: "Active",
     resume: "sarah_johnson_resume.pdf",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
     source: "LinkedIn",
     tags: ["Frontend Specialist"],
     attachments: [],
@@ -118,7 +120,8 @@ export const ENHANCED_CANDIDATES: CandidateData[] = [
     skills: ["React", "TypeScript", "Next.js", "Tailwind CSS"],
     status: "Active",
     resume: "michael_chen_resume.pdf",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
     source: "LinkedIn",
     tags: ["Modern Stack"],
     attachments: [],
@@ -162,7 +165,8 @@ export const ENHANCED_CANDIDATES: CandidateData[] = [
     skills: ["React", "JavaScript", "CSS3", "HTML5"],
     status: "Active",
     resume: "emily_davis_resume.pdf",
-    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b077?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1494790108755-2616b612b077?w=150&h=150&fit=crop&crop=face",
     source: "LinkedIn",
     tags: ["Junior Developer"],
     attachments: [],
@@ -206,7 +210,8 @@ export const ENHANCED_CANDIDATES: CandidateData[] = [
     skills: ["React", "TypeScript", "Node.js", "GraphQL"],
     status: "Active",
     resume: "david_wilson_resume.pdf",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
     source: "LinkedIn",
     tags: ["Senior Developer"],
     attachments: [],
@@ -252,7 +257,8 @@ export const ENHANCED_CANDIDATES: CandidateData[] = [
     skills: ["Python", "Django", "PostgreSQL", "AWS"],
     status: "Active",
     resume: "alex_kim_resume.pdf",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
     source: "Indeed",
     tags: ["Backend Specialist"],
     attachments: [],
@@ -296,7 +302,8 @@ export const ENHANCED_CANDIDATES: CandidateData[] = [
     skills: ["Python", "Flask", "MongoDB", "Docker"],
     status: "Active",
     resume: "lisa_wang_resume.pdf",
-    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b077?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1494790108755-2616b612b077?w=150&h=150&fit=crop&crop=face",
     source: "Indeed",
     tags: ["Python Developer"],
     attachments: [],
@@ -340,7 +347,8 @@ export const ENHANCED_CANDIDATES: CandidateData[] = [
     skills: ["Python", "Django", "PostgreSQL", "Redis"],
     status: "Active",
     resume: "tom_brown_resume.pdf",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
     source: "Indeed",
     tags: ["Senior Backend"],
     attachments: [],
@@ -386,7 +394,8 @@ export const ENHANCED_CANDIDATES: CandidateData[] = [
     skills: ["AWS", "Docker", "Kubernetes", "Terraform"],
     status: "Active",
     resume: "rachel_green_resume.pdf",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
     source: "Company Website",
     tags: ["DevOps Expert"],
     attachments: [],
@@ -430,7 +439,8 @@ export const ENHANCED_CANDIDATES: CandidateData[] = [
     skills: ["AWS", "Docker", "Jenkins", "Ansible"],
     status: "Active",
     resume: "james_miller_resume.pdf",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
     source: "Company Website",
     tags: ["Infrastructure"],
     attachments: [],
@@ -476,7 +486,8 @@ export const ENHANCED_CANDIDATES: CandidateData[] = [
     skills: ["Java", "Spring Boot", "Microservices", "Kafka"],
     status: "Active",
     resume: "emma_thompson_resume.pdf",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
     source: "Referral",
     tags: ["Senior Engineer"],
     attachments: [],
@@ -520,7 +531,8 @@ export const ENHANCED_CANDIDATES: CandidateData[] = [
     skills: ["Java", "Spring Boot", "MongoDB", "Kubernetes"],
     status: "Active",
     resume: "chris_anderson_resume.pdf",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
     source: "Referral",
     tags: ["System Design"],
     attachments: [],
@@ -566,7 +578,8 @@ export const ENHANCED_CANDIDATES: CandidateData[] = [
     skills: ["Leadership", "System Design", "Java", "Microservices"],
     status: "Active",
     resume: "maria_garcia_resume.pdf",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
     source: "Glassdoor",
     tags: ["Tech Lead"],
     attachments: [],
@@ -610,7 +623,8 @@ export const ENHANCED_CANDIDATES: CandidateData[] = [
     skills: ["Leadership", "Architecture", "Java", "Cloud"],
     status: "Active",
     resume: "robert_lee_resume.pdf",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
     source: "Glassdoor",
     tags: ["Architect"],
     attachments: [],
@@ -656,7 +670,8 @@ export const ENHANCED_CANDIDATES: CandidateData[] = [
     skills: ["System Design", "Architecture", "Java", "Cloud"],
     status: "Active",
     resume: "jennifer_white_resume.pdf",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+    avatar:
+      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
     source: "AngelList",
     tags: ["Senior Architect"],
     attachments: [],
@@ -710,7 +725,8 @@ export const ENHANCED_JOBS: JobData[] = [
     status: "Open",
     location: "San Francisco, CA",
     type: "Full-time",
-    description: "We're looking for a Senior Frontend Developer to join our engineering team...",
+    description:
+      "We're looking for a Senior Frontend Developer to join our engineering team...",
     priority: "High",
     emailAlias: "frontend-hiring@company.com",
     expectedSkills: ["React", "TypeScript", "Node.js", "GraphQL"],
@@ -839,7 +855,8 @@ export const ENHANCED_JOBS: JobData[] = [
     status: "Open",
     location: "Seattle, WA",
     type: "Full-time",
-    description: "Join our core engineering team to build high-scale systems...",
+    description:
+      "Join our core engineering team to build high-scale systems...",
     priority: "High",
     emailAlias: "senior-hiring@company.com",
     expectedSkills: ["Java", "Spring Boot", "Microservices", "Kafka"],
@@ -1038,50 +1055,74 @@ export const ENHANCED_INTERVIEWS: InterviewData[] = [
 
 // Helper functions to get enhanced data
 export const getEnhancedJob = (id: string): JobData | undefined => {
-  return ENHANCED_JOBS.find(job => job.id === id);
+  return ENHANCED_JOBS.find((job) => job.id === id);
 };
 
 export const getEnhancedCandidate = (id: string): CandidateData | undefined => {
-  return ENHANCED_CANDIDATES.find(candidate => candidate.id === id);
+  return ENHANCED_CANDIDATES.find((candidate) => candidate.id === id);
 };
 
 export const getEnhancedJobCandidates = (jobId: string): CandidateData[] => {
-  return ENHANCED_CANDIDATES.filter(candidate =>
-    candidate.jobApplications.some(app => app.jobId === jobId)
+  return ENHANCED_CANDIDATES.filter((candidate) =>
+    candidate.jobApplications.some((app) => app.jobId === jobId),
   );
 };
 
 export const getEnhancedInterview = (id: string): InterviewData | undefined => {
-  return ENHANCED_INTERVIEWS.find(interview => interview.id === id);
+  return ENHANCED_INTERVIEWS.find((interview) => interview.id === id);
 };
 
-export const getEnhancedCandidateInterviews = (candidateId: string): InterviewData[] => {
-  return ENHANCED_INTERVIEWS.filter(interview => interview.candidateId === candidateId);
+export const getEnhancedCandidateInterviews = (
+  candidateId: string,
+): InterviewData[] => {
+  return ENHANCED_INTERVIEWS.filter(
+    (interview) => interview.candidateId === candidateId,
+  );
 };
 
 // Get a specific job application from a candidate by job ID
-export const getJobApplication = (candidate: CandidateData | undefined, jobId: string) => {
-  if (!candidate || !candidate.jobApplications || candidate.jobApplications.length === 0) {
+export const getJobApplication = (
+  candidate: CandidateData | undefined,
+  jobId: string,
+) => {
+  if (
+    !candidate ||
+    !candidate.jobApplications ||
+    candidate.jobApplications.length === 0
+  ) {
     return null;
   }
 
-  return candidate.jobApplications.find(app => app.jobId === jobId || app.id === jobId) || null;
+  return (
+    candidate.jobApplications.find(
+      (app) => app.jobId === jobId || app.id === jobId,
+    ) || null
+  );
 };
 
 // Get the current/primary job application for a candidate
-export const getCurrentJobApplication = (candidate: CandidateData | undefined) => {
-  if (!candidate || !candidate.jobApplications || candidate.jobApplications.length === 0) {
+export const getCurrentJobApplication = (
+  candidate: CandidateData | undefined,
+) => {
+  if (
+    !candidate ||
+    !candidate.jobApplications ||
+    candidate.jobApplications.length === 0
+  ) {
     return null;
   }
 
   // Find the highest priority active application, or fallback to the first one
-  const activeApplications = candidate.jobApplications.filter(app => app.status === 'Active');
+  const activeApplications = candidate.jobApplications.filter(
+    (app) => app.status === "Active",
+  );
   if (activeApplications.length > 0) {
     // Sort by priority: High > Medium > Low
-    const priorityOrder = { 'High': 3, 'Medium': 2, 'Low': 1 };
-    activeApplications.sort((a, b) =>
-      (priorityOrder[b.priority as keyof typeof priorityOrder] || 0) -
-      (priorityOrder[a.priority as keyof typeof priorityOrder] || 0)
+    const priorityOrder = { High: 3, Medium: 2, Low: 1 };
+    activeApplications.sort(
+      (a, b) =>
+        (priorityOrder[b.priority as keyof typeof priorityOrder] || 0) -
+        (priorityOrder[a.priority as keyof typeof priorityOrder] || 0),
     );
     return activeApplications[0];
   }
@@ -1091,9 +1132,14 @@ export const getCurrentJobApplication = (candidate: CandidateData | undefined) =
 };
 
 // Convert a regular candidate to enhanced candidate format
-export const convertCandidateToEnhanced = (candidate: CandidateData): CandidateData => {
+export const convertCandidateToEnhanced = (
+  candidate: CandidateData,
+): CandidateData => {
   // If it's already enhanced or has the required fields, return as is
-  if (candidate.globalNotes !== undefined && candidate.createdAt !== undefined) {
+  if (
+    candidate.globalNotes !== undefined &&
+    candidate.createdAt !== undefined
+  ) {
     return candidate;
   }
 
@@ -1104,15 +1150,15 @@ export const convertCandidateToEnhanced = (candidate: CandidateData): CandidateD
     createdAt: candidate.createdAt || new Date().toISOString(),
     updatedAt: candidate.updatedAt || new Date().toISOString(),
     // Ensure other required enhanced fields exist
-    linkedInProfile: candidate.linkedInProfile || '',
-    githubProfile: candidate.githubProfile || '',
-    portfolioUrl: candidate.portfolioUrl || '',
+    linkedInProfile: candidate.linkedInProfile || "",
+    githubProfile: candidate.githubProfile || "",
+    portfolioUrl: candidate.portfolioUrl || "",
     education: candidate.education || [],
     workExperience: candidate.workExperience || [],
     lastActivity: candidate.lastActivity || new Date().toISOString(),
-    communicationPreference: candidate.communicationPreference || 'email',
-    timezone: candidate.timezone || 'UTC',
-    availability: candidate.availability || 'Unknown',
+    communicationPreference: candidate.communicationPreference || "email",
+    timezone: candidate.timezone || "UTC",
+    availability: candidate.availability || "Unknown",
     attachments: candidate.attachments || [],
   };
 };
