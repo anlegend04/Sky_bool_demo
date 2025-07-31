@@ -1338,7 +1338,7 @@ export default function FollowUpDashboard() {
         });
       }
     },
-    [candidates, jobs, toast],
+    [progressEntries, jobs, toast],
   );
 
   // Progress Entry Card Component (giữ nguyên)
